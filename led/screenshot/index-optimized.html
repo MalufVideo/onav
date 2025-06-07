@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Painel de LED - Styled Version</title>
+  <!-- Three.js (r128) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- GLTFLoader for 3D model import -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <!-- Flatpickr for date picker -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Left Sidebar: Controls -->
+  <div id="controls">
+    <!-- Pod 1: LED Principal -->
+    <div class="control-card" id="card-led-principal">
+      <h2>LED Principal</h2>
+      <div class="control-group">
+        <label for="width">Largura (metros): <span id="width-value">20</span></label>
+        <input type="range" id="width" min="1" max="36" step="0.5" value="20">
+      </div>
+      <div class="control-group">
+        <label for="height">Altura (metros): <span id="height-value">5</span></label>
+        <input type="range" id="height" min="1" max="8" step="0.5" value="5">
+      </div>
+      <div class="control-group">
+        <label for="curvature">Curvatura (graus por coluna): <span id="curvature-value">5</span></label>
+        <input type="range" id="curvature" min="0" max="5" step="1" value="5">
+      </div>
+
+      <p><strong>Módulos LED Principal:</strong> <span id="module-count">400</span></p>
+    </div>
+
+    <!-- Pod 2: Teto -->
+    <div class="control-card" id="card-teto">
+      <h2>Teto</h2>
+      <div class="control-group">
+        <label for="roof-width">Largura (metros): <span id="roof-width-value">8</span></label>
+        <input type="range" id="roof-width" min="0" max="8" step="0.5" value="8">
+      </div>
+      <div class="control-group">
+        <label for="roof-height">Altura (metros): <span id="roof-height-value">6</span></label>
+        <input type="range" id="roof-height" min="0" max="7" step="0.5" value="6">
+      </div>
+
+      <p><strong>Módulos LED Teto:</strong> <span id="teto-module-count">192</span></p>
+    </div>
+  </div>
+
+  <!-- Center 3D Viewer -->
+  <div id="canvas-container">
+    <!-- Pricing Pods Container -->
+    <div class="pricing-pods">
+      <!-- Pod: Diária 2D -->
+      <div class="control-card pricing-pod" id="card-custo-2d">
+        <h2><strong>Disguise 2D:</strong> R$ <span id="total-price">92040</span></h2>
+        <p>Módulos LED: R$ <span id="modules-price">71040</span></p>
+        <p>MX-40 Pro: R$ <span id="processors-price">4000</span></p>
+        <p>Disguise VX4n: R$ <span id="server-price">10000</span></p>
+        <p>Diretor Técnico: R$ <span id="director-price">7000</span></p>
+      </div>
+
+      <!-- Pod: Diária 3D -->
+      <div class="control-card pricing-pod" id="card-custo-3d">
+        <h2><strong>Disguise 2.5D e 3D:</strong> R$ <span id="total-3d-price">104540</span></h2>
+        <div class="control-group">
+          <label for="rxii-units">Unidades RXII: <span id="rxii-units-value">1</span></label>
+          <input type="range" id="rxii-units" min="1" max="3" step="1" value="1">
+          <p id="rxii-desc-1">1 unidade: Render node interno</p>
+          <p id="rxii-desc-2" style="display: none;">2 unidades: Render node interno + externo</p>
+          <p id="rxii-desc-3" style="display: none;">3 unidades: Interno, externo e Realidade Aumentada</p>
+        </div>
+        <p><strong>Disguise RXII:</strong> R$ <span id="rxii-price">7500</span></p>
+        <p><strong>Stype Tracking:</strong> R$ <span id="tracking-price">5000</span></p>
+      </div>
+
+      <!-- Pod: Rube Draco -->
+      <div class="control-card pricing-pod" id="card-rube-draco">
+        <h2><strong>Rube Draco:</strong> R$ <span id="rube-draco-total">0</span></h2>
+        <div class="control-group">
+          <button class="studio-button" data-toggle="cinebot" id="cinebot-btn">
+            <span>Cinebot</span>
+            <span>R$ 15.000</span>
+          </button>
+          <button class="studio-button" data-toggle="trilho" id="trilho-btn">
+            <span>Trilho</span>
+            <span>R$ 5.000</span>
+          </button>
+          <button class="studio-button" data-toggle="komodo" id="komodo-btn">
+            <span>Kit Red Komodo</span>
+            <span>R$ 1.500</span>
+          </button>
+          <input type="hidden" id="cinebot-toggle">
+          <input type="hidden" id="trilho-toggle">
+          <input type="hidden" id="komodo-toggle">
+        </div>
+      </div>
+
+      <!-- Pod: Estudios São Paulo -->
+      <div class="control-card pricing-pod" id="card-estudios">
+        <h2><strong>Estudios SP:</strong> R$ <span id="estudios-total">0</span></h2>
+        <div class="control-group">
+          <button class="studio-button" data-value="15000" data-studio="1">
+            <span>Estudio 1</span>
+            <span>750m²</span>
+            <span>R$ 15.000</span>
+          </button>
+          <button class="studio-button" data-value="10000" data-studio="2">
+            <span>Estudio 2</span>
+            <span>350m²</span>
+            <span>R$ 10.000</span>
+          </button>
+          <button class="studio-button" data-value="8000" data-studio="morumbi">
+            <span>Morumbi</span>
+            <span>350m²</span>
+            <span>R$ 8.000</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Sidebar: Detailed LED Info -->
+  <div id="info-sidebar">
+    <div class="info-card" id="info-principal">
+      <h2>Principal</h2>
+      <p><strong>Resolução Principal:</strong> <span id="resolution">7680×1920 (14.745.600 pixels)</span></p>
+      <p><strong>Consumo de Energia:</strong> 690 (máx.) / 230 (médio) W/m²</p>
+      <p><strong>Máximo:</strong> <span id="power-max">69000</span> W</p>
+      <p><strong>Média:</strong> <span id="power-avg">23000</span> W</p>
+      <p><strong>Peso Total do Painel:</strong> <span id="total-weight">3000</span> kg</p>
+      <p><strong>Processadores MX-40 Pro:</strong> <span id="processors">2</span></p>
+    </div>
+
+    <div class="info-card" id="info-teto">
+      <h2>Teto</h2>
+      <p><strong>Resolução Teto:</strong> <span id="teto-resolution">3072×2304 (7.077.888 pixels)</span></p>
+      <p><strong>Consumo de Energia:</strong> 690 (máx.) / 230 (médio) W/m²</p>
+      <p><strong>Máximo:</strong> <span id="teto-power-max">33120</span> W</p>
+      <p><strong>Média:</strong> <span id="teto-power-avg">11040</span> W</p>
+      <p><strong>Peso Total do Painel:</strong> <span id="teto-total-weight">1440</span> kg</p>
+    </div>
+
+    <div class="call-to-action">
+      <p>Consulte a disponibilidade e se é sua primeira produção virtual clique aqui que você tem super descontos na primeira produção</p>
+    </div>
+    <button id="proposta-btn">Proposta</button>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="proposal-modal">
+    <div class="modal-content">
+      <button class="modal-close">&times;</button>
+      <div class="form-step" id="step-1">
+        <h2>Proposta de Orçamento</h2>
+        <div id="order-summary" style="margin-bottom: 20px;"></div>
+        <form class="modal-form" id="proposal-form">
+          <div class="form-group">
+            <label for="project-name">Projeto</label>
+            <input type="text" id="project-name" required>
+          </div>
+          <div class="form-group">
+            <label for="shooting-dates-start">Datas da Filmagem</label>
+            <div class="date-range-container">
+              <div>
+                <label for="shooting-dates-start">Início</label>
+                <input type="text" id="shooting-dates-start" required readonly>
+              </div>
+              <div>
+                <label for="shooting-dates-end">Fim</label>
+                <input type="text" id="shooting-dates-end" required readonly>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-group prelight-container">
+              <div class="toggle-switch">
+                <label class="switch">
+                  <input type="checkbox" id="prelight-toggle">
+                  <span class="slider"></span>
+                </label>
+                <span>Prelight</span>
+              </div>
+              <div id="prelight-days-group" style="display: none;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <label for="prelight-days" style="margin: 0; white-space: nowrap;">Dias:</label>
+                  <input type="number" id="prelight-days" min="1" max="5" value="1" style="width: 60px; padding: 8px; border: none; border-radius: 8px; background-color: #f5f5f5;">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="client-name">Nome</label>
+            <input type="text" id="client-name" required>
+          </div>
+          <div class="form-group">
+            <label for="client-email">Email</label>
+            <input type="email" id="client-email" required>
+          </div>
+          <div class="form-group">
+            <label for="client-phone">Telefone</label>
+            <input type="tel" id="client-phone" required>
+          </div>
+          <div class="form-group">
+            <label for="client-company">Empresa</label>
+            <input type="text" id="client-company">
+          </div>
+          <div class="configuration-summary" id="config-summary">
+            <h3 style="text-align: center; margin-top: 20px; margin-bottom: 10px; font-size: 16px; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Configuração do LED</h3>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+              <div style="flex: 1; text-align: center;">
+                <p><strong>LED Principal:</strong> <span id="summary-led-principal-size">20x5m</span> (<span id="summary-led-principal-curve">5°</span> curvatura)</p>
+                <p><strong>Módulos:</strong> <span id="summary-led-principal-modules">400</span></p>
+                <p><span id="summary-led-principal-resolution">7680×1920</span> (<span id="summary-led-principal-pixels">14.745.600</span> pixels)</p>
+              </div>
+              <div style="flex: 1; text-align: center;">
+                <p><strong>LED Teto:</strong> <span id="summary-led-teto-size">8x6m</span></p>
+                <p><strong>Módulos:</strong> <span id="summary-led-teto-modules">192</span></p>
+                <p><span id="summary-led-teto-resolution">3072×2304</span> (<span id="summary-led-teto-pixels">7.077.888</span> pixels)</p>
+              </div>
+            </div>
+            
+            <h3 style="text-align: center; margin-top: 20px; margin-bottom: 10px; font-size: 16px; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Serviços Selecionados</h3>
+            <div id="summary-services">
+              <div style="margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between;">
+                  <strong>Disguise 2.5D e 3D</strong>
+                  <strong>R$ <span id="summary-3d-total">119.540</span></strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: #666;">
+                  <span>Módulos LED</span>
+                  <span>R$ <span id="summary-modules-price">71.040</span></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: #666;">
+                  <span>MX-40 Pro</span>
+                  <span>R$ <span id="summary-processors-price">4.000</span></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: #666;">
+                  <span>Disguise VX4n</span>
+                  <span>R$ <span id="summary-server-price">10.000</span></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: #666;">
+                  <span>Diretor Técnico</span>
+                  <span>R$ <span id="summary-director-price">7.000</span></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: #666;">
+                  <span>Disguise RXII (3 unidades)</span>
+                  <span>R$ <span id="summary-rxii-price">22.500</span></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: #666;">
+                  <span>Stype Tracking</span>
+                  <span>R$ <span id="summary-tracking-price">5.000</span></span>
+                </div>
+              </div>
+              
+              <div style="margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between;">
+                  <strong>Rube Draco</strong>
+                  <strong>R$ <span id="summary-rube-draco-total">21.500</span></strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: #666;">
+                  <span>Cinebot</span>
+                  <span>R$ <span id="summary-cinebot-price">15.000</span></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: #666;">
+                  <span>Trilho</span>
+                  <span>R$ <span id="summary-trilho-price">5.000</span></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: #666;">
+                  <span>Kit Red Komodo</span>
+                  <span>R$ <span id="summary-komodo-price">1.500</span></span>
+                </div>
+              </div>
+              
+              <div style="margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between;">
+                  <strong>Estudios SP</strong>
+                  <strong>R$ <span id="summary-estudios-total">15.000</span></strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: #666;">
+                  <span>Estudio 1</span>
+                  <span>R$ <span id="summary-estudio-price">15.000</span></span>
+                </div>
+              </div>
+              
+              <div style="display: flex; justify-content: space-between; margin-top: 20px; padding-top: 10px; border-top: 1px solid #ddd;">
+                <strong>Total</strong>
+                <strong>R$ <span id="summary-total">156.040</span></strong>
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="form-submit">Requisitar Proposta</button>
+        </form>
+      </div>
+      <div class="form-step" id="step-2" style="display: none;">
+        <h2>Agende uma Reunião</h2>
+        <p>Escolha um horário para discutirmos sua proposta:</p>
+        <div id="my-cal-inline"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript files -->
+  <script src="led-wall.js"></script>
+  <script src="pricing-pods.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

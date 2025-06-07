@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LED Wall Calculator - Fixed</title>
+</head>
+<body>
+    <h1>Carregando a solução...</h1>
+    <p>Por favor, aguarde...</p>
+    
+    <script>
+        // Wait for DOM to load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to inject our fix script into the page
+            function injectFixScript() {
+                // fix-rube-draco.js script injection removed
+                console.log('Injected fix script');
+            }
+            
+            // Function to check if we're already on the optimized page
+            function checkAndRedirect() {
+                if (window.location.href.includes('index.optimized.html')) {
+                    // We're already on the optimized page, just inject our fix
+                    injectFixScript();
+                } else {
+                    // Create a link to the optimized page
+                    const link = document.createElement('a');
+                    link.href = 'index.optimized.html';
+                    link.textContent = 'Clique aqui para ir para a versão otimizada';
+                    link.style.display = 'block';
+                    link.style.marginTop = '20px';
+                    link.style.fontSize = '16px';
+                    link.style.textDecoration = 'none';
+                    link.style.color = '#4285f4';
+                    document.body.appendChild(link);
+                    
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        // Store that we should inject the fix
+                        localStorage.setItem('injectRubeDracoFix', 'true');
+                        // Redirect to the optimized page
+                        window.location.href = 'index.optimized.html';
+                    });
+                }
+            }
+            
+            // If we arrived from a redirect with the flag set, inject the fix
+            if (localStorage.getItem('injectRubeDracoFix') === 'true') {
+                injectFixScript();
+                localStorage.removeItem('injectRubeDracoFix'); // Clear the flag
+            }
+            
+            // Check if we need to redirect
+            checkAndRedirect();
+        });
+    </script>
+</body>
+</html>

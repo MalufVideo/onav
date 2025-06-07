@@ -1,0 +1,260 @@
+/* Modal Container Styling */
+.modal-summary-container {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+  padding: 32px 28px 28px 28px;
+  max-width: 700px;
+  margin: 0 auto;
+  font-family: 'Inter', Arial, sans-serif;
+  color: #222;
+}
+
+/* Modal Header */
+.modal-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.modal-summary-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #222;
+}
+
+/* Two-column layout for top info */
+.modal-summary-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 30px;
+}
+
+@media (max-width: 700px) {
+  .modal-summary-top {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.modal-summary-section {
+  background: #f6faf6;
+  border-radius: 8px;
+  padding: 18px 18px 12px 18px;
+  margin-bottom: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+}
+
+.modal-summary-section h3 {
+  color: #1b9e3a;
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.modal-summary-section p,
+.modal-summary-section span,
+.modal-summary-section li {
+  font-size: 0.97rem;
+  margin-bottom: 4px;
+}
+
+/* Section titles */
+.modal-summary-section-title {
+  color: #1b9e3a;
+  font-size: 1.08rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+/* LED Config and Services */
+.modal-summary-led,
+.modal-summary-services {
+  background: #f8f8fb;
+  border-radius: 8px;
+  padding: 18px 18px 12px 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+}
+
+.modal-summary-led h3,
+.modal-summary-services h3 {
+  color: #1b9e3a;
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* Services List */
+.modal-summary-services ul {
+  list-style: disc inside;
+  margin: 0 0 10px 0;
+  padding: 0;
+}
+
+.modal-summary-services li {
+  margin-bottom: 4px;
+}
+
+/* Total Price */
+.modal-summary-total {
+  background: #eafbe7;
+  color: #1b9e3a;
+  font-weight: bold;
+  font-size: 1.08rem;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-top: 10px;
+  margin-bottom: 0;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive tweaks for modal */
+@media (max-width: 550px) {
+  .modal-summary-container {
+    padding: 10px 2vw 16px 2vw;
+  }
+  .modal-summary-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* Modal size override */
+#summary-modal .modal-content {
+  max-width: 800px;
+  width: 90%;
+}
+
+/* Added styles for the quote details modal (from my-quotes.html example) */
+:root {
+  --radius: 12px;
+  --space: 1rem;
+  --space-lg: 1.75rem;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-300: #d1d5db;
+  --gray-700: #374151;
+  --gray-900: #111827;
+  --primary: #14532d; /* Assuming this primary color is desired */
+}
+
+#quote-details-modal .modal-overlay{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:var(--space);
+  background:rgba(0,0,0,.55);
+  z-index:1000;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s
+}
+
+#quote-details-modal .modal-overlay.active{
+  opacity:1;
+  pointer-events:auto
+}
+
+#quote-details-modal .modal{
+  width:100%;
+  max-width:960px;
+  background:#fff;
+  border-radius:var(--radius);
+  box-shadow:0 8px 24px rgba(0,0,0,.15);
+  position:relative;
+  max-height:90vh;
+  overflow-y:auto
+}
+
+#quote-details-modal .modal-close-btn{
+  position:absolute;
+  top:14px;
+  right:14px;
+  border:none;
+  background:transparent;
+  font-size:2rem;
+  line-height:1;
+  cursor:pointer;
+  color:var(--gray-300);
+  transition:color .2s
+}
+
+#quote-details-modal .modal-close-btn:hover{
+  color:var(--gray-700)
+}
+
+#quote-details-modal #quote-details-content h2{
+  margin:0;
+  padding:var(--space-lg)var(--space-lg) 0;
+  font-size:1.6rem;
+  border-bottom:1px solid var(--gray-100)
+}
+
+#quote-details-modal #quote-details-content .section{
+  padding:var(--space-lg);
+  border-bottom:1px solid var(--gray-100)
+}
+
+#quote-details-modal #quote-details-content .section:last-of-type{
+  border-bottom:none
+}
+
+#quote-details-modal #quote-details-content .card-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:var(--space-lg)
+}
+
+#quote-details-modal #quote-details-content .card{
+  background:var(--gray-50);
+  padding:var(--space-lg);
+  border-radius:var(--radius)
+}
+
+#quote-details-modal #quote-details-content .card h3{
+  margin-top:0;
+  font-size:1.15rem;
+  color:var(--gray-700)
+}
+
+#quote-details-modal #quote-details-content .card h4{
+  margin:.75rem 0 .5rem;
+  font-size:1.05rem;
+  color:var(--gray-700)
+}
+
+#quote-details-modal #quote-details-content .service-list{
+  margin:0;
+  padding-left:1.3em
+}
+
+#quote-details-modal #quote-details-content .service-list li{
+  margin:.45rem 0;
+  padding:.3rem 0
+}
+
+#quote-details-modal #quote-details-content .total-line{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:var(--primary);
+  color:#fff;
+  font-size:1.25rem;
+  font-weight:600;
+  padding:var(--space-lg) calc(var(--space-lg)*1.2);
+  border-radius:var(--radius);
+  margin-top:var(--space-lg)
+}
+
+@media(max-width:480px){
+  #quote-details-modal #quote-details-content h2{
+    font-size:1.35rem
+  }
+}
+/* End of added quote details modal styles */

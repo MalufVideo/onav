@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Painel de LED - Styled Version</title>
+  <!-- Three.js (r128) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- GLTFLoader for 3D model import -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="modal-summary.css">
+  <!-- Authentication modules -->
+  <script src="auth-config.js" defer></script>
+  <script src="auth.js" defer></script>
+  <script src="auth-ui.js" defer></script>
+  <script src="auth-protection.js" defer></script>
+  <script src="quote-service.js" defer></script>
+  <script src="pricing-pods.js" defer></script>
+  <script src="modal-summary.js" defer></script>
+  <script src="led-wall.js" defer></script>
+  <script src="quote-cart-modal.js"></script> <!-- Added Quote Cart Modal script (removed defer) -->
+  <!-- Flatpickr for date selection -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <style>
+    .backup-btn {
+      font-size: 10px;
+      padding: 2px 5px;
+      margin-left: 5px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    
+    .backup-btn.active {
+      background-color: #4CAF50;
+      color: white;
+      border-color: #388E3C;
+    }
+    /* Sidebar logo styling */
+    #sidebar-logo-link {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+    #sidebar-logo {
+      max-width: 180px;
+      width: 80%;
+      height: auto;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <!-- Left Sidebar: Controls -->
+  <div id="controls">
+    <a href="/" id="sidebar-logo-link">
+      <img src="../img/on+av_logo_v3.png" alt="ON+AV Logo" id="sidebar-logo">
+    </a>
+    <!-- Pod 1: LED Principal -->
+    <div class="control-card" id="card-led-principal">
+      <h2>LED Principal</h2>
+      <div class="control-group">
+        <label for="width">Largura (metros): <span id="width-value">20</span></label>
+        <input type="range" id="width" min="1" max="36" step="0.5" value="20">
+      </div>
+      <div class="control-group">
+        <label for="height">Altura (metros): <span id="height-value">5</span></label>
+        <input type="range" id="height" min="1" max="8" step="0.5" value="5">
+      </div>
+      <div class="control-group">
+        <label for="curvature">Curvatura: <span id="curvature-value">5</span> graus</label>
+        <input type="range" id="curvature" min="0" max="5" step="1" value="5">
+      </div>
+
+      <p><strong>Módulos LED Principal:</strong> <span id="module-count">400</span></p>
+    </div>
+
+    <!-- Pod 2: Teto -->
+    <div class="control-card" id="card-teto">
+      <h2>Teto</h2>
+      <div class="control-group">
+        <label for="roof-width">Largura (metros): <span id="roof-width-value">8</span></label>
+        <input type="range" id="roof-width" min="0" max="8" step="0.5" value="8">
+      </div>
+      <div class="control-group">
+        <label for="roof-height">Altura (metros): <span id="roof-height-value">6</span></label>
+        <input type="range" id="roof-height" min="0" max="7" step="0.5" value="6">
+      </div>
+
+      <p><strong>Módulos LED Teto:</strong> <span id="teto-module-count">192</span></p>
+    </div>
+
+    <!-- Pod 3: Disguise Mode Selector -->
+    <div class="control-card" id="card-disguise-selector">
+        <h2>Produção Virtual em:</h2>
+        <div class="selector-buttons" style="display: flex; gap: 10px; margin-top: 10px;">
+            <button class="selector-btn active" id="disguise-mode-3d" data-mode="3d">
+                <strong>3D</strong>
+                <small>Unreal 5 ou 2.5D</small>
+            </button>
+            <button class="selector-btn" id="disguise-mode-2d" data-mode="2d">
+                <strong>2D</strong>
+                <small>Plates ou Camera Car</small>
+            </button>
+        </div>
+        <!-- Add any specific Disguise controls here if needed in the future -->
+    </div>
+    <div class="control-card" id="powered-by-disguise" style="display:flex; align-items:center; gap:10px; margin-top:10px;">
+      <p style="margin:0; font-size: 12px;"><strong>Powered by:</strong></p>
+      <img src="../img/logo_disguise_inverted.png" alt="Disguise Logo" style="height:30px;" />
+    </div>
+    <!-- Rube Draco Control Card Removed -->
+    <!-- Estudios Control Card Removed -->
+  </div>
+
+  <!-- Center 3D Viewer -->
+  <div id="canvas-container">
+    <!-- Pricing Pods Container -->
+    <div class="pricing-pods">
+      <!-- Unified Pod: VP 3D / 2D -->
+      <div class="control-card pricing-pod active" id="card-custo-3d">
+         <!-- Title will be dynamic -->
+         <h2><strong id="main-pod-title">VP 3D</strong>: <span id="total-price">Calculating...</span></h2>
+
+         <!-- Item 1: LED Modules (Always Visible) -->
+         <p style="display: flex; align-items: center;">Módulos LED: <span id="modules-price" style="margin-left: 4px;" data-price="23680">23.680</span></p>
+
+         <!-- Item 2: MX-40 Pro (Always Visible) -->
+         <p>MX-40 Pro: <span id="processors-price" data-price="4000">4.000</span></p>
+
+         <!-- Item 3: Disguise VX4n (Always Visible, Backup Button) -->
+         <p style="display: flex; align-items: center;">Disguise VX4n: <span id="server-price" style="margin-left: 4px;" data-price="10000">10.000</span> <button class="backup-btn" id="backup-btn">adicionar backup ativo</button></p>
+
+         <!-- Item 4: Disguise RXII (Visible in 3D Mode Only) -->
+         <div class="control-group" id="rxii-group">
+             <label for="rxii-units"> Disguise RXII: <span id="rxii-units-value">3</span> = <span id="rxii-price" data-unit-price="7500">22.500</span></label>
+             <input type="range" id="rxii-units" min="1" max="5" step="1" value="3">
+         </div>
+
+         <!-- Item 5: Stype Tracking (Visible in 3D Mode Only) -->
+         <p id="tracking-item">Stype Tracking: <span id="tracking-price" data-price="5000">5.000</span></p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Right Sidebar: Detailed LED Info -->
+  <div id="info-sidebar">
+    <div class="info-pod" id="info-principal">
+      <h2>Detalhes LED Principal</h2>
+      <p><strong>Resolução:</strong> <span id="resolution">3840 x 960 pixels</span></p>
+      <p><strong>Processadores:</strong> <span id="processors">4 unidades</span></p>
+      <p><strong>Potência Máxima:</strong> <span id="power-max">40</span> W</p>
+      <p><strong>Potência Média:</strong> <span id="power-avg">20</span> W</p>
+      <p><strong>Peso Total:</strong> <span id="total-weight">800</span> kg</p>
+    </div>
+
+    <div class="info-pod" id="info-teto">
+      <h2>Detalhes LED Teto</h2>
+      <p><strong>Resolução:</strong> <span id="teto-resolution">1536 x 1152 pixels</span></p>
+      <p><strong>Potência Máxima:</strong> <span id="teto-power-max">19.2</span> W</p>
+      <p><strong>Potência Média:</strong> <span id="teto-power-avg">9.6</span> W</p>
+      <p><strong>Peso Total:</strong> <span id="teto-total-weight">384</span> kg</p>
+    </div>
+
+    <div class="info-pod">
+      <button id="proposta-btn" class="form-submit">Gerar Proposta</button>
+    </div>
+  </div>
+
+  <!-- New Quote Cart Modal -->
+  <div id="quote-cart-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <button id="quote-cart-close-btn" class="modal-close">&times;</button>
+      <h2>Proposta de Orçamento (Carrinho)</h2>
+
+      <!-- Project Name and Dates -->
+      <div class="form-group">
+        <label for="cart-project-name">Projeto</label>
+        <input type="text" id="cart-project-name" required>
+      </div>
+      <div class="form-group">
+        <label>Datas da Filmagem</label>
+        <div class="date-range-container">
+          <div>
+            <label for="cart-shooting-dates-start">Início</label>
+            <input type="text" id="cart-shooting-dates-start" required readonly placeholder="DD/MM/AAAA">
+          </div>
+          <div>
+            <label for="cart-shooting-dates-end">Fim</label>
+            <input type="text" id="cart-shooting-dates-end" required readonly placeholder="DD/MM/AAAA">
+          </div>
+        </div>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid #eee; margin: 15px 0;">
+
+      <!-- Container for dynamically added cart items -->
+      <div id="cart-items-container">
+        <p>Seu carrinho de orçamento está vazio.</p>
+      </div>
+      
+      <!-- Total Price Display -->
+      <div class="cart-total">
+        <strong>Total Estimado:</strong> <span id="cart-total-price">R$ 0.00</span>
+      </div>
+      
+      <!-- Action Button -->
+      <button id="quote-cart-submit-btn" class="form-submit">Requisitar Proposta</button>
+      
+      <!-- Optional: Add form fields here if needed before submission -->
+      <!--
+      <form id="quote-details-form">
+        <div class="form-group">
+          <label for="cart-project-name">Nome do Projeto:</label>
+          <input type="text" id="cart-project-name" required>
+        </div>
+        <div class="form-group">
+          <label for="cart-shooting-dates">Datas da Filmagem:</label>
+          <input type="text" id="cart-shooting-dates" placeholder="DD/MM/AAAA - DD/MM/AAAA" required>
+        </div>
+      </form>
+      -->
+      
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmation-modal" class="modal-overlay" style="display: none;">
+    <div id="confirmation-content" class="modal-content"> 
+      <button id="confirmation-close-btn" class="modal-close">&times;</button> 
+      <div id="confirmation-header"> 
+          <h2>Proposta Enviada!</h2>
+      </div>
+      <div id="confirmation-body"> 
+          <p>Sua proposta foi enviada com sucesso. Em breve nossa equipe entrará em contato.</p>
+          <p>Você pode visualizar suas propostas salvas ou agendar uma conversa com um especialista.</p>
+           <!-- Cal.com Embed Placeholder -->
+           <div id="my-cal-inline" style="min-width:320px;height:630px;"></div>
+      </div>
+      <div id="confirmation-footer"> 
+          <button id="view-my-proposals-btn" class="button-secondary">Ver Minhas Propostas</button>
+          <!-- Button to trigger Cal.com will be handled by script if needed,
+               otherwise the inline embed above might suffice -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Cal.com integration -->
+  <script>
+    (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; typeof namespace === "string" ? (cal.ns[namespace] = api) && p(api, ar) : p(cal, ar); return; } p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
+    Cal("init", {origin:"https://cal.com"});
+    Cal("inline", {
+      elementOrSelector: "#my-cal-inline",
+      calLink: "us-aluga-h2l9n4/30min",
+      config: {
+        name: "Cliente LED",
+        email: "cliente@email.com",
+        notes: "Reunião sobre painel de LED",
+        layout: "month_view",
+        hideEventTypeDetails: false,
+        hideBranding: true,
+      }
+    });
+  </script>
+
+  <!-- Flatpickr initialization -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize date pickers
+      flatpickr("#shooting-dates-start", {
+        dateFormat: "d/m/Y",
+        locale: "pt",
+        allowInput: false,
+        disableMobile: true,
+        onChange: function(selectedDates, dateStr, instance) {
+          // Enable the end date picker after selecting a start date
+          const endDatePicker = flatpickr("#shooting-dates-end");
+          endDatePicker.set("minDate", selectedDates[0]);
+          
+          // Update the proposal summary to reflect the price changes
+          if (document.getElementById('shooting-dates-end').value) {
+            window.setTimeout(() => {
+              if (typeof updateProposalSummary === 'function') {
+                updateProposalSummary();
+                console.log('Updated proposal summary from start date change');
+              }
+            }, 100);
+          }
+        }
+      });
+      
+      flatpickr("#shooting-dates-end", {
+        dateFormat: "d/m/Y",
+        locale: "pt",
+        allowInput: false,
+        disableMobile: true,
+        onReady: function(selectedDates, dateStr, instance) {
+          // Force format to d/m/Y for any pre-existing value
+          const input = instance.input;
+          if (input.value && input.value.includes('-')) {
+            const date = new Date(input.value);
+            if (!isNaN(date)) {
+              const day = date.getDate().toString().padStart(2, '0');
+              const month = (date.getMonth() + 1).toString().padStart(2, '0');
+              const year = date.getFullYear();
+              input.value = `${day}/${month}/${year}`;
+              instance.selectedDates[0] = date;
+              instance.latestSelectedDateObj = date;
+            }
+          }
+        },
+        onChange: function(selectedDates, dateStr, instance) {
+          // Update the proposal summary to reflect the price changes
+          if (document.getElementById('shooting-dates-start').value) {
+            window.setTimeout(() => {
+              if (typeof updateProposalSummary === 'function') {
+                updateProposalSummary();
+                console.log('Updated proposal summary from end date change');
+              }
+            }, 100);
+          }
+        }
+      });
+  
+      // --- Initialize Flatpickr for the Quote Cart Modal ---
+      const cartStartDatePicker = flatpickr("#cart-shooting-dates-start", {
+        dateFormat: "d/m/Y",
+        locale: "pt",
+        allowInput: false, // Prevent manual input
+        disableMobile: true,
+        onChange: function(selectedDates, dateStr, instance) {
+          // Set minDate for the end date picker
+          const cartEndDatePickerInstance = document.querySelector("#cart-shooting-dates-end")._flatpickr;
+          if (cartEndDatePickerInstance) {
+            cartEndDatePickerInstance.set("minDate", selectedDates[0]);
+          }
+          // Update cart total when date changes (if end date is also selected)
+          if (document.getElementById('cart-shooting-dates-end').value && window.quoteCartModal) {
+              console.log("[Flatpickr Cart Start] Date changed, updating cart.");
+              window.quoteCartModal.updateCart();
+          }
+        }
+      });
+  
+      const cartEndDatePicker = flatpickr("#cart-shooting-dates-end", {
+        dateFormat: "d/m/Y",
+        locale: "pt",
+        allowInput: false,
+        disableMobile: true,
+        onChange: function(selectedDates, dateStr, instance) {
+          // Update cart total when date changes (if start date is also selected)
+          if (document.getElementById('cart-shooting-dates-start').value && window.quoteCartModal) {
+              console.log("[Flatpickr Cart End] Date changed, updating cart.");
+              window.quoteCartModal.updateCart();
+          }
+        }
+      });
+      
+      // Format any existing date values to ensure consistent display
+      const formatExistingDates = () => {
+        const endDateInput = document.getElementById('shooting-dates-end');
+        if (endDateInput && endDateInput.value && endDateInput.value.includes('-')) {
+          try {
+            // Convert YYYY-MM-DD to DD/MM/YYYY
+            const date = new Date(endDateInput.value);
+            if (!isNaN(date)) {
+              const day = date.getDate().toString().padStart(2, '0');
+              const month = (date.getMonth() + 1).toString().padStart(2, '0');
+              const year = date.getFullYear();
+              const formattedDate = `${day}/${month}/${year}`;
+              
+              // Update the input value directly
+              endDateInput.value = formattedDate;
+              
+              console.log('Fixed end date format:', formattedDate);
+              
+              // Also update the flatpickr instance if it exists
+              if (endDateInput._flatpickr) {
+                endDateInput._flatpickr.setDate(date);
+              }
+            }
+          } catch (error) {
+            console.error('Error formatting date:', error);
+          }
+        }
+      };
+      
+      // Call once on page load and also after a short delay to catch any async updates
+      formatExistingDates();
+      setTimeout(formatExistingDates, 500);
+      // Also add a second timeout in case the first one runs too early
+      setTimeout(formatExistingDates, 1500);
+      
+      // Old modal initialization logic removed (modalSummary object and init call)
+      // The new modal (#quote-cart-modal) is handled by QuoteCartModal class and modal-summary.js listener.
+    });
+  </script>
+
+  <script>
+    // Continuously monitor and fix the date format for the end date
+    document.addEventListener('DOMContentLoaded', function() {
+      // Function to force the correct date format
+      function forceCorrectDateFormat() {
+        const endInput = document.getElementById('shooting-dates-end');
+        if (endInput && endInput.value && endInput.value.includes('-')) {
+          try {
+            // Convert YYYY-MM-DD to DD/MM/YYYY
+            const parts = endInput.value.split('-');
+            if (parts.length === 3) {
+              // Use the date components directly without creating a Date object
+              // This avoids any timezone issues
+              const year = parts[0];
+              const month = parts[1];
+              const day = parts[2];
+              
+              // Format as DD/MM/YYYY
+              const formattedDate = `${day}/${month}/${year}`;
+              
+              // Update the input value directly
+              endInput.value = formattedDate;
+              
+              console.log('Forced end date format:', formattedDate);
+              
+              // If the flatpickr instance exists, also update it
+              if (endInput._flatpickr) {
+                // Create a date object with the correct parts
+                const dateObj = new Date(year, parseInt(month, 10) - 1, parseInt(day, 10));
+                
+                // Update flatpickr internal state without triggering onChange
+                const fp = endInput._flatpickr;
+                fp.selectedDates = [dateObj];
+                fp.latestSelectedDateObj = dateObj;
+                
+                // Force the input to show our formatted value
+                setTimeout(() => {
+                  // This ensures any other code doesn't override our format
+                  endInput.value = formattedDate;
+                }, 0);
+              }
+            }
+          } catch (error) {
+            console.error('Error formatting date:', error);
+          }
+        }
+      }
+      
+      // Run immediately and at intervals to ensure it always stays formatted correctly
+      forceCorrectDateFormat();
+      setTimeout(forceCorrectDateFormat, 500);
+      
+      // Set up an observer to watch for changes to the input value
+      const endInput = document.getElementById('shooting-dates-end');
+      if (endInput) {
+        // Create a MutationObserver to watch for attribute changes, particularly the value
+        const observer = new MutationObserver((mutations) => {
+          forceCorrectDateFormat();
+        });
+        
+        // Watch for attribute changes
+        observer.observe(endInput, { attributes: true });
+        
+        // Also run the formatter after any input event
+        endInput.addEventListener('input', forceCorrectDateFormat);
+        endInput.addEventListener('change', forceCorrectDateFormat);
+      }
+      
+      // Additionally, set an interval to continuously check and fix the format
+      // This is a fail-safe for any scenario where the other methods don't catch the change
+      const checkInterval = setInterval(forceCorrectDateFormat, 1000);
+      
+      // Stop the interval after a reasonable amount of time (60 seconds)
+      setTimeout(() => {
+        clearInterval(checkInterval);
+      }, 60000);
+    });
+  </script>
+
+  <script>
+    function fixFlatpickrDateDisplay() {
+      // Get both flatpickr instances
+      const startPicker = document.getElementById('shooting-dates-start')?._flatpickr;
+      const endPicker = document.getElementById('shooting-dates-end')?._flatpickr;
+
+      if (endPicker) {
+        // Save original method
+        const originalFormat = endPicker.formatDate;
+        
+        // Create our custom date formatter and parser
+        endPicker.formatDate = function(dateObj, formatStr) {
+          // Always use DD/MM/YYYY for display regardless of internal format
+          const day = dateObj.getDate().toString().padStart(2, '0');
+          const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+          const year = dateObj.getFullYear();
+          return `${day}/${month}/${year}`;
+        };
+        
+        // Force refresh if there's a current date
+        if (endPicker.selectedDates && endPicker.selectedDates.length > 0) {
+          const currentDate = endPicker.selectedDates[0];
+          endPicker.clear();
+          endPicker.setDate(currentDate);
+        }
+        
+        // Also handle direct value changes
+        const endInput = document.getElementById('shooting-dates-end');
+        if (endInput && endInput.value && endInput.value.includes('-')) {
+          try {
+            const date = new Date(endInput.value);
+            if (!isNaN(date)) {
+              endPicker.setDate(date);
+            }
+          } catch (e) {
+            console.error('Error setting end date:', e);
+          }
+        }
+      }
+    }
+    
+    // Run immediately and after a delay
+    setTimeout(fixFlatpickrDateDisplay, 0);
+    setTimeout(fixFlatpickrDateDisplay, 1000);
+  </script>
+
+  <!-- Initialize authentication -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if auth module is available
+      const waitForAuth = () => {
+        return new Promise((resolve) => {
+          const checkAuth = () => {
+            if (window.auth) {
+              resolve();
+            } else {
+              console.log('Waiting for auth to be available...');
+              setTimeout(checkAuth, 500);
+            }
+          };
+          checkAuth();
+        });
+      };
+
+      // Initialize authentication
+      waitForAuth()
+        .then(() => window.auth.initAuth())
+        .then(() => {
+          // Initialize authentication UI
+          if (window.authUI) {
+            window.authUI.initAuthUI();
+            console.log('Authentication initialized');
+          } else {
+            console.error('Auth UI module not available');
+          }
+        })
+        .catch(error => {
+          console.error('Failed to initialize authentication:', error);
+        });
+    });
+  </script>
+<!-- fix-rube-draco.js script removed -->
+
+  <script>
+    // Instantiate the Quote Cart Modal globally after DOM is ready
+    // Ensure this runs after the QuoteCartModal class definition is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('[index.optimized.html] DOMContentLoaded fired for modal instantiation.'); // Log listener start
+      if (typeof QuoteCartModal !== 'undefined') {
+        console.log('[index.optimized.html] QuoteCartModal class found. Instantiating...'); // Log class found
+        window.quoteCartModal = new QuoteCartModal();
+        console.log("[index.optimized.html] Global quoteCartModal instance created:", window.quoteCartModal); // Log instance creation
+      } else {
+        console.error("[index.optimized.html] QuoteCartModal class not found. Check script loading order.");
+      }
+
+      // Find the button and attach the listener here, ensuring both button and modal instance exist
+      const proposalBtn = document.getElementById('proposta-btn');
+      if (proposalBtn) {
+        console.log('[index.optimized.html] Found #proposta-btn, adding listener.');
+        proposalBtn.addEventListener('click', () => {
+          console.log('[index.optimized.html] #proposta-btn clicked!');
+          // Check authentication status
+          if (window.auth && window.auth.isAuthenticated()) {
+            // User is logged in, show the cart modal
+            if (window.quoteCartModal) {
+              // Get the current values from the main date pickers
+              const startInput = document.getElementById('shooting-dates-start');
+              const endInput = document.getElementById('shooting-dates-end');
+              const startValue = startInput ? startInput.value : '';
+              const endValue = endInput ? endInput.value : '';
+              window.quoteCartModal.setSelectedDates(startValue, endValue);
+              console.log('[index.optimized.html] User authenticated. Set selected dates:', startValue, endValue);
+              window.quoteCartModal.show(); // Show the new cart modal
+            } else {
+              console.error("[index.optimized.html] Quote Cart Modal instance not found on button click!");
+            }
+          } else {
+            // User is not logged in, show the login modal
+            console.log('[index.optimized.html] User not authenticated. Opening login modal.');
+            if (window.authUI && typeof window.authUI.openModal === 'function') {
+              window.authUI.openModal('login-modal'); // Use the function from auth-ui.js
+            } else {
+              console.error("[index.optimized.html] Auth UI or openModal function not found!");
+              alert('Por favor, faça login ou cadastre-se para gerar uma proposta.'); // Fallback alert
+            }
+          }
+        });
+      } else {
+        console.error('[index.optimized.html] #proposta-btn not found!');
+      }
+    });
+  </script>
+
+</body>
+</html>

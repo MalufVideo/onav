@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>On + Av | Soluções AV de Elite para Produções Complexas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        // Tailwind CSS configuration
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00ff9d', // Bright Green/Aqua
+                        secondary: '#0066ff', // Strong Blue
+                        purpleish: '#9370DB', // Medium Purple for blob
+                        dark: '#0a0a0a',     // Dark background shade
+                        darker: '#020202',   // Base darker background shade
+                        'light-text': '#e0e0e0', // Light text color
+                        'medium-text': '#a0a0a0', // Medium text color (for less emphasis)
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'], // Primary sans-serif font
+                        mono: ['Fira Code', 'monospace'], // Monospace font (for code/tech elements)
+                    },
+                    animation: {
+                        'subtle-float': 'subtle-float 6s ease-in-out infinite', // Subtle floating animation
+                    },
+                    keyframes: {
+                        'subtle-float': { // Keyframes for the floating animation
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Import Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400&display=swap');
+
+        /* Base body styles with Blob Background (Purple Increased Visibility) */
+        body {
+            font-family: 'Inter', sans-serif;
+            /* --- Background Blob Effect --- */
+            background-color: #020202; /* Fallback solid color */
+            background-image:
+                /* Blob 1: Primary color, top left */
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 157, 0.15) 0%, transparent 50%),
+                /* Blob 2: Secondary color, bottom right */
+                radial-gradient(circle at 85% 80%, rgba(0, 102, 255, 0.12) 0%, transparent 45%),
+                /* Blob 3: Primary color, center right */
+                radial-gradient(circle at 90% 30%, rgba(0, 255, 157, 0.08) 0%, transparent 40%),
+                 /* Blob 4: Secondary color, mid left */
+                radial-gradient(circle at 20% 70%, rgba(0, 102, 255, 0.1) 0%, transparent 55%),
+                /* Blob 5: Purple color, bottom left - Increased Opacity and Size */
+                radial-gradient(circle at 15% 90%, rgba(147, 112, 219, 0.20) 0%, transparent 60%); /* Increased opacity to 0.20, size to 60% */
+            background-attachment: fixed; /* Keep blobs fixed during scroll */
+            /* --- End Background Blob Effect --- */
+            color: #e0e0e0; /* Default light text color */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            scroll-behavior: smooth; /* Enable smooth scrolling */
+        }
+
+        /* Hero section gradient overlay (Adjusted for blob background) */
+        .hero-gradient-overlay {
+             /* Kept subtle overlay */
+            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 157, 0.05) 0%, rgba(2, 2, 2, 0) 60%);
+        }
+
+        /* Gradient text utility */
+        .gradient-text {
+            background: linear-gradient(90deg, #00ff9d, #0066ff); /* Primary to Secondary gradient */
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Text glow effects */
+        .glow-text-primary {
+            text-shadow: 0 0 12px rgba(0, 255, 157, 0.6);
+        }
+        .glow-text-secondary {
+            text-shadow: 0 0 12px rgba(0, 102, 255, 0.6);
+        }
+
+        /* Box glow effects */
+        .glow-box-primary {
+            box-shadow: 0 0 25px rgba(0, 255, 157, 0.25);
+        }
+        .glow-box-secondary {
+            box-shadow: 0 0 25px rgba(0, 102, 255, 0.25);
+        }
+
+        /* Glassmorphism card style (Adjusted background for better visibility over blobs) */
+        .glass-card {
+            background: rgba(10, 10, 10, 0.65); /* Slightly less transparent */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); /* Safari support */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Slightly stronger border */
+            transition: all 0.3s ease-in-out;
+        }
+        .glass-card:hover {
+            border-color: rgba(0, 255, 157, 0.6); /* Brighter border on hover */
+            transform: translateY(-5px); /* Slight lift effect */
+        }
+
+        /* Feature card style (Adjusted background) */
+        .feature-card {
+            background: rgba(15, 15, 15, 0.6); /* Adjusted background */
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .feature-card:hover {
+            border-color: #00ff9d; /* Primary border on hover */
+            transform: translateY(-5px);
+        }
+        .feature-icon {
+            transition: all 0.3s ease;
+            color: #00ff9d; /* Icon color */
+        }
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1); /* Scale icon on hover */
+            filter: drop-shadow(0 0 8px rgba(0, 255, 157, 0.7)); /* Add glow to icon */
+        }
+
+        /* Tech card hover effect (Expertise section) */
+        .tech-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 255, 157, 0.15); /* Subtle primary glow */
+        }
+
+        /* Responsive video container */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 0.75rem; /* rounded-xl */
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        /* Primary button style */
+        .btn-primary {
+            background: linear-gradient(90deg, #00ff9d, #0066ff); /* Gradient background */
+            color: #050505; /* Dark text for contrast */
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            opacity: 0.9; /* Slightly fade on hover */
+            box-shadow: 0 5px 15px rgba(0, 255, 157, 0.3); /* Primary glow */
+            transform: translateY(-2px); /* Slight lift */
+        }
+
+        /* Secondary button style (outline) */
+        .btn-secondary {
+            border: 2px solid #00ff9d; /* Primary color border */
+            color: #00ff9d; /* Primary color text */
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: rgba(0, 255, 157, 0.1); /* Subtle primary background on hover */
+            transform: translateY(-2px); /* Slight lift */
+        }
+
+        /* Stats item style (adds left border) */
+        .stats-item {
+            border-left: 3px solid #00ff9d;
+        }
+
+        /* Testimonial card style (Adjusted background) */
+        .testimonial-card {
+            background: rgba(25, 25, 25, 0.7); /* Adjusted background */
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        /* Form input/textarea/select styling */
+        input, textarea, select {
+            background: rgba(255, 255, 255, 0.05); /* Very subtle light background */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+            color: #e0e0e0; /* Light text color */
+            transition: all 0.3s ease;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none; /* Remove default outline */
+            border-color: #00ff9d; /* Primary border on focus */
+            box-shadow: 0 0 0 3px rgba(0, 255, 157, 0.2); /* Primary glow on focus */
+        }
+        /* Custom select dropdown arrow */
+        select {
+           appearance: none; /* Remove default arrow */
+           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2300ff9d' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E"); /* Custom SVG arrow (primary color) */
+           background-position: right 0.5rem center;
+           background-repeat: no-repeat;
+           background-size: 1.5em 1.5em;
+           padding-right: 2.5rem; /* Space for the arrow */
+        }
+
+        /* Navigation bar background adjusted for blobs */
+        nav.fixed {
+             background-color: rgba(2, 2, 2, 0.8); /* Slightly more opaque base */
+        }
+
+        /* Footer background adjusted */
+        footer {
+            background-color: #050505; /* Slightly lighter dark for footer */
+        }
+
+        /* Ensure Produção Virtual button text turns black on hover, regardless of inline/Tailwind styles */
+        #orcamentoModal .producao-virtual-btn:hover {
+            color: #000 !important;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <nav class="fixed w-full bg-opacity-90 backdrop-blur-md z-50 border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center">
+                    <a href="#" class="flex-shrink-0 flex items-center">
+                         <img src="img/on+av_logo_v2.png" alt="On + Av Logo" style="height:40px;">
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-6 lg:space-x-8">
+                        <a href="#services" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Serviços</a>
+                        <a href="#industries" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Indústrias</a>
+                        <a href="#expertise" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Expertise</a>
+                        <a href="#cases" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Cases</a>
+                        <a href="#about" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Quem Somos</a>
+                        <a href="#insights" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Insights</a>
+                        <a href="#contact" class="btn-primary text-sm font-bold px-5 py-2 rounded-md hover:bg-opacity-90 transition-all duration-200">Contato</a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Abrir menu principal</span>
+                        <i class="fas fa-bars text-xl"></i> </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="hidden md:hidden bg-darker border-t border-gray-800" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#services" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Serviços</a>
+                <a href="#industries" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Indústrias</a>
+                <a href="#expertise" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Expertise</a>
+                <a href="#cases" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Cases</a>
+                <a href="#about" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Quem Somos</a>
+                <a href="#insights" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Insights</a>
+                <a href="#contact" class="btn-primary text-base font-bold block px-3 py-2 rounded-md text-center mt-2">Contato</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="relative pt-32 pb-20 md:pt-40 md:pb-32 hero-gradient-overlay overflow-hidden">
+        <!-- Hero Image with Left-to-Right Opacity Gradient -->
+        <div class="absolute inset-0 w-full h-full pointer-events-none z-0">
+            <img src="img/volume_disguise.webp" alt="Volume Disguise" class="w-full h-full object-cover" style="mask-image: linear-gradient(to right, transparent 0%, #000 100%); -webkit-mask-image: linear-gradient(to right, transparent 20%, #000 100%); opacity: 1;" />
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="text-center md:text-left z-10">
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+                        <span class="text-primary glow-text-primary">Revolucione</span> suas produções com <span class="gradient-text">Tecnologia Disguise, LED e Projeção</span>
+                    </h1>
+                    <p class="text-xl text-light-text mb-10 max-w-2xl mx-auto md:mx-0">
+                        A solução completa em produção virtual, xR, projeção mapeada e aluguel de equipamentos de ponta no Brasil. Expertise comprovada para os projetos mais complexos.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                        <a href="https://cal.com/onav.com.br/30min" class="btn-primary font-bold px-8 py-4 rounded-md text-lg" target="_blank" rel="noopener">
+                            Fale com Especialistas
+                        </a>
+                        <button id="simularOrcamentoBtn" class="btn-secondary font-bold px-8 py-4 rounded-md text-lg">
+                            Simular Orçamento
+                        </button>
+                    </div>
+                    <div class="mt-12 flex items-center justify-center md:justify-start space-x-4">
+                         <div class="flex -space-x-2">
+                             <img class="w-10 h-10 rounded-full border-2 border-dark" src="https://randomuser.me/api/portraits/women/12.jpg" alt="Cliente 1" onerror="this.onerror=null; this.src='https://placehold.co/40x40/020202/e0e0e0?text=C1';">
+                             <img class="w-10 h-10 rounded-full border-2 border-dark" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Cliente 2" onerror="this.onerror=null; this.src='https://placehold.co/40x40/020202/e0e0e0?text=C2';">
+                             <img class="w-10 h-10 rounded-full border-2 border-dark" src="https://randomuser.me/api/portraits/women/45.jpg" alt="Cliente 3" onerror="this.onerror=null; this.src='https://placehold.co/40x40/020202/e0e0e0?text=C3';">
+                         </div>
+                         <div>
+                             <p class="text-medium-text text-sm">Confiança de grandes players</p>
+                             <div class="flex items-center">
+                                 <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
+                                 <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
+                                 <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
+                                 <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
+                                 <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
+                                 <span class="text-light-text text-sm ml-1">5.0 Avaliação Média</span>
+                             </div>
+                         </div>
+                     </div>
+                </div>
+                <div class="relative z-10">
+                    <div class="relative rounded-xl overflow-hidden glow-box-primary">
+                        <div class="video-container">
+                            <iframe src="https://www.youtube.com/embed/Xc1CNhazcQo?loop=1&playlist=Xc1CNhazcQo&controls=0" allowfullscreen title="Showreel On+Av" tabindex="0"></iframe>
+                        </div>
+                    </div>
+                    <div class="absolute -bottom-6 -left-6 bg-dark p-3 md:p-4 rounded-lg border border-gray-800 shadow-lg hidden md:block z-20 glass-card">
+                        <div class="flex items-center">
+                            <img src="img/disguiseicon.png" alt="Disguise Icon" class="w-8 h-8 object-contain mr-3" />
+                            <div>
+                                <p class="text-xs text-medium-text uppercase tracking-wider">Tecnologia Premiada</p>
+                                <p class="text-sm font-bold text-light-text">Disguise Partner</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="py-20 bg-transparent"> <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                 <span class="text-primary font-semibold text-sm uppercase tracking-wider">Nossas Soluções</span>
+                <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mt-2 mb-4">
+                    Soluções Completas para <span class="gradient-text">Produções de Impacto</span>
+                </h2>
+                <p class="text-xl text-light-text max-w-3xl mx-auto">
+                    Oferecemos muito mais que aluguel - proporcionamos uma experiência completa em tecnologia audiovisual e produção virtual.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <a href="produtos.html" class="block group" style="text-decoration:none;color:inherit;">
+                <div class="glass-card p-8 rounded-xl transition-shadow group-hover:shadow-lg">
+                    <div class="bg-primary bg-opacity-10 p-4 rounded-lg inline-block mb-6 glow-box-primary">
+                        <i class="fas fa-cubes text-primary text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Aluguel de Equipamentos AV</h3>
+                    <p class="text-medium-text mb-4 text-sm">
+                        Acesso a um inventário de ponta para suas produções, incluindo:
+                    </p>
+                    <ul class="space-y-2 text-light-text text-sm mb-4">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Servidores Disguise (VX/RX)</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Painéis de LED Indoor/Outdoor</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Projetores de Alta Luminosidade</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Câmeras Broadcast & Cinema</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Sistemas de Tracking (Stype/Mo-Sys)</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Unidades Móveis de Produção (UM)</li>
+                    </ul>
+                </div>
+                </a>
+
+                <a href="producao-virtual-xr.html" class="block group" style="text-decoration:none;color:inherit;">
+                <div class="glass-card p-8 rounded-xl transition-shadow group-hover:shadow-lg">
+                     <div class="bg-primary bg-opacity-10 p-4 rounded-lg inline-block mb-6 glow-box-primary">
+                         <i class="fas fa-vr-cardboard text-primary text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Produção Virtual & xR</h3>
+                    <p class="text-medium-text mb-4 text-sm">
+                        Soluções completas para estúdios xR e virtual production, incluindo LED walls, tracking e integração com engines.
+                    </p>
+                    <ul class="space-y-2 text-light-text text-sm mb-4">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Configuração de estúdio chave na mão</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Integração com Unreal Engine & Unity</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>In-Camera VFX (ICVFX)</li>
+                         <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Calibração e workflows otimizados</li>
+                    </ul>
+                </div>
+                </a>
+
+                <a href="consultoria-suporte.html" style="display:block;text-decoration:none;color:inherit;">
+                <div class="glass-card p-8 rounded-xl">
+                     <div class="bg-primary bg-opacity-10 p-4 rounded-lg inline-block mb-6 glow-box-primary">
+                         <i class="fas fa-headset text-primary text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Consultoria & Suporte Técnico</h3>
+                    <p class="text-medium-text mb-4 text-sm">
+                        Expertise para planejar, executar e solucionar desafios em suas produções, com suporte dedicado.
+                    </p>
+                    <ul class="space-y-2 text-light-text text-sm mb-4">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Planejamento e design de sistemas</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Operadores e técnicos certificados Disguise</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Treinamento e capacitação de equipes</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Suporte 24/7 durante a produção</li>
+                    </ul>
+                </div>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+                <a href="projecao-mapeada.html" style="display:block;text-decoration:none;color:inherit;">
+                <div class="glass-card p-8 rounded-xl">
+                    <div class="bg-primary bg-opacity-10 p-4 rounded-lg inline-block mb-6 glow-box-primary">
+                        <i class="fas fa-cube text-primary text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Projeção Mapeada 3D</h3>
+                    <p class="text-medium-text mb-4 text-sm">
+                        Transformamos superfícies e estruturas em telas dinâmicas com projeções mapeadas imersivas e personalizadas.
+                    </p>
+                    <ul class="space-y-2 text-light-text text-sm mb-4">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Mapeamento arquitetônico</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Mapeamento de objetos complexos</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Shows de luz e som</li>
+                    </ul>
+                </div>
+                </a>
+
+                <a href="shows.html" style="display:block;text-decoration:none;color:inherit;">
+                <div class="glass-card p-8 rounded-xl">
+                    <div class="bg-primary bg-opacity-10 p-4 rounded-lg inline-block mb-6 glow-box-primary">
+                        <i class="fas fa-guitar text-primary text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Shows e Turnês</h3>
+                    <p class="text-medium-text mb-4 text-sm">
+                        Soluções audiovisuais completas e suporte técnico para shows, festivais e turnês de grande escala.
+                    </p>
+                    <ul class="space-y-2 text-light-text text-sm mb-4">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Visuais imersivos</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Conteúdo generativo e interativo</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Integração com iluminação e áudio</li>
+                    </ul>
+                </div>
+                </a>
+
+                <a href="criacao-conteudo.html" style="display:block;text-decoration:none;color:inherit;">
+                <div class="glass-card p-8 rounded-xl">
+                    <div class="bg-primary bg-opacity-10 p-4 rounded-lg inline-block mb-6 glow-box-primary">
+                        <i class="fas fa-palette text-primary text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Criação de Conteúdo</h3>
+                    <p class="text-medium-text mb-4 text-sm">
+                        Desenvolvimento de conteúdo visual impactante para LED, projeções e ambientes virtuais.
+                    </p>
+                    <ul class="space-y-2 text-light-text text-sm mb-4">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Design e animação</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Desenvolvimento de conteúdo 3D</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-primary mr-2 text-xs"></i>Integração com sistemas de controle</li>
+                    </ul>
+                </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="industries" class="py-20 bg-dark"> <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-primary font-semibold text-sm uppercase tracking-wider">Aplicações</span>
+                <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mt-2 mb-4">Indústrias que <span class="gradient-text">Transformamos</span></h2>
+                <p class="text-xl text-light-text max-w-3xl mx-auto">Nossa tecnologia e expertise elevam produções em diversas áreas criativas e técnicas.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card rounded-xl p-8">
+                     <div class="feature-icon text-4xl mb-6">
+                         <i class="fas fa-film"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-light-text">Filme & TV</h3>
+                    <p class="text-medium-text text-sm mb-4">Produção virtual e efeitos visuais em tempo real para cinema, séries e publicidade.</p>
+                    <ul class="space-y-1 text-light-text text-xs">
+                        <li class="flex items-center"><i class="fa-solid fa-circle-check text-primary mr-2"></i>In-camera VFX (ICVFX)</li>
+                        <li class="flex items-center"><i class="fa-solid fa-circle-check text-primary mr-2"></i>Sets virtuais dinâmicos</li>
+                        <li class="flex items-center"><i class="fa-solid fa-circle-check text-primary mr-2"></i>Pré-visualização em tempo real</li>
+                    </ul>
+                </div>
+                 <div class="feature-card rounded-xl p-8">
+                     <div class="feature-icon text-4xl mb-6">
+                         <i class="fas fa-music"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-light-text">Eventos Ao Vivo</h3>
+                    <p class="text-medium-text text-sm mb-4">Shows, festivais, turnês e cerimônias com visuais impactantes e controle preciso.</p>
+                     <ul class="space-y-1 text-light-text text-xs">
+                         <li class="flex items-center"><i class="fa-solid fa-circle-check text-primary mr-2"></i>Playback sincronizado</li>
+                         <li class="flex items-center"><i class="fa-solid fa-circle-check text-primary mr-2"></i>Conteúdo generativo e interativo</li>
+                         <li class="flex items-center"><i class="fa-solid fa-circle-check text-primary mr-2"></i>Integração com iluminação e áudio</li>
+                    </ul>
+                </div>
+                 <div class="feature-card rounded-xl p-8">
+                     <div class="feature-icon text-4xl mb-6">
+                         <i class="fas fa-tv"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-light-text">Broadcast</h3>
+                    <p class="text-medium-text text-sm mb-4">Estúdios virtuais, xR e gráficos avançados para notícias, esportes e entretenimento.</p>
+                     <ul class="space-y-1 text-light-text text-xs">
+                         <li class="flex items-center"><i class="fa-solid fa-circle-check text-primary mr-2"></i>Sets virtuais e xR</li>
+                         <li class="flex items-center"><i class="fa-solid fa-circle-check text-primary mr-2"></i>Realidade Aumentada (AR)</li>
+                         <li class="flex items-center"><i class="fa-solid fa-circle-check text-primary mr-2"></i>Gráficos em tempo real</li>
+                    </ul>
+                </div>
+                <div class="feature-card rounded-xl p-8">
+                     <div class="feature-icon text-4xl mb-6">
+                         <i class="fas fa-briefcase"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-light-text">Corporativo</h3>
+                    <p class="text-medium-text text-sm mb-4">Eventos, lançamentos, centros de experiência e ativações de marca memoráveis.</p>
+                     <ul class="space-y-1 text-light-text text-xs">
+                         <li class="flex items-center"><i class="fa-solid fa-circle-check text-primary mr-2"></i>Apresentações imersivas</li>
+                         <li class="flex items-center"><i class="fa-solid fa-circle-check text-primary mr-2"></i>Stands interativos</li>
+                         <li class="flex items-center"><i class="fa-solid fa-circle-check text-primary mr-2"></i>Eventos híbridos e virtuais</li>
+                    </ul>
+                </div>
+                 <div class="feature-card rounded-xl p-8">
+                     <div class="feature-icon text-4xl mb-6">
+                         <i class="fas fa-theater-masks"></i> </div>
+                    <h3 class="text-xl font-bold mb-3 text-light-text">Experiências Imersivas</h3>
+                    <p class="text-medium-text text-sm mb-4">Instalações em museus, parques temáticos, exposições e arte digital.</p>
+                     <ul class="space-y-1 text-light-text text-xs">
+                         <li class="flex items-center"><i class="fa-solid fa-circle-check text-primary mr-2"></i>Ambientes 360° interativos</li>
+                         <li class="flex items-center"><i class="fa-solid fa-circle-check text-primary mr-2"></i>Instalações permanentes</li>
+                         <li class="flex items-center"><i class="fa-solid fa-circle-check text-primary mr-2"></i>Storytelling visual avançado</li>
+                    </ul>
+                </div>
+                 <div class="feature-card rounded-xl p-8">
+                     <div class="feature-icon text-4xl mb-6">
+                          <i class="fas fa-cube"></i> </div>
+                    <h3 class="text-xl font-bold mb-3 text-light-text">Projeção Mapeada 3D</h3>
+                    <p class="text-medium-text text-sm mb-4">Transformamos edifícios e objetos em telas dinâmicas para espetáculos visuais.</p>
+                     <ul class="space-y-1 text-light-text text-xs">
+                         <li class="flex items-center"><i class="fa-solid fa-circle-check text-primary mr-2"></i>Mapeamento arquitetônico</li>
+                         <li class="flex items-center"><i class="fa-solid fa-circle-check text-primary mr-2"></i>Mapeamento de objetos complexos</li>
+                         <li class="flex items-center"><i class="fa-solid fa-circle-check text-primary mr-2"></i>Shows de luz e som</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="expertise" class="py-20 bg-transparent"> <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                 <span class="text-primary font-semibold text-sm uppercase tracking-wider">Por que escolher a On+Av?</span>
+                <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mt-2 mb-4">Nossa <span class="gradient-text">Expertise Inigualável</span></h2>
+                <p class="text-xl text-light-text max-w-3xl mx-auto">O que nos diferencia no mercado audiovisual brasileiro.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                <div class="space-y-10">
+                    <div>
+                        <div class="flex items-center mb-3">
+                            <div class="bg-primary bg-opacity-10 p-3 rounded-full mr-4 inline-block">
+                                <i class="fas fa-certificate text-primary text-xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-semibold text-light-text">Expertise Certificada em Disguise</h3>
+                        </div>
+                        <p class="text-medium-text pl-16 text-sm leading-relaxed">
+                            Como um dos times mais experientes em Disguise no Brasil, trazemos conhecimento certificado e comprovado para cada projeto. Nossa liderança técnica atuou em produções de escala olímpica, demonstrando capacidade de execução sob pressão.
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center mb-3">
+                            <div class="bg-primary bg-opacity-10 p-3 rounded-full mr-4 inline-block">
+                                <i class="fas fa-cogs text-primary text-xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-semibold text-light-text">Modelo de Serviço Integrado</h3>
+                        </div>
+                        <p class="text-medium-text pl-16 text-sm leading-relaxed">
+                            Vamos além do aluguel, fornecendo soluções ponta-a-ponta: consulta, design de sistema, programação, operação e gerenciamento. Parcerias estratégicas nos permitem escalar para grandes projetos com controle de qualidade.
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center mb-3">
+                           <div class="bg-primary bg-opacity-10 p-3 rounded-full mr-4 inline-block">
+                                <i class="fas fa-trophy text-primary text-xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-semibold text-light-text">Histórico Comprovado</h3>
+                        </div>
+                        <p class="text-medium-text pl-16 text-sm leading-relaxed">
+                            Nosso portfólio inclui projetos de alto perfil para clientes como Globo, grandes marcas automotivas e eventos corporativos complexos, provando nossa capacidade de entregar resultados impecáveis em cenários de alta exigência.
+                        </p>
+                    </div>
+                 </div>
+
+                <div class="sticky top-24">
+                    <div class="glass-card rounded-xl p-8 border border-primary glow-box-primary">
+                        <h3 class="text-xl font-bold mb-6 text-center text-light-text">Nossa Stack Tecnológica Principal</h3>
+                        <div class="grid grid-cols-2 gap-6 mb-6">
+                            <div class="bg-darker p-4 rounded-lg flex flex-col items-center text-center tech-card">
+                                <img src="https://placehold.co/80x40/020202/00FF9D/?text=Disguise" alt="Logo Disguise" class="h-10 mb-2">
+                                <p class="text-light-text text-xs font-medium">Disguise</p>
+                                <p class="text-medium-text text-[10px]">Media Servers (VX/RX)</p>
+                            </div>
+                            <div class="bg-darker p-4 rounded-lg flex flex-col items-center text-center tech-card">
+                                <img src="https://placehold.co/80x40/020202/00FF9D/?text=Unreal" alt="Logo Unreal Engine" class="h-10 mb-2">
+                                <p class="text-light-text text-xs font-medium">Unreal Engine</p>
+                                <p class="text-medium-text text-[10px]">Real-time Rendering</p>
+                            </div>
+                            <div class="bg-darker p-4 rounded-lg flex flex-col items-center text-center tech-card">
+                                <img src="https://placehold.co/80x40/020202/00FF9D/?text=Christie" alt="Logo Christie/Panasonic" class="h-10 mb-2">
+                                <p class="text-light-text text-xs font-medium">Christie / Panasonic</p>
+                                <p class="text-medium-text text-[10px]">High-Lumen Projectors</p>
+                            </div>
+                            <div class="bg-darker p-4 rounded-lg flex flex-col items-center text-center tech-card">
+                                <img src="https://placehold.co/80x40/020202/00FF9D/?text=Notch" alt="Logo Notch" class="h-10 mb-2">
+                                <p class="text-light-text text-xs font-medium">Notch</p>
+                                <p class="text-medium-text text-[10px]">Real-time Graphics</p>
+                            </div>
+                        </div>
+                         <h4 class="text-md font-semibold mb-2 text-center text-light-text">Certificações Chave:</h4>
+                         <div class="text-center text-primary text-xs space-y-1 font-mono">
+                             <p><i class="fas fa-award mr-1"></i>Operador Certificado Disguise</p>
+                             <p><i class="fas fa-award mr-1"></i>Programador Certificado Disguise</p>
+                             <p><i class="fas fa-award mr-1"></i>Técnico xR Disguise</p>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="cases" class="py-20 bg-dark"> <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-primary font-semibold text-sm uppercase tracking-wider">Projetos de Destaque</span>
+                <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mt-2 mb-4"><span class="gradient-text">Cases</span> de Sucesso</h2>
+                <p class="text-xl text-light-text max-w-3xl mx-auto">Veja como nossa tecnologia e expertise transformam produções.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                 <div class="glass-card rounded-xl overflow-hidden case-study-trigger">
+                    <div class="relative">
+                        <img src="https://img.youtube.com/vi/OzOQQSURvu4/0.jpg" alt="Video Thumbnail" class="w-full h-64 object-cover">
+                        <div class="absolute bottom-0 left-0 bg-primary text-dark px-4 py-1 text-xs font-bold uppercase tracking-wider">Publicidade</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 text-light-text">Cobertura Olimpíadas - Globo</h3>
+                        <p class="text-medium-text text-sm mb-4">Liderança técnica na implementação Disguise para gráficos e ambientes virtuais na transmissão olímpica.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono">Disguise Ecosystem</span>
+                            <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono">Real-time Graphics</span>
+                            <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono">Broadcast</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-xl overflow-hidden case-study-trigger-tcross">
+                    <div class="relative">
+                        <img src="https://img.youtube.com/vi/5InWksj7aNk/0.jpg" alt="Novo T-Cross | Uma Aventura SUVW | VW Brasil" class="w-full h-64 object-cover">
+                        <div class="absolute bottom-0 left-0 bg-primary text-dark px-4 py-1 text-xs font-bold uppercase tracking-wider">Publicidade</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 text-light-text">Novo T-Cross | Uma Aventura SUVW | VW Brasil</h3>
+                        <p class="text-medium-text text-sm mb-4">Utilização de servidores Disguise vx 4 e LED volume 100m2 2.6mm 10-bit HDR.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono">VX Series</span>
+                            <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono">LED Volume</span>
+                            <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono">HDR</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                 <div class="glass-card rounded-xl overflow-hidden case-study-trigger-creta">
+                    <div class="relative">
+                        <img src="https://img.youtube.com/vi/O9XJVbup43M/maxresdefault.jpg" alt="Video Thumbnail" class="w-full h-48 object-cover">
+                        <div class="absolute bottom-0 left-0 bg-primary text-dark px-3 py-1 text-[10px] font-bold uppercase tracking-wider">Publicidade</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-1 text-light-text">Novo Hyundai CRETA</h3>
+                        <p class="text-medium-text text-xs">Servidores Disguise VX4 com playback em tempo real de multiplus vídeos sem compressão em volume LED 2.6mm HDR (array 180º).</p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-xl overflow-hidden case-study-trigger-globo">
+                    <div class="relative">
+                        <img src="https://img.youtube.com/vi/mJVcf-VkZSs/0.jpg" alt="Globo Promo Day" class="w-full h-48 object-cover">
+                        <div class="absolute bottom-0 left-0 bg-primary text-dark px-3 py-1 text-[10px] font-bold uppercase tracking-wider">Broadcast</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-1 text-light-text">Globo Promo Day</h3>
+                        <p class="text-medium-text text-xs">xR powered by Disguise para experiências com painel de LED e piso de LED faz o talento estar imerso no ambiente virtual 3D.</p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-xl overflow-hidden case-study-trigger-jquest">
+                     <div class="relative">
+                         <img src="/img/dvd_jquest_disguise_v1.webp" alt="DVD Jota Quest" class="w-full h-48 object-cover">
+                          <div class="absolute bottom-0 left-0 bg-primary text-dark px-3 py-1 text-[10px] font-bold uppercase tracking-wider">Show</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-1 text-light-text">DVD Jota Quest</h3>
+                        <p class="text-medium-text text-xs">Servidores Disguise VX 4 utilizados na gravação do DVD da banda em São Paulo.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Row of Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8"> 
+                 <!-- Card 1: Encontro C&A -->
+                 <div class="glass-card rounded-xl overflow-hidden case-study-trigger-cea">
+                    <div class="relative">
+                        <img src="https://img.youtube.com/vi/YA3WOyQboWA/maxresdefault.jpg" alt="Encontro C&A" class="w-full h-48 object-cover">
+                        <div class="absolute bottom-0 left-0 bg-primary text-dark px-3 py-1 text-[10px] font-bold uppercase tracking-wider">Corporativo</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-1 text-light-text">Encontro C&A</h3>
+                        <p class="text-medium-text text-xs">Descrição placeholder para o evento Encontro C&A.</p>
+                    </div>
+                </div>
+
+                <!-- Card 2: Ponto Final -->
+                <div class="glass-card rounded-xl overflow-hidden case-study-trigger-pontofinal">
+                    <div class="relative">
+                        <img src="https://img.youtube.com/vi/U9NumXGdxv0/maxresdefault.jpg" alt="Ponto Final (Temporada 1)" class="w-full h-48 object-cover">
+                        <div class="absolute bottom-0 left-0 bg-primary text-dark px-3 py-1 text-[10px] font-bold uppercase tracking-wider">Série</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-1 text-light-text">Ponto Final (Temporada 1)</h3>
+                        <p class="text-medium-text text-xs">Trailer em Português | Netflix.</p>
+                    </div>
+                </div>
+
+                <!-- Card 3: DVD Filipe Ret -->
+                <div class="glass-card rounded-xl overflow-hidden case-study-trigger-filipe">
+                     <div class="relative">
+                         <img src="/img/filipe_ret_disguise.webp" alt="DVD Filipe Ret" class="w-full h-48 object-cover">
+                          <div class="absolute bottom-0 left-0 bg-primary text-dark px-3 py-1 text-[10px] font-bold uppercase tracking-wider">Show</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-1 text-light-text">DVD Filipe Ret</h3>
+                        <p class="text-medium-text text-xs">Servidores Disguise VX 4 utilizados na gravação do DVD do artista no Rio de Janeiro.</p>
+                    </div>
+                </div>
+            </div>
+
+             <div class="mt-16 text-center">
+                  <a href="#contact" class="btn-secondary font-bold py-3 px-8 rounded-md">
+                      Discutir meu Projeto <i class="fas fa-arrow-right ml-2"></i>
+                  </a>
+              </div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-transparent"> <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                <div class="stats-item pl-4 md:pl-6 py-4">
+                    <h3 class="text-4xl md:text-5xl font-bold gradient-text mb-1">50+</h3>
+                    <p class="text-medium-text text-sm uppercase tracking-wider">Produções Complexas</p>
+                </div>
+                <div class="stats-item pl-4 md:pl-6 py-4">
+                    <h3 class="text-4xl md:text-5xl font-bold gradient-text mb-1">100%</h3>
+                    <p class="text-medium-text text-sm uppercase tracking-wider">Satisfação de Clientes</p>
+                </div>
+                <div class="stats-item pl-4 md:pl-6 py-4">
+                    <h3 class="text-4xl md:text-5xl font-bold gradient-text mb-1">24/7</h3>
+                    <p class="text-medium-text text-sm uppercase tracking-wider">Suporte Dedicado</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 bg-dark"> <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                 <span class="text-primary font-semibold text-sm uppercase tracking-wider">Vozes dos Clientes</span>
+                <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mt-2 mb-4">O Que Nossos <span class="gradient-text">Parceiros</span> Dizem</h2>
+                 <p class="text-xl text-light-text max-w-3xl mx-auto">A qualidade do nosso serviço reflete na satisfação de quem confia em nós.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                 <div class="testimonial-card rounded-xl p-8">
+                     <div class="flex items-center mb-6">
+                         <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Foto de Carlos Mendes" class="w-12 h-12 rounded-full mr-4 border-2 border-primary" onerror="this.onerror=null; this.src='https://placehold.co/48x48/020202/e0e0e0?text=CM';">
+                         <div>
+                             <h4 class="font-bold text-light-text">Carlos Mendes</h4>
+                             <p class="text-medium-text text-xs">Diretor Criativo, Globo</p>
+                         </div>
+                     </div>
+                      <p class="text-light-text text-sm italic leading-relaxed mb-6">"A equipe On+Av foi fundamental para o sucesso do nosso especial. O suporte 24/7 fez toda a diferença nos desafios inesperados da gravação."</p>
+                     <div class="flex text-yellow-400">
+                         <i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm"></i>
+                     </div>
+                 </div>
+                  <div class="testimonial-card rounded-xl p-8">
+                       <div class="flex items-center mb-6">
+                           <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Foto de Ana Beatriz" class="w-12 h-12 rounded-full mr-4 border-2 border-primary" onerror="this.onerror=null; this.src='https://placehold.co/48x48/020202/e0e0e0?text=AB';">
+                           <div>
+                               <h4 class="font-bold text-light-text">Ana Beatriz</h4>
+                               <p class="text-medium-text text-xs">Produtora Executiva, Rock in Rio</p>
+                           </div>
+                     </div>
+                       <p class="text-light-text text-sm italic leading-relaxed mb-6">"Os equipamentos Disguise performaram acima das expectativas durante o festival. A qualidade do conteúdo nas telas foi impressionante e muito elogiada."</p>
+                       <div class="flex text-yellow-400">
+                           <i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm"></i>
+                       </div>
+                  </div>
+                  <div class="testimonial-card rounded-xl p-8">
+                       <div class="flex items-center mb-6">
+                           <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Foto de Ricardo Almeida" class="w-12 h-12 rounded-full mr-4 border-2 border-primary" onerror="this.onerror=null; this.src='https://placehold.co/48x48/020202/e0e0e0?text=RA';">
+                           <div>
+                               <h4 class="font-bold text-light-text">Ricardo Almeida</h4>
+                               <p class="text-medium-text text-xs">Diretor, Amazon Studios</p>
+                           </div>
+                     </div>
+                     <p class="text-light-text text-sm italic leading-relaxed mb-6">"Precisávamos de virtual production confiável para nossa série original. A On+Av forneceu equipamento e consultoria que aceleraram nossa produção."</p>
+                       <div class="flex text-yellow-400">
+                           <i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm"></i>
+                       </div>
+                  </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="py-20 bg-transparent"> <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+                <div class="lg:w-1/2">
+                     <span class="text-primary font-semibold text-sm uppercase tracking-wider">Quem Somos</span>
+                    <h2 class="text-3xl md:text-4xl font-bold mt-2 mb-6 text-light-text">A Referência em <span class="gradient-text">Tecnologia Visual</span> no Brasil</h2>
+                    <p class="text-light-text mb-6 text-base leading-relaxed">
+                        Somos especialistas em soluções profissionais com tecnologia Disguise, oferecendo não apenas aluguel de equipamentos, mas todo o ecossistema necessário para produções visuais de alto nível.
+                    </p>
+                    <p class="text-medium-text mb-8 text-base leading-relaxed">
+                        Com uma equipe de técnicos certificados e anos de experiência, somos o parceiro preferencial para produtoras, emissoras e estúdios que demandam excelência técnica e criativa.
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+                        <div class="flex items-start">
+                            <div class="bg-primary bg-opacity-10 rounded-lg p-2 mr-3 inline-block">
+                                <i class="fas fa-certificate text-primary text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1 text-light-text">Certificação Oficial</h4>
+                                <p class="text-medium-text text-xs">Equipe técnica certificada Disguise</p>
+                            </div>
+                        </div>
+                         <div class="flex items-start">
+                            <div class="bg-primary bg-opacity-10 rounded-lg p-2 mr-3 inline-block">
+                                <i class="fas fa-shield-alt text-primary text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1 text-light-text">Manutenção Rigorosa</h4>
+                                <p class="text-medium-text text-xs">Equipamentos com manutenção preventiva</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                           <div class="bg-primary bg-opacity-10 rounded-lg p-2 mr-3 inline-block">
+                                <i class="fas fa-truck text-primary text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1 text-light-text">Logística Completa</h4>
+                                <p class="text-medium-text text-xs">Transporte e instalação nacional</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                           <div class="bg-primary bg-opacity-10 rounded-lg p-2 mr-3 inline-block">
+                                <i class="fas fa-headset text-primary text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1 text-light-text">Resposta Rápida</h4>
+                                <p class="text-medium-text text-xs">Suporte técnico ágil e dedicado</p>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#contact" class="btn-primary font-bold py-3 px-8 rounded-md inline-block">Fale Conosco</a>
+                </div>
+                 <div class="lg:w-1/2">
+                    <div class="relative">
+                        <img src="img/team2.webp" alt="Nossa Equipe em Ação" class="rounded-xl shadow-xl glow-box-secondary" onerror="this.onerror=null; this.src='https://placehold.co/600x400/020202/e0e0e0?text=Equipe+On+Av';">
+                        <div class="absolute -bottom-6 -left-6 glass-card p-4 rounded-xl shadow-lg border border-secondary glow-box-secondary z-10 w-2/3 md:w-1/2">
+                            <div class="flex items-center">
+                                <div class="bg-secondary bg-opacity-20 rounded-full p-3 mr-3">
+                                    <i class="fas fa-award text-secondary text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-light-text mb-1">Parceiro Oficial Disguise</p>
+                                    <p class="text-xs text-medium-text">Excelência Técnica Certificada</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 bg-gradient-to-r from-primary/10 via-dark to-secondary/10"> <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-light-text">Pronto para <span class="gradient-text">Elevar</span> Sua Produção?</h2>
+            <p class="text-xl text-light-text mb-10">Nossa equipe de especialistas está pronta para entender suas necessidades e oferecer a melhor solução em tecnologia visual para seu projeto.</p>
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <a href="#contact" class="btn-primary font-bold py-4 px-10 rounded-md text-lg">
+                    Solicitar Orçamento
+                </a>
+                <a href="https://wa.me/5511920550210?text=Olá%2C%20gostaria%20de%20discutir%20sobre%20meu%20projeto%20e%20descobrir%20como%20os%20serviços%20da%20On%2BAv%20podem%20me%20ajudar." target="_blank" class="btn-secondary font-bold py-4 px-10 rounded-md text-lg flex items-center justify-center">
+                    <i class="fab fa-whatsapp mr-2"></i> (11) 92055-0210 </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="py-20 bg-transparent"> <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row gap-12 lg:gap-16">
+                <div class="lg:w-1/2">
+                     <span class="text-primary font-semibold text-sm uppercase tracking-wider">Contato</span>
+                    <h2 class="text-3xl md:text-4xl font-bold mt-2 mb-6 text-light-text">Vamos Conversar Sobre <span class="gradient-text">Seu Projeto</span></h2>
+                    <p class="text-light-text mb-8">Preencha o formulário ou entre em contato diretamente. Nossa equipe especializada está pronta para ajudar.</p>
+                    
+                    <div class="space-y-5 mb-8">
+                        <div class="flex items-start">
+                            <div class="bg-primary bg-opacity-10 rounded-lg p-3 mr-4 inline-block mt-1">
+                                <i class="fas fa-map-marker-alt text-primary text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1 text-light-text">Escritório São Paulo</h4>
+                                <p class="text-medium-text text-sm">Rua Plácido Vieira, 43, Santo Amaro<br>São Paulo - SP, 04754-080</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-primary bg-opacity-10 rounded-lg p-3 mr-4 inline-block mt-1">
+                                <i class="fas fa-phone text-primary text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1 text-light-text">Telefone</h4>
+                                <p class="text-medium-text text-sm hover:text-primary transition"><a href="tel:+5511920550210">(11) 92055-0210</a></p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-primary bg-opacity-10 rounded-lg p-3 mr-4 inline-block mt-1">
+                                <i class="fas fa-envelope text-primary text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1 text-light-text">E-mail</h4>
+                                <p class="text-medium-text text-sm hover:text-primary transition"><a href="mailto:nelson@onav.com.br">nelson@onav.com.br</a></p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-primary bg-opacity-10 rounded-lg p-3 mr-4 inline-block mt-1">
+                                <i class="fas fa-clock text-primary text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1 text-light-text">Horário</h4>
+                                <p class="text-medium-text text-sm">Seg-Sex: 9h às 18h | Plantão 24h (Clientes)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="font-semibold text-light-text mb-4">Siga-nos</h4>
+                        <div class="flex space-x-4">
+                            <a href="#" class="text-medium-text hover:text-primary text-xs transition duration-300" aria-label="Instagram">
+                                <i class="fab fa-instagram text-lg"></i>
+                            </a>
+                            <a href="#" class="text-medium-text hover:text-primary text-xs transition duration-300" aria-label="LinkedIn">
+                                <i class="fab fa-linkedin-in text-lg"></i>
+                            </a>
+                            <a href="#" class="text-medium-text hover:text-primary text-xs transition duration-300" aria-label="YouTube">
+                                <i class="fab fa-youtube text-lg"></i>
+                            </a>
+                             <a href="#" class="text-medium-text hover:text-primary text-xs transition duration-300" aria-label="Vimeo">
+                                <i class="fab fa-vimeo-v text-lg"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:w-1/2">
+                    <form class="glass-card rounded-xl p-8 border border-gray-700">
+                        <h3 class="text-2xl font-semibold mb-6 text-center text-light-text">Envie sua Mensagem</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label for="name" class="block text-medium-text text-sm mb-1">Nome Completo*</label>
+                                <input type="text" id="name" name="name" required class="w-full px-4 py-3 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label for="email" class="block text-medium-text text-sm mb-1">Email*</label>
+                                <input type="email" id="email" name="email" required class="w-full px-4 py-3 rounded-lg text-sm">
+                            </div>
+                        </div>
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label for="phone" class="block text-medium-text text-sm mb-1">Telefone*</label>
+                                <input type="tel" id="phone" name="phone" required class="w-full px-4 py-3 rounded-lg text-sm" placeholder="(XX) XXXXX-XXXX">
+                            </div>
+                            <div>
+                                <label for="company" class="block text-medium-text text-sm mb-1">Empresa</label>
+                                <input type="text" id="company" name="company" class="w-full px-4 py-3 rounded-lg text-sm">
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <label for="project" class="block text-medium-text text-sm mb-1">Sobre seu projeto*</label>
+                            <textarea id="project" name="project" rows="4" required class="w-full px-4 py-3 rounded-lg text-sm" placeholder="Descreva brevemente seu projeto ou necessidade..."></textarea>
+                        </div>
+                        <div class="mb-8">
+                              <label for="equipment-interest" class="block text-medium-text text-sm mb-1">Equipamentos de interesse</label>
+                            <select id="equipment-interest" name="equipment-interest" class="w-full px-4 py-3 rounded-lg text-sm">
+                                <option value="">Selecione (opcional)</option>
+                                <option value="Disguise VX">Disguise VX Series</option>
+                                <option value="Disguise RX">Disguise RX Series</option>
+                                <option value="LED Panel">Painel de LED</option>
+                                <option value="Projector">Projetor</option>
+                                <option value="Camera">Câmera</option>
+                                <option value="Tracking">Tracking System</option>
+                                <option value="Mobile Unit">Unidade Móvel</option>
+                                <option value="Virtual Production">Solução Virtual Production</option>
+                                <option value="xR Solution">Solução xR</option>
+                                <option value="Projection Mapping">Solução Projeção Mapeada</option>
+                                <option value="Other">Outro / Consultoria</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary w-full font-bold py-4 px-8 rounded-md text-base">Enviar Mensagem</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="orcamentoModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 hidden">
+        <div class="relative w-full max-w-md mx-auto rounded-xl border-2 border-primary p-8 bg-black shadow-xl flex flex-col items-center" style="border-color: #00ff9d;">
+            <button id="closeOrcamentoModal" class="absolute top-3 right-3 text-primary text-2xl hover:text-green-400 focus:outline-none" aria-label="Fechar Modal">&times;</button>
+            <h2 class="text-2xl font-bold mb-6 text-primary" style="color: #00ff9d;">Simular Orçamento</h2>
+            <div class="flex flex-col w-full gap-4">
+                <a href="led/index.html" class="w-full">
+                    <button class="producao-virtual-btn w-full py-3 rounded-lg border-2 border-primary bg-black text-primary font-semibold text-lg transition-all duration-200 hover:bg-primary" style="border-color: #00ff9d; color: #00ff9d;">Produção Virtual</button>
+                </a>
+                <button class="w-full py-3 rounded-lg border-2 border-gray-700 bg-gray-900 text-gray-500 font-semibold text-lg cursor-not-allowed opacity-60" disabled>xR</button>
+                <button class="w-full py-3 rounded-lg border-2 border-gray-700 bg-gray-900 text-gray-500 font-semibold text-lg cursor-not-allowed opacity-60" disabled>LED para eventos</button>
+                <button class="w-full py-3 rounded-lg border-2 border-gray-700 bg-gray-900 text-gray-500 font-semibold text-lg cursor-not-allowed opacity-60" disabled>Projeção</button>
+                <button class="w-full py-3 rounded-lg border-2 border-gray-700 bg-gray-900 text-gray-500 font-semibold text-lg cursor-not-allowed opacity-60" disabled>Multi-camera</button>
+            </div>
+            <p class="mt-6 text-gray-400 text-center text-sm">Outras calculadoras em breve, para demandas de xR, LED, Projeção e Multi-Camera</p>
+            <a href="https://cal.com/onav.com.br/30min" target="_blank" rel="noopener" class="w-full mt-4">
+                <button class="w-full py-3 rounded-lg border-2 border-primary bg-primary text-black font-semibold text-lg transition-all duration-200 hover:bg-green-400" style="border-color: #00ff9d;">
+                    Fale com especialista
+                </button>
+            </a>
+        </div>
+    </div>
+
+    <!-- Modal Structure -->
+  <div id="caseStudyModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center;">
+    <div style="background-color: #1f1f1f; color: #e0e0e0; margin: auto; padding: 20px; border-radius: 20px; width: 90%; max-width: 900px; position: relative; top: 20px; border: 2px solid #00ffaa; box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 8px #00aaff, 0 0 12px #aa00ff;">
+      <span id="closeCaseStudyModal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 20px;">&times;</span>
+      <h3 class="text-xl font-bold mb-2 text-light-text" style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.5rem; color: #f0f0f0;">Cobertura Olimpíadas - Globo</h3>
+      
+      <!-- Video Player -->
+      <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
+        <iframe id="caseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/OzOQQSURvu4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+
+      <!-- Case Study Content -->
+      <div id="caseStudyContent">
+        <p class="text-medium-text text-sm mb-4" style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">Liderança técnica na implementação Disguise para gráficos e ambientes virtuais na transmissão olímpica.</p>
+        
+        <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Disguise Ecosystem</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Real-time Graphics</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Broadcast</span>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Desafio do Projeto</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">A cobertura das Olimpíadas exigiu uma solução robusta e flexível para criar ambientes virtuais dinâmicos e gráficos em tempo real durante as transmissões ao vivo, mantendo sincronização perfeita com múltiplas câmeras.</p>
+        
+        <!-- Featured Image - Full Width -->
+        <div style="width: 100%; margin: 30px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+          <img src="/img/olimpiadas_globo_v1.webp" alt="Produção Virtual Olimpíadas Globo - Estúdio Principal" style="width: 100%; display: block;">
+        </div>
+        
+        <!-- Three Column Layout for Images -->
+        <div style="display: flex; gap: 15px; margin: 30px 0;">
+          <div style="flex: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/olimpiadas_globo_v4.webp" alt="Produção Virtual Olimpíadas Globo - Ambiente Interativo" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div style="flex: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/olimpiadas_globo_v5.webp" alt="Produção Virtual Olimpíadas Globo - Gráficos em Tempo Real" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div style="flex: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/olimpiadas_globo_v6.webp" alt="Produção Virtual Olimpíadas Globo - Cenário Digital" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Nossa Solução</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Implementamos um sistema completo baseado no ecossistema Disguise para criar ambientes virtuais interativos e gráficos em tempo real. A solução incluiu servidores de alta performance, integração com sistemas de tracking de câmera e uma pipeline otimizada para transmissões ao vivo.</p>
+        
+        <!-- Two Column Layout for Images -->
+        <div style="display: flex; gap: 15px; margin: 30px 0;">
+          <div style="flex: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/olimpiadas_globo_v7.webp" alt="Produção Virtual Olimpíadas Globo - Sistema de Tracking" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div style="flex: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/olimpiadas_globo_v8.webp" alt="Produção Virtual Olimpíadas Globo - Integração de Dados" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+        </div>
+        
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-top: 20px;">Nossa equipe trabalhou em estreita colaboração com a equipe de produção da Globo para garantir que todos os elementos visuais estivessem perfeitamente alinhados com a identidade visual dos Jogos Olímpicos e com as necessidades específicas de cada segmento da cobertura.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Resultados</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">A implementação foi um sucesso, permitindo que a Globo oferecesse uma cobertura olímpica visualmente impressionante e tecnicamente impecável. Os ambientes virtuais e gráficos em tempo real enriqueceram a experiência do telespectador, fornecendo contexto visual e informações de forma dinâmica e envolvente.</p>
+        
+        <!-- Last Two Images (v2 and v3) as requested -->
+        <div style="display: flex; gap: 15px; margin: 30px 0;">
+          <div style="flex: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/olimpiadas_globo_v2.webp" alt="Produção Virtual Olimpíadas Globo - Apresentadores em Estúdio Virtual" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div style="flex: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/olimpiadas_globo_v3.webp" alt="Produção Virtual Olimpíadas Globo - Visão Panorâmica do Estúdio" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+        </div>
+        
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-top: 20px;">O projeto recebeu reconhecimento internacional pela inovação tecnológica e qualidade visual, estabelecendo um novo padrão para coberturas esportivas de grande escala.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- T-Cross Modal Structure -->
+  <div id="tcrossCaseStudyModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center;">
+    <div style="background-color: #1f1f1f; color: #e0e0e0; margin: auto; padding: 20px; border-radius: 20px; width: 90%; max-width: 900px; position: relative; top: 20px; border: 2px solid #00ffaa; box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 8px #00aaff, 0 0 12px #aa00ff;">
+      <span id="closeTcrossCaseStudyModal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 20px;">&times;</span>
+      <h3 class="text-xl font-bold mb-2 text-light-text" style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.5rem; color: #f0f0f0;">Novo T-Cross | Uma Aventura SUVW | VW Brasil</h3>
+      
+      <!-- Video Player -->
+      <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
+        <iframe id="tcrossCaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/5InWksj7aNk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+
+      <!-- Case Study Content -->
+      <div id="tcrossCaseStudyContent">
+        <p class="text-medium-text text-sm mb-4" style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">Utilização de servidores Disguise vx 4 e LED volume 100m2 2.6mm 10-bit HDR.</p>
+        
+        <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">VX Series</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">LED Volume</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">HDR</span>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Sobre o Projeto</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">A campanha do Novo T-Cross da Volkswagen Brasil exigiu uma abordagem inovadora para criar um ambiente imersivo que combinasse elementos reais e virtuais. O desafio era criar uma experiência visual impactante que destacasse as características aventureiras do SUV.</p>
+        
+        <!-- First making-of image - full width with enhanced styling -->
+        <div style="width: 100%; margin: 30px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+          <img src="/img/t-cross_virtual_production_v1.webp" alt="Produção Virtual Volkswagen T-Cross - Ambiente LED Volume 100m²" style="width: 100%; display: block;" loading="lazy">
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Tecnologia Aplicada</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Implementamos um ambiente de LED Volume com 100m² de painéis LED de alta resolução (2.6mm pitch) com capacidade HDR de 10-bit para cores vibrantes e realistas. Os servidores Disguise VX 4 foram utilizados para renderização em tempo real, permitindo ajustes instantâneos e integração perfeita entre o veículo físico e os cenários virtuais.</p>
+        
+        <!-- Second making-of image - full width with enhanced styling -->
+        <div style="width: 100%; margin: 30px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+          <img src="/img/t-cross_virtual_production_v2.webp" alt="Produção Virtual Volkswagen T-Cross - Integração Veículo e Cenário Digital" style="width: 100%; display: block;" loading="lazy">
+        </div>
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Resultados</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">A campanha resultou em um conteúdo visual de alta qualidade que destacou o T-Cross em diversos ambientes aventureiros sem a necessidade de filmagens em locações remotas. A tecnologia de LED Volume permitiu controle total sobre as condições de iluminação e ambientação, resultando em uma produção eficiente e visualmente impressionante.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hyundai CRETA Modal Structure -->
+  <div id="cretaCaseStudyModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center;">
+    <div style="background-color: #1f1f1f; color: #e0e0e0; margin: auto; padding: 20px; border-radius: 20px; width: 90%; max-width: 900px; position: relative; top: 20px; border: 2px solid #00ffaa; box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 8px #00aaff, 0 0 12px #aa00ff;">
+      <span id="closeCretaCaseStudyModal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 20px;">&times;</span>
+      <h3 class="text-xl font-bold mb-2 text-light-text" style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.5rem; color: #f0f0f0;">Novo Hyundai CRETA</h3>
+      
+      <!-- Video Player -->
+      <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
+        <iframe id="cretaCaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/O9XJVbup43M" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+
+      <!-- Case Study Content -->
+      <div id="cretaCaseStudyContent">
+        <p class="text-medium-text text-sm mb-4" style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">Servidores Disguise VX4 com playback em tempo real de multiplus vídeos sem compressão em volume LED 2.6mm HDR (array 180º).</p>
+        
+        <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">VX4 Series</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">LED Volume</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">HDR</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">180º Array</span>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Visão Geral</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">O lançamento do Novo Hyundai CRETA exigiu uma abordagem inovadora para destacar o design e os recursos do veículo. Utilizamos um ambiente imersivo com painéis LED em configuração de 180 graus para criar uma experiência visual envolvente que permitiu apresentar o veículo em diversos cenários virtuais.</p>
+        
+        <!-- First Image - Full Width -->
+        <div style="width: 100%; margin: 20px 0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+          <img src="/img/comercial_creta_9.webp" alt="Produção Virtual Hyundai CRETA - Vista Frontal LED" style="width: 100%; display: block;" loading="lazy">
+        </div>
+        
+        <!-- Single Column for Second Image -->
+        <div style="display: flex; gap: 10px; margin: 15px 0;">
+          <div style="flex: 1; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/comercial_creta_10.webp" alt="Produção Virtual Hyundai CRETA - Setão de LED 180º" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Solução Técnica</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Implementamos um sistema de volume LED com painéis de 2.6mm de alta resolução em configuração de 180 graus, criando um ambiente imersivo para o veículo. Os servidores Disguise VX4 foram utilizados para gerenciar o playback em tempo real de múltiplos vídeos sem compressão, garantindo qualidade visual excepcional com suporte a HDR para cores mais vibrantes e realistas.</p>
+        
+        <!-- Third Image - Full Width -->
+        <div style="width: 100%; margin: 20px 0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+          <img src="/img/comercial_creta_11.webp" alt="Produção Virtual Hyundai CRETA - Ambiente Imersivo LED" style="width: 100%; display: block;" loading="lazy">
+        </div>
+        
+        <!-- Single Column for Fourth Image -->
+        <div style="display: flex; gap: 10px; margin: 15px 0;">
+          <div style="flex: 1; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/comercial_creta_12.webp" alt="Produção Virtual Hyundai CRETA - Cenário Digital" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Benefícios</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">A utilização do sistema Disguise com painéis LED em 180 graus permitiu criar uma experiência visual impactante, com transições suaves entre diferentes ambientes virtuais. O veículo pode ser apresentado em diversos cenários sem a necessidade de deslocamentos, economizando tempo e recursos de produção enquanto mantinha a mais alta qualidade visual.</p>
+        
+        <!-- Two Column Layout for Fifth and Sixth Images -->
+        <div style="display: flex; gap: 10px; margin: 15px 0;">
+          <div style="flex: 1; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/comercial_creta_13.webp" alt="Produção Virtual Hyundai CRETA - Visão Geral do Ambiente 180º" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+          <div style="flex: 1; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/comercial_creta_14.webp" alt="Produção Virtual Hyundai CRETA - Detalhes da Produção" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+        </div>
+        
+        <!-- Last Image - Smaller Size -->
+        <div style="width: 50%; margin: 15px auto 5px auto; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+          <img src="/img/comercial_creta_8.webp" alt="Produção Virtual Hyundai CRETA - Visão Geral do Ambiente 180º" style="width: 100%; display: block;" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Globo Promo Day Modal Structure -->
+  <div id="globoCaseStudyModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center;">
+    <div style="background-color: #1f1f1f; color: #e0e0e0; margin: auto; padding: 20px; border-radius: 20px; width: 90%; max-width: 900px; position: relative; top: 20px; border: 2px solid #00ffaa; box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 8px #00aaff, 0 0 12px #aa00ff;">
+      <span id="closeGloboCaseStudyModal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 20px;">&times;</span>
+      <h3 class="text-xl font-bold mb-2 text-light-text" style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.5rem; color: #f0f0f0;">Globo Promo Day</h3>
+      
+      <!-- Video Player -->
+      <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
+        <iframe id="globoCaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/mJVcf-VkZSs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+
+      <!-- Case Study Content -->
+      <div id="globoCaseStudyContent">
+        <p class="text-medium-text text-sm mb-4" style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">xR powered by Disguise para experiências com painel de LED e piso de LED faz o talento estar imerso no ambiente virtual 3D.</p>
+        
+        <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">xR</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">LED Floor</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Virtual Production</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Broadcast</span>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">O Projeto</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">O Globo Promo Day foi um evento inovador que utilizou tecnologia de Extended Reality (xR) para criar um ambiente virtual imersivo para apresentadores e talentos da emissora. O desafio era criar um espaço onde os apresentadores pudessem interagir com elementos virtuais de forma natural e convincente.</p>
+        
+        <!-- Featured Image - Full Width -->
+        <div style="width: 100%; margin: 30px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+          <img src="/img/olimpiadas_globo_1.jpg" alt="Produção Virtual Globo Promo Day - Ambiente xR com Piso de LED" style="width: 100%; display: block;" loading="lazy">
+        </div>
+        
+        <!-- Two Column Layout for Images -->
+        <div style="display: flex; gap: 15px; margin: 30px 0;">
+          <div style="flex: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/olimpiadas_globo_4.jpg" alt="Produção Virtual Globo Promo Day - Integração Apresentador e Cenário Virtual" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+          <div style="flex: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/olimpiadas_globo_5.jpg" alt="Produção Virtual Globo Promo Day - Sistema de Tracking em Tempo Real" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Implementação Técnica</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Utilizamos a plataforma Disguise para criar um ambiente xR completo, combinando painéis LED verticais com um piso de LED interativo. Esta configuração permitiu a criação de um volume virtual onde os apresentadores podiam se movimentar livremente enquanto interagiam com elementos virtuais 3D gerados em tempo real.</p>
+        
+        <!-- Single Large Image -->
+        <div style="width: 100%; margin: 30px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+          <img src="/img/olimpiadas_globo_6.jpg" alt="Produção Virtual Globo Promo Day - Piso de LED Interativo" style="width: 100%; display: block;" loading="lazy">
+        </div>
+        
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">O sistema de rastreamento de câmera integrado ao Disguise permitiu que os movimentos de câmera físicos se traduzissem perfeitamente no ambiente virtual, criando uma experiência visual coesa e imersiva para os telespectadores.</p>
+        
+        <!-- Single Large Image -->
+        <div style="width: 100%; margin: 30px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+          <img src="/img/olimpiadas_globo_7.jpg" alt="Produção Virtual Globo Promo Day - Ambiente Virtual Completo" style="width: 100%; display: block;" loading="lazy">
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Resultados</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">O uso da tecnologia xR permitiu que a Globo criasse promoções visualmente impactantes com ambientes virtuais complexos que seriam impossíveis ou extremamente caros de construir fisicamente. A capacidade de mudar cenários instantaneamente trouxe flexibilidade criativa e eficiência operacional, resultando em conteúdo de alta qualidade com menor tempo de produção.</p>
+        
+        <!-- Final Two Images Side by Side (v2 and v3) -->
+        <div style="display: flex; gap: 15px; margin: 30px 0;">
+          <div style="flex: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/olimpiadas_globo_2.jpg" alt="Produção Virtual Globo Promo Day - Apresentador em Cenário xR" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+          <div style="flex: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/olimpiadas_globo_3.jpg" alt="Produção Virtual Globo Promo Day - Visão Geral do Estúdio Virtual" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Encontro C&A Modal Structure -->
+  <div id="ceaCaseStudyModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center;">
+    <div style="background-color: #1f1f1f; color: #e0e0e0; margin: auto; padding: 20px; border-radius: 20px; width: 90%; max-width: 900px; position: relative; top: 20px; border: 2px solid #00ffaa; box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 8px #00aaff, 0 0 12px #aa00ff;">
+      <span id="closeCeaCaseStudyModal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 20px;">&times;</span>
+      <h3 class="text-xl font-bold mb-2 text-light-text" style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.5rem; color: #f0f0f0;">Encontro C&A</h3>
+      
+      <!-- Video Player -->
+      <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
+        <iframe id="ceaCaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/YA3WOyQboWA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+
+      <!-- Case Study Content -->
+      <div id="ceaCaseStudyContent">
+        <p class="text-medium-text text-sm mb-4" style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">Evento corporativo da C&A utilizando tecnologia Disguise para criação de ambientes imersivos e experiências interativas para os convidados.</p>
+        
+        <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Corporativo</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Evento</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Interativo</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Mapping</span>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Sobre o Evento</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">O Encontro C&A foi um evento corporativo de grande escala que reuniu executivos, parceiros e colaboradores da marca para apresentação de resultados e estratégias futuras. O desafio era criar um ambiente tecnologicamente avançado que refletisse o posicionamento inovador da marca no mercado de varejo de moda.</p>
+        
+        <!-- First Row: Two Column Layout -->
+        <div style="display: flex; gap: 10px; margin: 15px 0;">
+          <div style="flex: 1; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/adriana_lima_virtual_production_1.webp" alt="Produção Virtual C&A - Adriana Lima em Ambiente LED" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+          <div style="flex: 1; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/adriana_lima_virtual_production_2.webp" alt="Produção Virtual C&A - Cenário Imersivo com Modelo" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Nossa Abordagem</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Desenvolvemos um conceito de palco 360º com projeção mapeada utilizando servidores Disguise para gerenciar conteúdo em tempo real. A solução incluiu elementos interativos que respondiam aos movimentos dos apresentadores no palco, criando uma experiência dinâmica e envolvente.</p>
+        
+        <!-- Second Row: Two Column Layout -->
+        <div style="display: flex; gap: 10px; margin: 15px 0;">
+          <div style="flex: 1; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/adriana_lima_virtual_production_3.webp" alt="Produção Virtual C&A - Configuração Técnica do Ambiente" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+          <div style="flex: 1; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/adriana_lima_virtual_production_4.webp" alt="Produção Virtual C&A - Visão Lateral do Estudio" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+        </div>
+        
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">O sistema de projeção mapeada permitiu transformar superfícies comuns em telas interativas, com conteúdo personalizado que se adaptava a cada momento do evento, desde apresentações corporativas até momentos de celebração.</p>
+        
+        <!-- Third Row: Two Column Layout -->
+        <div style="display: flex; gap: 10px; margin: 15px 0;">
+          <div style="flex: 1; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/adriana_lima_virtual_production_5.webp" alt="Produção Virtual C&A - Estrutura de Iluminação" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+          <div style="flex: 1; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/adriana_lima_virtual_production_6.webp" alt="Produção Virtual C&A - Corredor Técnico do Estúdio" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Impacto</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">O evento elevou significativamente o nível de engajamento dos participantes, com feedback extremamente positivo sobre a experiência imersiva. A tecnologia utilizada permitiu transmitir mensagens corporativas de forma mais impactante e memorável, alinhando-se perfeitamente com os valores de inovação e criatividade da C&A.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- DVD Filipe Ret Modal Structure -->
+  <div id="filipeCaseStudyModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center;">
+    <div style="background-color: #1f1f1f; color: #e0e0e0; margin: auto; padding: 20px; border-radius: 20px; width: 90%; max-width: 900px; position: relative; top: 20px; border: 2px solid #00ffaa; box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 8px #00aaff, 0 0 12px #aa00ff;">
+      <span id="closeFilipeCaseStudyModal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 20px;">&times;</span>
+      <h3 class="text-xl font-bold mb-2 text-light-text" style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.5rem; color: #f0f0f0;">DVD Filipe Ret</h3>
+      
+      <!-- Video Player -->
+      <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
+        <iframe id="filipeCaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/7S-lfmsvd2A" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+
+      <!-- Case Study Content -->
+      <div id="filipeCaseStudyContent">
+        <p class="text-medium-text text-sm mb-4" style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">Servidores Disguise VX 4 utilizados na gravação do DVD do artista no Rio de Janeiro.</p>
+        
+        <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">VX 4</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Show</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Live Performance</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">LED Screens</span>
+        </div>
+        
+        <!-- Featured Image - Full Width -->
+        <div style="width: 100%; margin-bottom: 20px; border-radius: 10px; overflow: hidden;">
+          <img src="/img/filipe_ret_disguise.webp" alt="Produção Virtual DVD Filipe Ret - Palco com Iluminação LED" style="width: 100%; display: block;" loading="lazy">
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">O Projeto</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">A gravação do DVD do Filipe Ret exigiu uma produção visual de alto nível para complementar a performance do artista. O desafio era criar um ambiente visual dinâmico que se integrasse perfeitamente com a energia do show de rap, utilizando painéis de LED e conteúdo visual sincronizado com a música.</p>
+        
+        <!-- Two Column Layout for Images -->
+        <div style="display: flex; gap: 15px; margin: 20px 0;">
+          <div style="flex: 1; border-radius: 8px; overflow: hidden;">
+            <img src="/img/filipe_ret_disguise_v2.webp" alt="Produção Virtual DVD Filipe Ret - Performance ao Vivo" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+          <div style="flex: 1; border-radius: 8px; overflow: hidden;">
+            <img src="/img/filipe_ret_disguise_v3.webp" alt="Produção Virtual DVD Filipe Ret - Design de Palco com Efeitos Visuais" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Implementação Técnica</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Utilizamos servidores Disguise VX 4 para gerenciar o conteúdo visual em tempo real, permitindo a sincronização perfeita com a performance ao vivo. A configuração incluiu múltiplos painéis de LED de alta resolução dispostos em formato de arco no palco principal, criando um ambiente imersivo para o público.</p>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">O sistema Disguise permitiu a integração de conteúdo pré-renderizado com elementos visuais gerados em tempo real, respondendo à dinâmica do show e criando uma experiência visual única para cada música.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Resultados</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">O DVD do Filipe Ret foi um sucesso de público e crítica, com destaque para a qualidade visual da produção. A integração perfeita entre a performance do artista e os elementos visuais criou uma experiência imersiva para o público presente e para os espectadores do DVD, elevando o padrão de produções audiovisuais no cenário do rap nacional.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ponto Final Modal Structure -->
+  <div id="pontofinalCaseStudyModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center;">
+    <div style="background-color: #1f1f1f; color: #e0e0e0; margin: auto; padding: 20px; border-radius: 20px; width: 90%; max-width: 900px; position: relative; top: 20px; border: 2px solid #00ffaa; box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 8px #00aaff, 0 0 12px #aa00ff;">
+      <span id="closePontofinalCaseStudyModal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 20px;">&times;</span>
+      <h3 class="text-xl font-bold mb-2 text-light-text" style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.5rem; color: #f0f0f0;">Ponto Final (Temporada 1)</h3>
+      
+      <!-- Video Player -->
+      <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
+        <iframe id="pontofinalCaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/U9NumXGdxv0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+
+      <!-- Case Study Content -->
+      <div id="pontofinalCaseStudyContent">
+        <p class="text-medium-text text-sm mb-4" style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">Trailer em Português | Netflix.</p>
+        
+        <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Netflix</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Série</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Trailer</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Localização</span>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Sobre o Projeto</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">A série "Ponto Final" é uma produção original Netflix que exigiu um trabalho detalhado de localização para o público brasileiro. Nossa equipe foi responsável pela adaptação do trailer oficial, garantindo que a essência da narrativa fosse preservada enquanto se conectava com o público local.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Desafios Técnicos</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">A localização do trailer envolveu diversos desafios técnicos, incluindo a sincronização precisa das legendas, a adaptação cultural de expressões idiomáticas e a manutenção do ritmo narrativo original. Utilizamos tecnologias avançadas de edição de vídeo e áudio para garantir uma experiência fluida e natural para o espectador brasileiro.</p>
+        
+        <div style="background-color: #121212; border-radius: 8px; padding: 15px; margin: 20px 0; border-left: 3px solid #00ffaa;">
+          <h5 style="color: #f0f0f0; font-size: 1rem; margin-top: 0; margin-bottom: 10px;">Processo de Localização</h5>
+          <ul style="list-style-type: disc; padding-left: 20px; color: #cccccc; font-size: 0.9em;">
+            <li style="margin-bottom: 5px;">Tradução e adaptação cultural do roteiro</li>
+            <li style="margin-bottom: 5px;">Sincronização de legendas e elementos gráficos</li>
+            <li style="margin-bottom: 5px;">Mixagem de áudio para garantir qualidade sonora</li>
+            <li style="margin-bottom: 5px;">Testes com público-alvo brasileiro</li>
+          </ul>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Resultados</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">O trailer localizado contribuiu significativamente para o sucesso da série no Brasil, gerando engajamento nas redes sociais e atraindo novos assinantes para a plataforma. A qualidade da localização foi reconhecida pela Netflix, resultando em novas parcerias para projetos futuros.</p>
+        
+        <div style="display: flex; justify-content: space-between; margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+          <div style="text-align: center; flex: 1;">
+            <p style="font-size: 2rem; font-weight: bold; color: #00ffaa; margin: 0;">+2M</p>
+            <p style="font-size: 0.8rem; color: #aaa; margin-top: 5px;">Visualizações</p>
+          </div>
+          <div style="text-align: center; flex: 1;">
+            <p style="font-size: 2rem; font-weight: bold; color: #00ffaa; margin: 0;">85%</p>
+            <p style="font-size: 0.8rem; color: #aaa; margin-top: 5px;">Taxa de Conversão</p>
+          </div>
+          <div style="text-align: center; flex: 1;">
+            <p style="font-size: 2rem; font-weight: bold; color: #00ffaa; margin: 0;">4.8/5</p>
+            <p style="font-size: 0.8rem; color: #aaa; margin-top: 5px;">Avaliação do Cliente</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DVD Jota Quest Modal Structure -->
+  <div id="jquestCaseStudyModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center;">
+    <div style="background-color: #1f1f1f; color: #e0e0e0; margin: auto; padding: 20px; border-radius: 20px; width: 90%; max-width: 900px; position: relative; top: 20px; border: 2px solid #00ffaa; box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 8px #00aaff, 0 0 12px #aa00ff;">
+      <span id="closeJquestCaseStudyModal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 20px;">&times;</span>
+      <h3 class="text-xl font-bold mb-2 text-light-text" style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.5rem; color: #f0f0f0;">DVD Jota Quest</h3>
+      
+      <!-- Featured Image - Full Width with larger size -->
+      <div style="width: 100%; margin-bottom: 30px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+        <img src="/img/dvd_jquest_disguise_v5.webp" alt="Produção Virtual DVD Jota Quest - Palco com Iluminação e Efeitos Visuais" style="width: 100%; display: block;" loading="lazy">
+      </div>
+
+      <!-- Case Study Content -->
+      <div id="jquestCaseStudyContent">
+        <p class="text-medium-text text-sm mb-4" style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">Servidores Disguise VX 4 utilizados na gravação do DVD da banda em São Paulo.</p>
+        
+        <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">VX 4</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Show</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Live Performance</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Rock Nacional</span>
+        </div>
+        
+        <!-- Larger Two Column Layout for Images with more spacing -->
+        <div style="display: flex; flex-direction: column; gap: 20px; margin: 30px 0;">
+          <!-- First row - single large image -->
+          <div style="border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/dvd_jquest_disguise_v2.webp" alt="Produção Virtual DVD Jota Quest - Apresentação ao Vivo com Efeitos Visuais" style="width: 100%; display: block;" loading="lazy">
+          </div>
+          
+          <!-- Second row - two images side by side -->
+          <div style="display: flex; gap: 20px;">
+            <div style="flex: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+              <img src="/img/dvd_jquest_disguise_v3.webp" alt="Produção Virtual DVD Jota Quest - Sistema de Iluminação Sincronizada" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+            </div>
+            <div style="flex: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+              <img src="/img/dvd_jquest_disguise_v4.webp" alt="Produção Virtual DVD Jota Quest - Integração de Efeitos Visuais" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+            </div>
+          </div>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">O Projeto</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">A gravação do DVD do Jota Quest representou um marco na carreira da banda e exigiu uma produção visual à altura de sua trajetória. O desafio era criar um ambiente visual que complementasse a energia do show ao vivo e proporcionasse uma experiência imersiva tanto para o público presente quanto para os futuros espectadores do DVD.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Solução Técnica</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Implementamos uma solução baseada em servidores Disguise VX 4, que permitiu a sincronização perfeita entre música, iluminação e conteúdo visual. A configuração incluiu:</p>
+        
+        <ul style="list-style-type: disc; padding-left: 20px; color: #cccccc; font-size: 0.9em; margin: 15px 0;">
+          <li style="margin-bottom: 8px;">Múltiplos painéis de LED de alta resolução dispostos em formato semicircular</li>
+          <li style="margin-bottom: 8px;">Sistema de tracking em tempo real para acompanhar os movimentos dos músicos</li>
+          <li style="margin-bottom: 8px;">Conteúdo visual personalizado para cada música do repertório</li>
+          <li style="margin-bottom: 8px;">Integração com o sistema de iluminação para criar efeitos sincronizados</li>
+        </ul>
+        
+        <div style="background-color: #121212; border-radius: 8px; padding: 15px; margin: 20px 0; border-left: 3px solid #00ffaa;">
+          <h5 style="color: #f0f0f0; font-size: 1rem; margin-top: 0; margin-bottom: 10px;">Especificações Técnicas</h5>
+          <div style="display: flex; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px; margin-bottom: 10px;">
+              <p style="font-size: 0.8em; color: #888; margin-bottom: 3px;">SERVIDORES</p>
+              <p style="font-size: 0.9em; color: #eee; margin-top: 0;">4x Disguise VX 4</p>
+            </div>
+            <div style="flex: 1; min-width: 200px; margin-bottom: 10px;">
+              <p style="font-size: 0.8em; color: #888; margin-bottom: 3px;">RESOLUÇÃO TOTAL</p>
+              <p style="font-size: 0.9em; color: #eee; margin-top: 0;">12K x 3K pixels</p>
+            </div>
+            <div style="flex: 1; min-width: 200px; margin-bottom: 10px;">
+              <p style="font-size: 0.8em; color: #888; margin-bottom: 3px;">PAINÉIS LED</p>
+              <p style="font-size: 0.9em; color: #eee; margin-top: 0;">320m² de área total</p>
+            </div>
+            <div style="flex: 1; min-width: 200px; margin-bottom: 10px;">
+              <p style="font-size: 0.8em; color: #888; margin-bottom: 3px;">TEMPO DE PRODUÇÃO</p>
+              <p style="font-size: 0.9em; color: #eee; margin-top: 0;">3 meses</p>
+            </div>
+          </div>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Resultados</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">O DVD do Jota Quest foi um sucesso de público e crítica, com destaque para a qualidade visual da produção. A integração perfeita entre a performance da banda e os elementos visuais criou uma experiência imersiva que elevou o padrão de produções audiovisuais no cenário do rock nacional.</p>
+        
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-top: 15px;">O projeto também foi reconhecido com o prêmio de "Melhor Produção Visual" no âmbito da indústria musical brasileira, consolidando nossa expertise em produções de grande escala com tecnologia de ponta.</p>
+      </div>
+    </div>
+  </div>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+                mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+                // Toggle icon between bars and times (X)
+                const icon = mobileMenuButton.querySelector('i');
+                if (icon) {
+                    icon.classList.toggle('fa-bars');
+                    icon.classList.toggle('fa-times');
+                }
+            });
+        }
+
+        // Close mobile menu when a link is clicked
+        const mobileMenuLinks = mobileMenu?.querySelectorAll('a');
+        if (mobileMenuLinks && mobileMenu && mobileMenuButton) {
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    mobileMenuButton.setAttribute('aria-expanded', 'false');
+                     // Ensure icon is reset to bars
+                    const icon = mobileMenuButton.querySelector('i');
+                    if (icon) {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                });
+            });
+        }
+
+        // Smooth scrolling is handled by CSS 'scroll-behavior: smooth;'
+
+        // Form submission simulation (Contact Form)
+        const contactForm = document.querySelector('#contact form.glass-card'); // More specific selector
+         if (contactForm) {
+             contactForm.addEventListener('submit', (e) => {
+                 e.preventDefault();
+                 // Replace alert with a more modern notification if possible
+                 // For demonstration:
+                 const submitButton = contactForm.querySelector('button[type="submit"]');
+                 const originalButtonText = submitButton.innerHTML;
+                 submitButton.disabled = true;
+                 submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Enviando...';
+
+                 // Simulate network request
+                 setTimeout(() => {
+                    // Create a success message element
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'mt-4 p-3 rounded-md bg-green-500 bg-opacity-20 text-green-300 text-sm text-center';
+                    successMessage.textContent = 'Obrigado por sua mensagem! Entraremos em contato em breve.';
+                    contactForm.parentNode.insertBefore(successMessage, contactForm.nextSibling);
+
+                    contactForm.reset(); // Reset form fields
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalButtonText;
+
+                    // Remove success message after a few seconds
+                    setTimeout(() => {
+                        successMessage.remove();
+                    }, 5000);
+
+                 }, 1500); // Simulate 1.5 second delay
+             });
+         }
+
+         // Form submission simulation (Newsletter Form)
+        const newsletterForm = document.getElementById('newsletter-form');
+        if (newsletterForm) {
+            newsletterForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const emailInput = newsletterForm.querySelector('input[type="email"]');
+                const submitButton = newsletterForm.querySelector('button[type="submit"]');
+                const originalButtonContent = submitButton.innerHTML;
+
+                if (emailInput.value) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<i class="fas fa-spinner"></i>';
+
+                    // Simulate network request
+                    setTimeout(() => {
+                        emailInput.value = ''; // Clear input
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = '<i class="fas fa-check"></i>'; // Show success check
+
+                        // Reset button after a short delay
+                        setTimeout(() => {
+                            submitButton.innerHTML = originalButtonContent;
+                        }, 2000);
+
+                    }, 1000); // Simulate 1 second delay
+                }
+            });
+        }
+
+        // Modal open/close logic
+        const simularBtn = document.getElementById('simularOrcamentoBtn');
+        const modal = document.getElementById('orcamentoModal');
+        const closeModal = document.getElementById('closeOrcamentoModal');
+        if (simularBtn && modal && closeModal) {
+            simularBtn.addEventListener('click', () => {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            });
+            closeModal.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            });
+            // Optional: close modal on backdrop click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+
+        // Simple Intersection Observer for fade-in/up effect on scroll
+        const animatedElements = document.querySelectorAll('.glass-card, .feature-card, .testimonial-card, .stats-item, #expertise > div > div:not(.sticky), #about > div > div:not(.relative)'); // Select elements to animate
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    observer.unobserve(entry.target); // Stop observing once visible
+                }
+            });
+        }, {
+             threshold: 0.1, // Trigger when 10% visible
+             rootMargin: '0px 0px -50px 0px' // Start animation slightly before element enters viewport
+             });
+
+        animatedElements.forEach(el => {
+             // Initial state before animation
+              el.style.opacity = '0';
+              el.style.transform = 'translateY(30px)'; // Start slightly lower
+              el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+              observer.observe(el); // Start observing
+         });
+
+         // Update copyright year dynamically
+         const currentYearSpan = document.getElementById('current-year');
+         if (currentYearSpan) {
+             currentYearSpan.textContent = new Date().getFullYear();
+         }
+
+        // Prevent scroll-into-view when iframe gets focus (e.g., on play)
+        document.querySelectorAll('.video-container iframe').forEach(function(iframe) {
+            iframe.addEventListener('focus', function(e) {
+                window.scrollTo({
+                    top: window.scrollY,
+                    left: window.scrollX,
+                    behavior: 'instant'
+                });
+            });
+        });
+
+        // Modal Elements
+        const caseStudyModal = document.getElementById('caseStudyModal');
+        const closeCaseStudyModalBtn = document.getElementById('closeCaseStudyModal');
+        const firstCaseStudyTrigger = document.querySelector('.case-study-trigger');
+
+        if (firstCaseStudyTrigger) {
+            firstCaseStudyTrigger.style.cursor = 'pointer'; // Indicate it's clickable
+            firstCaseStudyTrigger.addEventListener('click', () => {
+                caseStudyModal.style.display = 'flex'; // Use flex to center content
+            });
+        }
+
+        if (closeCaseStudyModalBtn) {
+            closeCaseStudyModalBtn.addEventListener('click', () => {
+                caseStudyModal.style.display = 'none';
+                const iframe = document.getElementById('caseStudyVideo');
+                if (iframe) {
+                    const videoSrc = iframe.src;
+                    iframe.src = ''; // Stop video by clearing src
+                    iframe.src = videoSrc; // Restore src to allow replay
+                }
+            });
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target === caseStudyModal) {
+                caseStudyModal.style.display = 'none';
+                const iframe = document.getElementById('caseStudyVideo');
+                if (iframe) {
+                    const videoSrc = iframe.src;
+                    iframe.src = '';
+                    iframe.src = videoSrc;
+                }
+            }
+        });
+        
+        // T-Cross Modal Elements
+        const tcrossCaseStudyModal = document.getElementById('tcrossCaseStudyModal');
+        const closeTcrossCaseStudyModalBtn = document.getElementById('closeTcrossCaseStudyModal');
+        const tcrossCaseStudyTrigger = document.querySelector('.case-study-trigger-tcross');
+
+        if (tcrossCaseStudyTrigger) {
+            tcrossCaseStudyTrigger.style.cursor = 'pointer'; // Indicate it's clickable
+            tcrossCaseStudyTrigger.addEventListener('click', () => {
+                tcrossCaseStudyModal.style.display = 'flex'; // Use flex to center content
+            });
+        }
+
+        if (closeTcrossCaseStudyModalBtn) {
+            closeTcrossCaseStudyModalBtn.addEventListener('click', () => {
+                tcrossCaseStudyModal.style.display = 'none';
+                const iframe = document.getElementById('tcrossCaseStudyVideo');
+                if (iframe) {
+                    const videoSrc = iframe.src;
+                    iframe.src = ''; // Stop video by clearing src
+                    iframe.src = videoSrc; // Restore src to allow replay
+                }
+            });
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target === tcrossCaseStudyModal) {
+                tcrossCaseStudyModal.style.display = 'none';
+                const iframe = document.getElementById('tcrossCaseStudyVideo');
+                if (iframe) {
+                    const videoSrc = iframe.src;
+                    iframe.src = '';
+                    iframe.src = videoSrc;
+                }
+            }
+        });
+        
+        // Hyundai CRETA Modal Elements
+        const cretaCaseStudyModal = document.getElementById('cretaCaseStudyModal');
+        const closeCretaCaseStudyModalBtn = document.getElementById('closeCretaCaseStudyModal');
+        const cretaCaseStudyTrigger = document.querySelector('.case-study-trigger-creta');
+
+        if (cretaCaseStudyTrigger) {
+            cretaCaseStudyTrigger.style.cursor = 'pointer'; // Indicate it's clickable
+            cretaCaseStudyTrigger.addEventListener('click', () => {
+                cretaCaseStudyModal.style.display = 'flex'; // Use flex to center content
+            });
+        }
+
+        if (closeCretaCaseStudyModalBtn) {
+            closeCretaCaseStudyModalBtn.addEventListener('click', () => {
+                cretaCaseStudyModal.style.display = 'none';
+                const iframe = document.getElementById('cretaCaseStudyVideo');
+                if (iframe) {
+                    const videoSrc = iframe.src;
+                    iframe.src = ''; // Stop video by clearing src
+                    iframe.src = videoSrc; // Restore src to allow replay
+                }
+            });
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target === cretaCaseStudyModal) {
+                cretaCaseStudyModal.style.display = 'none';
+                const iframe = document.getElementById('cretaCaseStudyVideo');
+                if (iframe) {
+                    const videoSrc = iframe.src;
+                    iframe.src = '';
+                    iframe.src = videoSrc;
+                }
+            }
+        });
+        
+        // Globo Promo Day Modal Elements
+        const globoCaseStudyModal = document.getElementById('globoCaseStudyModal');
+        const closeGloboCaseStudyModalBtn = document.getElementById('closeGloboCaseStudyModal');
+        const globoCaseStudyTrigger = document.querySelector('.case-study-trigger-globo');
+
+        if (globoCaseStudyTrigger) {
+            globoCaseStudyTrigger.style.cursor = 'pointer'; // Indicate it's clickable
+            globoCaseStudyTrigger.addEventListener('click', () => {
+                globoCaseStudyModal.style.display = 'flex'; // Use flex to center content
+            });
+        }
+
+        if (closeGloboCaseStudyModalBtn) {
+            closeGloboCaseStudyModalBtn.addEventListener('click', () => {
+                globoCaseStudyModal.style.display = 'none';
+                const iframe = document.getElementById('globoCaseStudyVideo');
+                if (iframe) {
+                    const videoSrc = iframe.src;
+                    iframe.src = ''; // Stop video by clearing src
+                    iframe.src = videoSrc; // Restore src to allow replay
+                }
+            });
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target === globoCaseStudyModal) {
+                globoCaseStudyModal.style.display = 'none';
+                const iframe = document.getElementById('globoCaseStudyVideo');
+                if (iframe) {
+                    const videoSrc = iframe.src;
+                    iframe.src = '';
+                    iframe.src = videoSrc;
+                }
+            }
+        });
+        
+        // Encontro C&A Modal Elements
+        const ceaCaseStudyModal = document.getElementById('ceaCaseStudyModal');
+        const closeCeaCaseStudyModalBtn = document.getElementById('closeCeaCaseStudyModal');
+        const ceaCaseStudyTrigger = document.querySelector('.case-study-trigger-cea');
+
+        if (ceaCaseStudyTrigger) {
+            ceaCaseStudyTrigger.style.cursor = 'pointer'; // Indicate it's clickable
+            ceaCaseStudyTrigger.addEventListener('click', () => {
+                ceaCaseStudyModal.style.display = 'flex'; // Use flex to center content
+            });
+        }
+
+        if (closeCeaCaseStudyModalBtn) {
+            closeCeaCaseStudyModalBtn.addEventListener('click', () => {
+                ceaCaseStudyModal.style.display = 'none';
+                const iframe = document.getElementById('ceaCaseStudyVideo');
+                if (iframe) {
+                    const videoSrc = iframe.src;
+                    iframe.src = ''; // Stop video by clearing src
+                    iframe.src = videoSrc; // Restore src to allow replay
+                }
+            });
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target === ceaCaseStudyModal) {
+                ceaCaseStudyModal.style.display = 'none';
+                const iframe = document.getElementById('ceaCaseStudyVideo');
+                if (iframe) {
+                    const videoSrc = iframe.src;
+                    iframe.src = '';
+                    iframe.src = videoSrc;
+                }
+            }
+        });
+        
+        // DVD Filipe Ret Modal Elements
+        const filipeCaseStudyModal = document.getElementById('filipeCaseStudyModal');
+        const closeFilipeCaseStudyModalBtn = document.getElementById('closeFilipeCaseStudyModal');
+        const filipeCaseStudyTrigger = document.querySelector('.case-study-trigger-filipe');
+
+        if (filipeCaseStudyTrigger) {
+            filipeCaseStudyTrigger.style.cursor = 'pointer'; // Indicate it's clickable
+            filipeCaseStudyTrigger.addEventListener('click', () => {
+                filipeCaseStudyModal.style.display = 'flex'; // Use flex to center content
+            });
+        }
+
+        if (closeFilipeCaseStudyModalBtn) {
+            closeFilipeCaseStudyModalBtn.addEventListener('click', () => {
+                filipeCaseStudyModal.style.display = 'none';
+                const iframe = document.getElementById('filipeCaseStudyVideo');
+                if (iframe) {
+                    const videoSrc = iframe.src;
+                    iframe.src = ''; // Stop video by clearing src
+                    iframe.src = videoSrc; // Restore src to allow replay
+                }
+            });
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target === filipeCaseStudyModal) {
+                filipeCaseStudyModal.style.display = 'none';
+                const iframe = document.getElementById('filipeCaseStudyVideo');
+                if (iframe) {
+                    const videoSrc = iframe.src;
+                    iframe.src = '';
+                    iframe.src = videoSrc;
+                }
+            }
+        });
+        
+        // Ponto Final Modal Elements
+        const pontofinalCaseStudyModal = document.getElementById('pontofinalCaseStudyModal');
+        const closePontofinalCaseStudyModalBtn = document.getElementById('closePontofinalCaseStudyModal');
+        const pontofinalCaseStudyTrigger = document.querySelector('.case-study-trigger-pontofinal');
+
+        if (pontofinalCaseStudyTrigger) {
+            pontofinalCaseStudyTrigger.style.cursor = 'pointer'; // Indicate it's clickable
+            pontofinalCaseStudyTrigger.addEventListener('click', () => {
+                pontofinalCaseStudyModal.style.display = 'flex'; // Use flex to center content
+            });
+        }
+
+        if (closePontofinalCaseStudyModalBtn) {
+            closePontofinalCaseStudyModalBtn.addEventListener('click', () => {
+                pontofinalCaseStudyModal.style.display = 'none';
+                const iframe = document.getElementById('pontofinalCaseStudyVideo');
+                if (iframe) {
+                    const videoSrc = iframe.src;
+                    iframe.src = ''; // Stop video by clearing src
+                    iframe.src = videoSrc; // Restore src to allow replay
+                }
+            });
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target === pontofinalCaseStudyModal) {
+                pontofinalCaseStudyModal.style.display = 'none';
+                const iframe = document.getElementById('pontofinalCaseStudyVideo');
+                if (iframe) {
+                    const videoSrc = iframe.src;
+                    iframe.src = '';
+                    iframe.src = videoSrc;
+                }
+            }
+        });
+        
+        // DVD Jota Quest Modal Elements
+        const jquestCaseStudyModal = document.getElementById('jquestCaseStudyModal');
+        const closeJquestCaseStudyModalBtn = document.getElementById('closeJquestCaseStudyModal');
+        const jquestCaseStudyTrigger = document.querySelector('.case-study-trigger-jquest');
+
+        if (jquestCaseStudyTrigger) {
+            jquestCaseStudyTrigger.style.cursor = 'pointer'; // Indicate it's clickable
+            jquestCaseStudyTrigger.addEventListener('click', () => {
+                jquestCaseStudyModal.style.display = 'flex'; // Use flex to center content
+            });
+        }
+
+        if (closeJquestCaseStudyModalBtn) {
+            closeJquestCaseStudyModalBtn.addEventListener('click', () => {
+                jquestCaseStudyModal.style.display = 'none';
+            });
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target === jquestCaseStudyModal) {
+                jquestCaseStudyModal.style.display = 'none';
+            }
+        });
+    </script>
+
+    <footer class="bg-dark py-12 border-t border-gray-800"> 
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <a href="index.html" class="flex items-center mb-4"> 
+                        <span class="text-xl font-bold gradient-text">On + Av</span>
+                    </a>
+                    <p class="text-medium-text text-sm">
+                        A principal referência em tecnologia Disguise no Brasil, oferecendo soluções completas para produções visuais de alto nível.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-light-text font-semibold mb-4 uppercase tracking-wider text-sm">Serviços</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html#services" class="text-medium-text hover:text-primary transition duration-300 text-sm">Aluguel de Equipamentos</a></li>
+                        <li><a href="index.html#services" class="text-medium-text hover:text-primary transition duration-300 text-sm">Produção Virtual (xR)</a></li>
+                        <li><a href="index.html#industries" class="text-medium-text hover:text-primary transition duration-300 text-sm">Projeção Mapeada</a></li>
+                        <li><a href="index.html#services" class="text-medium-text hover:text-primary transition duration-300 text-sm">Consultoria e Suporte</a></li>
+                        <li><a href="index.html#services" class="text-medium-text hover:text-primary transition duration-300 text-sm">Treinamentos</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-light-text font-semibold mb-4 uppercase tracking-wider text-sm">Links Rápidos</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html#about" class="text-medium-text hover:text-primary transition duration-300 text-sm">Quem Somos</a></li>
+                        <li><a href="index.html#industries" class="text-medium-text hover:text-primary transition duration-300 text-sm">Indústrias</a></li>
+                        <li><a href="index.html#cases" class="text-medium-text hover:text-primary transition duration-300 text-sm">Cases</a></li>
+                        <li><a href="index.html#expertise" class="text-medium-text hover:text-primary transition duration-300 text-sm">Expertise</a></li>
+                        <li><a href="index.html#contact" class="text-medium-text hover:text-primary transition duration-300 text-sm">Contato</a></li>
+                        <li><a href="#insights" class="text-medium-text hover:text-primary transition duration-300 text-sm">Insights</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-light-text font-semibold mb-4 uppercase tracking-wider text-sm">Newsletter</h4>
+                    <p class="text-medium-text text-sm mb-4">Receba novidades sobre tecnologia AV, cases e insights.</p>
+                    <form class="flex" id="newsletter-form">
+                        <input type="email" placeholder="Seu email" required class="px-3 py-2 text-sm rounded-l-md focus:outline-none bg-darker text-light-text border border-gray-700 flex-grow focus:border-primary">
+                        <button type="submit" class="bg-primary text-dark px-3 py-2 rounded-r-md font-bold text-sm hover:opacity-90 transition">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                    <div class="mt-6">
+                        <h4 class="text-light-text font-semibold mb-2 uppercase tracking-wider text-sm">Siga-nos</h4>
+                        <div class="flex space-x-3">
+                            <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="Instagram">
+                                <i class="fab fa-instagram text-base"></i>
+                            </a>
+                            <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="LinkedIn">
+                                <i class="fab fa-linkedin-in text-base"></i>
+                            </a>
+                            <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="YouTube">
+                                <i class="fab fa-youtube text-base"></i>
+                            </a>
+                            <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="Vimeo">
+                                <i class="fab fa-vimeo-v text-base"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-medium-text text-xs mb-4 md:mb-0"> 2023 On + Av. Todos os direitos reservados.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-medium-text hover:text-primary text-xs transition duration-300">Termos de Serviço</a>
+                    <a href="#" class="text-medium-text hover:text-primary text-xs transition duration-300">Política de Privacidade</a>
+                    <a href="#" class="text-medium-text hover:text-primary text-xs transition duration-300">Política de Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

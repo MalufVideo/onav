@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gerenciamento de Produtos</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<style>
+.fade-in { animation: fadeIn 0.3s ease-in-out forwards; opacity: 0; } /* Added forwards and opacity */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.sidebar { transition: all 0.3s ease; }
+.sidebar.collapsed { width: 70px; }
+.sidebar.collapsed .sidebar-text,
+.sidebar.collapsed .logo-text { display: none; }
+.sidebar.collapsed .logo-icon { margin-right: 0; }
+.table-row-hover:hover { background-color: rgba(59, 130, 246, 0.05); transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+.price-cell { font-family: 'Courier New', monospace; font-weight: bold; }
+</style>
+</head>
+<body class="bg-gray-50 font-sans">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<div class="sidebar bg-blue-800 text-white w-64 flex flex-col transition-all duration-300 ease-in-out">
+<div class="p-4 flex items-center justify-between border-b border-blue-700">
+<div class="flex items-center">
+<div class="logo-icon mr-3"><i class="fas fa-boxes text-2xl"></i></div>
+<span class="logo-text text-xl font-bold">InventoryPro</span>
+</div>
+<button id="toggleSidebar" class="text-blue-200 hover:text-white"><i class="fas fa-bars"></i></button>
+</div>
+<nav class="flex-grow p-4">
+<ul>
+<li class="mb-2"><a href="#" class="flex items-center p-2 rounded hover:bg-blue-700"><i class="fas fa-tachometer-alt mr-3"></i><span class="sidebar-text">Painel</span></a></li>
+<li class="mb-2"><a href="#" class="flex items-center p-2 rounded bg-blue-700"><i class="fas fa-box-open mr-3"></i><span class="sidebar-text">Produtos</span></a></li>
+<li class="mb-2"><a href="#" class="flex items-center p-2 rounded hover:bg-blue-700"><i class="fas fa-tags mr-3"></i><span class="sidebar-text">Categorias</span></a></li>
+<li class="mb-2"><a href="#" class="flex items-center p-2 rounded hover:bg-blue-700"><i class="fas fa-file-invoice-dollar mr-3"></i><span class="sidebar-text">Propostas</span></a></li>
+<li class="mb-2"><a href="#" class="flex items-center p-2 rounded hover:bg-blue-700"><i class="fas fa-users mr-3"></i><span class="sidebar-text">Clientes</span></a></li>
+<li class="mb-2"><a href="#" class="flex items-center p-2 rounded hover:bg-blue-700"><i class="fas fa-chart-line mr-3"></i><span class="sidebar-text">Relatórios</span></a></li>
+</ul>
+</nav>
+<div class="p-4 border-t border-blue-700">
+<a href="#" class="flex items-center p-2 rounded hover:bg-blue-700"><i class="fas fa-cog mr-3"></i><span class="sidebar-text">Configurações</span></a>
+</div>
+</div>
+
+<!-- Main Content -->
+<div class="flex-1 overflow-auto">
+<header class="bg-white shadow-sm p-4 flex justify-between items-center">
+<h1 class="text-2xl font-bold text-gray-800">Gerenciamento de Produtos</h1>
+<div class="flex items-center space-x-4">
+<div class="relative">
+<input type="text" placeholder="Buscar produtos..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+<i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+</div>
+<button id="addProductBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+<i class="fas fa-plus mr-2"></i><span>Adicionar Produto</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-bold cursor-pointer"><span>AD</span></div>
+</div>
+</header>
+
+<main class="p-6">
+<!-- Filters (Optional - Functionality not implemented) -->
+<div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+<div class="flex flex-wrap items-center gap-4">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+<select class="border rounded-lg px-3 py-2 w-48 focus:outline-none focus:ring-2 focus:ring-blue-500">
+<option>Todas as Categorias</option>
+<option>LED Modules</option>
+<option>Processors</option>
+<option>Disguise Servers</option>
+<option>Tracking</option>
+<option>Cinebot</option>
+<option>Estudios SP</option>
+<option>Equipe Técnica</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Faixa de Preço</label>
+<select class="border rounded-lg px-3 py-2 w-48 focus:outline-none focus:ring-2 focus:ring-blue-500">
+<option>Todos os Preços</option>
+<option>Abaixo de R$ 1.000</option>
+<option>R$ 1,000 - R$ 5,000</option>
+<option>R$ 5,000 - R$ 10,000</option>
+<option>Acima de R$ 10.000</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Unidade</label>
+<select class="border rounded-lg px-3 py-2 w-48 focus:outline-none focus:ring-2 focus:ring-blue-500">
+<option>Todos os Tipos</option>
+<option>per_day</option>
+</select>
+</div>
+<div class="flex items-end">
+<button class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg flex items-center h-[42px]">
+<i class="fas fa-filter mr-2"></i><span>Aplicar Filtros</span>
+</button>
+</div>
+</div>
+</div>
+
+<!-- Products Table -->
+<div class="bg-white rounded-lg shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="min-w-full divide-y divide-gray-200">
+<thead class="bg-gray-50">
+<tr>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço (R$)</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo de Unidade</th>
+<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+</tr>
+</thead>
+<tbody id="productsTableBody" class="bg-white divide-y divide-gray-200">
+<!-- Products will be dynamically inserted here -->
+</tbody>
+</table>
+</div>
+</div>
+</main>
+</div>
+</div>
+
+<!-- Add/Edit Product Modal (Hidden by default) -->
+<div id="productModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden">
+  <div class="relative mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+    <div class="mt-3 text-center">
+      <h3 class="text-lg leading-6 font-medium text-gray-900" id="modalTitle">Adicionar Produto</h3>
+      <form id="productForm" class="mt-2 px-7 py-3 space-y-4 text-left">
+        <input type="hidden" id="productId" />
+        <div>
+          <label for="productName" class="block text-sm font-medium text-gray-700">Nome</label>
+          <input type="text" id="productName" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+        <div>
+          <label for="productDescription" class="block text-sm font-medium text-gray-700">Descrição</label>
+          <textarea id="productDescription" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+        </div>
+        <div>
+          <label for="productCategory" class="block text-sm font-medium text-gray-700">Categoria</label>
+          <input type="text" id="productCategory" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+        <div>
+          <label for="productPrice" class="block text-sm font-medium text-gray-700">Preço (R$)</label>
+          <input type="number" id="productPrice" step="0.01" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+        <div>
+          <label for="productUnitType" class="block text-sm font-medium text-gray-700">Tipo de Unidade</label>
+          <select id="productUnitType" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <option value="per_day">Por Dia</option>
+            <option value="fixed">Fixo</option>
+            <!-- Add other unit types if needed -->
+          </select>
+        </div>
+        <div class="items-center px-4 py-3">
+          <button id="saveProductBtn" type="submit" class="px-4 py-2 bg-blue-600 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            Salvar
+          </button>
+        </div>
+      </form>
+      <div class="items-center px-4 py-3">
+        <button id="closeModalBtn" class="px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script>
+// Supabase Client Setup
+const supabaseUrl = 'https://qhhjvpsxkfjcxitpnhxi.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1ODk4NzksImV4cCI6MjA1NTE2NTg3OX0.kAcBsHJnlr56fJ6qvXSLOWRiLTnQR7ilXUi_2Qzj4RE';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+// DOM Elements
+const productsTableBody = document.getElementById('productsTableBody');
+const addProductBtn = document.getElementById('addProductBtn');
+const productModal = document.getElementById('productModal');
+const productForm = document.getElementById('productForm');
+const modalTitle = document.getElementById('modalTitle');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const productIdInput = document.getElementById('productId');
+const productNameInput = document.getElementById('productName');
+const productDescriptionInput = document.getElementById('productDescription');
+const productCategoryInput = document.getElementById('productCategory');
+const productPriceInput = document.getElementById('productPrice');
+const productUnitTypeInput = document.getElementById('productUnitType');
+
+// Fetch and Render Products
+async function fetchProducts() {
+  const { data: products, error } = await supabase.from('products').select('*');
+  if (error) {
+    console.error('Erro ao buscar produtos:', error);
+    return;
+  }
+  // Sort products by custom category order
+  const categoryOrder = [
+    'LED Modules', 'Processors', 'Disguise Servers', 'Tracking', 'Cinebot', 'Estudios SP', 'Equipe Técnica'
+  ];
+  products.sort((a, b) => {
+    const indexA = categoryOrder.indexOf(a.category || '');
+    const indexB = categoryOrder.indexOf(b.category || '');
+    if (indexA === -1 && indexB === -1) return (a.name || '').localeCompare(b.name || '');
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
+
+  productsTableBody.innerHTML = ''; // Clear existing rows
+  products.forEach(p => {
+    const tr = document.createElement('tr');
+    tr.className = 'table-row-hover transition-all duration-150 ease-in-out fade-in';
+    let categoryColorClass = 'bg-gray-100 text-gray-800'; // Default
+    switch (p.category) {
+        case 'LED Modules': categoryColorClass = 'bg-blue-100 text-blue-800'; break;
+        case 'Processors': categoryColorClass = 'bg-purple-100 text-purple-800'; break;
+        case 'Disguise Servers': categoryColorClass = 'bg-green-100 text-green-800'; break;
+        case 'Tracking': categoryColorClass = 'bg-yellow-100 text-yellow-800'; break;
+        case 'Cinebot': categoryColorClass = 'bg-indigo-100 text-indigo-800'; break;
+        case 'Estudios SP': categoryColorClass = 'bg-pink-100 text-pink-800'; break;
+        case 'Equipe Técnica': categoryColorClass = 'bg-red-100 text-red-800'; break;
+    }
+
+    tr.innerHTML = `
+      <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">${p.name}</td>
+      <td class="px-6 py-4 text-gray-500">${p.description || ''}</td>
+      <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${categoryColorClass}">${p.category || ''}</span></td>
+      <td class="px-6 py-4 whitespace-nowrap price-cell text-blue-600">${parseFloat(p.price).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-gray-500">${p.unit_type || ''}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <button onclick="editProduct('${p.id}')" class="text-blue-600 hover:text-blue-900 mr-3" title="Editar"><i class="fas fa-edit"></i></button>
+        <button onclick="deleteProduct('${p.id}')" class="text-red-600 hover:text-red-900" title="Excluir"><i class="fas fa-trash-alt"></i></button>
+      </td>`;
+    productsTableBody.appendChild(tr);
+  });
+  applyFadeInAnimation();
+}
+
+// Delete Product
+async function deleteProduct(id) {
+  if (!confirm('Tem certeza que deseja excluir este produto?')) return;
+  const { error } = await supabase.from('products').delete().eq('id', id);
+  if (error) {
+      console.error('Erro ao excluir:', error);
+            alert(`Erro ao excluir produto: ${error.message}`);
+  } else {
+      fetchProducts(); // Refresh the list
+  }
+}
+
+// Show Modal
+function showModal(isEdit = false, product = null) {
+    productForm.reset(); // Clear form
+    if (isEdit && product) {
+        modalTitle.textContent = 'Editar Produto';
+        productIdInput.value = product.id;
+        productNameInput.value = product.name;
+        productDescriptionInput.value = product.description || '';
+        productCategoryInput.value = product.category || '';
+        productPriceInput.value = product.price;
+        productUnitTypeInput.value = product.unit_type || 'fixed';
+    } else {
+        modalTitle.textContent = 'Adicionar Produto';
+        productIdInput.value = ''; // Ensure ID is empty for add
+    }
+    productModal.classList.remove('hidden');
+}
+
+// Hide Modal
+function hideModal() {
+    productModal.classList.add('hidden');
+}
+
+// Edit Product - Fetch data and show modal
+async function editProduct(id) {
+  const { data, error } = await supabase.from('products').select('*').eq('id', id).single();
+  if (error) {
+      console.error('Erro ao buscar produto:', error);
+            alert(`Erro ao buscar detalhes do produto: ${error.message}`);
+      return;
+  }
+  showModal(true, data);
+}
+
+// Add Product - Show empty modal
+addProductBtn.onclick = () => {
+  showModal(false);
+};
+
+// Close Modal Button
+closeModalBtn.onclick = hideModal;
+
+// Handle Form Submission (Add/Update)
+productForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const id = productIdInput.value;
+    const productData = {
+        name: productNameInput.value,
+        description: productDescriptionInput.value,
+        category: productCategoryInput.value,
+        price: parseFloat(productPriceInput.value),
+        unit_type: productUnitTypeInput.value
+    };
+
+    let error;
+    if (id) { // Update existing product
+        ({ error } = await supabase.from('products').update(productData).eq('id', id));
+    } else { // Insert new product
+        ({ error } = await supabase.from('products').insert([productData]));
+    }
+
+    if (error) {
+        console.error('Erro ao salvar:', error);
+                alert(`Erro ao salvar produto: ${error.message}`);
+    } else {
+        hideModal();
+        fetchProducts(); // Refresh the list
+    }
+};
+
+
+// Basic UI Interactions
+document.getElementById('toggleSidebar').addEventListener('click', function() {
+  document.querySelector('.sidebar').classList.toggle('collapsed');
+});
+
+function applyFadeInAnimation() {
+    const rows = productsTableBody.querySelectorAll('tr');
+    rows.forEach((row, index) => {
+        row.style.animation = 'none'; // Reset animation
+        void row.offsetWidth; // Trigger reflow
+        row.style.animation = `fadeIn 0.3s ease-in-out ${index * 0.05}s forwards`;
+    });
+}
+
+// Initial Fetch
+document.addEventListener('DOMContentLoaded', fetchProducts);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minhas Propostas - LED Wall</title>
+  
+  <!-- Authentication modules -->
+  <script src="auth-config.js" defer></script>
+  <script src="auth.js" defer></script>
+  <script src="auth-ui.js" defer></script>
+  <script src="auth-protection.js" defer></script>
+  <script src="quote-service.js" defer></script>
+  <script src="my-quotes.js" defer></script>
+  
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .header h1 {
+      margin: 0;
+      color: #333;
+    }
+    
+    .auth-nav-buttons {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+    }
+    
+    .auth-button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+    
+    .user-profile {
+      display: flex;
+      align-items: center;
+    }
+    
+    #user-name {
+      margin-right: 10px;
+      font-weight: bold;
+    }
+    
+    .logout-btn {
+      background-color: #f44336;
+    }
+    
+    .logout-btn:hover {
+      background-color: #d32f2f;
+    }
+    
+    .back-button {
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .quote-card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      padding: 20px;
+      transition: transform 0.2s;
+    }
+    
+    .quote-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    .quote-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      align-items: center;
+    }
+    
+    .quote-header h3 {
+      margin: 0;
+      font-size: 18px;
+      color: #4CAF50;
+    }
+    
+    .quote-date {
+      color: #777;
+      font-size: 14px;
+    }
+    
+    .quote-details {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .quote-info p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+    
+    .quote-price {
+      text-align: right;
+    }
+    
+    .price {
+      font-size: 20px;
+      font-weight: bold;
+      color: #4CAF50;
+      margin-bottom: 10px;
+    }
+    
+    .view-details-btn {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .view-details-btn:hover {
+      background-color: #45a049;
+    }
+    
+    .loading, .empty-quotes, .error {
+      padding: 20px;
+      text-align: center;
+      background-color: white;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    
+    .loading {
+      color: #2196F3;
+    }
+    
+    .empty-quotes {
+      color: #777;
+    }
+    
+    .error {
+      color: #f44336;
+    }
+    
+    .login-prompt {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      text-align: center;
+      margin-top: 50px;
+    }
+    
+    .login-button {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-overlay.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      max-width: 800px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 30px;
+      position: relative;
+      margin: auto;
+      left: 0;
+      right: 0;
+      transform: translate(0, 0);
+    }
+    
+    /* Specific styling for quote details modal */
+    #quote-details-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    #quote-details-modal.active {
+      display: flex;
+    }
+    
+    #quote-details-content {
+      margin: auto;
+      max-width: 800px;
+      width: 90%;
+    }
+    
+    .quote-detail-section {
+      margin-bottom: 30px;
+    }
+    
+    .quote-detail-section h3 {
+      color: #4CAF50;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .quote-detail-section h4 {
+      margin-bottom: 10px;
+      margin-top: 20px;
+      color: #555;
+    }
+    
+    .quote-detail-section p {
+      margin: 8px 0;
+      font-size: 14px;
+    }
+    
+    .total-price {
+      font-size: 18px;
+      color: #4CAF50;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    
+    /* New styles for detailed quote view */
+    .quote-details-section {
+      margin-bottom: 25px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 15px;
+    }
+    
+    .quote-details-section:last-child {
+      border-bottom: none;
+    }
+    
+    .quote-details-section h3 {
+      color: #4caf50;
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+    
+    .led-config-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+    }
+    
+    .led-config-item {
+      flex: 1;
+      min-width: 250px;
+    }
+    
+    .led-config-item h4 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: #555;
+    }
+    
+    .service-item {
+      margin-bottom: 20px;
+      background-color: #f9f9f9;
+      border-radius: 5px;
+      padding: 15px;
+    }
+    
+    .service-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    
+    .service-header h4 {
+      margin: 0;
+      color: #333;
+    }
+    
+    .service-details {
+      padding-left: 15px;
+    }
+    
+    .service-detail-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      color: #666;
+    }
+    
+    .total-section {
+      background-color: #f0f8f0;
+      border: 1px solid #ddd;
+      margin-top: 20px;
+    }
+    
+    .total-section .service-header {
+      border-bottom: none;
+    }
+    
+    .total-section h3 {
+      color: #333;
+      margin: 0;
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #777;
+    }
+    
+    @media (max-width: 768px) {
+      .quote-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .quote-price {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-right: 0;
+      }
+      
+      .btn-details {
+        align-self: flex-start;
+      }
+      
+      .led-config-container {
+        flex-direction: column;
+        gap: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="quotes-container">
+    <div class="header">
+      <h1>Minhas Propostas</h1>
+      <a href="index.html" class="back-button">Voltar ao Calculador</a>
+    </div>
+    
+    <div id="quotes-list">
+      <!-- Quotes will be loaded here -->
+    </div>
+  </div>
+</body>
+</html>
