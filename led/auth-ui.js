@@ -302,104 +302,214 @@ function updateAuthUI() {
 function addAuthStyles() {
   const styleSheet = document.createElement('style');
   styleSheet.textContent = `
-    /* Main Auth Container Styles */
-    .auth-container {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      width: 100%;
-    }
-    
-    /* Auth Navigation Buttons */
-    .auth-nav-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      padding: 5px;
-      background-color: transparent;
-      width: 100%;
-    }
-    
-    .auth-button {
-      padding: 8px 12px;
-      border: none;
-      border-radius: 6px;
-      background-color: #4CAF50;
-      color: white;
-      font-weight: 500;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background-color 0.2s;
-      text-decoration: none;
-      display: inline-block;
-      text-align: center;
-    }
-    
-    .auth-button:hover {
-      background-color: #45a049;
-    }
-    
-    .logout-btn {
-      background-color: #f44336;
-    }
-    
-    .logout-btn:hover {
-      background-color: #d32f2f;
-    }
-    
-    .user-profile {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 6px;
-      width: 100%;
-    }
-    
-    #user-name {
-      color: #333;
-      font-weight: bold;
-      flex-grow: 1;
-      text-align: center;
-      width: 100%;
-      margin-bottom: 5px;
-    }
-    
-    /* Error and Success Messages */
-    .auth-error, 
-    .auth-success {
-      margin: 6px 0;
-      padding: 6px;
-      border-radius: 4px;
-      font-size: 14px;
-      text-align: center;
-    }
-    
-    .auth-error {
-      background-color: #ffebee;
-      color: #c62828;
-      border: 1px solid #ef9a9a;
-    }
-    
-    .auth-success {
-      background-color: #e8f5e9;
-      color: #2e7d32;
-      border: 1px solid #a5d6a7;
-    }
-    
-    /* Auth Modal Specific Styles */
-    .auth-modal {
-      max-width: 400px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
-    }
-    
-    .auth-form {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-  `;
+/* Main Auth Container Styles (mostly unchanged unless conflicting) */
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+/* Auth Navigation Buttons (mostly unchanged unless conflicting) */
+.auth-nav-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  padding: 5px;
+  background-color: transparent;
+  width: 100%;
+}
+
+.auth-button { /* This is for sidebar buttons, not modal submit */
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background-color: #4CAF50; /* Existing green */
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.auth-button:hover {
+  background-color: #45a049;
+}
+
+.logout-btn {
+  background-color: #f44336;
+}
+
+.logout-btn:hover {
+  background-color: #d32f2f;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+}
+
+#user-name {
+  color: #333;
+  font-weight: bold;
+  flex-grow: 1;
+  text-align: center;
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+/* --- NEW/MODIFIED MODAL STYLES START HERE --- */
+
+/* General Modal Overlay (assuming this is handled by existing .modal-overlay) */
+/* .modal-overlay { ... } */
+
+/* Modal Content Base (assuming this is handled by existing .modal-content) */
+/* .modal-content { ... } */
+
+/* Auth Modal Specific Styles */
+.auth-modal { /* This class is on the modal-content div */
+  background-color: #ffffff;
+  padding: 30px 40px; /* Increased padding */
+  border-radius: 12px; /* Softer, larger radius */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
+  max-width: 480px; /* Increased width */
+  width: 90%; /* Responsive width */
+  text-align: left; /* Align content to the left */
+}
+
+.auth-modal h2 {
+  font-size: 22px; /* Slightly smaller title */
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px; /* Reduced space below title */
+  text-align: center; /* Center the title */
+}
+
+.auth-modal .modal-close { /* Style the close button */
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 28px;
+  color: #aaa;
+  background: none;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.auth-modal .modal-close:hover {
+  color: #333;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Reduced gap between form groups */
+}
+
+.auth-form .form-group {
+  margin-bottom: 0; /* Remove margin as gap is handled by flex on auth-form */
+}
+
+.auth-form label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500; /* Slightly less bold */
+  color: #555;
+  margin-bottom: 5px; /* Reduced space between label and input */
+}
+
+.auth-form input[type="text"],
+.auth-form input[type="email"],
+.auth-form input[type="password"],
+.auth-form input[type="tel"] {
+  width: 100%;
+  padding: 10px 12px; /* Reduced padding */
+  font-size: 15px; /* Slightly smaller font in input */
+  color: #333;
+  background-color: #f9f9f9; /* Light background for inputs */
+  border: 1px solid #ddd; /* Softer border */
+  border-radius: 8px; /* Rounded corners */
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.auth-form input[type="text"]:focus,
+.auth-form input[type="email"]:focus,
+.auth-form input[type="password"]:focus,
+.auth-form input[type="tel"]:focus {
+  outline: none;
+  border-color: #007bff; /* Highlight color on focus */
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1); /* Subtle glow on focus */
+}
+
+.auth-form .form-submit { /* This is the main action button in the modal */
+  width: 100%;
+  padding: 10px 15px; /* Reduced padding */
+  font-size: 16px;
+  font-weight: 600; /* Bolder text */
+  color: #fff;
+  background-color: #007bff; /* Modern blue */
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  margin-top: 15px; /* Adjusted space above the button, can be 10px if needed */
+  text-transform: none; /* No uppercase, more modern */
+}
+
+.auth-form .form-submit:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.auth-form .form-submit:active {
+  transform: translateY(1px); /* Slight press effect */
+}
+
+/* Error and Success Messages */
+.auth-error,
+.auth-success {
+  display: none; /* Hidden by default */
+  margin: 10px 0 0 0; /* Adjusted margin */
+  padding: 12px 15px; /* Increased padding */
+  border-radius: 8px; /* Rounded corners */
+  font-size: 14px;
+  text-align: left; /* Align text to left */
+  border-width: 1px;
+  border-style: solid;
+}
+
+.auth-error {
+  background-color: #f8d7da; /* Softer red */
+  color: #721c24;
+  border-color: #f5c6cb;
+}
+
+.auth-success {
+  background-color: #d4edda; /* Softer green */
+  color: #155724;
+  border-color: #c3e6cb;
+}
+
+/* Optional: Add a subtle divider line if needed */
+/* .auth-modal hr {
+  border: 0;
+  height: 1px;
+  background-color: #eee;
+  margin: 25px 0;
+} */
+
+/* --- NEW/MODIFIED MODAL STYLES END HERE --- */
+`;
   document.head.appendChild(styleSheet);
 }
 
@@ -425,20 +535,27 @@ window.authUI = {
 function clearMessages() {
   document.querySelectorAll('.auth-error').forEach(error => {
     error.textContent = '';
+    error.style.display = 'none';
   });
   document.querySelectorAll('.auth-success').forEach(success => {
     success.textContent = '';
+    success.style.display = 'none';
   });
 }
 
 function showError(element, message) {
-  element.textContent = message;
+  if (element) {
+    element.textContent = message;
+    element.style.display = 'block';
+  }
 }
 
 function showSuccess(element, message) {
-  element.textContent = message;
-  element.style.color = '#388e3c';
-  element.style.display = 'block';
+  if (element) {
+    element.textContent = message;
+    element.style.display = 'block';
+    // Color is handled by CSS class .auth-success
+  }
 }
 
 function setFormLoading(form, isLoading) {

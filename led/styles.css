@@ -210,9 +210,17 @@
   transform: translateX(-50%); 
   display: flex; 
   gap: 12px; 
-  z-index: 10; 
+  z-index: 5; 
   width: 95%; 
   justify-content: center;
+  max-width: 60%;
+}
+
+/* For larger screens (Full HD and above) */
+@media screen and (min-width: 1920px) {
+  .pricing-pods {
+    max-width: 64%;
+  }
 }
 
 /* Make the 2D and 3D pods wider */
@@ -343,6 +351,8 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f0f2f5;
   height: 100vh;
+  overflow: hidden;
+  width: 100%;
 }
 p {
   margin: 8px 0;
@@ -356,35 +366,123 @@ h2 {
   padding-bottom: 5px;
 }
 
-/* Left Sidebar (15%) */
+/* Left Sidebar with responsive width */
 #controls {
-  width: 15%;
-  padding: 20px;
+  width: 20%; /* Default for smaller screens */
+  padding: 20px 20px 10px; /* Reduced bottom padding */
   background: #fff;
   height: 100%;
   overflow-y: auto;
   box-shadow: 2px 0 6px rgba(0,0,0,0.1);
 }
+
+/* For screens smaller than Full HD, reduce spacing in left sidebar */
+@media screen and (max-width: 1919px) {
+  /* Reduce header spacing */
+  #controls h3 {
+    margin-top: 8px;
+    margin-bottom: 5px;
+    font-size: 0.95em;
+  }
+  
+  /* Reduce card spacing */
+  #controls .control-card {
+    margin-bottom: 8px;
+    padding: 10px;
+  }
+  
+  /* Reduce slider container spacing */
+  #controls .slider-container {
+    margin-bottom: 3px;
+  }
+  
+  /* Reduce paragraph spacing */
+  #controls p {
+    margin: 3px 0;
+    font-size: 0.92em;
+  }
+  
+  /* Adjust the 'Produção Virtual em:' section */
+  #controls h3:last-of-type {
+    margin-top: 4px;
+    margin-bottom: 4px;
+  }
+  
+  /* Make sliders more compact */
+  #controls input[type="range"] {
+    margin: 4px 0;
+    height: 5px;
+  }
+  
+  /* Reduce spacing in module count information */
+  #controls #led-controls h3 + p,
+  #controls #teto-controls h3 + p {
+    margin-top: 2px;
+    margin-bottom: 2px;
+  }
+  
+  /* Make the value displays more compact */
+  #controls .value-display {
+    font-size: 0.9em;
+    margin: 2px 0;
+  }
+}
+
+/* For larger screens (Full HD and above) */
+@media screen and (min-width: 1920px) {
+  #controls {
+    width: 18%;
+    padding: 20px;
+  }
+}
 #controls::-webkit-scrollbar {
   display: none;
 }
 
-/* Center Column (70%) */
+/* Center Column with responsive width */
 #canvas-container {
-  width: 70%;
+  width: 60%; /* Default for smaller screens */
   height: 100%;
   background-color: #e9ecef;
   position: relative;
+  overflow: hidden;
+  z-index: 1;
+  clip-path: inset(0);
 }
 
-/* Right Sidebar (15%) */
+/* For larger screens (Full HD and above) */
+@media screen and (min-width: 1920px) {
+  #canvas-container {
+    width: 64%;
+  }
+}
+
+/* Ensure THREE.js canvas stays within its container */
+#canvas-container canvas {
+  position: absolute !important;
+  max-width: 100% !important;
+  display: block !important;
+}
+
+/* Right Sidebar with responsive width */
 #info-sidebar {
-  width: 15%;
+  width: 20%; /* Default for smaller screens */
   padding: 20px;
   background: #fff;
   height: 100%;
   overflow-y: auto;
   box-shadow: -2px 0 6px rgba(0,0,0,0.1);
+  box-sizing: border-box;
+  z-index: 10;
+  position: relative;
+  isolation: isolate;
+}
+
+/* For larger screens (Full HD and above) */
+@media screen and (min-width: 1920px) {
+  #info-sidebar {
+    width: 18%;
+  }
 }
 #info-sidebar::-webkit-scrollbar {
   display: none;

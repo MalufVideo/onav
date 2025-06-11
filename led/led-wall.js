@@ -24,9 +24,14 @@ class LEDWallCalculator {
 
     // Scene, camera and renderer settings
     this.scene = new THREE.Scene();
+    // Use container width from DOM or calculate based on screen width
+    const container = document.getElementById('canvas-container');
+    // For screens smaller than Full HD (1920px), use 60%, otherwise use 64%
+    const widthPercent = window.innerWidth >= 1920 ? 0.64 : 0.60;
+    const containerWidth = container ? container.offsetWidth : (window.innerWidth * widthPercent);
     this.camera = new THREE.PerspectiveCamera(
       75,
-      (window.innerWidth * 0.7) / window.innerHeight,
+      containerWidth / window.innerHeight,
       0.1,
       1000
     );
@@ -48,13 +53,12 @@ class LEDWallCalculator {
     this.scene.add(this.wallGroup);
     this.scene.add(this.roofGroup);
 
-    // Append renderer to canvas container (center column width = 70%)
-    const container = document.getElementById('canvas-container');
+    // Append renderer to canvas container (using container's actual width)
     if (!container) {
         console.error('Canvas container not found!');
         return;
     }
-    this.renderer.setSize(window.innerWidth * 0.7, window.innerHeight);
+    this.renderer.setSize(containerWidth, window.innerHeight);
     container.appendChild(this.renderer.domElement);
 
     // Camera control settings
@@ -98,6 +102,9 @@ class LEDWallCalculator {
     this.renderer.domElement.addEventListener('wheel', this.onMouseWheel.bind(this), { passive: false });
     this.renderer.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
     this.renderer.domElement.addEventListener('dblclick', this.onDoubleClick.bind(this));
+    
+    // Add window resize handler to ensure proper sizing
+    window.addEventListener('resize', this.onWindowResize.bind(this));
 
     // Lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.15);
@@ -348,6 +355,22 @@ class LEDWallCalculator {
   onDoubleClick(event) {
     event.preventDefault();
     this.resetView();
+  }
+  
+  // Handle window resize
+  onWindowResize() {
+    const container = document.getElementById('canvas-container');
+    if (!container) return;
+    
+    // Get actual container width or calculate based on screen size
+    const containerWidth = container.offsetWidth;
+    
+    // Update camera aspect ratio
+    this.camera.aspect = containerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+    
+    // Resize renderer to match container width
+    this.renderer.setSize(containerWidth, window.innerHeight);
   }
 
   // --- Camera Movements ---

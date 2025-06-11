@@ -42,6 +42,154 @@
         /* Import Google Fonts */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400&display=swap');
 
+        /* Gallery Styles */
+        .gallery-container {
+            position: relative;
+            overflow: hidden;
+        }
+        .gallery-item {
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+        }
+        .gallery-item:hover {
+            border-color: rgba(0,255,157,0.5);
+            box-shadow: 0 8px 20px rgba(0,255,157,0.2);
+        }
+        .gallery-item img {
+            transition: all 0.5s ease;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* Lightbox styles */
+        .lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .lightbox.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .lightbox-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 90%;
+            height: 90%;
+        }
+        .lightbox-content {
+            max-width: 100%;
+            max-height: 100%;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            border: 2px solid rgba(0,255,157,0.3);
+            box-shadow: 0 0 30px rgba(0,255,157,0.3);
+        }
+        .lightbox.active .lightbox-content {
+            transform: scale(1);
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #fff;
+            font-size: 30px;
+            cursor: pointer;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .lightbox-caption {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: white;
+            padding: 10px;
+            background-color: rgba(0,0,0,0.5);
+            font-size: 1.2rem;
+        }
+        
+        .play-icon {
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+        
+        .gallery-item:hover .play-icon {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        .video-play-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .video-play-overlay:hover {
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .video-play-overlay svg {
+            filter: drop-shadow(0 0 8px rgba(0,255,157,0.5));
+        }
+        
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            opacity: 0.7;
+            border: 1px solid rgba(0,255,157,0.3);
+            box-shadow: 0 0 15px rgba(0,255,157,0.3);
+        }
+        
+        .lightbox-nav:hover {
+            background-color: rgba(0,0,0,0.8);
+            opacity: 1;
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .lightbox-prev {
+            left: 20px;
+        }
+        
+        .lightbox-next {
+            right: 20px;
+        }
+
         /* Base body styles with Blob Background */
         body {
             font-family: 'Inter', sans-serif;
@@ -99,6 +247,31 @@
         .styled-list li { display: flex; align-items: flex-start; margin-bottom: 0.5rem; }
         .styled-list li i { color: #00ff9d; margin-right: 0.75rem; margin-top: 0.25rem; flex-shrink: 0; }
 
+        @media (min-width: 1280px) { /* For large desktop screens */
+            #what-is-mapping .grid {
+                position: relative;
+            }
+            #what-is-mapping .image-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 58%; /* Adjust width as needed */
+                height: 100%;
+                z-index: 0;
+            }
+            #what-is-mapping .image-container img {
+                object-fit: cover;
+                width: 100%;
+                height: 100%;
+                opacity: 1; /* Removed overlay effect */
+                border-radius: 0.75rem; /* Match parent container rounding */
+            }
+            #what-is-mapping .text-container {
+                position: relative;
+                z-index: 1;
+                grid-column: 2 / 3;
+            }
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -153,16 +326,19 @@
 
             <section id="what-is-mapping" class="mb-16 content-section rounded-xl p-8 md:p-12" data-aos="fade-up">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                    <div class="flex justify-center items-center">
-                         <img src="https://placehold.co/500x350/0a0a0a/00ff9d?text=Mapeamento+3D+Conceito" alt="Ilustração Conceito Projeção Mapeada" class="rounded-lg shadow-lg glow-box-primary w-full h-auto object-cover">
+                    <div class="image-container flex justify-center items-center">
+                         <img src="img/on/palco_domo_energetico.webp" alt="Palco Domo Energético - Exemplo de Projeção Mapeada" class="rounded-lg shadow-lg glow-box-primary w-full h-auto object-cover">
                     </div>
-                    <div>
+                    <div class="text-container">
                         <h2 class="text-3xl font-bold mb-4 text-primary glow-text-primary">O Poder da Projeção</h2>
                         <p class="text-light-text mb-4 leading-relaxed">
                             A projeção mapeada (ou video mapping) utiliza tecnologia avançada para transformar objetos, edifícios e superfícies irregulares em telas vivas. Projetamos conteúdo visual que se adapta perfeitamente às formas tridimensionais, criando ilusões de ótica e experiências imersivas surpreendentes.
                         </p>
                         <p class="text-medium-text leading-relaxed">
                             É a arte de usar a luz para redesenhar a realidade, contando histórias e evocando emoções de uma forma única e memorável.
+                        </p>
+                        <p class="text-light-text mt-6 mb-4 leading-relaxed">
+                            A On+AV é fruto de uma joint venture entre a On Projeções, um dos maiores nomes em projeção na América Latina, e a AV Design, referência em criação de conteúdo e operação de Disguise. Essa união poderosa combina o que há de melhor nos dois mundos, resultando em experiências visuais verdadeiramente inovadoras e impactantes.
                         </p>
                     </div>
                 </div>
@@ -190,8 +366,72 @@
             </section>
 
             <section class="mb-16" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-10">Galeria de <span class="gradient-text">Projetos On</span></h2>
+                <div class="gallery-container">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="gallery-item video-item overflow-hidden rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg" data-aos="fade-up" data-video-src="img/on/disney_on.mp4">
+                            <div class="relative">
+                                <img src="img/on/disney.webp" alt="Disney Projection Mapping" class="w-full h-64 object-cover hover:brightness-110 transition-all duration-300">
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <div class="play-icon bg-primary bg-opacity-70 rounded-full p-3 transform transition-transform duration-300 hover:scale-110">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gallery-item overflow-hidden rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg" data-aos="fade-up" data-aos-delay="100">
+                            <img src="img/on/retrato_por_do_sol_virtual.webp" alt="Retrato Pôr do Sol Virtual" class="w-full h-64 object-cover hover:brightness-110 transition-all duration-300">
+
+                        </div>
+                        <div class="gallery-item overflow-hidden rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg" data-aos="fade-up" data-aos-delay="200">
+                            <img src="img/on/monet_crianca_cavalo.webp" alt="Monet Criança Cavalo" class="w-full h-64 object-cover hover:brightness-110 transition-all duration-300">
+
+                        </div>
+                        <div class="gallery-item overflow-hidden rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg" data-aos="fade-up">
+                            <img src="img/on/paisagem_pontes_monet.webp" alt="Paisagem Pontes Monet" class="w-full h-64 object-cover hover:brightness-110 transition-all duration-300">
+
+                        </div>
+                        <div class="gallery-item overflow-hidden rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg" data-aos="fade-up" data-aos-delay="100">
+                            <img src="img/on/niermayer.jpg" alt="Niermayer" class="w-full h-64 object-cover hover:brightness-110 transition-all duration-300">
+
+                        </div>
+                        <div class="gallery-item overflow-hidden rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg" data-aos="fade-up" data-aos-delay="200">
+                            <img src="img/on/projecao_azul_barco.webp" alt="Projeção Azul Barco" class="w-full h-64 object-cover hover:brightness-110 transition-all duration-300">
+
+                        </div>
+                        <div class="gallery-item overflow-hidden rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg" data-aos="fade-up">
+                            <img src="img/on/projecao_domo_luzes.webp" alt="Projeção Domo Luzes" class="w-full h-64 object-cover hover:brightness-110 transition-all duration-300">
+
+                        </div>
+                        <div class="gallery-item overflow-hidden rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg video-item" data-aos="fade-up" data-aos-delay="150" data-video-src="img/on/luan_santana_on.mp4">
+                            <div class="relative">
+                                <img src="img/on/luan.webp" alt="Luan Santana ON" class="w-full h-64 object-cover hover:brightness-110 transition-all duration-300">
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <div class="play-icon bg-primary bg-opacity-70 rounded-full p-3 transform transition-transform duration-300 hover:scale-110">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="gallery-item overflow-hidden rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg" data-aos="fade-up" data-aos-delay="100">
+                            <img src="img/on/projecao_teto_michelangelo.webp" alt="Projeção Teto Michelangelo" class="w-full h-64 object-cover hover:brightness-110 transition-all duration-300">
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-16" data-aos="fade-up">
                 <h2 class="text-3xl md:text-4xl font-bold text-center mb-10">Aplicações <span class="gradient-text">Infinitas</span></h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+
                     <div class="application-card rounded-lg p-6 text-center">
                         <div class="mb-4 text-secondary text-4xl"><i class="fas fa-calendar-alt"></i></div>
                         <h3 class="text-xl font-semibold mb-2 text-light-text">Eventos</h3>
@@ -245,7 +485,7 @@
             <section id="disguise-advantage" class="mb-16 content-section rounded-xl p-8 md:p-12" data-aos="fade-up">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                      <div class="md:order-last flex justify-center items-center">
-                         <img src="https://placehold.co/500x400/0a0a0a/0066ff?text=Disguise+Mapping+UI" alt="Interface Disguise para Mapeamento" class="rounded-lg shadow-lg glow-box-secondary w-full h-auto object-cover">
+                         <img src="img/Omnical_Calibration_disguise.webp" alt="Omnical Calibration no Disguise" class="rounded-lg shadow-lg glow-box-secondary w-full h-auto object-cover">
                     </div>
                     <div class="md:order-first">
                         <h2 class="text-3xl font-bold mb-4 text-secondary glow-text-secondary">A Vantagem Disguise</h2>
@@ -261,7 +501,7 @@
                         <p class="text-light-text mb-6 leading-relaxed text-sm">
                            Nossa expertise comprovada com Disguise garante que sua visão mais ambiciosa se torne realidade com qualidade e segurança incomparáveis.
                         </p>
-                        <a href="index.html#contact" class="btn-secondary">Discutir Projeto com Disguise</a>
+                        <a href="index.html#contact" class="btn-secondary">Discutir Projeto</a>
                     </div>
                 </div>
             </section>
@@ -336,6 +576,192 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     <script>
         // Initialize AOS
+        
+        // Lightbox functionality for gallery
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create lightbox elements
+            const lightbox = document.createElement('div');
+            lightbox.className = 'lightbox';
+            const lightboxContainer = document.createElement('div');
+            lightboxContainer.className = 'lightbox-container';
+            const lightboxClose = document.createElement('span');
+            lightboxClose.className = 'lightbox-close';
+            lightboxClose.innerHTML = '&times;';
+            const lightboxCaption = document.createElement('div');
+            lightboxCaption.className = 'lightbox-caption';
+            lightboxCaption.style.display = 'none'; // Hide caption element
+            
+            // Create navigation arrows
+            const prevButton = document.createElement('div');
+            prevButton.className = 'lightbox-nav lightbox-prev';
+            prevButton.innerHTML = '&#10094;';
+            
+            const nextButton = document.createElement('div');
+            nextButton.className = 'lightbox-nav lightbox-next';
+            nextButton.innerHTML = '&#10095;';
+            
+            lightbox.appendChild(lightboxContainer);
+            lightbox.appendChild(lightboxClose);
+            lightbox.appendChild(lightboxCaption);
+            lightbox.appendChild(prevButton);
+            lightbox.appendChild(nextButton);
+            document.body.appendChild(lightbox);
+            
+            // Get all gallery items
+            const galleryItems = document.querySelectorAll('.gallery-item');
+            let currentIndex = 0;
+            
+            // Function to show item in lightbox
+            function showItem(index) {
+                // Clear previous content
+                lightboxContainer.innerHTML = '';
+                
+                // Ensure index is within bounds
+                if (index < 0) index = galleryItems.length - 1;
+                if (index >= galleryItems.length) index = 0;
+                
+                currentIndex = index;
+                const item = galleryItems[index];
+                
+                const img = item.querySelector('img');
+                const caption = img ? img.getAttribute('alt') : '';
+                const isVideoItem = item.classList.contains('video-item');
+                
+                if (isVideoItem) {
+                    // Handle video content
+                    const videoSource = item.getAttribute('data-video-src');
+                    const lightboxVideo = document.createElement('video');
+                    lightboxVideo.className = 'lightbox-content';
+                    lightboxVideo.controls = true;
+                    lightboxVideo.autoplay = false;
+                    lightboxVideo.preload = 'auto';
+                    lightboxVideo.style.maxHeight = '80vh';
+                    lightboxVideo.innerHTML = `<source src="${videoSource}" type="video/mp4">Seu navegador não suporta vídeos HTML5.`;
+                    lightboxContainer.appendChild(lightboxVideo);
+                    
+                    // Add play button for better UX
+                    setTimeout(() => {
+                        try {
+                            const playPromise = lightboxVideo.play();
+                            if (playPromise !== undefined) {
+                                playPromise.catch(e => {
+                                    console.log('Auto-play prevented:', e);
+                                    // Add a play button overlay if autoplay is prevented
+                                    const playOverlay = document.createElement('div');
+                                    playOverlay.className = 'video-play-overlay';
+                                    playOverlay.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+                                    lightboxContainer.appendChild(playOverlay);
+                                    playOverlay.addEventListener('click', () => {
+                                        lightboxVideo.play();
+                                        playOverlay.remove();
+                                    });
+                                });
+                            }
+                        } catch (e) {
+                            console.log('Video play error:', e);
+                        }
+                    }, 300);
+                } else if (img) {
+                    // Handle image content
+                    const lightboxImg = document.createElement('img');
+                    lightboxImg.className = 'lightbox-content';
+                    lightboxImg.src = img.src;
+                    lightboxContainer.appendChild(lightboxImg);
+                }
+                
+                // Update caption
+                lightboxCaption.textContent = caption;
+                lightboxCaption.style.display = caption ? 'block' : 'none';
+            }
+            
+            // Add click event to gallery items
+            galleryItems.forEach((item, index) => {
+                item.addEventListener('click', function() {
+                    // Pause any currently playing videos before showing new content
+                    const currentVideos = document.querySelectorAll('.lightbox video');
+                    currentVideos.forEach(video => video.pause());
+                    
+                    currentIndex = index;
+                    showItem(currentIndex);
+                    lightbox.classList.add('active');
+                    document.body.style.overflow = 'hidden'; // Prevent scrolling
+                });
+            });
+            
+            // Navigation button events
+            prevButton.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent lightbox from closing
+                e.preventDefault(); // Prevent default behavior
+                
+                // Pause any currently playing videos
+                const currentVideos = document.querySelectorAll('.lightbox video');
+                currentVideos.forEach(video => video.pause());
+                
+                showItem(currentIndex - 1);
+                return false; // Prevent event bubbling
+            });
+            
+            nextButton.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent lightbox from closing
+                e.preventDefault(); // Prevent default behavior
+                
+                // Pause any currently playing videos
+                const currentVideos = document.querySelectorAll('.lightbox video');
+                currentVideos.forEach(video => video.pause());
+                
+                showItem(currentIndex + 1);
+                return false; // Prevent event bubbling
+            });
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (!lightbox.classList.contains('active')) return;
+                
+                if (e.key === 'ArrowLeft') {
+                    showItem(currentIndex - 1);
+                } else if (e.key === 'ArrowRight') {
+                    showItem(currentIndex + 1);
+                } else if (e.key === 'Escape') {
+                    closeLightbox();
+                }
+            });
+            
+            // Close lightbox on click
+            lightboxClose.addEventListener('click', closeLightbox);
+            
+            // Close when clicking on the lightbox background (outside content)
+            lightbox.addEventListener('click', function(e) {
+                // Close if clicking on the lightbox background or any element that's not the image/video content
+                if (e.target === lightbox || !e.target.closest('.lightbox-content')) {
+                    closeLightbox();
+                }
+            });
+            
+            // Prevent event bubbling when clicking on content
+            lightboxContainer.addEventListener('click', function(e) {
+                // Only stop propagation if clicking on the actual content
+                if (e.target.closest('.lightbox-content')) {
+                    e.stopPropagation();
+                }
+            });
+            
+            lightboxCaption.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            lightboxClose.addEventListener('click', function(e) {
+                e.stopPropagation();
+                closeLightbox();
+            });
+            
+            function closeLightbox() {
+                const videos = lightbox.querySelectorAll('video');
+                videos.forEach(video => video.pause()); // Pause any playing videos
+                lightbox.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling
+            }
+        });
+        
         AOS.init({ duration: 800, once: true });
 
         // Mobile menu toggle
