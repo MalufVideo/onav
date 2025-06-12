@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coldplay – Music of the Spheres World Tour | On + Av</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.2.0/css/glightbox.min.css">
+    <script>
+        // Tailwind CSS configuration
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00ff9d',
+                        secondary: '#0066ff',
+                        dark: '#0a0a0a',
+                        darker: '#020202',
+                        'light-text': '#e0e0e0',
+                        'medium-text': '#a0a0a0',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020202;
+            color: #e0e0e0;
+        }
+        .content-section {
+            background: rgba(15, 15, 15, 0.65);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-text { 
+            background: linear-gradient(90deg, #00ff9d, #0066ff); 
+            -webkit-background-clip: text; 
+            background-clip: text; 
+            color: transparent; 
+        }
+        .btn-primary {
+            background-color: #00ff9d;
+            color: #020202;
+            transition: all 0.3s ease;
+            border-radius: 0.375rem;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .btn-secondary {
+            background-color: transparent;
+            color: #00ff9d;
+            border: 1px solid #00ff9d;
+            transition: all 0.3s ease;
+            border-radius: 0.375rem;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .gallery-item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .gallery-item:hover {
+            transform: scale(1.03);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="relative min-h-screen py-8">
+        <!-- Overlay background com gradiente -->
+        <div class="fixed inset-0 -z-10">
+            <div class="absolute inset-0 bg-darker opacity-95"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-darker via-darker to-black opacity-95"></div>
+        </div>
+        
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Botão voltar -->
+            <div class="flex justify-between items-center mb-8">
+                <a href="../shows.html#casos-sucesso" class="flex items-center text-medium-text hover:text-primary transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    <span>Voltar para Shows e Turnês</span>
+                </a>
+            </div>
+            
+            <!-- Título do caso -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-4">
+                    Coldplay – <span class="gradient-text">Music of the Spheres World Tour</span>
+                </h1>
+                <p class="text-xl text-medium-text">
+                    2022
+                </p>
+            </div>
+            
+            <!-- Conteúdo principal -->
+            <div class="content-section rounded-xl p-8 md:p-10 mb-10">
+                <div class="md:flex gap-12 items-center mb-8">
+                    <div class="md:w-2/3 mb-6 md:mb-0">
+                        <img src="img/coldplay.jpg" alt="Coldplay Music of the Spheres Tour" class="rounded-lg w-full h-auto">
+                    </div>
+                    <div class="md:w-1/3">
+                        <h2 class="text-2xl font-bold mb-4 text-primary">Visão Geral</h2>
+                        <p class="mb-4 text-light-text">
+                            Para a turnê mundial em estádios "Music of the Spheres" do Coldplay, o estúdio FRAY utilizou o Notch para criar visuais IMAG, efeitos generativos e um jogo interativo que complementam perfeitamente a experiência musical visionária da banda.
+                        </p>
+                        <div class="flex flex-col space-y-2">
+                            <div>
+                                <span class="text-medium-text">Cliente:</span> 
+                                <span class="text-light-text font-medium">Coldplay</span>
+                            </div>
+                            <div>
+                                <span class="text-medium-text">Tour:</span> 
+                                <span class="text-light-text font-medium">Music of the Spheres World Tour</span>
+                            </div>
+                            <div>
+                                <span class="text-medium-text">Tecnologia:</span> 
+                                <span class="text-light-text font-medium">Disguise com integração Notch</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold mb-4 text-primary">O Desafio</h2>
+                    <p class="mb-4 text-light-text">
+                        Ao longo de 5 meses, o FRAY Studio produziu os visuais em tempo real para a turnê mundial Music of the Spheres, incluindo efeitos de vídeo generativos e um jogo interativo para aquecimento pré-show. A produção precisava criar uma experiência visual que seguisse perfeitamente a narrativa temática do álbum, mantendo a imagem da banda constantemente presente durante todo o espetáculo.
+                    </p>
+                    <p class="text-light-text">
+                        Os efeitos de vídeo desempenharam um papel vital, com o briefing de ter IMAG (imagem ampliada) continuamente exibida durante todo o show. Com o palco apresentando 8 grandes telas LED, a equipe precisava criar uma variedade de looks usando efeitos generativos em tempo real que adicionassem momentos de acentos estilizados hiper-realistas à banda, seguindo o arco narrativo do show.
+                    </p>
+                </div>
+                
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold mb-4 text-primary">A Solução Inovadora</h2>
+                    <p class="mb-4 text-light-text">
+                        Antes de cada show, os espectadores podiam participar de uma competição de dança em duas pistas de dança, gerando energia a partir do movimento. Isso, por sua vez, produzia eletricidade para o próprio show. O Notch foi usado para visualizar a energia gerada e aplicar efeitos de vídeo no feed ao vivo do público dançando.
+                    </p>
+                    <p class="mb-4 text-light-text">
+                        Esses acentos de efeitos generativos incluíam efeitos de trilhas prismáticas coloridas em "Paradise" e "A Sky Full of Stars"; as partículas geradas por movimento de "Biutyful"; as distorções de vídeo granuladas e reativas ao áudio de "People Of The Pride"; os efeitos psicodélicos de cores do perseguidor de arco-íris de "Charlie Brown"; e a captura e reprodução reversa da gravação ao vivo da banda e do público de "The Scientist".
+                    </p>
+                    <p class="mb-4 text-light-text">
+                        "O Notch nos permitiu desenvolver um fluxo de trabalho em tempo real, trabalhando em conjunto com o Disguise para garantir que pudéssemos produzir e exibir saída de vídeo em muitas superfícies diferentes. Dentro de projetos únicos, tínhamos até cinco resoluções diferentes e vários tipos de mapeamento em diferentes camadas, levando em conta as telas IMAG circulares, o Moonrise, que está situado no palco superior da banda, e as esferas LED", explica Kira O'Brien, Tecnóloga Criativa da FRAY Studio.
+                    </p>
+                </div>
+                
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold mb-4 text-primary">Tecnologia e Sustentabilidade</h2>
+                    <ul class="list-disc pl-5 space-y-2 text-light-text mt-4">
+                        <li>Integração perfeita entre Notch e Disguise para efeitos visuais em tempo real</li>
+                        <li>Sistema interativo de geração de energia através da dança do público</li>
+                        <li>Telas circulares IMAG e esferas LED integradas ao design do palco</li>
+                        <li>Efeitos visuais reativos a áudio que se adaptam a cada performance</li>
+                        <li>Jogo pré-show que exibia a cidade atual, um medidor de atividade e uma bateria animada mostrando a energia gerada</li>
+                    </ul>
+                </div>
+                
+                <div class="mb-10">
+                    <h2 class="text-2xl font-bold mb-6 text-primary">Galeria</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="img/coldplay.jpg" class="gallery-item glightbox" data-gallery="gallery1">
+                            <img src="img/coldplay.jpg" alt="Coldplay Music of the Spheres Tour" class="rounded-lg w-full h-auto object-cover">
+                        </a>
+                        <a href="img/coldplay_disguise.webp" class="gallery-item glightbox" data-gallery="gallery1">
+                            <img src="img/coldplay_disguise.webp" alt="Coldplay with Disguise Technology" class="rounded-lg w-full h-auto object-cover">
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <p class="mb-6 text-medium-text italic">
+                        "O Notch permitiu que desenvolvêssemos um fluxo de trabalho em tempo real, trabalhando em conjunto com o Disguise para garantir que pudéssemos produzir e exibir saída de vídeo em muitas superfícies diferentes."
+                    </p>
+                    <p class="mb-6 text-medium-text">
+                        – Kira O'Brien, Tecnóloga Criativa, FRAY Studio
+                    </p>
+                    <div class="flex flex-col md:flex-row justify-center gap-4">
+                        <a href="https://www.notch.one/madewithnotch/coldplay-music-of-the-spheres-tour-2022" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+                            Ver artigo original
+                        </a>
+                        <a href="https://www.coldplay.com/" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+                            Site oficial do Coldplay
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <a href="../shows.html#casos-sucesso" class="btn-primary inline-block hover:opacity-90">
+                    Ver mais casos de sucesso
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.2.0/js/glightbox.min.js"></script>
+    <script>
+        // Inicializar o lightbox
+        const lightbox = GLightbox({
+            touchNavigation: true,
+            loop: true,
+            autoplayVideos: true
+        });
+    </script>
+</body>
+</html>

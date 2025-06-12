@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KISS – End of the Road World Tour | On + Av</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.2.0/css/glightbox.min.css">
+    <script>
+        // Tailwind CSS configuration
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00ff9d',
+                        secondary: '#0066ff',
+                        dark: '#0a0a0a',
+                        darker: '#020202',
+                        'light-text': '#e0e0e0',
+                        'medium-text': '#a0a0a0',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020202;
+            color: #e0e0e0;
+        }
+        .content-section {
+            background: rgba(15, 15, 15, 0.65);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-text { 
+            background: linear-gradient(90deg, #00ff9d, #0066ff); 
+            -webkit-background-clip: text; 
+            background-clip: text; 
+            color: transparent; 
+        }
+        .btn-primary {
+            background-color: #00ff9d;
+            color: #020202;
+            transition: all 0.3s ease;
+            border-radius: 0.375rem;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .btn-secondary {
+            background-color: transparent;
+            color: #00ff9d;
+            border: 1px solid #00ff9d;
+            transition: all 0.3s ease;
+            border-radius: 0.375rem;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .gallery-item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .gallery-item:hover {
+            transform: scale(1.03);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="relative min-h-screen py-8">
+        <!-- Overlay background com gradiente -->
+        <div class="fixed inset-0 -z-10">
+            <div class="absolute inset-0 bg-darker opacity-95"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-darker via-darker to-black opacity-95"></div>
+        </div>
+        
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Botão voltar -->
+            <div class="flex justify-between items-center mb-8">
+                <a href="../shows.html#casos-sucesso" class="flex items-center text-medium-text hover:text-primary transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    <span>Voltar para Shows e Turnês</span>
+                </a>
+            </div>
+            
+            <!-- Título do caso -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-4">
+                    KISS – <span class="gradient-text">"End of the Road" World Tour</span>
+                </h1>
+                <p class="text-xl text-medium-text">
+                    2019
+                </p>
+            </div>
+            
+            <!-- Conteúdo principal -->
+            <div class="content-section rounded-xl p-8 md:p-10 mb-10">
+                <div class="md:flex gap-12 items-center mb-8">
+                    <div class="md:w-2/3 mb-6 md:mb-0">
+                        <img src="img/kiss-main-body-image-3.jpg" alt="KISS End of the Road Tour" class="rounded-lg w-full h-auto">
+                    </div>
+                    <div class="md:w-1/3">
+                        <h2 class="text-2xl font-bold mb-4 text-primary">Visão Geral</h2>
+                        <p class="mb-4 text-light-text">
+                            A icônica banda americana KISS embarcou na turnê "End of the Road" World Tour com a Disguise impulsionando shows finais complexos e dinâmicos, destacando-se por elementos visuais sensacionais que complementam a produção grandiosa.
+                        </p>
+                        <div class="flex flex-col space-y-2">
+                            <div>
+                                <span class="text-medium-text">Cliente:</span> 
+                                <span class="text-light-text font-medium">KISS</span>
+                            </div>
+                            <div>
+                                <span class="text-medium-text">Tour:</span> 
+                                <span class="text-light-text font-medium">End of the Road World Tour</span>
+                            </div>
+                            <div>
+                                <span class="text-medium-text">Tecnologia Disguise:</span> 
+                                <span class="text-light-text font-medium">Servidores gx 2</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold mb-4 text-primary">O Desafio</h2>
+                    <p class="mb-4 text-light-text">
+                        Para a última turnê do KISS, uma banda cuja carreira musical abrange mais de 40 anos, a produção exigia um espetáculo à altura de seu legado. A turnê começou em janeiro em Vancouver e terminou em Nagoya, Japão, no final de 2019, com 112 datas de shows entre elas.
+                    </p>
+                    <p class="text-light-text">
+                        Fiel ao legado do KISS, a produção em grande escala da turnê incluía lasers, kits de bateria flutuantes, fogo, pirotecnia e muito mais. Era necessário um sistema de mídia que pudesse gerenciar elementos visuais complexos, incluindo 17 pods de vídeo LED acima do palco que se movem para dentro e para fora por meio de guinchos automatizados, uma parede de vídeo LED maciça no fundo do palco e duas telas laterais.
+                    </p>
+                </div>
+                
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold mb-4 text-primary">A Solução Disguise</h2>
+                    <p class="mb-4 text-light-text">
+                        Servidores de mídia Disguise gx 2 foram implementados para impulsionar os elementos visuais em grande escala da turnê. O sistema foi escolhido principalmente por suas capacidades de integração com o Notch, permitindo que os elementos visuais respondessem a dados de áudio, vídeo ou iluminação em tempo real.
+                    </p>
+                    <p class="mb-4 text-light-text">
+                        "O gx 2 nos dá o poder gráfico necessário para renderizar ambientes 3D bastante complexos em tempo real. O sistema foi capaz de renderizar efeitos IMAG do Notch sem esforço, e a vinculação de feeds de câmera a cenas do Notch no Disguise é simples e intuitiva", explica Danny Firpo, CEO da All of it Now.
+                    </p>
+                    <ul class="list-disc pl-5 space-y-2 text-light-text mt-4">
+                        <li>17 pods de vídeo LED automatizados acima do palco</li>
+                        <li>Enorme painel de vídeo LED no fundo do palco</li>
+                        <li>Integração perfeita com efeitos de iluminação e pirotecnia</li>
+                        <li>Conteúdo visual responsivo controlado em tempo real</li>
+                        <li>Sistema robusto e confiável para uma turnê mundial de 112 shows</li>
+                    </ul>
+                </div>
+                
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold mb-4 text-primary">Momentos Destacados</h2>
+                    <p class="mb-4 text-light-text">
+                        Um dos "momentos verdadeiramente únicos do show" acontece durante o solo de guitarra de Tommy Thayer em "Cold Gin". O sistema recebe uma entrada de áudio do solo de guitarra de Tommy, que controla a tremulação da câmera em uma cena do Notch, bem como pulsos do "sol" na cena.
+                    </p>
+                    <p class="text-light-text">
+                        Próximo ao final deste momento, explosões de vídeo nos pods de vídeo LED são cronometradas com precisão para efeitos de pirotecnia: foguetes são disparados da guitarra de Tommy atingindo os pods, e tanto a automação quanto a iluminação fazem os pods parecerem que foram atingidos. Tudo isso acontece em cerca de um minuto e resulta em uma cena que é conduzida pelo artista e mantém o nível de espontaneidade, talento e improvisação pelo qual a banda é conhecida.
+                    </p>
+                </div>
+                
+                <div class="mb-10">
+                    <h2 class="text-2xl font-bold mb-6 text-primary">Galeria</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <a href="img/kiss-main-body-image-3.jpg" class="gallery-item glightbox" data-gallery="gallery1">
+                            <img src="img/kiss-main-body-image-3.jpg" alt="KISS Live Performance" class="rounded-lg w-full h-48 object-cover">
+                        </a>
+                        <a href="img/kiss-main-body-images-4.jpg" class="gallery-item glightbox" data-gallery="gallery1">
+                            <img src="img/kiss-main-body-images-4.jpg" alt="KISS Stage Setup" class="rounded-lg w-full h-48 object-cover">
+                        </a>
+                        <a href="img/kiss_disguise.webp" class="gallery-item glightbox" data-gallery="gallery1">
+                            <img src="img/kiss_disguise.webp" alt="KISS with Disguise Technology" class="rounded-lg w-full h-48 object-cover">
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <p class="mb-6 text-medium-text italic">
+                        "Durante o ensaio, a rede 10G e o sistema de ingestão de conteúdo nos economizaram horas de tempo de gerenciamento de mídia por meio de um sistema de versionamento incrivelmente simplificado incorporado na plataforma Disguise."
+                    </p>
+                    <p class="mb-6 text-medium-text">
+                        – Danny Firpo, CEO da All of it Now
+                    </p>
+                    <div class="flex flex-col md:flex-row justify-center gap-4">
+                        <a href="https://www.disguise.one/en/insights/case-studies/kiss" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+                            Ver artigo original
+                        </a>
+                        <a href="https://www.kissonline.com/" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+                            Site oficial do KISS
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <a href="../shows.html#casos-sucesso" class="btn-primary inline-block hover:opacity-90">
+                    Ver mais casos de sucesso
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.2.0/js/glightbox.min.js"></script>
+    <script>
+        // Inicializar o lightbox
+        const lightbox = GLightbox({
+            touchNavigation: true,
+            loop: true,
+            autoplayVideos: true
+        });
+    </script>
+</body>
+</html>

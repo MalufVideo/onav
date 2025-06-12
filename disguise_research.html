@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisa Disguise: Grandes Turnês | On + Av</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <script>
+        // Tailwind CSS configuration (Consistent with other pages)
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00ff9d',
+                        secondary: '#0066ff',
+                        purpleish: '#9370DB',
+                        dark: '#0a0a0a',
+                        darker: '#020202',
+                        'light-text': '#e0e0e0',
+                        'medium-text': '#a0a0a0',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    animation: {
+                        'subtle-float': 'subtle-float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        'subtle-float': {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Import Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400&display=swap');
+
+        /* Base body styles with Blob Background */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020202;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 157, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 85% 80%, rgba(0, 102, 255, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 90% 30%, rgba(0, 255, 157, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 20% 70%, rgba(0, 102, 255, 0.1) 0%, transparent 55%),
+                radial-gradient(circle at 15% 90%, rgba(147, 112, 219, 0.20) 0%, transparent 60%);
+            background-attachment: fixed;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Utilities */
+        .gradient-text { background: linear-gradient(90deg, #00ff9d, #0066ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .glow-text-primary { text-shadow: 0 0 12px rgba(0, 255, 157, 0.6); }
+        .glow-box-primary { box-shadow: 0 0 25px rgba(0, 255, 157, 0.25); }
+        .glow-text-secondary { text-shadow: 0 0 12px rgba(0, 102, 255, 0.6); }
+        .glow-box-secondary { box-shadow: 0 0 25px rgba(0, 102, 255, 0.25); }
+
+        /* Card Styles */
+        .content-section, .feature-card {
+            background: rgba(15, 15, 15, 0.65); /* Unified card background */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease-in-out;
+        }
+        .content-section:hover, .feature-card:hover {
+            border-color: rgba(0, 255, 157, 0.6);
+            transform: translateY(-5px);
+        }
+        /* Keep static sections non-transformable on hover */
+        #disguise-live-advantage:hover {
+            transform: none;
+            border-color: #00ff9d;
+        }
+
+        /* Button Styles */
+        .btn-primary, .btn-secondary { transition: all 0.3s ease; border-radius: 0.375rem; padding: 0.5rem 1.5rem; font-size: 0.875rem; font-weight: 500; display: inline-block; }
+        .btn-primary { background: linear-gradient(90deg, #00ff9d, #0066ff); color: #050505; }
+        .btn-primary:hover { opacity: 0.9; box-shadow: 0 5px 15px rgba(0, 255, 157, 0.3); transform: translateY(-2px); }
+        .btn-secondary { border: 2px solid #00ff9d; color: #00ff9d; }
+        .btn-secondary:hover { background-color: rgba(0, 255, 157, 0.1); transform: translateY(-2px); }
+
+        /* Nav and Footer */
+        nav.fixed { background-color: rgba(2, 2, 2, 0.8); }
+        footer { background-color: #050505; }
+
+        /* List Styling */
+        .styled-list li { display: flex; align-items: flex-start; margin-bottom: 0.5rem; }
+        .styled-list li i { color: #00ff9d; margin-right: 0.75rem; margin-top: 0.25rem; flex-shrink: 0; }
+        
+        /* Table Styles */
+        .research-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .research-table th {
+            background-color: rgba(0, 255, 157, 0.1);
+            color: #00ff9d;
+            font-weight: 600;
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0, 255, 157, 0.3);
+        }
+        .research-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .research-table tr:hover td {
+            background-color: rgba(0, 255, 157, 0.05);
+        }
+        
+        /* Project Card Styles */
+        .project-card {
+            background: rgba(15, 15, 15, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .project-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 255, 157, 0.6);
+            box-shadow: 0 10px 25px rgba(0, 255, 157, 0.15);
+        }
+        .project-image {
+            height: 250px;
+            width: 100%;
+            object-fit: cover;
+            transition: all 0.5s ease;
+        }
+        .project-card:hover .project-image {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <nav class="fixed w-full bg-opacity-90 backdrop-blur-md z-50 border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex-shrink-0 flex items-center">
+                        <img src="img/on+av_logo_v2.png" alt="On + Av Logo" style="height:40px;" onerror="this.onerror=null; this.alt='On + Av'; this.src='https://placehold.co/120x40/020202/00ff9d?text=On%2BAv';">
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-6 lg:space-x-8">
+                        <a href="index.html" class="text-light-text hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Início</a>
+                        <a href="produtos.html" class="text-light-text hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Produtos</a>
+                        <a href="shows.html" class="text-primary px-3 py-2 rounded-md text-sm font-medium">Shows</a>
+                        <a href="projecao-mapeada.html" class="text-light-text hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Projeção</a>
+                        <a href="producao-virtual-xr.html" class="text-light-text hover:text-primary px-3 py-2 rounded-md text-sm font-medium">XR</a>
+                        <a href="criacao-conteudo.html" class="text-light-text hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Conteúdo</a>
+                        <a href="consultoria-suporte.html" class="text-light-text hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Suporte</a>
+                        <a href="index.html#contact" class="btn-primary">Contato</a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Abrir menu principal</span>
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="hidden md:hidden bg-darker border-t border-gray-800" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="index.html" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Início</a>
+                <a href="produtos.html" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Produtos</a>
+                <a href="shows.html" class="text-primary block px-3 py-2 rounded-md text-base font-medium">Shows</a>
+                <a href="projecao-mapeada.html" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Projeção</a>
+                <a href="producao-virtual-xr.html" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">XR</a>
+                <a href="criacao-conteudo.html" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Conteúdo</a>
+                <a href="consultoria-suporte.html" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Suporte</a>
+                <a href="index.html#contact" class="btn-primary text-base font-bold block px-3 py-2 rounded-md text-center mt-2">Contato</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-24 pb-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 mt-8" data-aos="fade-up">
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4">
+                    Pesquisa <span class="gradient-text">Disguise</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-light-text max-w-3xl mx-auto">
+                    Análise detalhada das maiores turnês mundiais e seu uso da tecnologia Disguise
+                </p>
+            </div>
+            
+            <!-- Introduction Section -->
+            <section id="research-intro" class="mb-16 content-section rounded-xl p-8 md:p-12" data-aos="fade-up">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold mb-4 text-primary">Tecnologia de Ponta nos Maiores Shows do Mundo</h2>
+                        <p class="text-light-text mb-4 leading-relaxed">
+                            Esta pesquisa apresenta um estudo detalhado sobre como a tecnologia Disguise está revolucionando os shows e turnês de artistas renomados globalmente. Os servidores Disguise são o coração tecnológico por trás das experiências visuais mais impressionantes da indústria do entretenimento ao vivo.
+                        </p>
+                        <p class="text-medium-text mb-6 leading-relaxed">
+                            Cada projeto analisado demonstra o uso inovador de diferentes modelos de servidores Disguise, desde os versáteis 4×4pro até os poderosos gx 3, alimentando desde telões LED até projeções mapeadas complexas e efeitos visuais em tempo real.
+                        </p>
+                    </div>
+                    <div class="flex justify-center items-center">
+                        <img src="https://www.disguise.one/media/5723/d3-technologies-gx-range.jpg" alt="Servidores Disguise gx series" class="rounded-lg shadow-lg w-full h-auto object-cover">
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Research Table Section -->
+            <section id="research-table" class="mb-16" data-aos="fade-up">
+                <h2 class="text-3xl font-bold mb-8 text-center">Tabela Comparativa <span class="gradient-text">Disguise em Turnês</span></h2>
+                
+                <div class="overflow-x-auto">
+                    <table class="research-table">
+                        <thead>
+                            <tr>
+                                <th class="w-1/12">#</th>
+                                <th class="w-3/12">Artista / Show (período)</th>
+                                <th class="w-3/12">Hardware Disguise utilizado</th>
+                                <th class="w-5/12">O que controla & por que é importante</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td><strong>Beyoncé – <em>Renaissance World Tour</em></strong> (2023-24)</td>
+                                <td>Iluminação e conteúdo Notch executados a partir de um sistema Disguise programado pela Green Wall Designs</td>
+                                <td>Ajudou a sincronizar o "portal" LED 360°, looks IMAG personalizados e efeitos Notch generativos em estádios</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td><strong>Beyoncé – <em>Formation World Tour</em></strong> (2016)</td>
+                                <td>(3) servidores 4×4pro + placas VFC (1 ao vivo / 1 backup / 1 reserva)</td>
+                                <td>Alimentou o "Monolith" LED giratório de 60 × 60 × 30 pés projetado por Es Devlin; modo timeline e MultiEdit permitiram rápidas mudanças de cidade para cidade</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td><strong>Coldplay – <em>Music of the Spheres Tour</em></strong> (2022-25)</td>
+                                <td>Servidores gx 2c</td>
+                                <td>Controlam os "planetas" LED infláveis, piso com ladrilhos LED e superfícies IMAG, mantendo-se dentro do orçamento de carbono da turnê</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td><strong>Ed Sheeran – <em>Mathematics Tour</em></strong> (2022-25)</td>
+                                <td>Servidores gx 2c (compatíveis com Notch)</td>
+                                <td>Mantém seis telas 360° suspensas e uma coroa circular no teto sincronizadas; Notch usado para efeitos de partículas em tempo real reagindo a cada música</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td><strong>Billie Eilish – <em>When We All Fall Asleep Tour</em></strong> (2019)</td>
+                                <td>Servidores gx 2</td>
+                                <td>Gerencia piso LED de formato amplo e backdrop, possibilitando a narrativa visual temática de "quarto em queda" com estilo horror</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Projects Section -->
+            <section id="tour-projects" class="mb-16" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-10">Projetos <span class="gradient-text">Detalhados</span></h2>
+                
+                <!-- Tour Navigation -->
+                <div class="flex flex-wrap justify-center gap-4 mb-10">
+                    <a href="#beyonce-renaissance" class="btn-secondary text-sm">Beyoncé Renaissance</a>
+                    <a href="#beyonce-formation" class="btn-secondary text-sm">Beyoncé Formation</a>
+                    <a href="#coldplay" class="btn-secondary text-sm">Coldplay</a>
+                    <a href="#ed-sheeran" class="btn-secondary text-sm">Ed Sheeran</a>
+                    <a href="#billie-eilish" class="btn-secondary text-sm">Billie Eilish</a>
+                    <a href="#u2" class="btn-secondary text-sm">U2</a>
+                    <a href="#lady-gaga" class="btn-secondary text-sm">Lady Gaga</a>
+                    <a href="#the-weeknd" class="btn-secondary text-sm">The Weeknd</a>
+                    <a href="#glass-animals" class="btn-secondary text-sm">Glass Animals</a>
+                    <a href="#adele" class="btn-secondary text-sm">Adele</a>
+                    <a href="#taylor-swift" class="btn-secondary text-sm">Taylor Swift</a>
+                </div>
+                
+                <!-- Beyoncé Renaissance World Tour -->
+                <div id="beyonce-renaissance" class="project-card mb-16">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="p-8">
+                            <h3 class="text-2xl font-bold mb-4 text-primary">Beyoncé – Renaissance World Tour (2023)</h3>
+                            <p class="text-light-text mb-4">
+                                A Renaissance World Tour de Beyoncé apresentou uma das produções visuais mais ambiciosas já criadas para um show ao vivo. O palco, projetado pela Stufish Entertainment Architects e Es Devlin Studio, contava com uma tela LED panorâmica de 15 metros de altura com uma parede LED circular deslizante no centro, conhecida como "portal".
+                            </p>
+                            <p class="text-medium-text mb-4">
+                                A Green Wall Designs foi responsável pela programação do sistema Disguise que gerenciava tanto a iluminação quanto o conteúdo Notch. Este sistema permitiu a sincronização perfeita do portal LED 360°, looks IMAG (Image Magnification) personalizados e efeitos generativos criados no Notch em tempo real.
+                            </p>
+                            <ul class="styled-list mb-4">
+                                <li><i class="fas fa-check-circle"></i> <span>Integração perfeita entre iluminação e vídeo através da plataforma Disguise</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Efeitos visuais generativos em tempo real usando Notch</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Adaptação dinâmica do conteúdo para diferentes estádios e arenas</span></li>
+                            </ul>
+                        </div>
+                        <div class="overflow-hidden">
+                            <img src="https://media.pitchfork.com/photos/646e1d9a5a2c3f2d1ff4e0e4/master/w_1600,c_limit/Beyonce-Renaissance.jpg" alt="Beyoncé Renaissance World Tour" class="project-image">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Beyoncé Formation World Tour -->
+                <div id="beyonce-formation" class="project-card mb-16">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="overflow-hidden">
+                            <img src="https://www.disguise.one/media/2143/beyonce_formation_tour_2016_1.jpg" alt="Beyoncé Formation World Tour" class="project-image" loading="lazy">
+                        </div>
+                        <div class="p-8">
+                            <h3 class="text-2xl font-bold mb-4 text-primary">Beyoncé – Formation World Tour (2016)</h3>
+                            <p class="text-light-text mb-4">
+                                A Formation World Tour de Beyoncé apresentou como peça central um impressionante cubo LED giratório de 60 × 60 × 30 pés, apelidado de "Monolith", projetado pela renomada designer Es Devlin. Esta estrutura monumental transformou-se no elemento visual definidor da turnê.
+                            </p>
+                            <p class="text-medium-text mb-4">
+                                Para alimentar esta estrutura complexa, foram utilizados três servidores Disguise 4×4pro equipados com placas VFC (Video Format Conversion), operando em configuração de redundância: um servidor principal ao vivo, um backup em espera quente e um terceiro para contingência. O sistema Disguise permitiu que a equipe técnica adaptasse rapidamente o conteúdo visual para cada cidade da turnê através do modo timeline e da funcionalidade MultiEdit.
+                            </p>
+                            <ul class="styled-list mb-4">
+                                <li><i class="fas fa-check-circle"></i> <span>Configuração de redundância tripla para máxima confiabilidade</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Placas VFC para conversão de formato de vídeo em tempo real</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Adaptação rápida do conteúdo para diferentes locais usando MultiEdit</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Coldplay Music of the Spheres Tour -->
+                <div id="coldplay" class="project-card mb-16">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="p-8">
+                            <h3 class="text-2xl font-bold mb-4 text-primary">Coldplay – Music of the Spheres Tour (2022-25)</h3>
+                            <p class="text-light-text mb-4">
+                                A turnê Music of the Spheres do Coldplay é conhecida não apenas por sua grandiosidade visual, mas também por seu compromisso com a sustentabilidade. A produção utiliza servidores Disguise gx 2c para controlar uma variedade de elementos visuais, incluindo "planetas" LED infláveis, um piso com ladrilhos LED e superfícies IMAG (Image Magnification) distribuídas pelo palco.
+                            </p>
+                            <p class="text-medium-text mb-4">
+                                Um aspecto notável desta turnê é como a tecnologia Disguise foi implementada para maximizar o impacto visual enquanto mantém a produção dentro do orçamento de carbono estabelecido pela banda. Os servidores gx 2c foram escolhidos por sua eficiência energética e capacidade de processamento, permitindo efeitos visuais impressionantes com menor consumo de energia.
+                            </p>
+                            <ul class="styled-list mb-4">
+                                <li><i class="fas fa-check-circle"></i> <span>Controle sincronizado de múltiplos elementos LED, incluindo estruturas infláveis</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Eficiência energética alinhada com os objetivos de sustentabilidade da turnê</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Integração com efeitos de iluminação e pulseiras LED do público</span></li>
+                            </ul>
+                        </div>
+                        <div class="overflow-hidden">
+                            <img src="https://www.nme.com/wp-content/uploads/2022/03/Coldplay-Music-Of-The-Spheres-tour-2022.jpg" alt="Coldplay Music of the Spheres Tour" class="project-image" loading="lazy">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ed Sheeran Mathematics Tour -->
+                <div id="ed-sheeran" class="project-card mb-16">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="overflow-hidden">
+                            <img src="https://www.disguise.one/media/5227/ed-sheeran-mathematics-tour-2022-1.jpg" alt="Ed Sheeran Mathematics Tour" class="project-image" loading="lazy">
+                        </div>
+                        <div class="p-8">
+                            <h3 class="text-2xl font-bold mb-4 text-primary">Ed Sheeran – Mathematics Tour (2022-25)</h3>
+                            <p class="text-light-text mb-4">
+                                A Mathematics Tour de Ed Sheeran apresenta um design de palco inovador em formato circular, com seis telas LED suspensas em 360° e uma coroa circular no teto. Esta configuração complexa é gerenciada por servidores Disguise gx 2c, escolhidos especificamente por sua compatibilidade com o software Notch para efeitos visuais em tempo real.
+                            </p>
+                            <p class="text-medium-text mb-4">
+                                O sistema Disguise sincroniza perfeitamente todas as telas suspensas, criando uma experiência visual imersiva para o público em todos os ângulos da arena. Um aspecto destacado desta produção é o uso do Notch para criar efeitos de partículas em tempo real que reagem dinamicamente a cada música, transformando o palco em um ambiente visual responsivo à performance.
+                            </p>
+                            <ul class="styled-list mb-4">
+                                <li><i class="fas fa-check-circle"></i> <span>Sincronização perfeita de múltiplas telas em configuração 360°</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Efeitos visuais reativos em tempo real através da integração Notch</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Design de palco central que maximiza a visibilidade para todo o público</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Billie Eilish When We All Fall Asleep Tour -->
+                <div id="billie-eilish" class="project-card mb-16">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="p-8">
+                            <h3 class="text-2xl font-bold mb-4 text-primary">Billie Eilish – When We All Fall Asleep Tour (2019)</h3>
+                            <p class="text-light-text mb-4">
+                                A When We All Fall Asleep Tour de Billie Eilish apresentou uma estética visual única que complementava perfeitamente o estilo sombrio e atmosférico de sua música. A produção utilizou servidores Disguise gx 2 para gerenciar um piso LED de formato amplo e um backdrop LED, criando um ambiente imersivo que transportava o público para o universo visual da artista.
+                            </p>
+                            <p class="text-medium-text mb-4">
+                                O design visual da turnê incorporou a narrativa temática de "quarto em queda" com estilo horror, refletindo a estética do álbum. Os servidores Disguise permitiram transições perfeitas entre diferentes ambientes visuais, sincronizados precisamente com cada música e momento da performance, criando uma experiência coesa e cinematográfica.
+                            </p>
+                            <ul class="styled-list mb-4">
+                                <li><i class="fas fa-check-circle"></i> <span>Integração perfeita entre piso LED e backdrop para criar ambientes imersivos</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Narrativa visual coerente com a estética do álbum</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Transições precisas entre diferentes ambientes visuais</span></li>
+                            </ul>
+                        </div>
+                        <div class="overflow-hidden">
+                            <img src="https://www.nme.com/wp-content/uploads/2020/10/BillieEilish_WhenWeAllFallAsleepTour_2019.jpg" alt="Billie Eilish When We All Fall Asleep Tour" class="project-image" loading="lazy">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- U2 Experience + Innocence Tour -->
+                <div id="u2" class="project-card mb-16">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="overflow-hidden">
+                            <img src="https://www.disguise.one/media/3107/u2-experience-innocence-tour-2018-1.jpg" alt="U2 Experience + Innocence Tour" class="project-image" loading="lazy">
+                        </div>
+                        <div class="p-8">
+                            <h3 class="text-2xl font-bold mb-4 text-primary">U2 – Experience + Innocence Tour (2018)</h3>
+                            <p class="text-light-text mb-4">
+                                A Experience + Innocence Tour do U2 apresentou uma das implementações mais inovadoras da tecnologia Disguise em turnês de arena. O elemento central da produção foi uma tela LED dupla-face suspensa de 30 metros de comprimento, que dividia a arena ao meio, criando um "palco de histórias" interativo onde a banda podia performar dentro das imagens projetadas.
+                            </p>
+                            <p class="text-medium-text mb-4">
+                                A produção utilizou servidores Disguise 4×4pro com placas VFC para alimentar esta estrutura complexa. O sistema permitiu que a banda interagisse com conteúdo visual em tempo real, criando momentos onde os membros do U2 pareciam estar dentro de ambientes virtuais. A capacidade do Disguise de mapear conteúdo em superfícies tridimensionais foi fundamental para criar esta experiência imersiva.
+                            </p>
+                            <ul class="styled-list mb-4">
+                                <li><i class="fas fa-check-circle"></i> <span>Tela LED dupla-face suspensa de 30 metros com interação em tempo real</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Mapeamento de conteúdo em superfícies tridimensionais complexas</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Integração perfeita entre performance ao vivo e ambientes virtuais</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lady Gaga Chromatica Ball -->
+                <div id="lady-gaga" class="project-card mb-16">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="p-8">
+                            <h3 class="text-2xl font-bold mb-4 text-primary">Lady Gaga – The Chromatica Ball (2022)</h3>
+                            <p class="text-light-text mb-4">
+                                The Chromatica Ball de Lady Gaga apresentou uma produção visual extraordinária que combinava elementos arquitetônicos monumentais com tecnologia de ponta. O palco, projetado para refletir a estética futurista e industrial do álbum Chromatica, contava com múltiplas telas LED e superfícies de projeção integradas a uma estrutura escultural.
+                            </p>
+                            <p class="text-medium-text mb-4">
+                                A turnê utilizou servidores Disguise gx 2 para gerenciar o conteúdo visual complexo em todas as superfícies de exibição. Um aspecto destacado foi a capacidade do sistema Disguise de sincronizar perfeitamente o conteúdo visual com a coreografia elaborada e os momentos musicais específicos, criando uma narrativa visual que complementava a jornada musical do show.
+                            </p>
+                            <ul class="styled-list mb-4">
+                                <li><i class="fas fa-check-circle"></i> <span>Sincronização precisa entre conteúdo visual, coreografia e música</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Integração de múltiplas superfícies LED em uma estrutura escultural</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Adaptação do conteúdo visual para diferentes tamanhos de estádio</span></li>
+                            </ul>
+                        </div>
+                        <div class="overflow-hidden">
+                            <img src="https://www.rollingstone.com/wp-content/uploads/2022/07/lady-gaga-chromatica-ball-review.jpg" alt="Lady Gaga The Chromatica Ball" class="project-image" loading="lazy">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- The Weeknd After Hours til Dawn -->
+                <div id="the-weeknd" class="project-card mb-16">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="overflow-hidden">
+                            <img src="https://www.nme.com/wp-content/uploads/2022/07/The-Weeknd-After-Hours-Til-Dawn-Tour-2022.jpg" alt="The Weeknd After Hours til Dawn Tour" class="project-image" loading="lazy">
+                        </div>
+                        <div class="p-8">
+                            <h3 class="text-2xl font-bold mb-4 text-primary">The Weeknd – After Hours til Dawn Tour (2022-23)</h3>
+                            <p class="text-light-text mb-4">
+                                A After Hours til Dawn Tour de The Weeknd apresentou uma produção visual espetacular que transformou estádios em uma metrópole distopíca inspirada nos álbuns After Hours e Dawn FM. O elemento central da produção foi uma recriação de 56 metros de comprimento do horizonte de uma cidade em ruínas, complementada por uma lua gigante inflável e efeitos de iluminação imersivos.
+                            </p>
+                            <p class="text-medium-text mb-4">
+                                A produção utilizou servidores Disguise gx 2 para gerenciar o conteúdo visual em todas as superfícies LED integradas ao cenário urbano. O sistema Disguise permitiu a sincronização perfeita entre o conteúdo visual, a iluminação e os efeitos especiais, criando transições fluidas entre diferentes "atos" do show que representavam a jornada narrativa dos álbuns.
+                            </p>
+                            <ul class="styled-list mb-4">
+                                <li><i class="fas fa-check-circle"></i> <span>Integração de conteúdo visual em uma cenografia urbana tridimensional</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Sincronização entre conteúdo LED, iluminação e efeitos especiais</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Adaptação do conteúdo para diferentes configurações de estádio</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Glass Animals Dreamland Tour -->
+                <div id="glass-animals" class="project-card mb-16">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="p-8">
+                            <h3 class="text-2xl font-bold mb-4 text-primary">Glass Animals – Dreamland Tour (2021-22)</h3>
+                            <p class="text-light-text mb-4">
+                                A Dreamland Tour do Glass Animals apresentou uma produção visual psicodélica e nostálgica que complementava perfeitamente a estética do álbum. O palco foi transformado em um ambiente imersivo inspirado nos anos 90 e na internet primitiva, com elementos visuais retrô e uma paleta de cores vibrante.
+                            </p>
+                            <p class="text-medium-text mb-4">
+                                A produção utilizou servidores Disguise gx 1c para gerenciar o conteúdo visual em telas LED e projeções. Um aspecto destacado foi o uso de efeitos visuais generativos criados com o software Notch, que reagiam em tempo real à música, criando uma experiência visual dinâmica que evoluía organicamente ao longo do show.
+                            </p>
+                            <ul class="styled-list mb-4">
+                                <li><i class="fas fa-check-circle"></i> <span>Efeitos visuais generativos em tempo real usando Notch</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Estética visual retrô e nostálgica alinhada com o conceito do álbum</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Adaptação do conteúdo para diferentes tamanhos de venue</span></li>
+                            </ul>
+                        </div>
+                        <div class="overflow-hidden">
+                            <img src="https://www.nme.com/wp-content/uploads/2021/09/Glass-Animals-Dreamland-Tour-2021.jpg" alt="Glass Animals Dreamland Tour" class="project-image" loading="lazy">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Adele 30 Tour -->
+                <div id="adele" class="project-card mb-16">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="overflow-hidden">
+                            <img src="https://www.rollingstone.com/wp-content/uploads/2022/07/adele-hyde-park-review.jpg" alt="Adele 30 Tour" class="project-image" loading="lazy">
+                        </div>
+                        <div class="p-8">
+                            <h3 class="text-2xl font-bold mb-4 text-primary">Adele – 30 Weekend with Adele (2022-23)</h3>
+                            <p class="text-light-text mb-4">
+                                A residência "Weekend with Adele" no Colosseum do Caesars Palace em Las Vegas apresentou uma produção visual elegante e sofisticada que complementava a voz poderosa da artista. O design do palco incorporava elementos clássicos com tecnologia moderna, criando um ambiente íntimo mesmo em um espaço grande.
+                            </p>
+                            <p class="text-medium-text mb-4">
+                                A produção utilizou servidores Disguise 4×4pro para gerenciar o conteúdo visual em telas LED e projeções mapeadas. Um aspecto destacado foi o uso de projeção mapeada em elementos cenários tridimensionais, criando efeitos visuais sutis mas impactantes que transformavam o ambiente de acordo com cada música, sem nunca ofuscar a performance vocal de Adele.
+                            </p>
+                            <ul class="styled-list mb-4">
+                                <li><i class="fas fa-check-circle"></i> <span>Projeção mapeada em elementos cenários tridimensionais</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Transições visuais sutis e elegantes entre músicas</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Integração perfeita entre iluminação e conteúdo visual</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Taylor Swift Eras Tour -->
+                <div id="taylor-swift" class="project-card mb-16">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="p-8">
+                            <h3 class="text-2xl font-bold mb-4 text-primary">Taylor Swift – The Eras Tour (2023-24)</h3>
+                            <p class="text-light-text mb-4">
+                                The Eras Tour de Taylor Swift é uma das produções de turnê mais ambiciosas já criadas, apresentando um show de três horas que percorre todas as 10 eras da carreira da artista. O design visual da turnê é igualmente grandioso, com um palco principal massivo, uma passarela em forma de T, e uma variedade de elementos cenários que se transformam para cada era.
+                            </p>
+                            <p class="text-medium-text mb-4">
+                                A produção utiliza servidores Disguise gx 3 para gerenciar o conteúdo visual em múltiplas telas LED, incluindo o piso do palco, painéis verticais móveis e uma tela de fundo gigante. O sistema Disguise permite transições perfeitas entre as diferentes estéticas visuais de cada era, sincronizando conteúdo visual com coreografias elaboradas e efeitos especiais, incluindo fogos de artifício e pirotecnia.
+                            </p>
+                            <ul class="styled-list mb-4">
+                                <li><i class="fas fa-check-circle"></i> <span>Transições perfeitas entre 10 estéticas visuais distintas para cada era</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Sincronização de conteúdo visual em múltiplas superfícies LED, incluindo painéis móveis</span></li>
+                                <li><i class="fas fa-check-circle"></i> <span>Integração com efeitos especiais, iluminação e pirotecnia</span></li>
+                            </ul>
+                        </div>
+                        <div class="overflow-hidden">
+                            <img src="https://www.rollingstone.com/wp-content/uploads/2023/03/GettyImages-1473363476-1.jpg" alt="Taylor Swift The Eras Tour" class="project-image" loading="lazy">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Conclusion Section -->
+                <div class="content-section rounded-xl p-8 md:p-12 mb-16" data-aos="fade-up">
+                    <h3 class="text-2xl font-bold mb-4 text-center text-primary">O Impacto da Tecnologia Disguise</h3>
+                    <p class="text-light-text mb-6 text-center max-w-4xl mx-auto">
+                        Como demonstrado nesta pesquisa, a tecnologia Disguise tem sido fundamental para elevar a experiência visual de shows e turnês ao redor do mundo. Desde a sincronização perfeita de conteúdo em superfícies complexas até a integração de efeitos visuais em tempo real, os servidores Disguise permitem que diretores criativos e designers realizem visões artísticas cada vez mais ambiciosas.
+                    </p>
+                    <p class="text-medium-text text-center max-w-4xl mx-auto">
+                        A flexibilidade e confiabilidade dos sistemas Disguise continuam a definir o padrão para produções audiovisuais de grande escala, permitindo experiências imersivas que complementam e amplificam a música, transformando shows em verdadeiras obras de arte multissensoriais.
+                    </p>
+                </div>
+                
+                <!-- Credits Disclaimer Section -->
+                <div class="content-section rounded-xl p-8 md:p-12 mb-16 border-t-4 border-red-500" data-aos="fade-up">
+                    <h3 class="text-2xl font-bold mb-4 text-center text-red-500">Créditos e Disclaimer</h3>
+                    <div class="text-light-text mb-6 max-w-4xl mx-auto">
+                        <p class="mb-4">
+                            <strong>IMPORTANTE:</strong> Esta página contém uma pesquisa de referência sobre produções que utilizaram tecnologia Disguise. A On + Av <strong>não foi responsável</strong> pela produção, design ou execução de nenhum dos shows ou turnês mencionados nesta página.
+                        </p>
+                        <p class="mb-4">
+                            Todo o conteúdo apresentado tem finalidade exclusivamente informativa e educacional, demonstrando as capacidades da tecnologia Disguise em produções de grande escala.
+                        </p>
+                        <p class="mb-6">
+                            As imagens utilizadas nesta página são de propriedade de seus respectivos detentores de direitos autorais e são usadas apenas para fins informativos e educacionais.
+                        </p>
+                        <h4 class="text-xl font-semibold mb-2 text-primary">Créditos de Imagens:</h4>
+                        <ul class="styled-list mb-4 space-y-2">
+                            <li><i class="fas fa-camera"></i> <span>Beyoncé Renaissance World Tour: Imagem via Pitchfork/Getty Images</span></li>
+                            <li><i class="fas fa-camera"></i> <span>Beyoncé Formation World Tour: Imagem via disguise.one</span></li>
+                            <li><i class="fas fa-camera"></i> <span>Coldplay Music of the Spheres Tour: Imagem via NME/Anna Lee Media</span></li>
+                            <li><i class="fas fa-camera"></i> <span>Ed Sheeran Mathematics Tour: Imagem via disguise.one</span></li>
+                            <li><i class="fas fa-camera"></i> <span>Billie Eilish When We All Fall Asleep Tour: Imagem via NME/Getty Images</span></li>
+                            <li><i class="fas fa-camera"></i> <span>U2 Experience + Innocence Tour: Imagem via disguise.one</span></li>
+                            <li><i class="fas fa-camera"></i> <span>Lady Gaga Chromatica Ball: Imagem via Rolling Stone/Getty Images</span></li>
+                            <li><i class="fas fa-camera"></i> <span>The Weeknd After Hours til Dawn Tour: Imagem via NME/Getty Images</span></li>
+                            <li><i class="fas fa-camera"></i> <span>Glass Animals Dreamland Tour: Imagem via NME/Getty Images</span></li>
+                            <li><i class="fas fa-camera"></i> <span>Adele 30 Weekend with Adele: Imagem via Rolling Stone/Getty Images</span></li>
+                            <li><i class="fas fa-camera"></i> <span>Taylor Swift The Eras Tour: Imagem via Rolling Stone/Getty Images</span></li>
+                        </ul>
+                        <p class="text-sm text-medium-text">
+                            Fontes de informação: disguise.one, Rolling Stone, NME, Pitchfork, Billboard e sites oficiais dos artistas.
+                        </p>
+                    </div>
+                </div>
+</div>
+</main>
+
+<!-- Footer Section -->
+<footer class="border-t border-gray-800 pt-12 pb-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div>
+                <img src="img/on+av_logo_v2.png" alt="On + Av Logo" class="h-10 mb-4" onerror="this.onerror=null; this.alt='On + Av'; this.src='https://placehold.co/120x40/020202/00ff9d?text=On%2BAv';">
+                <p class="text-medium-text mb-4">Soluções audiovisuais de ponta para shows, eventos e produções criativas.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-medium-text hover:text-primary"><i class="fab fa-instagram text-xl"></i></a>
+                    <a href="#" class="text-medium-text hover:text-primary"><i class="fab fa-linkedin text-xl"></i></a>
+                    <a href="#" class="text-medium-text hover:text-primary"><i class="fab fa-youtube text-xl"></i></a>
+                </div>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Links Rápidos</h3>
+                <ul class="space-y-2">
+                    <li><a href="index.html" class="text-medium-text hover:text-primary">Início</a></li>
+                    <li><a href="produtos.html" class="text-medium-text hover:text-primary">Produtos</a></li>
+                    <li><a href="shows.html" class="text-medium-text hover:text-primary">Shows</a></li>
+                    <li><a href="projecao-mapeada.html" class="text-medium-text hover:text-primary">Projeção Mapeada</a></li>
+                    <li><a href="producao-virtual-xr.html" class="text-medium-text hover:text-primary">Produção Virtual & XR</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-4">Contato</h3>
+                <ul class="space-y-2">
+                    <li class="flex items-start">
+                        <i class="fas fa-map-marker-alt text-primary mt-1 mr-2"></i>
+                        <span class="text-medium-text">São Paulo, SP - Brasil</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-envelope text-primary mt-1 mr-2"></i>
+                        <span class="text-medium-text">contato@onav.com.br</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-phone-alt text-primary mt-1 mr-2"></i>
+                        <span class="text-medium-text">+55 (11) 9999-9999</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 pt-8 text-center">
+            <p class="text-medium-text">&copy; <span id="current-year">2025</span> On + Av. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    // Initialize AOS
+    AOS.init({ duration: 800, once: true });
+    
+    // Mobile menu toggle
+    const mobileMenuButton = document.querySelector('.mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+            mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+            const icon = mobileMenuButton.querySelector('i');
+            if (icon) { 
+                icon.classList.toggle('fa-bars'); 
+                icon.classList.toggle('fa-times'); 
+            }
+        });
+    }
+    
+    // Update copyright year
+    const currentYearSpan = document.getElementById('current-year');
+    if (currentYearSpan) { 
+        currentYearSpan.textContent = new Date().getFullYear(); 
+    }
+</script>
+</body>
+</html>

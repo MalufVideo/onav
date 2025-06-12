@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Próximos Casos Disguise | On + Av</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        // Tailwind CSS configuration
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00ff9d',
+                        secondary: '#0066ff',
+                        dark: '#0a0a0a',
+                        darker: '#020202',
+                        'light-text': '#e0e0e0',
+                        'medium-text': '#a0a0a0',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020202;
+            color: #e0e0e0;
+        }
+        .content-section {
+            background: rgba(15, 15, 15, 0.65);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-text { 
+            background: linear-gradient(90deg, #00ff9d, #0066ff); 
+            -webkit-background-clip: text; 
+            background-clip: text; 
+            color: transparent; 
+        }
+        .btn-primary {
+            background-color: #00ff9d;
+            color: #020202;
+            transition: all 0.3s ease;
+            border-radius: 0.375rem;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .btn-secondary {
+            background-color: transparent;
+            color: #00ff9d;
+            border: 1px solid #00ff9d;
+            transition: all 0.3s ease;
+            border-radius: 0.375rem;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .badge {
+            background-color: rgba(0, 255, 157, 0.15);
+            color: #00ff9d;
+            border-radius: 9999px;
+            padding: 0.25rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="relative min-h-screen py-8">
+        <!-- Overlay background com gradiente -->
+        <div class="fixed inset-0 -z-10">
+            <div class="absolute inset-0 bg-darker opacity-95"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-darker via-darker to-black opacity-95"></div>
+        </div>
+        
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Botão voltar -->
+            <div class="flex justify-between items-center mb-8">
+                <a href="../showsv2.html" class="flex items-center text-medium-text hover:text-primary transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    <span>Voltar para Shows e Turnês</span>
+                </a>
+            </div>
+            
+            <!-- Título do caso -->
+            <div class="text-center mb-12">
+                <div class="mb-4">
+                    <span class="badge">
+                        <i class="fas fa-clock mr-2"></i>
+                        Em breve
+                    </span>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-4">
+                    Próximos <span class="gradient-text">Cases Disguise</span>
+                </h1>
+                <p class="text-xl text-medium-text max-w-3xl mx-auto">
+                    Estamos constantemente expandindo nossa galeria com novos casos de uso da tecnologia Disguise em shows e turnês ao redor do mundo.
+                </p>
+            </div>
+            
+            <!-- Conteúdo principal -->
+            <div class="content-section rounded-xl p-8 md:p-10 mb-10">
+                <div class="text-center mb-12">
+                    <div class="mb-8 max-w-xl mx-auto">
+                        <i class="fas fa-film text-primary text-6xl mb-6 opacity-80"></i>
+                        <h2 class="text-2xl font-bold mb-4">Mais casos estão chegando!</h2>
+                        <p class="text-light-text mb-4">
+                            Em breve adicionaremos mais estudos de caso detalhados sobre como a tecnologia Disguise está sendo utilizada em produção de shows e turnês de artistas nacionais e internacionais.
+                        </p>
+                        <p class="text-medium-text">
+                            Fique de olho para conhecer as histórias por trás das produções mais inovadoras do mundo do entretenimento ao vivo.
+                        </p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+                        <div class="content-section rounded-lg p-6 text-left">
+                            <h3 class="text-xl font-bold mb-3">Artistas Internacionais</h3>
+                            <p class="text-medium-text mb-4">
+                                Estamos preparando materiais sobre grandes artistas como Coldplay, Bruno Mars, Billie Eilish e muito mais.
+                            </p>
+                            <div class="flex flex-wrap gap-2 mt-4">
+                                <span class="text-xs bg-opacity-20 bg-primary text-primary py-1 px-3 rounded-full">Coldplay</span>
+                                <span class="text-xs bg-opacity-20 bg-primary text-primary py-1 px-3 rounded-full">Bruno Mars</span>
+                                <span class="text-xs bg-opacity-20 bg-primary text-primary py-1 px-3 rounded-full">Billie Eilish</span>
+                                <span class="text-xs bg-opacity-20 bg-primary text-primary py-1 px-3 rounded-full">Taylor Swift</span>
+                            </div>
+                        </div>
+                        
+                        <div class="content-section rounded-lg p-6 text-left">
+                            <h3 class="text-xl font-bold mb-3">Artistas Nacionais</h3>
+                            <p class="text-medium-text mb-4">
+                                Também estamos documentando como artistas brasileiros estão utilizando a tecnologia Disguise em seus shows.
+                            </p>
+                            <div class="flex flex-wrap gap-2 mt-4">
+                                <span class="text-xs bg-opacity-20 bg-primary text-primary py-1 px-3 rounded-full">Alok</span>
+                                <span class="text-xs bg-opacity-20 bg-primary text-primary py-1 px-3 rounded-full">Anitta</span>
+                                <span class="text-xs bg-opacity-20 bg-primary text-primary py-1 px-3 rounded-full">Ivete Sangalo</span>
+                                <span class="text-xs bg-opacity-20 bg-primary text-primary py-1 px-3 rounded-full">Rock in Rio</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-12">
+                        <p class="text-medium-text italic mb-6">
+                            "Nosso objetivo é criar um acervo completo de estudos de caso que mostrem como a tecnologia de servidores de mídia está redefinindo a experiência dos shows ao vivo."
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-10">
+                    <a href="../showsv2.html" class="btn-primary inline-block hover:opacity-90">
+                        Ver casos disponíveis
+                    </a>
+                    <p class="text-sm text-medium-text mt-4">
+                        Volte em breve para ver nossos novos estudos de caso!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

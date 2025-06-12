@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U2 – The Joshua Tree Tour | On + Av</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.2.0/css/glightbox.min.css">
+    <script>
+        // Tailwind CSS configuration
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00ff9d',
+                        secondary: '#0066ff',
+                        dark: '#0a0a0a',
+                        darker: '#020202',
+                        'light-text': '#e0e0e0',
+                        'medium-text': '#a0a0a0',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020202;
+            color: #e0e0e0;
+        }
+        .content-section {
+            background: rgba(15, 15, 15, 0.65);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-text { 
+            background: linear-gradient(90deg, #00ff9d, #0066ff); 
+            -webkit-background-clip: text; 
+            background-clip: text; 
+            color: transparent; 
+        }
+        .btn-primary {
+            background-color: #00ff9d;
+            color: #020202;
+            transition: all 0.3s ease;
+            border-radius: 0.375rem;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .btn-secondary {
+            background-color: transparent;
+            color: #00ff9d;
+            border: 1px solid #00ff9d;
+            transition: all 0.3s ease;
+            border-radius: 0.375rem;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .gallery-item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .gallery-item:hover {
+            transform: scale(1.03);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="relative min-h-screen py-8">
+        <!-- Overlay background com gradiente -->
+        <div class="fixed inset-0 -z-10">
+            <div class="absolute inset-0 bg-darker opacity-95"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-darker via-darker to-black opacity-95"></div>
+        </div>
+        
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Botão voltar -->
+            <div class="flex justify-between items-center mb-8">
+                <a href="../shows.html#casos-sucesso" class="flex items-center text-medium-text hover:text-primary transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    <span>Voltar para Shows e Turnês</span>
+                </a>
+            </div>
+            
+            <!-- Título do caso -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-4">
+                    U2 – <span class="gradient-text">"The Joshua Tree Tour"</span>
+                </h1>
+                <p class="text-xl text-medium-text">
+                    2017-2019
+                </p>
+            </div>
+            
+            <!-- Conteúdo principal -->
+            <div class="content-section rounded-xl p-8 md:p-10 mb-10">
+                <div class="md:flex gap-12 items-center mb-8">
+                    <div class="md:w-2/3 mb-6 md:mb-0">
+                        <img src="img/u2jt-hero-2.webp" alt="U2 Joshua Tree Tour" class="rounded-lg w-full h-auto">
+                    </div>
+                    <div class="md:w-1/3">
+                        <h2 class="text-2xl font-bold mb-4 text-primary">Visão Geral</h2>
+                        <p class="mb-4 text-light-text">
+                            A turnê comemorativa do U2 para o álbum The Joshua Tree apresentou uma tela LED 4K de 61 m x 14 m (200 x 45 pés) – uma das maiores já utilizadas em turnê até aquele momento.
+                        </p>
+                        <div class="flex flex-col space-y-2">
+                            <div>
+                                <span class="text-medium-text">Cliente:</span> 
+                                <span class="text-light-text font-medium">U2</span>
+                            </div>
+                            <div>
+                                <span class="text-medium-text">Solução Disguise:</span> 
+                                <span class="text-light-text font-medium">Servidores gx 2</span>
+                            </div>
+                            <div>
+                                <span class="text-medium-text">Designer do Show:</span> 
+                                <span class="text-light-text font-medium">Willie Williams</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold mb-4 text-primary">O Desafio</h2>
+                    <p class="mb-4 text-light-text">
+                        Criar uma experiência visual imersiva para celebrar um álbum icônico do U2, utilizando uma das maiores telas LED já usadas em turnês até então. O desafio incluía a necessidade de coordenar um enorme volume de conteúdo visual 4K em um painel panorâmico massivo, garantindo sincronização perfeita e confiabilidade em shows ao redor do mundo.
+                    </p>
+                    <p class="text-light-text">
+                        Todo o conteúdo para esta tela panorâmica foi gerenciado pelos servidores de mídia Disguise gx 2. O designer de longa data da banda, Willie Williams, contou com a pré-visualização 3D do Disguise para mapear as impressionantes imagens do deserto em toda a tela gigante.
+                    </p>
+                </div>
+                
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold mb-4 text-primary">A Solução Disguise</h2>
+                    <p class="mb-4 text-light-text">
+                        A produção utilizou servidores Disguise gx 2 para alimentar o que era, na época, a maior produção de turnê baseada em LED do mundo. A plataforma Disguise permitiu:
+                    </p>
+                    <ul class="list-disc pl-5 space-y-2 text-light-text">
+                        <li>Sincronização perfeita de conteúdo 4K em uma tela gigante de 61 m x 14 m</li>
+                        <li>Visualização 3D antecipada do design completo do palco para planejamento preciso</li>
+                        <li>Integração com o sistema de iluminação para criar uma experiência visual coesa</li>
+                        <li>Redundância robusta para garantir performances sem falhas em dezenas de shows</li>
+                        <li>Adaptabilidade para ajustar conteúdo visual para diferentes locais e arenas</li>
+                    </ul>
+                </div>
+                
+                <div class="mb-10">
+                    <h2 class="text-2xl font-bold mb-6 text-primary">Galeria</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <a href="img/u2jt-02-2.jpg" class="gallery-item glightbox" data-gallery="gallery1">
+                            <img src="img/u2jt-02-2.jpg" alt="U2 Joshua Tree Tour" class="rounded-lg w-full h-48 object-cover">
+                        </a>
+                        <a href="img/u2jt-03-2.jpg" class="gallery-item glightbox" data-gallery="gallery1">
+                            <img src="img/u2jt-03-2.jpg" alt="U2 Joshua Tree Tour" class="rounded-lg w-full h-48 object-cover">
+                        </a>
+                        <a href="img/u2jt-06-2.jpg" class="gallery-item glightbox" data-gallery="gallery1">
+                            <img src="img/u2jt-06-2.jpg" alt="U2 Joshua Tree Tour" class="rounded-lg w-full h-48 object-cover">
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <p class="mb-6 text-medium-text italic">
+                        "Esta configuração – a maior produção de turnê baseada em LED de sua época – demonstrou a confiabilidade e sincronização do Disguise em uma única tela massiva."
+                    </p>
+                    <a href="https://www.disguise.one/en/insights/case-studies/u2-joshua-tree" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+                        Ver estudo de caso
+                    </a>
+                    <a href="img/U2_2017.pdf" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+                        <i class="fas fa-file-pdf mr-2"></i>Artigo Lighting&Sound America
+                    </a>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <a href="../shows.html#casos-sucesso" class="btn-primary inline-block hover:opacity-90">
+                    Ver mais casos de sucesso
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.2.0/js/glightbox.min.js"></script>
+    <script>
+        // Inicializar o lightbox
+        const lightbox = GLightbox({
+            touchNavigation: true,
+            loop: true,
+            autoplayVideos: true
+        });
+    </script>
+</body>
+</html>

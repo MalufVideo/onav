@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Envie seu Projeto | On + Av</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        // Tailwind CSS configuration
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00ff9d',
+                        secondary: '#0066ff',
+                        dark: '#0a0a0a',
+                        darker: '#020202',
+                        'light-text': '#e0e0e0',
+                        'medium-text': '#a0a0a0',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020202;
+            color: #e0e0e0;
+        }
+        .content-section {
+            background: rgba(15, 15, 15, 0.65);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-text { 
+            background: linear-gradient(90deg, #00ff9d, #0066ff); 
+            -webkit-background-clip: text; 
+            background-clip: text; 
+            color: transparent; 
+        }
+        .btn-primary {
+            background-color: #00ff9d;
+            color: #020202;
+            transition: all 0.3s ease;
+            border-radius: 0.375rem;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .btn-secondary {
+            background-color: transparent;
+            color: #00ff9d;
+            border: 1px solid #00ff9d;
+            transition: all 0.3s ease;
+            border-radius: 0.375rem;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .input-field {
+            background-color: rgba(20, 20, 20, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.375rem;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            color: #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            border-color: #00ff9d;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 255, 157, 0.2);
+        }
+        .badge {
+            background-color: rgba(0, 255, 157, 0.15);
+            color: #00ff9d;
+            border-radius: 9999px;
+            padding: 0.25rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="relative min-h-screen py-8">
+        <!-- Overlay background com gradiente -->
+        <div class="fixed inset-0 -z-10">
+            <div class="absolute inset-0 bg-darker opacity-95"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-darker via-darker to-black opacity-95"></div>
+        </div>
+        
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Botão voltar -->
+            <div class="flex justify-between items-center mb-8">
+                <a href="../showsv2.html" class="flex items-center text-medium-text hover:text-primary transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    <span>Voltar para Shows e Turnês</span>
+                </a>
+            </div>
+            
+            <!-- Título do caso -->
+            <div class="text-center mb-12">
+                <div class="mb-4">
+                    <span class="badge">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        Colabore
+                    </span>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-4">
+                    Envie seu <span class="gradient-text">Projeto</span>
+                </h1>
+                <p class="text-xl text-medium-text max-w-3xl mx-auto">
+                    Você trabalha com tecnologia Disguise ou participou de alguma produção que utilizou servidores de mídia em shows ao vivo? Compartilhe sua experiência e tenha seu caso destacado em nossa galeria.
+                </p>
+            </div>
+            
+            <!-- Conteúdo principal -->
+            <div class="content-section rounded-xl p-8 md:p-10 mb-10">
+                <div class="md:flex gap-10">
+                    <div class="md:w-1/2 mb-8 md:mb-0">
+                        <h2 class="text-2xl font-bold mb-6 text-primary">Por que colaborar?</h2>
+                        
+                        <div class="mb-6">
+                            <div class="flex items-start mb-4">
+                                <div class="bg-primary bg-opacity-10 p-2 rounded-lg mr-4 text-primary">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold mb-1">Visibilidade</h3>
+                                    <p class="text-medium-text">
+                                        Tenha seu trabalho exposto para uma comunidade de especialistas e entusiastas em tecnologia audiovisual.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start mb-4">
+                                <div class="bg-primary bg-opacity-10 p-2 rounded-lg mr-4 text-primary">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold mb-1">Networking</h3>
+                                    <p class="text-medium-text">
+                                        Conecte-se com outros profissionais e potenciais parceiros na indústria de shows e eventos.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="bg-primary bg-opacity-10 p-2 rounded-lg mr-4 text-primary">
+                                    <i class="fas fa-lightbulb"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold mb-1">Inspiração</h3>
+                                    <p class="text-medium-text">
+                                        Inspire outros profissionais com suas soluções criativas e inovadoras.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="content-section rounded-lg p-5 mt-8">
+                            <h3 class="text-lg font-semibold mb-3">O que estamos procurando</h3>
+                            <ul class="space-y-2 text-medium-text">
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-primary mr-2"></i>
+                                    Projetos que utilizaram servidores Disguise
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-primary mr-2"></i>
+                                    Shows e turnês nacionais ou internacionais
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-primary mr-2"></i>
+                                    Soluções técnicas inovadoras
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-primary mr-2"></i>
+                                    Detalhes sobre desafios e resultados
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-primary mr-2"></i>
+                                    Imagens de alta qualidade do projeto
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="md:w-1/2">
+                        <h2 class="text-2xl font-bold mb-6 text-primary">Formulário de Envio</h2>
+                        
+                        <form class="space-y-5">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-sm font-medium text-light-text mb-2">Nome</label>
+                                    <input type="text" class="input-field" placeholder="Seu nome completo">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-light-text mb-2">Email</label>
+                                    <input type="email" class="input-field" placeholder="seu@email.com">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-light-text mb-2">Empresa/Organização</label>
+                                <input type="text" class="input-field" placeholder="Nome da empresa ou organização">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-light-text mb-2">Nome do Projeto</label>
+                                <input type="text" class="input-field" placeholder="Ex: Nome do Artista - Tour XYZ">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-light-text mb-2">Descrição do Projeto</label>
+                                <textarea class="input-field" rows="4" placeholder="Conte-nos sobre o projeto, desafios técnicos, soluções implementadas e resultados"></textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-light-text mb-2">Equipamentos Disguise Utilizados</label>
+                                <input type="text" class="input-field" placeholder="Ex: 3x servidores gx 2c, 2x vx 4, etc.">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-light-text mb-2">Enviar Imagens</label>
+                                <div class="border border-dashed border-gray-600 rounded-lg p-4 text-center">
+                                    <i class="fas fa-cloud-upload-alt text-2xl text-medium-text mb-2"></i>
+                                    <p class="text-medium-text mb-1">Arraste e solte imagens ou</p>
+                                    <button type="button" class="text-primary font-medium hover:underline">
+                                        selecione arquivos
+                                    </button>
+                                    <p class="text-xs text-medium-text mt-2">
+                                        Formatos aceitos: JPG, PNG, WEBP - Tamanho máx: 10MB por arquivo
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <input type="checkbox" id="terms" class="mt-1 mr-3">
+                                <label for="terms" class="text-sm text-medium-text">
+                                    Concordo em compartilhar estas informações e imagens, e confirmo que possuo os direitos necessários para sua divulgação.
+                                </label>
+                            </div>
+                            
+                            <div class="pt-3">
+                                <button type="button" class="btn-primary w-full">
+                                    Enviar Projeto
+                                </button>
+                                <p class="text-xs text-medium-text text-center mt-3">
+                                    Nossa equipe analisará seu envio e entrará em contato para mais informações.
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-8">
+                <a href="../showsv2.html" class="btn-secondary inline-block hover:opacity-90">
+                    Voltar para galeria de casos
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
