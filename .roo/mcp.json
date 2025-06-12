@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@supabase/mcp-server-supabase@latest"],
+      "env": {
+        "SUPABASE_PROJECT_REF": "qhhjvpsxkfjcxitpnhxi",
+        "SUPABASE_DB_PASSWORD": "Bananeta1234@",
+        "SUPABASE_REGION": "us-east-1",
+        "SUPABASE_ACCESS_TOKEN": "sbp_c8987b5b449daa066456877769ec9dd93146eaa2",
+        "SUPABASE_SERVICE_ROLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczOTU4OTg3OSwiZXhwIjoyMDU1MTY1ODc5fQ.z2VbGSyj6HCxtFyji69JX9uoBw1fRPWM74YSZisdDCU"
+      },
+      "disabled": false,
+      "alwaysAllow": [
+        "get_schemas",
+        "get_tables",
+        "get_table_schema"
+      ]
+    }
+  }
+}

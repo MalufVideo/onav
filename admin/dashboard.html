@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Administrativo - ON+AV</title>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="dashboard.css">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="../img/on+av_logo_v3.png" alt="ON+AV Logo" class="logo">
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li class="menu-item active" data-page="overview">
+                <a href="#overview">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Visão Geral</span>
+                </a>
+            </li>
+            <li class="menu-item" data-page="leads">
+                <a href="#leads">
+                    <i class="fas fa-users"></i>
+                    <span>Leads</span>
+                    <span class="badge" id="newLeadsCount">0</span>
+                </a>
+            </li>
+            <li class="menu-item" data-page="quotes">
+                <a href="#quotes">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Orçamentos</span>
+                </a>
+            </li>
+            <li class="menu-item" data-page="products">
+                <a href="#products">
+                    <i class="fas fa-box"></i>
+                    <span>Produtos</span>
+                </a>
+            </li>
+            <li class="menu-item" data-page="calendar">
+                <a href="#calendar">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Calendário</span>
+                </a>
+            </li>
+            <li class="menu-item" data-page="analytics">
+                <a href="#analytics">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </a>
+            </li>
+            <li class="menu-item" data-page="settings">
+                <a href="#settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Configurações</span>
+                </a>
+            </li>
+        </ul>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span id="userName">Admin</span>
+            </div>
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-content" id="mainContent">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <h1 id="pageTitle">Visão Geral</h1>
+            </div>
+            <div class="top-bar-right">
+                <button class="notification-btn" id="notificationBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationCount">0</span>
+                </button>
+                <button class="refresh-btn" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Page Content Container -->
+        <div class="page-content" id="pageContent">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </main>
+
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="notification-header">
+            <h3>Notificações</h3>
+            <button class="close-panel" id="closeNotificationPanel">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notification-list" id="notificationList">
+            <!-- Notifications will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Quote Edit Modal -->
+    <div class="modal" id="quoteEditModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2>Editar Orçamento</h2>
+                <button class="modal-close" data-modal="quoteEditModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="quoteEditContent">
+                <!-- Quote edit form will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Lead Details Modal -->
+    <div class="modal" id="leadDetailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalhes do Lead</h2>
+                <button class="modal-close" data-modal="leadDetailsModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="leadDetailsContent">
+                <!-- Lead details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Modal (reused from original) -->
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="productModalTitle">Adicionar Produto</h2>
+                <button class="modal-close" data-modal="productModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="productForm">
+                    <input type="hidden" id="productId">
+                    <div class="form-group">
+                        <label for="productName">Nome:</label>
+                        <input type="text" id="productName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productDescription">Descrição:</label>
+                        <textarea id="productDescription"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="productCategory">Categoria:</label>
+                        <select id="productCategory" required>
+                            <option value="">Selecione...</option>
+                            <option value="LED Modules">Módulos LED</option>
+                            <option value="Processors">Processadores</option>
+                            <option value="Disguise Servers">Servidores Disguise</option>
+                            <option value="Tracking">Tracking</option>
+                            <option value="Cinebot">Cinebot</option>
+                            <option value="Estudios SP">Estúdios SP</option>
+                            <option value="Equipe Técnica">Equipe Técnica</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="productPrice">Preço (R$):</label>
+                        <input type="number" id="productPrice" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productUnitType">Tipo de Unidade:</label>
+                        <select id="productUnitType" required>
+                            <option value="per_day">Por Dia</option>
+                            <option value="per_unit">Por Unidade</option>
+                            <option value="per_module">Por Módulo</option>
+                            <option value="fixed">Fixo</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                        <button type="button" class="btn btn-secondary" data-modal-close="productModal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Configurações de Integração</h2>
+                <button class="modal-close" data-modal="settingsModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="settingsForm">
+                    <h3>WhatsApp Business API</h3>
+                    <div class="form-group">
+                        <label for="whatsappToken">Token de Acesso:</label>
+                        <input type="password" id="whatsappToken" placeholder="Seu token do WhatsApp Business">
+                    </div>
+                    <div class="form-group">
+                        <label for="whatsappNumber">Número do WhatsApp:</label>
+                        <input type="text" id="whatsappNumber" placeholder="+55 11 99999-9999">
+                    </div>
+                    
+                    <h3>Notificações</h3>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="notifyNewLead" checked>
+                            <span>Notificar novos leads via WhatsApp</span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="notifyQuoteUpdate" checked>
+                            <span>Notificar atualizações de orçamento</span>
+                        </label>
+                    </div>
+                    
+                    <h3>CRM Integration</h3>
+                    <div class="form-group">
+                        <label for="crmType">Tipo de CRM:</label>
+                        <select id="crmType">
+                            <option value="">Nenhum</option>
+                            <option value="hubspot">HubSpot</option>
+                            <option value="pipedrive">Pipedrive</option>
+                            <option value="salesforce">Salesforce</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="crmApiKeyGroup" style="display: none;">
+                        <label for="crmApiKey">API Key:</label>
+                        <input type="password" id="crmApiKey" placeholder="Sua API Key do CRM">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Salvar Configurações</button>
+                        <button type="button" class="btn btn-secondary" data-modal-close="settingsModal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <div class="toast-content">
+            <i class="fas fa-check-circle" id="toastIcon"></i>
+            <span id="toastMessage">Mensagem</span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="dashboard.js"></script>
+</body>
+</html>
