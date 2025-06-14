@@ -1,0 +1,83 @@
+    <!-- New Proposal Modal -->
+    <div class="modal" id="newProposalModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Novo Orçamento</h2>
+                <button class="modal-close" data-modal="newProposalModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="newProposalForm">
+                    <div class="form-group">
+                        <label for="leadName">Nome do Cliente:</label>
+                        <input type="text" id="leadName" required placeholder="Digite o nome do cliente...">
+                        <div class="lead-suggestions" id="leadSuggestions"></div>
+                        <input type="hidden" id="selectedLeadId">
+                    </div>
+                    <div class="form-group">
+                        <label for="leadEmail">Email:</label>
+                        <input type="email" id="leadEmail" placeholder="email@exemplo.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="leadPhone">Telefone:</label>
+                        <input type="tel" id="leadPhone" placeholder="+55 11 99999-9999">
+                    </div>
+                    <div class="form-group">
+                        <label for="leadCompany">Empresa:</label>
+                        <input type="text" id="leadCompany" placeholder="Nome da empresa">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Criar Orçamento</button>
+                        <button type="button" class="btn btn-secondary" data-modal-close="newProposalModal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Management Modal -->
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="userModalTitle">Adicionar Usuário</h2>
+                <button class="modal-close" data-modal="userModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="userForm">
+                    <input type="hidden" id="userId">
+                    <div class="form-group">
+                        <label for="userFullName">Nome Completo:</label>
+                        <input type="text" id="userFullName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userEmail">Email:</label>
+                        <input type="email" id="userEmail" required>
+                    </div>
+                    <div class="form-group" id="passwordGroup">
+                        <label for="userPassword">Senha:</label>
+                        <input type="password" id="userPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userRole">Função:</label>
+                        <select id="userRole" required>
+                            <option value="sales_rep">Vendedor</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="userActive" checked>
+                            <span>Usuário Ativo</span>
+                        </label>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                        <button type="button" class="btn btn-secondary" data-modal-close="userModal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>

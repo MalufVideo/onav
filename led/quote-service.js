@@ -21,11 +21,20 @@ async function saveQuote(quoteData) {
     // For debugging - log the raw input data
     // console.log('Raw quote data:', JSON.stringify(quoteData, null, 2));
     
+    // Get current user info for sales rep tracking
+    const currentUser = window.auth.getCurrentUser();
+    const userProfile = window.auth.getUserProfile();
+    
     // Add default values for any missing required fields
     const processedData = {
       // Keep user and session data
       user_id: quoteData.user_id,
       status: quoteData.status || 'pending',
+      
+      // Sales rep information
+      sales_rep_id: currentUser?.id,
+      sales_rep_name: userProfile?.full_name || currentUser?.email || 'Sistema',
+      lead_id: quoteData.lead_id || null,
       
       // Client and project info
       project_name: quoteData.project_name || 'Projeto sem nome',
@@ -97,27 +106,61 @@ async function saveQuote(quoteData) {
 }
 
 /**
- * Gets all proposals for the current user
+ * Gets proposals based on user role and context
+ * @param {string} context - 'my-quotes' for user quotes, 'dashboard' for admin view
  * @returns {Promise<Object>} - The proposals or error
  */
-async function getProposals() {
+async function getProposals(context = 'my-quotes') {
   try {
     // Make sure auth is initialized
     if (!window.auth || !window.auth.isAuthenticated()) {
       throw new Error('User must be authenticated to view proposals');
     }
     
-    // Get Supabase client from auth module
+    // Get Supabase client and current user
     const supabase = window.auth.getSupabaseClient();
-    if (!supabase) {
-      throw new Error('Supabase client not available');
+    const currentUser = window.auth.getCurrentUser();
+    
+    if (!supabase || !currentUser) {
+      throw new Error('Supabase client or user not available');
     }
     
-    // Fetch proposals from the new table
-    const { data, error } = await supabase
+    // Get user profile to determine role
+    const { data: userProfile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('id', currentUser.id)
+      .single();
+    
+    let query = supabase
       .from('proposals')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .select('*');
+    
+    // Apply filtering based on user role and context
+    if (context === 'my-quotes') {
+      if (userProfile?.role === 'sales_rep') {
+        // Sales reps see quotes they created
+        query = query.eq('sales_rep_id', currentUser.id);
+      } else if (userProfile?.role === 'admin') {
+        // Admins accessing my-quotes should see their own quotes only
+        query = query.or(`user_id.eq.${currentUser.id},sales_rep_id.eq.${currentUser.id}`);
+      } else {
+        // End users see only their own quotes
+        query = query.eq('user_id', currentUser.id);
+      }
+    } else if (context === 'dashboard') {
+      // Dashboard context - only admins should access this
+      if (userProfile?.role !== 'admin') {
+        throw new Error('Unauthorized: Only admins can access dashboard view');
+      }
+      // Admins see all quotes in dashboard
+    } else {
+      // Default: user sees only their own quotes
+      query = query.eq('user_id', currentUser.id);
+    }
+    
+    // Execute the query
+    const { data, error } = await query.order('created_at', { ascending: false });
       
     if (error) throw error;
     

@@ -381,11 +381,40 @@ async function showQuoteDetails(quote) {
           </div>
         </div>
 
+        <!-- DISCOUNT INFORMATION SECTION -->
+        ${quote.total_discount_percentage > 0 ? `
+        <div class="section" style="margin-bottom: 25px;">
+          <div class="card" style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 1.2rem; color: #856404;"><i class="fas fa-tag"></i> Desconto Aplicado</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+              <div>
+                <strong>Preço Original:</strong><br>
+                <span style="font-size: 1.1rem; text-decoration: line-through; color: #6c757d;">${formatCurrency(quote.original_total_price || quote.total_price)}</span>
+              </div>
+              <div>
+                <strong>Desconto:</strong><br>
+                <span style="font-size: 1.1rem; color: #dc3545;">${quote.total_discount_percentage.toFixed(1)}% (${formatCurrency(quote.total_discount_amount)})</span>
+              </div>
+              <div>
+                <strong>Preço Final:</strong><br>
+                <span style="font-size: 1.1rem; color: #28a745; font-weight: bold;">${totalPrice}</span>
+              </div>
+            </div>
+            ${quote.discount_reason ? `
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ffeaa7;">
+              <strong>Motivo do Desconto:</strong><br>
+              <span style="color: #856404;">${quote.discount_reason}</span>
+            </div>
+            ` : ''}
+          </div>
+        </div>
+        ` : ''}
+
         <!-- UPDATED TOTAL DISPLAY -->
         <div class="section" style="margin-bottom: 25px;">
           <div class="total-line" style="display: flex; justify-content: flex-end; align-items: center; padding-top: 15px; border-top: 1px solid #dee2e6; font-size: 1.2rem; font-weight: bold; color: #343a40;">
-            <span style="margin-right: 15px;">Total Estimado (${daysCount} ${daysCount > 1 ? 'dias' : 'dia'}):</span>
-            <span id="quote-details-total-price">${totalPrice}</span>
+            <span style="margin-right: 15px;">Total ${quote.total_discount_percentage > 0 ? 'com Desconto' : 'Estimado'} (${daysCount} ${daysCount > 1 ? 'dias' : 'dia'}):</span>
+            <span id="quote-details-total-price" style="color: ${quote.total_discount_percentage > 0 ? '#28a745' : '#343a40'};">${totalPrice}</span>
           </div>
         </div>
 

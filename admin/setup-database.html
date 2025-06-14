@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Database - Quote History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            border: 1px solid #bee5eb;
+        }
+        .code {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            border: 1px solid #e9ecef;
+            margin: 15px 0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quote History Database Setup</h1>
+        
+        <div class="info">
+            <strong>Important:</strong> This is a one-time setup to initialize the quote history tracking system. 
+            This will add new tables and columns to your database to track all quote changes and discounts.
+        </div>
+
+        <h2>What this setup will do:</h2>
+        <ul>
+            <li>Add new columns to the <code>proposals</code> table for discount tracking</li>
+            <li>Create a new <code>quote_history</code> table to log all changes</li>
+            <li>Set up proper indexes for better performance</li>
+            <li>Create initial history records for existing quotes</li>
+        </ul>
+
+        <div class="info">
+            <strong>Columns to be added to proposals table:</strong>
+            <div class="code">original_total_price TEXT
+total_discount_percentage DECIMAL(5,2) DEFAULT 0
+total_discount_amount DECIMAL(10,2) DEFAULT 0
+discount_reason TEXT
+last_modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+last_modified_by TEXT</div>
+        </div>
+
+        <button id="setupBtn" class="btn" onclick="setupDatabase()">
+            🚀 Setup Quote History Database
+        </button>
+
+        <button id="testBtn" class="btn" onclick="testConnection()" style="background-color: #28a745;">
+            🔧 Test Database Connection
+        </button>
+
+        <div id="result"></div>
+
+        <div id="manual-setup" style="margin-top: 30px;">
+            <h3>Manual Setup (Alternative)</h3>
+            <p>If the automatic setup fails, you can manually run this SQL in your Supabase dashboard:</p>
+            <div class="code" id="manual-sql">
+-- Add columns to proposals table if they don't exist
+ALTER TABLE proposals ADD COLUMN IF NOT EXISTS original_total_price TEXT;
+ALTER TABLE proposals ADD COLUMN IF NOT EXISTS total_discount_percentage DECIMAL(5,2) DEFAULT 0;
+ALTER TABLE proposals ADD COLUMN IF NOT EXISTS total_discount_amount DECIMAL(10,2) DEFAULT 0;
+ALTER TABLE proposals ADD COLUMN IF NOT EXISTS discount_reason TEXT;
+ALTER TABLE proposals ADD COLUMN IF NOT EXISTS last_modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE proposals ADD COLUMN IF NOT EXISTS last_modified_by TEXT;
+
+-- Create quote_history table
+CREATE TABLE IF NOT EXISTS quote_history (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    proposal_id UUID NOT NULL,
+    change_type VARCHAR(50) NOT NULL,
+    old_total_price TEXT,
+    old_status VARCHAR(20),
+    old_discount_percentage DECIMAL(5,2),
+    old_discount_amount DECIMAL(10,2),
+    new_total_price TEXT,
+    new_status VARCHAR(20),
+    new_discount_percentage DECIMAL(5,2),
+    new_discount_amount DECIMAL(10,2),
+    discount_type VARCHAR(20),
+    discount_value DECIMAL(10,2),
+    discount_reason TEXT,
+    changed_by TEXT,
+    change_description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    client_notified BOOLEAN DEFAULT FALSE,
+    admin_notes TEXT
+);
+
+-- Create indexes
+CREATE INDEX IF NOT EXISTS idx_quote_history_proposal_id ON quote_history(proposal_id);
+CREATE INDEX IF NOT EXISTS idx_quote_history_created_at ON quote_history(created_at);
+CREATE INDEX IF NOT EXISTS idx_quote_history_change_type ON quote_history(change_type);
+
+-- Update original_total_price for existing proposals
+UPDATE proposals 
+SET original_total_price = total_price 
+WHERE original_total_price IS NULL;
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function testConnection() {
+            const btn = document.getElementById('testBtn');
+            const result = document.getElementById('result');
+            
+            btn.disabled = true;
+            btn.textContent = 'Testing...';
+            
+            try {
+                const response = await fetch('/api/products', {
+                    method: 'GET'
+                });
+                
+                if (response.ok) {
+                    result.innerHTML = '<div class="success">✅ Database connection successful! Ready to setup quote history.</div>';
+                } else {
+                    result.innerHTML = '<div class="error">❌ Database connection failed. Please check your configuration.</div>';
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ Connection error: ${error.message}</div>`;
+            }
+            
+            btn.disabled = false;
+            btn.textContent = '🔧 Test Database Connection';
+        }
+
+        async function setupDatabase() {
+            const btn = document.getElementById('setupBtn');
+            const result = document.getElementById('result');
+            
+            btn.disabled = true;
+            btn.textContent = 'Setting up...';
+            
+            try {
+                const response = await fetch('/api/setup-quote-history', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    result.innerHTML = `
+                        <div class="success">
+                            ✅ Database setup completed successfully!
+                            <br><br>
+                            <strong>What was created:</strong>
+                            <ul>
+                                <li>Added discount tracking columns to proposals table</li>
+                                <li>Created quote_history table for change tracking</li>
+                                <li>Set up database indexes for performance</li>
+                                <li>Initialized original prices for existing quotes</li>
+                            </ul>
+                            <br>
+                            <strong>Next steps:</strong>
+                            <ul>
+                                <li>Go to your admin dashboard</li>
+                                <li>Navigate to the "Orçamentos" section</li>
+                                <li>You'll now see a history button (⏰) next to each quote</li>
+                                <li>When you apply discounts, they'll be tracked in the history</li>
+                                <li>Clients will see discount information when viewing quote details</li>
+                            </ul>
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="error">
+                            ❌ Setup failed: ${data.error || 'Unknown error'}
+                            <br><br>
+                            Please try the manual setup below or contact support.
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="error">
+                        ❌ Setup error: ${error.message}
+                        <br><br>
+                        Please try the manual setup below.
+                    </div>
+                `;
+            }
+            
+            btn.disabled = false;
+            btn.textContent = '🚀 Setup Quote History Database';
+        }
+
+        // Test connection on load
+        window.addEventListener('load', testConnection);
+    </script>
+</body>
+</html>

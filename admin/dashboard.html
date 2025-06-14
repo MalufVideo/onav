@@ -12,7 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="/admin/dashboard.css">
     
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -21,7 +21,7 @@
     <!-- Sidebar Navigation -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="../img/on+av_logo_v3.png" alt="ON+AV Logo" class="logo">
+            <img src="/img/on+av_logo_v3.png" alt="ON+AV Logo" class="logo">
             <button class="sidebar-toggle" id="sidebarToggle">
                 <i class="fas fa-bars"></i>
             </button>
@@ -34,35 +34,41 @@
                     <span>Visão Geral</span>
                 </a>
             </li>
-            <li class="menu-item" data-page="leads">
-                <a href="#leads">
-                    <i class="fas fa-users"></i>
-                    <span>Leads</span>
-                    <span class="badge" id="newLeadsCount">0</span>
-                </a>
-            </li>
             <li class="menu-item" data-page="quotes">
                 <a href="#quotes">
                     <i class="fas fa-file-invoice-dollar"></i>
                     <span>Orçamentos</span>
                 </a>
             </li>
-            <li class="menu-item" data-page="products">
+            <li class="menu-item admin-only" data-page="leads">
+                <a href="#leads">
+                    <i class="fas fa-users"></i>
+                    <span>Leads</span>
+                    <span class="badge" id="newLeadsCount">0</span>
+                </a>
+            </li>
+            <li class="menu-item admin-only" data-page="products">
                 <a href="#products">
                     <i class="fas fa-box"></i>
                     <span>Produtos</span>
+                </a>
+            </li>
+            <li class="menu-item admin-only" data-page="users">
+                <a href="#users">
+                    <i class="fas fa-user-friends"></i>
+                    <span>Usuários</span>
+                </a>
+            </li>
+            <li class="menu-item admin-only" data-page="analytics">
+                <a href="#analytics">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
                 </a>
             </li>
             <li class="menu-item" data-page="calendar">
                 <a href="#calendar">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Calendário</span>
-                </a>
-            </li>
-            <li class="menu-item" data-page="analytics">
-                <a href="#analytics">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Analytics</span>
                 </a>
             </li>
             <li class="menu-item" data-page="settings">
@@ -206,6 +212,20 @@
         </div>
     </div>
 
+    <!-- Quote Details Modal -->
+    <div class="modal" id="quoteDetailsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 1000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
+        <div id="quoteDetailsContent" style="width: 100%; max-height: 100%; overflow-y: auto;">
+            <!-- Quote details will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Quote History Modal -->
+    <div class="modal" id="quoteHistoryModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 1000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
+        <div id="quoteHistoryContent" style="width: 100%; max-width: 1000px; max-height: 100%; overflow-y: auto; background-color: white; border-radius: 8px; padding: 30px; position: relative;">
+            <!-- Quote history will be loaded here -->
+        </div>
+    </div>
+
     <!-- Settings Modal -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
@@ -274,6 +294,6 @@
     </div>
 
     <!-- Scripts -->
-    <script src="dashboard.js"></script>
+    <script src="/admin/dashboard.js"></script>
 </body>
 </html>

@@ -98,6 +98,28 @@ async function signUp(email, password, userData = {}) {
     });
     
     if (error) throw error;
+    
+    // Create user profile if user was created successfully
+    if (data.user) {
+      try {
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .insert([{
+            id: data.user.id,
+            email: email,
+            full_name: name || email.split('@')[0],
+            phone: phone || '',
+            role: 'end_user'
+          }]);
+        
+        if (profileError) {
+          console.warn('Could not create user profile:', profileError);
+        }
+      } catch (profileError) {
+        console.warn('Error creating user profile:', profileError);
+      }
+    }
+    
     return { success: true, user: data.user };
   } catch (error) {
     console.error('Error signing up:', error.message);
@@ -116,6 +138,26 @@ async function signIn(email, password) {
     });
     
     if (error) throw error;
+    
+    // Update last login time in user_profiles
+    if (data.user) {
+      try {
+        const { error: updateError } = await supabase
+          .from('user_profiles')
+          .update({ 
+            last_login_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', data.user.id);
+        
+        if (updateError) {
+          console.warn('Could not update last login:', updateError);
+        }
+      } catch (updateError) {
+        console.warn('Error updating last login:', updateError);
+      }
+    }
+    
     return { success: true, user: data.user };
   } catch (error) {
     console.error('Error signing in:', error.message);
@@ -172,6 +214,35 @@ function getSupabaseClient() {
   return supabase;
 }
 
+// Get user profile information
+async function getUserProfile() {
+  if (!currentUser || !supabase) return null;
+  
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', currentUser.id)
+      .single();
+    
+    if (error) {
+      console.warn('User profile not found, treating as end user');
+      return { role: 'end_user', full_name: currentUser.email };
+    }
+    
+    return data;
+  } catch (error) {
+    console.warn('Error fetching user profile:', error);
+    return { role: 'end_user', full_name: currentUser.email };
+  }
+}
+
+// Check if user has specific role
+async function hasRole(role) {
+  const profile = await getUserProfile();
+  return profile?.role === role;
+}
+
 // Export auth functions
 window.auth = {
   initAuth,
@@ -181,5 +252,7 @@ window.auth = {
   getCurrentUser,
   isAuthenticated,
   onAuthStateChange,
-  getSupabaseClient
+  getSupabaseClient,
+  getUserProfile,
+  hasRole
 };

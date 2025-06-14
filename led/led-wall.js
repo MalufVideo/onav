@@ -132,8 +132,6 @@ class LEDWallCalculator {
     ground.receiveShadow = true;
     this.scene.add(ground);
 
-    // Load external human model using GLTFLoader
-    this.addHuman();
 
     // Responsive handling
     window.addEventListener('resize', () => {
@@ -445,38 +443,6 @@ class LEDWallCalculator {
     this.cameraControls.position.set(0, 1.8, 15);
   }
 
-  // --- 3D Model Loading ---
-  addHuman() {
-    const loader = new THREE.GLTFLoader();
-    loader.load('model.glb', (gltf) => {
-      const model = gltf.scene;
-      const box = new THREE.Box3().setFromObject(model);
-      const size = new THREE.Vector3();
-      box.getSize(size);
-      const scale = 1.8 / size.y;
-      model.scale.set(scale, scale, scale);
-      box.setFromObject(model);
-      const minY = box.min.y;
-      model.position.set(0, -minY, 3);
-      const modelLight = new THREE.DirectionalLight(0xffffff, 1.7);
-      modelLight.position.set(1, 2, 3.5);
-      modelLight.target = model;
-      modelLight.castShadow = true;
-      modelLight.shadow.mapSize.width = 2048;
-      modelLight.shadow.mapSize.height = 2048;
-      this.scene.add(modelLight);
-      model.traverse((node) => {
-        if (node.isMesh) {
-          node.castShadow = true;
-          node.receiveShadow = true;
-        }
-      });
-      this.humanModel = model;
-      this.scene.add(this.humanModel);
-    }, undefined, (error) => {
-      console.error('Error loading model:', error);
-    });
-  }
 
   // --- LED Wall Creation ---
   createLEDWall(width, height, curvature, group, yOffset) {
