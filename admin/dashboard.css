@@ -538,6 +538,12 @@ tbody tr:hover {
     border-color: var(--primary-color);
 }
 
+.form-help {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
 .form-group textarea {
     min-height: 100px;
     resize: vertical;

@@ -552,6 +552,62 @@ function generateLeadsTable(leads) {
         </tr>`).join('');
 }
 
+// Helper function to extract sales rep name from quote data
+function getSalesRepName(quote) {
+    // First try the direct field
+    if (quote.sales_rep_name) return quote.sales_rep_name;
+    
+    // Then try to extract from discount_description JSON
+    try {
+        if (quote.discount_description) {
+            const data = JSON.parse(quote.discount_description);
+            if (data.sales_rep_name) return data.sales_rep_name;
+        }
+    } catch (e) {
+        // Ignore JSON parse errors
+        console.log('Error parsing sales rep data for quote:', quote.id, e);
+    }
+    
+    // Debug: log the quote data to see what we have
+    console.log('Sales rep debug for quote:', quote.id, {
+        sales_rep_name: quote.sales_rep_name,
+        discount_description: quote.discount_description,
+        all_quote_data: quote
+    });
+    
+    return '';
+}
+
+// Helper function to extract extended quote data from JSON
+function getExtendedQuoteData(quote) {
+    const defaultData = {
+        principal_power_max: null,
+        principal_power_avg: null,
+        principal_weight: null,
+        teto_power_max: null,
+        teto_power_avg: null,
+        teto_weight: null,
+        led_principal_pixels_width: null,
+        led_principal_pixels_height: null,
+        led_principal_total_pixels: null,
+        led_teto_pixels_width: null,
+        led_teto_pixels_height: null,
+        led_teto_total_pixels: null,
+        led_teto_resolution: null
+    };
+    
+    try {
+        if (quote.discount_description) {
+            const data = JSON.parse(quote.discount_description);
+            return { ...defaultData, ...data };
+        }
+    } catch (e) {
+        // Ignore JSON parse errors
+    }
+    
+    return defaultData;
+}
+
 function generateQuotesTable(quotes) {
     if (!quotes || quotes.length === 0) return '<tr><td colspan="8" class="text-center">Nenhum orçamento</td></tr>';
     return quotes.map(quote => `
@@ -559,7 +615,7 @@ function generateQuotesTable(quotes) {
             <td>#${quote.id.substring(0, 8)}</td>
             <td>${quote.project_name || 'N/A'}</td>
             <td>${quote.client_name || 'N/A'}</td>
-            <td>${quote.sales_rep_name || ''}</td>
+            <td>${getSalesRepName(quote)}</td>
             <td>${formatDateRange(quote.shooting_dates_start, quote.shooting_dates_end)}</td>
             <td>${quote.total_price || 'N/A'}</td>
             <td><span class="status-badge ${quote.status}">${getStatusLabel(quote.status)}</span></td>
@@ -1290,17 +1346,40 @@ function showQuoteDetailsModal(quote) {
     };
 
     // Safely parse and process services
+    let servicesProcessed = false;
+    
+    // First try the direct field
     if (quote.selected_services) {
         if (typeof quote.selected_services === 'string') {
             try {
                 const parsedServices = JSON.parse(quote.selected_services);
                 processServicesForTable(parsedServices);
+                servicesProcessed = true;
             } catch (e) {
-                serviceTableRowsHtml = '<tr><td colspan="4" style="padding: 10px; text-align: center; border-bottom: 1px solid #dee2e6;">Erro ao carregar serviços.</td></tr>';
+                console.log('Error parsing selected_services:', e);
             }
         } else if (Array.isArray(quote.selected_services)) {
             processServicesForTable(quote.selected_services);
+            servicesProcessed = true;
         }
+    }
+    
+    // If not found, try to get services from discount_description JSON
+    if (!servicesProcessed && quote.discount_description) {
+        try {
+            const extendedData = JSON.parse(quote.discount_description);
+            if (extendedData.services && Array.isArray(extendedData.services)) {
+                processServicesForTable(extendedData.services);
+                servicesProcessed = true;
+            }
+        } catch (e) {
+            console.log('Error parsing services from discount_description:', e);
+        }
+    }
+    
+    // If still no services found, show empty message
+    if (!servicesProcessed) {
+        serviceTableRowsHtml = '<tr><td colspan="4" style="padding: 10px; text-align: center; border-bottom: 1px solid #dee2e6;">Nenhum serviço adicionado</td></tr>';
     }
 
     // Format other data safely
@@ -1316,31 +1395,43 @@ function showQuoteDetailsModal(quote) {
     const daysCount = quote.days_count || 1;
     const totalPrice = quote.total_price || formatCurrencyHelper(dailySubtotalSum * daysCount);
 
+    // Get extended data from JSON
+    const extendedData = getExtendedQuoteData(quote);
+    
+    // Debug: log the quote data to see what we have
+    console.log('Quote details debug:', {
+        quote_id: quote.id,
+        discount_description: quote.discount_description,
+        extendedData: extendedData,
+        selected_services: quote.selected_services,
+        full_quote: quote
+    });
+    
     // LED Principal Data
     const ledPWidth = quote.led_principal_width || 'N/A';
     const ledPHeight = quote.led_principal_height || 'N/A';
     const ledPCurvature = quote.led_principal_curvature !== null ? quote.led_principal_curvature : 'N/A';
     const ledPModules = quote.led_principal_modules || 'N/A';
     const ledPResolution = quote.led_principal_resolution || 'N/A';
-    const ledPPixelsW = quote.led_principal_pixels_width || 'N/A';
-    const ledPPixelsH = quote.led_principal_pixels_height || 'N/A';
-    const ledPTotalPixels = quote.led_principal_total_pixels ? Number(quote.led_principal_total_pixels).toLocaleString('pt-BR') : 'N/A';
-    const ledPPowerMax = quote.principal_power_max ? `${formatNumberHelper(quote.principal_power_max)} W` : 'N/A';
-    const ledPPowerAvg = quote.principal_power_avg ? `${formatNumberHelper(quote.principal_power_avg)} W` : 'N/A';
-    const ledPWeight = quote.principal_weight ? `${formatNumberHelper(quote.principal_weight)} kg` : 'N/A';
+    const ledPPixelsW = quote.led_principal_pixels_width || extendedData.led_principal_pixels_width || 'N/A';
+    const ledPPixelsH = quote.led_principal_pixels_height || extendedData.led_principal_pixels_height || 'N/A';
+    const ledPTotalPixels = (quote.led_principal_total_pixels || extendedData.led_principal_total_pixels) ? Number(quote.led_principal_total_pixels || extendedData.led_principal_total_pixels).toLocaleString('pt-BR') : 'N/A';
+    const ledPPowerMax = (quote.principal_power_max || extendedData.principal_power_max) ? `${formatNumberHelper(quote.principal_power_max || extendedData.principal_power_max)} W` : 'N/A';
+    const ledPPowerAvg = (quote.principal_power_avg || extendedData.principal_power_avg) ? `${formatNumberHelper(quote.principal_power_avg || extendedData.principal_power_avg)} W` : 'N/A';
+    const ledPWeight = (quote.principal_weight || extendedData.principal_weight) ? `${formatNumberHelper(quote.principal_weight || extendedData.principal_weight)} kg` : 'N/A';
 
     // LED Teto Data
     const hasTetoLed = !!quote.led_teto_width;
     const ledTWidth = quote.led_teto_width || 'N/A';
     const ledTHeight = quote.led_teto_height || 'N/A';
     const ledTModules = quote.led_teto_modules || 'N/A';
-    const ledTResolution = quote.led_teto_resolution || 'N/A';
-    const ledTPixelsW = quote.led_teto_pixels_width || 'N/A';
-    const ledTPixelsH = quote.led_teto_pixels_height || 'N/A';
-    const ledTTotalPixels = quote.led_teto_total_pixels ? Number(quote.led_teto_total_pixels).toLocaleString('pt-BR') : 'N/A';
-    const ledTPowerMax = quote.teto_power_max ? `${formatNumberHelper(quote.teto_power_max)} W` : 'N/A';
-    const ledTPowerAvg = quote.teto_power_avg ? `${formatNumberHelper(quote.teto_power_avg)} W` : 'N/A';
-    const ledTWeight = quote.teto_weight ? `${formatNumberHelper(quote.teto_weight)} kg` : 'N/A';
+    const ledTResolution = quote.led_teto_resolution || extendedData.led_teto_resolution || 'N/A';
+    const ledTPixelsW = quote.led_teto_pixels_width || extendedData.led_teto_pixels_width || 'N/A';
+    const ledTPixelsH = quote.led_teto_pixels_height || extendedData.led_teto_pixels_height || 'N/A';
+    const ledTTotalPixels = (quote.led_teto_total_pixels || extendedData.led_teto_total_pixels) ? Number(quote.led_teto_total_pixels || extendedData.led_teto_total_pixels).toLocaleString('pt-BR') : 'N/A';
+    const ledTPowerMax = (quote.teto_power_max || extendedData.teto_power_max) ? `${formatNumberHelper(quote.teto_power_max || extendedData.teto_power_max)} W` : 'N/A';
+    const ledTPowerAvg = (quote.teto_power_avg || extendedData.teto_power_avg) ? `${formatNumberHelper(quote.teto_power_avg || extendedData.teto_power_avg)} W` : 'N/A';
+    const ledTWeight = (quote.teto_weight || extendedData.teto_weight) ? `${formatNumberHelper(quote.teto_weight || extendedData.teto_weight)} kg` : 'N/A';
 
     // Build Modal HTML
     modalContent.innerHTML = `
@@ -1816,7 +1907,395 @@ function generateServicesTable(services) {
 
 // Dummy functions for buttons
 function exportLeads() { showToast('Função de exportação em desenvolvimento.', 'info'); }
-function createNewQuote() { showToast('Função para criar novo orçamento em desenvolvimento.', 'info'); }
+function createNewQuote() {
+    // Create the client selection modal
+    const modalHTML = `
+        <div class="modal active" id="newQuoteModal">
+            <div class="modal-content large">
+                <div class="modal-header">
+                    <h2>Novo Orçamento - Selecionar Cliente</h2>
+                    <button class="modal-close" onclick="closeNewQuoteModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="clientSelectionForm">
+                        <div class="form-group">
+                            <label for="clientEmail">Email do Cliente:</label>
+                            <input type="email" id="clientEmail" required placeholder="Digite o email do cliente...">
+                            <small class="form-help">Digite o email para verificar se o cliente já existe</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="clientName">Nome:</label>
+                            <input type="text" id="clientName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="clientCompany">Empresa:</label>
+                            <input type="text" id="clientCompany">
+                        </div>
+                        <div class="form-group">
+                            <label for="clientPhone">Telefone:</label>
+                            <input type="tel" id="clientPhone">
+                        </div>
+                        <div class="form-group">
+                            <label for="clientPassword">Senha (para novo cliente):</label>
+                            <input type="password" id="clientPassword" placeholder="Deixe em branco para clientes existentes">
+                            <small class="form-help">Crie uma senha para que o cliente possa acessar o sistema</small>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Continuar para Calculadora</button>
+                            <button type="button" class="btn btn-secondary" onclick="closeNewQuoteModal()">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>`;
+    
+    // Remove existing modal if present
+    const existingModal = document.getElementById('newQuoteModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Initialize the modal functionality
+    initializeNewQuoteModal();
+}
+
+function closeNewQuoteModal() {
+    const modal = document.getElementById('newQuoteModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function initializeNewQuoteModal() {
+    const emailInput = document.getElementById('clientEmail');
+    const clientForm = document.getElementById('clientSelectionForm');
+    
+    // Add email input listener for auto-population
+    emailInput.addEventListener('blur', async () => {
+        const email = emailInput.value.trim();
+        if (email && email.includes('@')) {
+            await checkExistingClient(email);
+        }
+    });
+    
+    // Handle form submission
+    clientForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await handleClientSelection();
+    });
+}
+
+async function checkExistingClient(email) {
+    try {
+        const { data: session } = await supabase.auth.getSession();
+        if (!session?.session?.access_token) {
+            throw new Error('No valid session');
+        }
+
+        const response = await fetch('/api/check-user-by-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.session.access_token}`
+            },
+            body: JSON.stringify({ email })
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            console.error('Server response:', error);
+            throw new Error(error.error || 'Failed to check user');
+        }
+
+        const result = await response.json();
+        
+        if (result.exists && result.profile) {
+            // User exists with complete profile - auto-populate the form
+            document.getElementById('clientName').value = result.profile.full_name || '';
+            document.getElementById('clientCompany').value = result.profile.company || '';
+            document.getElementById('clientPhone').value = result.profile.phone || '';
+            document.getElementById('clientPassword').value = '';
+            document.getElementById('clientPassword').placeholder = 'Cliente já existe - senha não necessária';
+            document.getElementById('clientPassword').disabled = true;
+            document.getElementById('clientPassword').required = false;
+            
+            // Store the user ID for later use
+            window.existingClientUserId = result.user_id;
+            
+            showToast('Cliente encontrado! Dados preenchidos automaticamente.', 'success');
+        } else if (result.exists && !result.profile) {
+            // User exists in auth but no profile - clear form and enable password
+            clearClientForm();
+            document.getElementById('clientPassword').disabled = false;
+            document.getElementById('clientPassword').placeholder = 'Cliente existe mas sem perfil completo';
+            document.getElementById('clientPassword').required = false;
+            
+            // Store the user ID for later use
+            window.existingClientUserId = result.user_id;
+            
+            showToast('Email encontrado no sistema. Complete os dados do perfil.', 'info');
+        } else {
+            // User doesn't exist - clear form and enable password
+            clearClientForm();
+            document.getElementById('clientPassword').disabled = false;
+            document.getElementById('clientPassword').placeholder = 'Novo cliente - criar senha';
+            document.getElementById('clientPassword').required = true;
+            
+            // Clear any stored user ID
+            window.existingClientUserId = null;
+            
+            showToast('Novo cliente. Preencha todos os dados e crie uma senha.', 'info');
+        }
+    } catch (error) {
+        console.error('Error checking existing client:', error);
+        // On error, treat as new client
+        clearClientForm();
+        document.getElementById('clientPassword').disabled = false;
+        document.getElementById('clientPassword').required = true;
+        window.existingClientUserId = null;
+        showToast('Erro ao verificar cliente. Tratando como novo cliente.', 'warning');
+    }
+}
+
+function clearClientForm() {
+    document.getElementById('clientName').value = '';
+    document.getElementById('clientCompany').value = '';
+    document.getElementById('clientPhone').value = '';
+    document.getElementById('clientPassword').value = '';
+}
+
+async function handleClientSelection() {
+    const email = document.getElementById('clientEmail').value.trim();
+    const name = document.getElementById('clientName').value.trim();
+    const company = document.getElementById('clientCompany').value.trim();
+    const phone = document.getElementById('clientPhone').value.trim();
+    const password = document.getElementById('clientPassword').value.trim();
+    
+    if (!email || !name) {
+        showToast('Email e nome são obrigatórios.', 'error');
+        return;
+    }
+    
+    try {
+        const { data: session } = await supabase.auth.getSession();
+        if (!session?.session?.access_token) {
+            throw new Error('No valid session');
+        }
+
+        let clientUserId = null;
+        let isNewClient = false;
+        
+        if (window.existingClientUserId) {
+            // User exists, update their profile
+            clientUserId = window.existingClientUserId;
+            
+            const response = await fetch('/api/update-user-profile', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.session.access_token}`
+                },
+                body: JSON.stringify({
+                    user_id: clientUserId,
+                    email: email,
+                    full_name: name,
+                    company: company,
+                    phone: phone
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to update user profile');
+            }
+            
+            isNewClient = false;
+        } else {
+            // Create new user
+            if (!password) {
+                showToast('Senha é obrigatória para novos clientes.', 'error');
+                return;
+            }
+            
+            const response = await fetch('/api/create-client-user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.session.access_token}`
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password,
+                    full_name: name,
+                    company: company,
+                    phone: phone
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to create client user');
+            }
+            
+            const result = await response.json();
+            clientUserId = result.user_id;
+            isNewClient = true;
+        }
+        
+        // Close the client modal and open the calculator
+        closeNewQuoteModal();
+        
+        // Store client info for the calculator
+        window.selectedClientForQuote = {
+            userId: clientUserId,
+            email: email,
+            name: name,
+            company: company,
+            phone: phone,
+            isNew: isNewClient
+        };
+        
+        // Open the LED calculator modal
+        openLedCalculatorModal();
+        
+        showToast(isNewClient ? 'Novo cliente criado com sucesso!' : 'Cliente selecionado!', 'success');
+        
+    } catch (error) {
+        console.error('Error handling client selection:', error);
+        showToast('Erro ao processar cliente: ' + error.message, 'error');
+    }
+}
+
+function openLedCalculatorModal() {
+    const modalHTML = `
+        <div class="modal active" id="ledCalculatorModal" style="z-index: 1001;">
+            <div class="modal-content" style="width: 95%; max-width: 1400px; height: 90vh; overflow: hidden;">
+                <div class="modal-header">
+                    <h2>Calculadora LED - ${window.selectedClientForQuote?.name} (${window.selectedClientForQuote?.company})</h2>
+                    <button class="modal-close" onclick="closeLedCalculatorModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 0; height: calc(90vh - 60px); overflow: hidden;">
+                    <iframe id="ledCalculatorFrame" 
+                            src="/led/index.html?dashboard=true" 
+                            style="width: 100%; height: 100%; border: none;"
+                            frameborder="0">
+                    </iframe>
+                </div>
+            </div>
+        </div>`;
+    
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Initialize communication with iframe
+    initializeCalculatorCommunication();
+}
+
+function closeLedCalculatorModal() {
+    const modal = document.getElementById('ledCalculatorModal');
+    if (modal) {
+        modal.remove();
+    }
+    // Clear selected client data
+    window.selectedClientForQuote = null;
+}
+
+function initializeCalculatorCommunication() {
+    // Listen for messages from the LED calculator iframe
+    window.addEventListener('message', async (event) => {
+        // Make sure the message is from our LED calculator
+        if (event.origin !== window.location.origin) return;
+        
+        if (event.data.type === 'QUOTE_READY_FOR_SUBMISSION') {
+            // The LED calculator is ready to submit the quote
+            await handleQuoteSubmissionFromCalculator(event.data.quoteData);
+        } else if (event.data.type === 'CALCULATOR_LOADED') {
+            // Send client information to the calculator
+            const iframe = document.getElementById('ledCalculatorFrame');
+            if (iframe && window.selectedClientForQuote) {
+                iframe.contentWindow.postMessage({
+                    type: 'SET_CLIENT_INFO',
+                    clientInfo: window.selectedClientForQuote
+                }, window.location.origin);
+            }
+        }
+    });
+}
+
+async function handleQuoteSubmissionFromCalculator(quoteData) {
+    try {
+        if (!window.selectedClientForQuote) {
+            showToast('Informações do cliente não encontradas.', 'error');
+            return;
+        }
+        
+        // Debug log to see what IDs we have
+        console.log('Quote submission debug:', {
+            selectedClient: window.selectedClientForQuote,
+            currentUser: currentUser,
+            userProfile: userProfile
+        });
+
+        // Prepare the quote data with client and sales rep information
+        const completeQuoteData = {
+            ...quoteData,
+            user_id: window.selectedClientForQuote.userId, // This should be the CLIENT's ID
+            client_name: window.selectedClientForQuote.name,
+            client_company: window.selectedClientForQuote.company,
+            client_email: window.selectedClientForQuote.email,
+            client_phone: window.selectedClientForQuote.phone,
+            sales_rep_id: currentUser?.id, // This should be the SALES REP's ID
+            sales_rep_name: userProfile?.full_name || currentUser?.email || 'Admin',
+            created_by_dashboard: true,
+            status: 'pending'
+        };
+
+        console.log('Complete quote data to submit:', completeQuoteData);
+        
+        // Save the quote using the existing quote service functionality
+        const response = await fetch('/api/save-proposal', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${await supabase.auth.getSession().then(s => s.data.session?.access_token)}`
+            },
+            body: JSON.stringify(completeQuoteData)
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            showToast('Orçamento criado com sucesso!', 'success');
+            
+            // Close the calculator modal
+            closeLedCalculatorModal();
+            
+            // Refresh the quotes page if we're on it
+            if (currentPage === 'quotes') {
+                await loadQuotesPage();
+            }
+            
+            // Optionally show the created quote
+            if (result.data?.id) {
+                setTimeout(() => {
+                    viewQuoteDetails(result.data.id);
+                }, 1000);
+            }
+        } else {
+            const error = await response.json();
+            showToast('Erro ao criar orçamento: ' + (error.message || 'Erro desconhecido'), 'error');
+        }
+    } catch (error) {
+        console.error('Error saving quote from calculator:', error);
+        showToast('Erro ao salvar orçamento: ' + error.message, 'error');
+    }
+}
 function sendWhatsApp(phone) { 
     if(phone) {
         window.open(`https://wa.me/${phone.replace(/\D/g, '')}`, '_blank');

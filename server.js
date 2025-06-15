@@ -13,13 +13,27 @@ const io = new Server(server);
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Error: SUPABASE_URL and SUPABASE_ANON_KEY must be provided in .env file');
   process.exit(1); // Exit if keys are missing
 }
 
+// Create both clients - anon for regular operations, service for admin operations
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseAdmin = supabaseServiceKey ? createClient(supabaseUrl, supabaseServiceKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+}) : supabase;
+
+// Warning if service key is missing
+if (!supabaseServiceKey) {
+  console.warn('WARNING: SUPABASE_SERVICE_ROLE_KEY not found. Admin functions (user creation from dashboard) will not work.');
+  console.warn('Please add SUPABASE_SERVICE_ROLE_KEY to your .env file for full functionality.');
+}
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -169,10 +183,102 @@ app.delete('/api/products/:id', async (req, res) => {
 
 // Test endpoint to verify server is working
 app.get('/api/test', (req, res) => {
-  res.json({ message: 'Server is working!', timestamp: new Date().toISOString() });
+  res.json({ 
+    message: 'Server is working!', 
+    timestamp: new Date().toISOString(),
+    supabase_configured: !!supabaseUrl && !!supabaseAnonKey,
+    admin_client_available: !!supabaseServiceKey
+  });
 });
 
-// Setup database schema for quote history
+// Debug endpoint to check quote data structure
+app.get('/api/debug/quote/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const { data, error } = await supabaseAdmin
+      .from('proposals')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+
+    // Parse the JSON data to see what's stored
+    let parsedDiscountDescription = null;
+    try {
+      if (data.discount_description) {
+        parsedDiscountDescription = JSON.parse(data.discount_description);
+      }
+    } catch (e) {
+      parsedDiscountDescription = { error: 'Failed to parse JSON' };
+    }
+
+    res.json({
+      success: true,
+      raw_data: data,
+      parsed_discount_description: parsedDiscountDescription
+    });
+
+  } catch (error) {
+    console.error('Error fetching quote debug data:', error);
+    res.status(500).json({ error: 'Failed to fetch quote debug data', details: error.message });
+  }
+});
+
+// Test endpoint to validate proposal data structure
+app.post('/api/test-proposal-data', async (req, res) => {
+  try {
+    const rawData = req.body;
+    
+    // Helper functions (same as in save-proposal)
+    function safeNumber(value) {
+      if (value === null || value === undefined || value === '') return null;
+      if (typeof value === 'number') return value;
+      const cleanedValue = String(value).replace(/[^\d.,]/g, '').replace(',', '.');
+      const num = parseFloat(cleanedValue);
+      return isNaN(num) ? null : num;
+    }
+
+    function safeInteger(value) {
+      if (value === null || value === undefined || value === '') return null;
+      if (typeof value === 'number') return Math.round(value);
+      const cleanedValue = String(value).replace(/\D/g, '');
+      const num = parseInt(cleanedValue, 10);
+      return isNaN(num) ? null : num;
+    }
+    
+    // Process data same as save-proposal but don't save
+    const processedData = {
+      user_id: rawData.user_id,
+      project_name: rawData.project_name,
+      led_principal_width: safeNumber(rawData.led_principal_width),
+      led_principal_height: safeNumber(rawData.led_principal_height),
+      principal_power_max: safeInteger(rawData.principal_power_max),
+      principal_power_avg: safeInteger(rawData.principal_power_avg)
+    };
+    
+    res.json({
+      success: true,
+      raw_data_sample: {
+        user_id: rawData.user_id,
+        project_name: rawData.project_name,
+        led_principal_width: rawData.led_principal_width,
+        principal_power_max: rawData.principal_power_max
+      },
+      processed_data_sample: processedData,
+      data_types: {
+        led_principal_width: typeof processedData.led_principal_width,
+        principal_power_max: typeof processedData.principal_power_max
+      }
+    });
+  } catch (error) {
+    console.error('Error testing proposal data:', error);
+    res.status(500).json({ error: 'Test failed', details: error.message });
+  }
+});
+
+// Setup database schema for quote history and missing columns
 app.post('/api/setup-quote-history', async (req, res) => {
   try {
     // Add columns to proposals table if they don't exist
@@ -182,7 +288,23 @@ app.post('/api/setup-quote-history', async (req, res) => {
       `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS total_discount_amount DECIMAL(10,2) DEFAULT 0`,
       `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS discount_reason TEXT`,
       `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS last_modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP`,
-      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS last_modified_by TEXT`
+      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS last_modified_by TEXT`,
+      // Add missing columns for complete quote display
+      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS comercial TEXT`,
+      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS sales_rep_name TEXT`,
+      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS principal_power_max INTEGER`,
+      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS principal_power_avg INTEGER`,
+      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS principal_weight INTEGER`,
+      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS teto_power_max INTEGER`,
+      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS teto_power_avg INTEGER`,
+      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS teto_weight INTEGER`,
+      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS led_principal_pixels_width INTEGER`,
+      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS led_principal_pixels_height INTEGER`,
+      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS led_principal_total_pixels BIGINT`,
+      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS led_teto_pixels_width INTEGER`,
+      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS led_teto_pixels_height INTEGER`,
+      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS led_teto_total_pixels BIGINT`,
+      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS led_teto_resolution TEXT`
     ];
 
     for (const query of alterQueries) {
@@ -665,6 +787,732 @@ app.get('/api/proposals', async (req, res) => {
   } catch (error) {
     console.error('Error fetching proposals:', error.message);
     res.status(500).json({ error: 'Failed to fetch proposals', details: error.message });
+  }
+});
+
+// POST save proposal endpoint for dashboard quotes
+app.post('/api/save-proposal', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: 'No authorization header' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    const rawProposalData = req.body;
+    
+    console.log('Received proposal data:', JSON.stringify(rawProposalData, null, 2));
+    
+    // Ensure required fields are present
+    if (!rawProposalData.user_id || !rawProposalData.project_name) {
+      return res.status(400).json({ error: 'Missing required fields: user_id and project_name' });
+    }
+
+    // Helper function to safely convert string to number
+    function safeNumber(value) {
+      if (value === null || value === undefined || value === '') return null;
+      if (typeof value === 'number') return value;
+      const cleanedValue = String(value).replace(/[^\d.,]/g, '').replace(',', '.');
+      const num = parseFloat(cleanedValue);
+      return isNaN(num) ? null : num;
+    }
+
+    // Helper function to safely convert string to integer
+    function safeInteger(value) {
+      if (value === null || value === undefined || value === '') return null;
+      if (typeof value === 'number') return Math.round(value);
+      const cleanedValue = String(value).replace(/\D/g, '');
+      const num = parseInt(cleanedValue, 10);
+      return isNaN(num) ? null : num;
+    }
+
+    // Map and validate proposal data to match database schema
+    // Start with core required fields only, then add others if they exist
+    const proposalData = {
+      // Core required fields
+      user_id: rawProposalData.user_id,
+      project_name: rawProposalData.project_name,
+      status: rawProposalData.status || 'pending',
+      
+      // Client Information
+      client_name: rawProposalData.client_name,
+      client_company: rawProposalData.client_company,
+      client_email: rawProposalData.client_email,
+      client_phone: rawProposalData.client_phone,
+      
+      // Date fields
+      shooting_dates_start: rawProposalData.shooting_dates_start,
+      shooting_dates_end: rawProposalData.shooting_dates_end,
+      
+      // Basic pricing
+      days_count: safeInteger(rawProposalData.days_count) || 1,
+      total_price: rawProposalData.total_price,
+      
+      // Service Selection
+      selected_pod_type: rawProposalData.selected_pod_type
+    };
+
+    // Add LED configuration fields if they exist
+    if (rawProposalData.led_principal_width !== undefined) {
+      proposalData.led_principal_width = safeNumber(rawProposalData.led_principal_width);
+    }
+    if (rawProposalData.led_principal_height !== undefined) {
+      proposalData.led_principal_height = safeNumber(rawProposalData.led_principal_height);
+    }
+    if (rawProposalData.led_principal_curvature !== undefined) {
+      proposalData.led_principal_curvature = safeInteger(rawProposalData.led_principal_curvature);
+    }
+    if (rawProposalData.led_principal_modules !== undefined) {
+      proposalData.led_principal_modules = safeInteger(rawProposalData.led_principal_modules);
+    }
+    if (rawProposalData.led_principal_resolution !== undefined) {
+      proposalData.led_principal_resolution = rawProposalData.led_principal_resolution;
+    }
+    
+    // Add LED Teto configuration if exists
+    if (rawProposalData.led_teto_width !== undefined) {
+      proposalData.led_teto_width = safeNumber(rawProposalData.led_teto_width);
+    }
+    if (rawProposalData.led_teto_height !== undefined) {
+      proposalData.led_teto_height = safeNumber(rawProposalData.led_teto_height);
+    }
+    if (rawProposalData.led_teto_modules !== undefined) {
+      proposalData.led_teto_modules = safeInteger(rawProposalData.led_teto_modules);
+    }
+    
+    // Add power/weight data only if columns exist (they might not be in the actual DB)
+    if (rawProposalData.daily_rate !== undefined) {
+      proposalData.daily_rate = safeNumber(rawProposalData.daily_rate);
+    }
+    
+    // Add sales rep information directly (using existing discount_description field to store structured data)
+    if (rawProposalData.sales_rep_name) {
+      // Store sales rep name in an existing column that we know exists
+      // We'll put it in the discount_description as structured data and also try other existing fields
+    }
+    
+    // Store all additional data in discount_description as JSON
+    // This includes power, weight, pixels, and sales rep data
+    
+    // Store dashboard-specific data as JSON in discount_description
+    const dashboardData = {
+      created_by_dashboard: rawProposalData.created_by_dashboard || false,
+      sales_rep_id: rawProposalData.sales_rep_id || user.id,
+      sales_rep_name: rawProposalData.sales_rep_name,
+      
+      // Power and weight data
+      principal_power_max: safeInteger(rawProposalData.principal_power_max),
+      principal_power_avg: safeInteger(rawProposalData.principal_power_avg),
+      principal_weight: safeInteger(rawProposalData.principal_weight),
+      teto_power_max: safeInteger(rawProposalData.teto_power_max),
+      teto_power_avg: safeInteger(rawProposalData.teto_power_avg),
+      teto_weight: safeInteger(rawProposalData.teto_weight),
+      
+      // Pixel data
+      led_principal_pixels_width: safeInteger(rawProposalData.led_principal_pixels_width),
+      led_principal_pixels_height: safeInteger(rawProposalData.led_principal_pixels_height),
+      led_principal_total_pixels: safeInteger(rawProposalData.led_principal_total_pixels),
+      led_teto_pixels_width: safeInteger(rawProposalData.led_teto_pixels_width),
+      led_teto_pixels_height: safeInteger(rawProposalData.led_teto_pixels_height),
+      led_teto_total_pixels: safeInteger(rawProposalData.led_teto_total_pixels),
+      led_teto_resolution: rawProposalData.led_teto_resolution
+    };
+    
+    if (rawProposalData.selected_services && Array.isArray(rawProposalData.selected_services)) {
+      dashboardData.services = rawProposalData.selected_services;
+    }
+    
+    proposalData.discount_description = JSON.stringify(dashboardData);
+    
+    // Remove null/undefined values to avoid database issues
+    Object.keys(proposalData).forEach(key => {
+      if (proposalData[key] === null || proposalData[key] === undefined) {
+        delete proposalData[key];
+      }
+    });
+    
+    console.log('Final proposal data to insert:', JSON.stringify(proposalData, null, 2));
+    console.log('Discount description content:', proposalData.discount_description);
+
+    const { data, error } = await supabaseAdmin
+      .from('proposals')
+      .insert([proposalData])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Database error details:', error);
+      throw error;
+    }
+    
+    res.status(201).json({ 
+      success: true, 
+      message: 'Proposal saved successfully',
+      data: data 
+    });
+    
+  } catch (error) {
+    console.error('Error saving proposal:', error.message);
+    console.error('Full error object:', error);
+    res.status(500).json({ 
+      error: 'Failed to save proposal', 
+      details: error.message,
+      hint: error.hint || 'Check server logs for more details'
+    });
+  }
+});
+
+// Check if user exists by email (for dashboard client selection)
+app.post('/api/check-user-by-email', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: 'No authorization header' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    // Check if current user is admin or sales_rep
+    const { data: userProfile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('role, email')
+      .eq('id', user.id)
+      .single();
+
+    console.log('User profile check:', { user_id: user.id, email: user.email, profile: userProfile, error: profileError });
+
+    // Special handling for master admin
+    let userRole = userProfile?.role;
+    const masterAdminEmails = [
+      'nelson.maluf@onprojecoes.com.br',
+      'nelson@avdesign.video'
+    ];
+    
+    if (masterAdminEmails.includes(user.email)) {
+      userRole = 'admin';
+      console.log('Master admin detected, granting admin role');
+    }
+
+    if (!userRole || !['admin', 'sales_rep'].includes(userRole)) {
+      return res.status(403).json({ 
+        error: 'Unauthorized: Only admins and sales reps can check users',
+        debug: {
+          user_email: user.email,
+          user_role: userRole,
+          profile_found: !!userProfile
+        }
+      });
+    }
+
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    // Check if user exists in auth.users
+    let existingUser = null;
+    try {
+      const { data: authUsers, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+      if (listError) throw listError;
+      existingUser = authUsers.users.find(u => u.email === email);
+    } catch (error) {
+      // If admin functions don't work, check user_profiles table instead
+      console.log('Admin listUsers failed, checking profiles table:', error.message);
+      const { data: profileUser } = await supabase
+        .from('user_profiles')
+        .select('id, email')
+        .eq('email', email)
+        .single();
+      
+      if (profileUser) {
+        existingUser = { id: profileUser.id };
+      }
+    }
+    
+    if (existingUser) {
+      // Check for profile data
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', existingUser.id)
+        .single();
+
+      res.json({
+        exists: true,
+        user_id: existingUser.id,
+        profile: profile || null
+      });
+    } else {
+      res.json({
+        exists: false,
+        user_id: null,
+        profile: null
+      });
+    }
+
+  } catch (error) {
+    console.error('Error checking user by email:', error.message);
+    res.status(500).json({ error: 'Failed to check user', details: error.message });
+  }
+});
+
+// Create new user (for dashboard client creation)
+app.post('/api/create-client-user', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: 'No authorization header' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    // Check if current user is admin or sales_rep
+    const { data: userProfile, error: userProfileError } = await supabase
+      .from('user_profiles')
+      .select('role, email')
+      .eq('id', user.id)
+      .single();
+
+    // Special handling for master admin
+    let userRole = userProfile?.role;
+    const masterAdminEmails = [
+      'nelson.maluf@onprojecoes.com.br',
+      'nelson@avdesign.video'
+    ];
+    
+    if (masterAdminEmails.includes(user.email)) {
+      userRole = 'admin';
+    }
+
+    if (!userRole || !['admin', 'sales_rep'].includes(userRole)) {
+      return res.status(403).json({ 
+        error: 'Unauthorized: Only admins and sales reps can create users',
+        debug: {
+          user_email: user.email,
+          user_role: userRole,
+          profile_found: !!userProfile
+        }
+      });
+    }
+
+    const { email, password, full_name, company, phone } = req.body;
+    
+    if (!email || !password || !full_name) {
+      return res.status(400).json({ error: 'Email, password, and full_name are required' });
+    }
+
+    // Create user in auth
+    let newUser = null;
+    try {
+      const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
+        email: email,
+        password: password,
+        email_confirm: true
+      });
+      if (createError) throw createError;
+      newUser = userData;
+    } catch (error) {
+      // If admin createUser doesn't work, return an error with instructions
+      if (!supabaseServiceKey) {
+        return res.status(500).json({ 
+          error: 'Cannot create users without service role key',
+          message: 'Please add SUPABASE_SERVICE_ROLE_KEY to your .env file to enable user creation from dashboard',
+          details: error.message
+        });
+      }
+      throw error;
+    }
+
+    // Create profile (only using columns we know exist)
+    const profileData = {
+      id: newUser.user.id,
+      email: email,
+      full_name: full_name,
+      role: 'end_user',
+      is_active: true
+    };
+
+    // Add optional fields if they're provided
+    if (phone) profileData.phone = phone;
+
+    const { data: profile, error: insertProfileError } = await supabaseAdmin
+      .from('user_profiles')
+      .insert(profileData)
+      .select()
+      .single();
+
+    if (insertProfileError) {
+      console.error('Error creating profile:', insertProfileError);
+      // Try to clean up the created user if profile creation fails
+      await supabaseAdmin.auth.admin.deleteUser(newUser.user.id);
+      throw new Error('Failed to create user profile');
+    }
+
+    res.status(201).json({
+      success: true,
+      user_id: newUser.user.id,
+      profile: profile
+    });
+
+  } catch (error) {
+    console.error('Error creating client user:', error.message);
+    res.status(500).json({ error: 'Failed to create client user', details: error.message });
+  }
+});
+
+// Update user profile (for existing users without complete profiles)
+app.put('/api/update-user-profile', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: 'No authorization header' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    // Check if current user is admin or sales_rep
+    const { data: userProfile, error: userProfileError } = await supabase
+      .from('user_profiles')
+      .select('role, email')
+      .eq('id', user.id)
+      .single();
+
+    // Special handling for master admin
+    let userRole = userProfile?.role;
+    const masterAdminEmails = [
+      'nelson.maluf@onprojecoes.com.br',
+      'nelson@avdesign.video'
+    ];
+    
+    if (masterAdminEmails.includes(user.email)) {
+      userRole = 'admin';
+    }
+
+    if (!userRole || !['admin', 'sales_rep'].includes(userRole)) {
+      return res.status(403).json({ 
+        error: 'Unauthorized: Only admins and sales reps can update user profiles',
+        debug: {
+          user_email: user.email,
+          user_role: userRole,
+          profile_found: !!userProfile
+        }
+      });
+    }
+
+    const { user_id, email, full_name, company, phone } = req.body;
+    
+    if (!user_id || !email || !full_name) {
+      return res.status(400).json({ error: 'user_id, email, and full_name are required' });
+    }
+
+    // Update or create profile (only using columns we know exist)
+    const profileData = {
+      id: user_id,
+      email: email,
+      full_name: full_name,
+      role: 'end_user',
+      is_active: true,
+      updated_at: new Date().toISOString()
+    };
+
+    // Add optional fields if they're provided
+    if (phone) profileData.phone = phone;
+
+    const { data: profile, error: updateProfileError } = await supabaseAdmin
+      .from('user_profiles')
+      .upsert(profileData, { onConflict: 'id' })
+      .select()
+      .single();
+
+    if (updateProfileError) throw updateProfileError;
+
+    res.json({
+      success: true,
+      profile: profile
+    });
+
+  } catch (error) {
+    console.error('Error updating user profile:', error.message);
+    res.status(500).json({ error: 'Failed to update user profile', details: error.message });
+  }
+});
+
+// Debug endpoint to check current user profile
+app.get('/api/debug/current-user', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: 'No authorization header' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    // Get user profile
+    const { data: userProfile, error: debugProfileError } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    res.json({
+      auth_user: {
+        id: user.id,
+        email: user.email,
+        created_at: user.created_at
+      },
+      profile: userProfile,
+      profile_error: debugProfileError,
+      is_master_admin: user.email === 'nelson.maluf@onprojecoes.com.br'
+    });
+
+  } catch (error) {
+    console.error('Error checking current user:', error.message);
+    res.status(500).json({ error: 'Failed to check current user', details: error.message });
+  }
+});
+
+// Helper endpoint to create/update admin profile
+app.post('/api/setup-admin-profile', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: 'No authorization header' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    // Only allow master admin to set up profiles
+    const masterAdminEmails = [
+      'nelson.maluf@onprojecoes.com.br',
+      'nelson@avdesign.video'
+    ];
+    
+    if (!masterAdminEmails.includes(user.email)) {
+      return res.status(403).json({ error: 'Only master admin can setup profiles' });
+    }
+
+    // Create or update profile for current user
+    const adminName = user.email === 'nelson@avdesign.video' ? 'Nelson (Admin)' : 'Nelson Maluf (Master Admin)';
+    
+    const { data: profile, error: setupProfileError } = await supabaseAdmin
+      .from('user_profiles')
+      .upsert({
+        id: user.id,
+        email: user.email,
+        full_name: adminName,
+        role: 'admin',
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'id' })
+      .select()
+      .single();
+
+    if (setupProfileError) throw setupProfileError;
+
+    res.json({
+      success: true,
+      message: 'Admin profile created/updated successfully',
+      profile: profile
+    });
+
+  } catch (error) {
+    console.error('Error setting up admin profile:', error.message);
+    res.status(500).json({ error: 'Failed to setup admin profile', details: error.message });
+  }
+});
+
+// Simplified endpoint to create admin profile without auth restrictions
+app.post('/api/bootstrap-admin', async (req, res) => {
+  try {
+    const { user_id, email } = req.body;
+    
+    if (!user_id || !email) {
+      return res.status(400).json({ error: 'user_id and email are required' });
+    }
+
+    // Only allow for master admin emails
+    const masterAdminEmails = [
+      'nelson.maluf@onprojecoes.com.br',
+      'nelson@avdesign.video'
+    ];
+    
+    if (!masterAdminEmails.includes(email)) {
+      return res.status(403).json({ error: 'Only master admin can be bootstrapped' });
+    }
+
+    // Create or update profile for the user
+    const adminName = email === 'nelson@avdesign.video' ? 'Nelson (Admin)' : 'Nelson Maluf (Master Admin)';
+    
+    const { data: profile, error: bootstrapError } = await supabaseAdmin
+      .from('user_profiles')
+      .upsert({
+        id: user_id,
+        email: email,
+        full_name: adminName,
+        role: 'admin',
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'id' })
+      .select()
+      .single();
+
+    if (bootstrapError) throw bootstrapError;
+
+    res.json({
+      success: true,
+      message: 'Admin profile bootstrapped successfully',
+      profile: profile
+    });
+
+  } catch (error) {
+    console.error('Error bootstrapping admin profile:', error.message);
+    res.status(500).json({ error: 'Failed to bootstrap admin profile', details: error.message });
+  }
+});
+
+// Debug endpoint to check table structure
+app.get('/api/debug/table-structure', async (req, res) => {
+  try {
+    // Try to get table info by querying with all possible columns
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .limit(1);
+
+    if (error) {
+      console.error('Error querying user_profiles:', error);
+      
+      // Try basic query to see what columns exist
+      const { data: basicData, error: basicError } = await supabase
+        .from('user_profiles')
+        .select()
+        .limit(1);
+      
+      return res.json({
+        error: error,
+        basic_query: basicData,
+        basic_error: basicError
+      });
+    }
+
+    res.json({
+      success: true,
+      sample_data: data,
+      message: 'Query successful'
+    });
+
+  } catch (error) {
+    console.error('Error checking table structure:', error.message);
+    res.status(500).json({ error: 'Failed to check table structure', details: error.message });
+  }
+});
+
+// Setup database tables and RLS policies
+app.post('/api/setup-database', async (req, res) => {
+  try {
+    // Create user_profiles table if it doesn't exist
+    const createTableSQL = `
+      CREATE TABLE IF NOT EXISTS user_profiles (
+        id UUID PRIMARY KEY,
+        email TEXT UNIQUE NOT NULL,
+        full_name TEXT,
+        phone TEXT,
+        role TEXT DEFAULT 'end_user',
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    const { error: createError } = await supabaseAdmin.rpc('exec_sql', { 
+      sql: createTableSQL 
+    });
+    
+    if (createError) {
+      console.log('Table creation error (may already exist):', createError);
+    }
+
+    // Enable RLS
+    const enableRLSSQL = `ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;`;
+    const { error: rlsError } = await supabaseAdmin.rpc('exec_sql', { 
+      sql: enableRLSSQL 
+    });
+    
+    if (rlsError) {
+      console.log('RLS enable error (may already be enabled):', rlsError);
+    }
+
+    // Create policies
+    const policies = [
+      // Allow service role to do everything
+      `CREATE POLICY IF NOT EXISTS "Service role can do everything" ON user_profiles FOR ALL USING (true);`,
+      
+      // Allow users to read their own profile
+      `CREATE POLICY IF NOT EXISTS "Users can read own profile" ON user_profiles FOR SELECT USING (auth.uid() = id);`,
+      
+      // Allow users to update their own profile
+      `CREATE POLICY IF NOT EXISTS "Users can update own profile" ON user_profiles FOR UPDATE USING (auth.uid() = id);`,
+      
+      // Allow admins to do everything
+      `CREATE POLICY IF NOT EXISTS "Admins can do everything" ON user_profiles FOR ALL USING (
+        EXISTS (
+          SELECT 1 FROM user_profiles up 
+          WHERE up.id = auth.uid() AND up.role = 'admin'
+        )
+      );`
+    ];
+
+    for (const policy of policies) {
+      const { error: policyError } = await supabaseAdmin.rpc('exec_sql', { 
+        sql: policy 
+      });
+      
+      if (policyError) {
+        console.log('Policy creation error (may already exist):', policyError);
+      }
+    }
+
+    res.json({
+      success: true,
+      message: 'Database setup completed'
+    });
+
+  } catch (error) {
+    console.error('Error setting up database:', error.message);
+    res.status(500).json({ error: 'Failed to setup database', details: error.message });
   }
 });
 

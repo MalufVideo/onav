@@ -249,19 +249,68 @@ async function showQuoteDetails(quote) {
     }
   };
 
+  // Helper function to extract extended quote data from JSON (same as dashboard)
+  const getExtendedQuoteData = (quote) => {
+    const defaultData = {
+        principal_power_max: null,
+        principal_power_avg: null,
+        principal_weight: null,
+        teto_power_max: null,
+        teto_power_avg: null,
+        teto_weight: null,
+        led_principal_pixels_width: null,
+        led_principal_pixels_height: null,
+        led_principal_total_pixels: null,
+        led_teto_pixels_width: null,
+        led_teto_pixels_height: null,
+        led_teto_total_pixels: null,
+        led_teto_resolution: null,
+        services: null
+    };
+    
+    try {
+        if (quote.discount_description) {
+            const data = JSON.parse(quote.discount_description);
+            return { ...defaultData, ...data };
+        }
+    } catch (e) {
+        console.log('Error parsing extended quote data:', e);
+    }
+    
+    return defaultData;
+  };
+
+  // Get extended data from JSON
+  const extendedData = getExtendedQuoteData(quote);
+
   // Safely parse and process services
+  let servicesProcessed = false;
+  
+  // First try the direct field
   if (quote.selected_services) {
       if (typeof quote.selected_services === 'string') {
           try {
               const parsedServices = JSON.parse(quote.selected_services);
               processServicesForTable(parsedServices);
+              servicesProcessed = true;
           } catch (e) {
-              // console.error('Error parsing selected_services:', e);
-              serviceTableRowsHtml = '<tr><td colspan="4" style="padding: 10px; text-align: center; border-bottom: 1px solid #dee2e6;">Erro ao carregar serviços.</td></tr>';
+              console.log('Error parsing selected_services:', e);
           }
       } else if (Array.isArray(quote.selected_services)) {
           processServicesForTable(quote.selected_services);
+          servicesProcessed = true;
       }
+  }
+  
+  // If not found, try to get services from discount_description JSON
+  if (!servicesProcessed && extendedData.services && Array.isArray(extendedData.services)) {
+      processServicesForTable(extendedData.services);
+      servicesProcessed = true;
+  }
+  
+  // If still no services found, show empty message
+  if (!servicesProcessed) {
+      serviceTableRowsHtml = '<tr><td colspan="4" style="padding: 10px; text-align: center; border-bottom: 1px solid #dee2e6;">Nenhum serviço adicionado</td></tr>';
   }
 
   // --- Format other data safely (Remains the same) ---
@@ -277,31 +326,31 @@ async function showQuoteDetails(quote) {
   const daysCount = quote.days_count || 1; 
   const totalPrice = quote.total_price || formatCurrency(dailySubtotalSum * daysCount); 
 
-  // LED Principal Data (Remains the same)
+  // LED Principal Data (Updated to use extended data)
   const ledPWidth = quote.led_principal_width || 'N/A';
   const ledPHeight = quote.led_principal_height || 'N/A';
   const ledPCurvature = quote.led_principal_curvature !== null ? quote.led_principal_curvature : 'N/A';
   const ledPModules = quote.led_principal_modules || 'N/A';
   const ledPResolution = quote.led_principal_resolution || 'N/A';
-  const ledPPixelsW = quote.led_principal_pixels_width || 'N/A';
-  const ledPPixelsH = quote.led_principal_pixels_height || 'N/A';
-  const ledPTotalPixels = quote.led_principal_total_pixels ? Number(quote.led_principal_total_pixels).toLocaleString('pt-BR') : 'N/A';
-  const ledPPowerMax = quote.principal_power_max ? `${formatNumber(quote.principal_power_max)} W` : 'N/A'; 
-  const ledPPowerAvg = quote.principal_power_avg ? `${formatNumber(quote.principal_power_avg)} W` : 'N/A'; 
-  const ledPWeight = quote.principal_weight ? `${formatNumber(quote.principal_weight)} kg` : 'N/A';   
+  const ledPPixelsW = quote.led_principal_pixels_width || extendedData.led_principal_pixels_width || 'N/A';
+  const ledPPixelsH = quote.led_principal_pixels_height || extendedData.led_principal_pixels_height || 'N/A';
+  const ledPTotalPixels = (quote.led_principal_total_pixels || extendedData.led_principal_total_pixels) ? Number(quote.led_principal_total_pixels || extendedData.led_principal_total_pixels).toLocaleString('pt-BR') : 'N/A';
+  const ledPPowerMax = (quote.principal_power_max || extendedData.principal_power_max) ? `${formatNumber(quote.principal_power_max || extendedData.principal_power_max)} W` : 'N/A'; 
+  const ledPPowerAvg = (quote.principal_power_avg || extendedData.principal_power_avg) ? `${formatNumber(quote.principal_power_avg || extendedData.principal_power_avg)} W` : 'N/A'; 
+  const ledPWeight = (quote.principal_weight || extendedData.principal_weight) ? `${formatNumber(quote.principal_weight || extendedData.principal_weight)} kg` : 'N/A';   
 
-  // LED Teto Data (Remains the same)
+  // LED Teto Data (Updated to use extended data)
   const hasTetoLed = !!quote.led_teto_width; 
   const ledTWidth = quote.led_teto_width || 'N/A';
   const ledTHeight = quote.led_teto_height || 'N/A';
   const ledTModules = quote.led_teto_modules || 'N/A';
-  const ledTResolution = quote.led_teto_resolution || 'N/A';
-  const ledTPixelsW = quote.led_teto_pixels_width || 'N/A';
-  const ledTPixelsH = quote.led_teto_pixels_height || 'N/A';
-  const ledTTotalPixels = quote.led_teto_total_pixels ? Number(quote.led_teto_total_pixels).toLocaleString('pt-BR') : 'N/A';
-  const ledTPowerMax = quote.teto_power_max ? `${formatNumber(quote.teto_power_max)} W` : 'N/A';
-  const ledTPowerAvg = quote.teto_power_avg ? `${formatNumber(quote.teto_power_avg)} W` : 'N/A'; 
-  const ledTWeight = quote.teto_weight ? `${formatNumber(quote.teto_weight)} kg` : 'N/A';   
+  const ledTResolution = quote.led_teto_resolution || extendedData.led_teto_resolution || 'N/A';
+  const ledTPixelsW = quote.led_teto_pixels_width || extendedData.led_teto_pixels_width || 'N/A';
+  const ledTPixelsH = quote.led_teto_pixels_height || extendedData.led_teto_pixels_height || 'N/A';
+  const ledTTotalPixels = (quote.led_teto_total_pixels || extendedData.led_teto_total_pixels) ? Number(quote.led_teto_total_pixels || extendedData.led_teto_total_pixels).toLocaleString('pt-BR') : 'N/A';
+  const ledTPowerMax = (quote.teto_power_max || extendedData.teto_power_max) ? `${formatNumber(quote.teto_power_max || extendedData.teto_power_max)} W` : 'N/A';
+  const ledTPowerAvg = (quote.teto_power_avg || extendedData.teto_power_avg) ? `${formatNumber(quote.teto_power_avg || extendedData.teto_power_avg)} W` : 'N/A'; 
+  const ledTWeight = (quote.teto_weight || extendedData.teto_weight) ? `${formatNumber(quote.teto_weight || extendedData.teto_weight)} kg` : 'N/A';   
 
   // --- Build Modal HTML - RESTORING ORIGINAL STRUCTURE WITH UPDATED TABLE/TOTAL ---
   modalContent.innerHTML = `
