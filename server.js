@@ -41,8 +41,8 @@ app.use(express.json());
 // Enable CORS for all origins (adjust for production later if needed)
 app.use(cors());
 
-// Serve static files from 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static files from root directory
+app.use(express.static(path.join(__dirname)));
 
 // Serve static files from 'admin' directory under the /admin path
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
@@ -486,6 +486,38 @@ app.put('/api/proposals/:id/apply-discount', async (req, res) => {
 
     if (historyError) {
       console.error('Error creating history entry:', historyError);
+    }
+
+    // Call the discount email Edge Function
+    console.log('About to call discount email function for proposal ID:', id);
+    console.log('SUPABASE_URL:', process.env.SUPABASE_URL);
+    console.log('SERVICE_ROLE_KEY exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+    
+    try {
+      const functionUrl = `${process.env.SUPABASE_URL}/functions/v1/send-discount-email`;
+      console.log('Calling Edge Function at:', functionUrl);
+      
+      const discountEmailResponse = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
+        },
+        body: JSON.stringify({ proposalId: id })
+      });
+
+      console.log('Edge Function response status:', discountEmailResponse.status);
+      
+      if (!discountEmailResponse.ok) {
+        const errorText = await discountEmailResponse.text();
+        console.error('Failed to send discount email:', errorText);
+      } else {
+        const emailResult = await discountEmailResponse.json();
+        console.log('Discount email sent successfully:', emailResult);
+      }
+    } catch (emailError) {
+      console.error('Error calling discount email function:', emailError);
+      // Don't fail the discount application if email fails
     }
 
     res.json({ 
@@ -1515,6 +1547,86 @@ app.post('/api/setup-database', async (req, res) => {
     res.status(500).json({ error: 'Failed to setup database', details: error.message });
   }
 });
+
+// --- Email API Route ---
+
+// Import Resend
+const { Resend } = require('resend');
+const resend = new Resend(process.env.RESEND_API_KEY || 're_jMkwd7zt_FihowYjXxNzcDcek6RsfkNpp');
+
+// Handle contact form submissions
+app.post('/api/send-email', async (req, res) => {
+  try {
+    const { name, email, subject, message, phone, company, project, 'equipment-interest': equipmentInterest } = req.body;
+    
+    // Basic validation - check for either message or project field
+    if (!name || !email || (!message && !project)) {
+      return res.status(400).json({ 
+        error: 'Campos obrigatórios: nome, email e mensagem',
+        message: 'Por favor, preencha todos os campos obrigatórios.' 
+      });
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ 
+        error: 'Email inválido',
+        message: 'Por favor, insira um endereço de email válido.' 
+      });
+    }
+
+    // Prepare email content
+    const emailContent = message || project || '';
+    const emailSubject = subject || `On+Av Site: Nova Mensagem de Contato de ${name}`;
+    
+    // Send email using Resend
+    const { data, error } = await resend.emails.send({
+      from: 'On+Av Contato <contato@onav.com.br>',
+      to: ['nelsonhdvideo@gmail.com'],
+      subject: emailSubject,
+      html: `
+        <p>Você recebeu uma nova mensagem do formulário de contato do site On+Av:</p>
+        <hr>
+        <p><strong>Nome:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        ${phone ? `<p><strong>Telefone:</strong> ${phone}</p>` : ''}
+        ${company ? `<p><strong>Empresa:</strong> ${company}</p>` : ''}
+        <p><strong>Mensagem:</strong></p>
+        <p>${emailContent.replace(/\n/g, '<br>')}</p>
+        ${equipmentInterest ? `<p><strong>Equipamentos de interesse:</strong> ${equipmentInterest}</p>` : ''}
+        <hr>
+        <p><em>Enviado via formulário do site em ${new Date().toLocaleString('pt-BR')}.</em></p>
+      `,
+    });
+
+    if (error) {
+      console.error('Resend API Error:', error);
+      return res.status(400).json({ 
+        error: 'Erro ao enviar email',
+        message: 'Erro ao enviar o email. Tente novamente mais tarde.',
+        details: error.message 
+      });
+    }
+
+    console.log('Email sent successfully:', data);
+    
+    res.json({ 
+      success: true, 
+      message: 'Mensagem enviada com sucesso! Entraremos em contato em breve.' 
+    });
+    
+  } catch (error) {
+    console.error('Error handling contact form:', error.message);
+    res.status(500).json({ 
+      error: 'Erro interno do servidor',
+      message: 'Ocorreu um erro ao processar sua mensagem. Tente novamente mais tarde.',
+      details: error.message 
+    });
+  }
+});
+
+// --- End Email API Route ---
 
 // --- End User and Lead Management Routes ---
 

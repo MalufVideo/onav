@@ -863,91 +863,30 @@ async function saveQuoteChanges(event, quoteId, originalTotal) {
     const discountReason = document.getElementById('discountReason').value;
     
     try {
-        // First, get the current proposal to calculate changes
-        const { data: currentProposal, error: fetchError } = await supabase
-            .from('proposals')
-            .select('*')
-            .eq('id', quoteId)
-            .single();
+        // Call the server API endpoint which handles both discount application and email sending
+        const response = await fetch(`/api/proposals/${quoteId}/apply-discount`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                discountType: discountType,
+                discountValue: discountValue,
+                discountReason: discountReason,
+                newStatus: status,
+                changedBy: currentUser?.email || 'admin'
+            })
+        });
 
-        if (fetchError) throw fetchError;
+        const result = await response.json();
 
-        // Calculate new price and discount amounts
-        const currentPriceStr = currentProposal.total_price || 'R$ 0,00';
-        const currentPriceNum = parseFloat(currentPriceStr.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
-        
-        let newPrice = currentPriceNum;
-        let discountAmount = 0;
-        
-        if (discountValue > 0) {
-            if (discountType === 'percentage') {
-                discountAmount = currentPriceNum * (discountValue / 100);
-                newPrice = currentPriceNum - discountAmount;
-            } else {
-                discountAmount = discountValue;
-                newPrice = currentPriceNum - discountValue;
-            }
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to apply discount');
         }
 
-        // Format new price
-        const formattedNewPrice = `R$ ${newPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+        // Show success message
+        showToast('Orçamento atualizado com sucesso! E-mail de desconto enviado.', 'success');
         
-        // Calculate total discount from original
-        const originalPrice = currentProposal.original_total_price || currentProposal.total_price;
-        const originalPriceNum = parseFloat(originalPrice.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
-        const totalDiscountAmount = originalPriceNum - newPrice;
-        const totalDiscountPercentage = originalPriceNum > 0 ? (totalDiscountAmount / originalPriceNum) * 100 : 0;
-
-        // Update proposal with new discount tracking fields
-        const updateData = {
-            total_price: formattedNewPrice,
-            status: status,
-            original_total_price: originalPrice,
-            total_discount_percentage: totalDiscountPercentage,
-            total_discount_amount: totalDiscountAmount,
-            discount_reason: discountReason,
-            last_modified_at: new Date().toISOString(),
-            last_modified_by: currentUser?.email || 'admin'
-        };
-
-        const { error: updateError } = await supabase
-            .from('proposals')
-            .update(updateData)
-            .eq('id', quoteId);
-
-        if (updateError) throw updateError;
-
-        // Create history entry
-        const historyEntry = {
-            proposal_id: quoteId,
-            change_type: 'discount_applied',
-            old_total_price: currentProposal.total_price,
-            old_status: currentProposal.status,
-            old_discount_percentage: currentProposal.total_discount_percentage || 0,
-            old_discount_amount: currentProposal.total_discount_amount || 0,
-            new_total_price: formattedNewPrice,
-            new_status: status,
-            new_discount_percentage: totalDiscountPercentage,
-            new_discount_amount: totalDiscountAmount,
-            discount_type: discountType,
-            discount_value: discountValue,
-            discount_reason: discountReason,
-            changed_by: currentUser?.email || 'admin',
-            change_description: `Applied ${discountType === 'percentage' ? discountValue + '%' : 'R$ ' + discountValue} discount`,
-            created_at: new Date().toISOString()
-        };
-
-        const { error: historyError } = await supabase
-            .from('quote_history')
-            .insert([historyEntry]);
-
-        if (historyError) {
-            console.error('Error creating history entry:', historyError);
-            showToast('Orçamento atualizado, mas erro ao salvar histórico', 'warning');
-        } else {
-            showToast('Orçamento atualizado com sucesso! Histórico registrado.', 'success');
-        }
-
         closeModal('quoteEditModal');
         loadPage(currentPage);
 
