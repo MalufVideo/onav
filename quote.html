@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposta ON+AV</title>
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .quote-section {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1.5rem 0;
+        }
+        .quote-section:last-child {
+            border-bottom: none;
+        }
+        .service-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+        }
+        .service-table th,
+        .service-table td {
+            border: 1px solid #e5e7eb;
+            padding: 8px 12px;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        .service-table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        .service-table tbody tr:nth-child(odd) {
+            background-color: #fdfdfd;
+        }
+        .total-line {
+            background: #dcfce7;
+            color: #166534;
+            font-weight: 600;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border: 1px solid #a7f3d0;
+        }
+        .discount-section {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .approve-button {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .approve-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .approve-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Loading State -->
+    <div id="loading" class="min-h-screen flex items-center justify-center">
+        <div class="text-center">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-gray-600">Carregando proposta...</p>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="error" class="min-h-screen flex items-center justify-center hidden">
+        <div class="text-center max-w-md mx-auto px-4">
+            <div class="mb-6">
+                <svg class="mx-auto h-16 w-16 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.134 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Proposta não encontrada</h1>
+            <p class="text-gray-600 mb-6" id="error-message">A proposta que você está procurando não foi encontrada ou o link pode ter expirado.</p>
+            <a href="/" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                Voltar ao site
+            </a>
+        </div>
+    </div>
+
+    <!-- Quote Content -->
+    <div id="quote-content" class="min-h-screen bg-gray-50 py-8 hidden">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Header -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
+                <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-8 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <img src="/img/on+av_logo_v3.png" alt="ON+AV Logo" class="h-12 mb-4">
+                            <h1 class="text-2xl font-bold" id="project-title">Proposta Orçamentária</h1>
+                            <p class="text-blue-100 mt-1">Equipamentos de LED e Produção Virtual</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-blue-100 text-sm">Proposta</div>
+                            <div class="text-xl font-semibold" id="quote-number">#000000</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Client and Project Info -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Informações do Cliente</h3>
+                        <div class="space-y-2 text-sm">
+                            <div><span class="font-medium text-gray-700">Nome:</span> <span id="client-name">-</span></div>
+                            <div><span class="font-medium text-gray-700">Empresa:</span> <span id="client-company">-</span></div>
+                            <div><span class="font-medium text-gray-700">Email:</span> <span id="client-email">-</span></div>
+                            <div><span class="font-medium text-gray-700">Telefone:</span> <span id="client-phone">-</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Detalhes do Projeto</h3>
+                        <div class="space-y-2 text-sm">
+                            <div><span class="font-medium text-gray-700">Data da Proposta:</span> <span id="proposal-date">-</span></div>
+                            <div><span class="font-medium text-gray-700">Período de Filmagem:</span> <span id="shooting-period">-</span></div>
+                            <div><span class="font-medium text-gray-700">Duração:</span> <span id="duration">-</span></div>
+                            <div><span class="font-medium text-gray-700">Status:</span> <span id="quote-status" class="px-2 py-1 text-xs rounded-full">-</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LED Configuration -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Configuração do LED</h3>
+                <div class="grid md:grid-cols-2 gap-6" id="led-config">
+                    <!-- LED Principal -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="font-semibold text-gray-800 mb-3">LED Principal</h4>
+                        <div class="space-y-2 text-sm">
+                            <div><span class="font-medium">Dimensões:</span> <span id="led-principal-dimensions">-</span></div>
+                            <div><span class="font-medium">Curvatura:</span> <span id="led-principal-curvature">-</span></div>
+                            <div><span class="font-medium">Módulos:</span> <span id="led-principal-modules">-</span></div>
+                        </div>
+                    </div>
+                    <!-- LED Teto -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="font-semibold text-gray-800 mb-3">LED Teto</h4>
+                        <div class="space-y-2 text-sm">
+                            <div><span class="font-medium">Dimensões:</span> <span id="led-teto-dimensions">-</span></div>
+                            <div><span class="font-medium">Módulos:</span> <span id="led-teto-modules">-</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Serviços Incluídos (Valores Diários)</h3>
+                <div class="overflow-x-auto">
+                    <table class="service-table w-full">
+                        <thead>
+                            <tr>
+                                <th class="text-left">Item</th>
+                                <th class="text-center">Qtd</th>
+                                <th class="text-right">Preço Unit. (Diária)</th>
+                                <th class="text-right">Subtotal (Diária)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="services-table-body">
+                            <!-- Services will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Discount Section (if applicable) -->
+            <div id="discount-section" class="bg-white rounded-lg shadow-lg p-6 mb-6 hidden">
+                <h3 class="text-lg font-semibold text-red-600 mb-4">🎉 Desconto Aplicado</h3>
+                <div class="discount-section">
+                    <div class="grid md:grid-cols-3 gap-4 text-center mb-4">
+                        <div>
+                            <div class="text-sm font-medium text-gray-700">Preço Original</div>
+                            <div class="text-lg text-gray-500 line-through" id="original-price">-</div>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-gray-700">Desconto</div>
+                            <div class="text-lg text-red-600 font-semibold" id="discount-amount">-</div>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-gray-700">Preço Final</div>
+                            <div class="text-xl text-green-600 font-bold" id="final-price">-</div>
+                        </div>
+                    </div>
+                    <div class="text-center text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+                        <strong>Motivo do Desconto:</strong> <span id="discount-reason">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <div class="total-line flex justify-between items-center">
+                    <span class="text-lg">Total (<span id="total-duration">-</span>)</span>
+                    <span class="text-xl font-bold" id="total-price">-</span>
+                </div>
+            </div>
+
+            <!-- Approval Section -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <div id="approval-pending" class="text-center">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Aprovação da Proposta</h3>
+                    <p class="text-gray-600 mb-6">Após revisar todos os detalhes acima, você pode aprovar esta proposta clicando no botão abaixo.</p>
+                    <button id="approve-button" 
+                            class="approve-button text-white font-semibold py-3 px-8 rounded-lg text-lg transition-all duration-300"
+                            onclick="approveQuote()">
+                        ✓ Aprovar Proposta
+                    </button>
+                    <p class="text-xs text-gray-500 mt-4">Ao aprovar, você concorda com os termos e condições apresentados nesta proposta.</p>
+                </div>
+
+                <div id="approval-success" class="text-center hidden">
+                    <div class="text-green-600 mb-4">
+                        <svg class="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">✅ Proposta Aprovada!</h3>
+                    <p class="text-gray-600 mb-4">Sua aprovação foi registrada em <span id="approval-date">-</span></p>
+                    <p class="text-sm text-gray-500">Nossa equipe entrará em contato em breve para dar continuidade ao projeto.</p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center text-gray-500 text-sm">
+                <p>&copy; 2025 ON+AV. Todos os direitos reservados.</p>
+                <p class="mt-1">
+                    <a href="https://onav.com.br" class="text-blue-600 hover:text-blue-800">www.onav.com.br</a> | 
+                    <a href="mailto:contato@onav.com.br" class="text-blue-600 hover:text-blue-800">contato@onav.com.br</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get slug from URL path
+        const urlPath = window.location.pathname;
+        const slug = urlPath.split('/').pop() || urlPath.split('/')[2]; // Handle both /quote/slug and /slug patterns
+
+        // Format currency
+        function formatCurrency(value) {
+            if (value === null || value === undefined || isNaN(value)) {
+                return 'N/A';
+            }
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(value);
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            } catch (e) {
+                return '-';
+            }
+        }
+
+        // Format shooting period
+        function formatShootingPeriod(startDate, endDate) {
+            if (!startDate || !endDate) return '-';
+            
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const startDay = start.toLocaleDateString('pt-BR', { day: '2-digit' });
+            const endDay = end.toLocaleDateString('pt-BR', { day: '2-digit' });
+            const monthYear = end.toLocaleDateString('pt-BR', { 
+                month: '2-digit', 
+                year: 'numeric' 
+            });
+            
+            return `${startDay} a ${endDay}/${monthYear}`;
+        }
+
+        // Load quote data
+        async function loadQuote() {
+            try {
+                const response = await fetch(`/api/quotes/public/${slug}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Quote not found');
+                }
+
+                populateQuoteData(data.quote);
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('quote-content').classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error loading quote:', error);
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error').classList.remove('hidden');
+                document.getElementById('error-message').textContent = error.message;
+            }
+        }
+
+        // Populate quote data in the page
+        function populateQuoteData(quote) {
+            // Header
+            document.getElementById('project-title').textContent = `Proposta: ${quote.project_name || 'Projeto'}`;
+            document.getElementById('quote-number').textContent = `#${quote.id.substring(0, 8)}`;
+
+            // Client info
+            document.getElementById('client-name').textContent = quote.client_name || '-';
+            document.getElementById('client-company').textContent = quote.client_company || '-';
+            document.getElementById('client-email').textContent = quote.client_email || '-';
+            document.getElementById('client-phone').textContent = quote.client_phone || '-';
+
+            // Project details
+            document.getElementById('proposal-date').textContent = formatDate(quote.created_at);
+            document.getElementById('shooting-period').textContent = formatShootingPeriod(quote.shooting_dates_start, quote.shooting_dates_end);
+            document.getElementById('duration').textContent = quote.days_count ? `${quote.days_count} dia(s)` : '-';
+            
+            // Status
+            const statusElement = document.getElementById('quote-status');
+            const status = quote.status || 'pending';
+            statusElement.textContent = getStatusText(status);
+            statusElement.className = `px-2 py-1 text-xs rounded-full ${getStatusClass(status)}`;
+
+            // LED Configuration
+            const ledPWidth = quote.led_principal_width ?? '-';
+            const ledPHeight = quote.led_principal_height ?? '-';
+            const ledPCurvature = quote.led_principal_curvature ?? '-';
+            const ledPModules = quote.led_principal_modules ?? '-';
+            const ledTWidth = quote.led_teto_width ?? '-';
+            const ledTHeight = quote.led_teto_height ?? '-';
+            const ledTModules = quote.led_teto_modules ?? '-';
+
+            document.getElementById('led-principal-dimensions').textContent = `${ledPWidth} m × ${ledPHeight} m`;
+            document.getElementById('led-principal-curvature').textContent = `${ledPCurvature}°`;
+            document.getElementById('led-principal-modules').textContent = ledPModules;
+            document.getElementById('led-teto-dimensions').textContent = `${ledTWidth} m × ${ledTHeight} m`;
+            document.getElementById('led-teto-modules').textContent = ledTModules;
+
+            // Services
+            populateServices(quote.selected_services || []);
+
+            // Discount section
+            if (quote.discount_percentage || quote.discount_amount) {
+                showDiscountSection(quote);
+            }
+
+            // Total
+            document.getElementById('total-duration').textContent = quote.days_count ? `${quote.days_count} dia(s)` : '-';
+            document.getElementById('total-price').textContent = quote.total_price || '-';
+
+            // Approval section
+            if (quote.quote_approved) {
+                showApprovedState(quote.quote_approved_at);
+            }
+        }
+
+        // Populate services table
+        function populateServices(services) {
+            const tbody = document.getElementById('services-table-body');
+            tbody.innerHTML = '';
+
+            if (!services || services.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">Nenhum serviço selecionado</td></tr>';
+                return;
+            }
+
+            services.forEach(service => {
+                const unitPrice = service.unit_price ?? 0;
+                const quantity = service.quantity ?? 0;
+                const dailySubtotal = unitPrice * quantity;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${service.name || 'N/A'}</td>
+                    <td class="text-center">${quantity}</td>
+                    <td class="text-right">${formatCurrency(unitPrice)}</td>
+                    <td class="text-right">${formatCurrency(dailySubtotal)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Show discount section
+        function showDiscountSection(quote) {
+            const discountSection = document.getElementById('discount-section');
+            const originalPrice = parseFloat(quote.original_total_price) || 0;
+            const discountPercentage = quote.discount_percentage || 0;
+            
+            // Calculate discount amount from percentage and original price
+            const discountAmount = (originalPrice * discountPercentage) / 100;
+            const finalPrice = originalPrice - discountAmount;
+
+            document.getElementById('original-price').textContent = formatCurrency(originalPrice);
+            document.getElementById('discount-amount').textContent = `${discountPercentage.toFixed(1)}% (${formatCurrency(discountAmount)})`;
+            document.getElementById('final-price').textContent = formatCurrency(finalPrice);
+            
+            // Add discount reason
+            const reasonElement = document.getElementById('discount-reason');
+            if (reasonElement) {
+                reasonElement.textContent = `Desconto progressivo por ${quote.days_count || 1} dias de locação`;
+            }
+
+            discountSection.classList.remove('hidden');
+        }
+
+        // Show approved state
+        function showApprovedState(approvedAt) {
+            document.getElementById('approval-pending').classList.add('hidden');
+            document.getElementById('approval-success').classList.remove('hidden');
+            document.getElementById('approval-date').textContent = formatDate(approvedAt);
+        }
+
+        // Get status text
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': 'Pendente',
+                'approved': 'Aprovado',
+                'rejected': 'Rejeitado',
+                'in_progress': 'Em Andamento',
+                'completed': 'Concluído'
+            };
+            return statusMap[status] || 'Pendente';
+        }
+
+        // Get status CSS class
+        function getStatusClass(status) {
+            const classMap = {
+                'pending': 'bg-yellow-100 text-yellow-800',
+                'approved': 'bg-green-100 text-green-800',
+                'rejected': 'bg-red-100 text-red-800',
+                'in_progress': 'bg-blue-100 text-blue-800',
+                'completed': 'bg-purple-100 text-purple-800'
+            };
+            return classMap[status] || 'bg-gray-100 text-gray-800';
+        }
+
+        // Approve quote
+        async function approveQuote() {
+            const button = document.getElementById('approve-button');
+            button.disabled = true;
+            button.textContent = 'Aprovando...';
+
+            try {
+                const response = await fetch(`/api/quotes/approve/${slug}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to approve quote');
+                }
+
+                // Show success state
+                showApprovedState(data.approvedAt);
+
+            } catch (error) {
+                console.error('Error approving quote:', error);
+                alert('Erro ao aprovar proposta. Tente novamente.');
+                button.disabled = false;
+                button.textContent = '✓ Aprovar Proposta';
+            }
+        }
+
+        // Load quote on page load
+        document.addEventListener('DOMContentLoaded', loadQuote);
+    </script>
+</body>
+</html>

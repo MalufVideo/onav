@@ -698,8 +698,8 @@ async function editQuote(quoteId) {
     const currentTotal = parseFloat(quote.total_price?.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
     
     // Calculate current discount values to pre-fill the form
-    const currentDiscountPercentage = quote.total_discount_percentage || 0;
-    const currentDiscountAmount = quote.total_discount_amount || 0;
+    const currentDiscountPercentage = quote.discount_percentage || 0;
+    const currentDiscountAmount = quote.discount_amount || 0;
     const currentDiscountReason = quote.discount_reason || '';
     
     // Determine discount type and value from current state
@@ -814,7 +814,33 @@ async function editQuote(quoteId) {
                     <option value="rejected" ${quote.status === 'rejected' ? 'selected' : ''}>Rejeitado</option>
                 </select>
             </div>
-            <h4>Aplicar Desconto</h4>
+            <!-- Current Discount Info -->
+            ${currentDiscountPercentage > 0 ? `
+            <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; padding: 15px; margin-bottom: 20px;">
+                <h4 style="margin-top: 0; margin-bottom: 10px; color: #856404;"><i class="fas fa-info-circle"></i> Desconto Atual</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; font-size: 0.9rem;">
+                    <div>
+                        <strong>Tipo:</strong> ${quote.days_count > 1 ? 'Progressivo por dias' : 'Manual'}
+                    </div>
+                    <div>
+                        <strong>Desconto:</strong> ${currentDiscountPercentage.toFixed(1)}%
+                    </div>
+                    <div>
+                        <strong>Valor:</strong> R$ ${((originalTotal * currentDiscountPercentage) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </div>
+                    <div>
+                        <strong>Dias:</strong> ${quote.days_count || 1} dia(s)
+                    </div>
+                </div>
+                ${currentDiscountReason ? `<p style="margin: 10px 0 0 0; font-size: 0.85rem; color: #856404;"><strong>Motivo:</strong> ${currentDiscountReason}</p>` : ''}
+            </div>
+            ` : ''}
+            
+            <h4>Ajustar Desconto Global</h4>
+            <p style="color: #6c757d; font-size: 0.9rem; margin-bottom: 15px;">
+                O desconto será aplicado sobre o preço original (R$ ${originalTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}). 
+                Valores são globais, não cumulativos.
+            </p>
             <div class="form-group">
                 <label>Tipo de Desconto</label>
                 <select id="discountType" class="form-control" onchange="calculateNewTotal(${originalTotal})">
@@ -825,6 +851,13 @@ async function editQuote(quoteId) {
             <div class="form-group">
                 <label>Valor do Desconto</label>
                 <input type="number" id="discountValue" class="form-control" min="0" step="0.01" value="${discountValue}" oninput="calculateNewTotal(${originalTotal})">
+                <small class="form-help">
+                    <span id="discountAmountDisplay" style="color: #dc3545; font-weight: 500;">
+                        ${discountType === 'percentage' && discountValue > 0 ? 
+                            `R$ ${((originalTotal * discountValue) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 
+                            ''}
+                    </span>
+                </small>
             </div>
             <div class="form-group">
                 <label>Motivo do Desconto</label>
@@ -1397,7 +1430,7 @@ function showQuoteDetailsModal(quote) {
                   <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Data da Proposta:</strong> <span id="quote-details-created-date">${createdDate}</span></p>
                   <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Período de Filmagem:</strong> <span id="quote-details-shooting-dates">${shootingStart} – ${shootingEnd}</span></p>
                   <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Duração:</strong> <span id="quote-details-days-count">${daysCount}</span> dia(s)</p>
-                  <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Numero do orçamento:</strong> <span id="quote-details-proposal-id">${proposalId}</span></p>
+                  <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Numero do orçamento:</strong> <span id="quote-details-proposal-id">${proposalId.substring(0, 8)}</span></p>
                 </div>
               </div>
             </div>
@@ -1410,7 +1443,6 @@ function showQuoteDetailsModal(quote) {
                   <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Dimensões:</strong> <span id="led-principal-dimensions">${ledPWidth}</span>&nbsp;m × <span id="led-principal-height">${ledPHeight}</span>&nbsp;m</p>
                   <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Curvatura:</strong> <span id="led-principal-curvature">${ledPCurvature}</span>°</p>
                   <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Módulos:</strong> <span id="led-principal-modules">${formatNumberHelper(ledPModules)}</span></p>
-                  <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Resolução:</strong> <span id="led-principal-resolution">${ledPResolution}</span></p>
                   <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Pixels (L×A):</strong> <span id="led-principal-pixels-wh">${formatNumberHelper(ledPPixelsW)}</span> × <span id="led-principal-pixels-h">${formatNumberHelper(ledPPixelsH)}</span> (<span id="led-principal-total-pixels">${ledPTotalPixels}</span> total)</p>
                   <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Potência Máx./Média:</strong> <span id="led-principal-power">${ledPPowerMax}</span> / <span id="led-principal-power-avg">${ledPPowerAvg}</span></p>
                   <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Peso:</strong> <span id="led-principal-weight">${ledPWeight}</span></p>
@@ -1421,7 +1453,6 @@ function showQuoteDetailsModal(quote) {
                   <h4 style="margin-top: 0; margin-bottom: 15px; font-size: 1.1rem; color: #495057;">LED Teto</h4>
                   <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Dimensões:</strong> <span id="led-teto-dimensions">${ledTWidth}</span>&nbsp;m × <span id="led-teto-height">${ledTHeight}</span>&nbsp;m</p>
                   <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Módulos:</strong> <span id="led-teto-modules">${formatNumberHelper(ledTModules)}</span></p>
-                  <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Resolução:</strong> <span id="led-teto-resolution">${ledTResolution}</span></p>
                   <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Pixels (L×A):</strong> <span id="led-teto-pixels-wh">${formatNumberHelper(ledTPixelsW)}</span> × <span id="led-teto-pixels-h">${formatNumberHelper(ledTPixelsH)}</span> (<span id="led-teto-total-pixels">${ledTTotalPixels}</span> total)</p>
                   <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Potência Máx./Média:</strong> <span id="led-teto-power">${ledTPowerMax}</span> / <span id="led-teto-power-avg">${ledTPowerAvg}</span></p>
                   <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Peso:</strong> <span id="led-teto-weight">${ledTWeight}</span></p>
@@ -1450,7 +1481,7 @@ function showQuoteDetailsModal(quote) {
             </div>
 
             <!-- DISCOUNT INFORMATION SECTION -->
-            ${(quote.total_discount_percentage && quote.total_discount_percentage > 0) ? `
+            ${(quote.discount_percentage && quote.discount_percentage > 0) ? `
             <div class="section" style="margin-bottom: 25px;">
               <div class="card" style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                 <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 1.2rem; color: #856404;"><i class="fas fa-tag"></i> Desconto Aplicado</h3>
@@ -1461,27 +1492,51 @@ function showQuoteDetailsModal(quote) {
                   </div>
                   <div>
                     <strong>Desconto:</strong><br>
-                    <span style="font-size: 1.1rem; color: #dc3545;">${quote.total_discount_percentage.toFixed(1)}% (${formatCurrencyHelper(quote.total_discount_amount)})</span>
+                    <span style="font-size: 1.1rem; color: #dc3545;">${quote.discount_percentage.toFixed(1)}% (${formatCurrencyHelper((parseFloat(quote.original_total_price) * quote.discount_percentage) / 100)})</span>
                   </div>
                   <div>
                     <strong>Preço Final:</strong><br>
                     <span style="font-size: 1.1rem; color: #28a745; font-weight: bold;">${totalPrice}</span>
                   </div>
                 </div>
-                ${quote.discount_reason ? `
                 <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ffeaa7;">
                   <strong>Motivo do Desconto:</strong><br>
-                  <span style="color: #856404;">${quote.discount_reason}</span>
+                  <span style="color: #856404;">Desconto progressivo por ${daysCount} dias de locação</span>
                 </div>
-                ` : ''}
               </div>
             </div>
             ` : ''}
 
             <div class="section" style="margin-bottom: 25px;">
               <div class="total-line" style="display: flex; justify-content: flex-end; align-items: center; padding-top: 15px; border-top: 1px solid #dee2e6; font-size: 1.2rem; font-weight: bold; color: #343a40;">
-                <span style="margin-right: 15px;">Total ${(quote.total_discount_percentage && quote.total_discount_percentage > 0) ? 'com Desconto' : 'Estimado'} (${daysCount} ${daysCount > 1 ? 'dias' : 'dia'}):</span>
-                <span id="quote-details-total-price" style="color: ${(quote.total_discount_percentage && quote.total_discount_percentage > 0) ? '#28a745' : '#343a40'};">${totalPrice}</span>
+                <span style="margin-right: 15px;">Total ${(quote.discount_percentage && quote.discount_percentage > 0) ? 'com Desconto' : 'Estimado'} (${daysCount} ${daysCount > 1 ? 'dias' : 'dia'}):</span>
+                <span id="quote-details-total-price" style="color: ${(quote.discount_percentage && quote.discount_percentage > 0) ? '#28a745' : '#343a40'};">${totalPrice}</span>
+              </div>
+            </div>
+
+            <!-- Link da Proposta Section -->
+            <div class="section" style="margin-bottom: 25px;">
+              <div class="card" style="background-color: #e7f3ff; border: 1px solid #b3d7ff; border-radius: 6px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 1.2rem; color: #0056b3;"><i class="fas fa-link"></i> Link da Proposta</h3>
+                <p style="margin: 5px 0 10px 0; font-size: 0.9rem; color: #495057;">Compartilhe este link com o cliente para visualização e aprovação:</p>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                  <input type="text" id="quote-url-input" value="Gerando link..." readonly 
+                         style="flex: 1; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; background-color: #f8f9fa; font-family: monospace; font-size: 0.85rem;">
+                  <button id="copy-url-btn" onclick="copyQuoteUrl()" 
+                          style="background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">
+                    <i class="fas fa-copy"></i> Copiar
+                  </button>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                  <button onclick="openQuoteUrl()" 
+                          style="background-color: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">
+                    <i class="fas fa-external-link-alt"></i> Abrir Link
+                  </button>
+                  <button onclick="sendQuoteWhatsApp('${clientPhone}', '${quote.id}')" 
+                          style="background-color: #25d366; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -1511,6 +1566,107 @@ function showQuoteDetailsModal(quote) {
             document.body.style.overflow = '';
         }
     });
+
+    // Load the quote URL
+    loadQuoteUrl(quote.id);
+}
+
+// Functions for quote URL handling
+let currentQuoteUrl = '';
+
+async function loadQuoteUrl(quoteId) {
+    try {
+        // First try to generate/get the slug
+        const response = await fetch(`/api/proposals/${quoteId}/generate-slug`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const baseUrl = window.location.origin;
+            currentQuoteUrl = `${baseUrl}/quote/${data.slug}`;
+            
+            const urlInput = document.getElementById('quote-url-input');
+            if (urlInput) {
+                urlInput.value = currentQuoteUrl;
+            }
+        } else {
+            console.error('Failed to generate quote URL');
+            const urlInput = document.getElementById('quote-url-input');
+            if (urlInput) {
+                urlInput.value = 'Erro ao gerar link';
+            }
+        }
+    } catch (error) {
+        console.error('Error loading quote URL:', error);
+        const urlInput = document.getElementById('quote-url-input');
+        if (urlInput) {
+            urlInput.value = 'Erro ao gerar link';
+        }
+    }
+}
+
+async function copyQuoteUrl() {
+    const urlInput = document.getElementById('quote-url-input');
+    const copyBtn = document.getElementById('copy-url-btn');
+    
+    if (!urlInput || !urlInput.value || urlInput.value.includes('Erro') || urlInput.value.includes('Gerando')) {
+        showToast('Link não disponível', 'error');
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(urlInput.value);
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+        copyBtn.style.backgroundColor = '#28a745';
+        
+        setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+            copyBtn.style.backgroundColor = '#28a745';
+        }, 2000);
+        
+        showToast('Link copiado para a área de transferência!', 'success');
+    } catch (error) {
+        console.error('Error copying to clipboard:', error);
+        // Fallback for older browsers
+        urlInput.select();
+        document.execCommand('copy');
+        showToast('Link copiado!', 'success');
+    }
+}
+
+function openQuoteUrl() {
+    if (!currentQuoteUrl || currentQuoteUrl.includes('Erro') || currentQuoteUrl.includes('Gerando')) {
+        showToast('Link não disponível', 'error');
+        return;
+    }
+    window.open(currentQuoteUrl, '_blank');
+}
+
+function sendQuoteWhatsApp(clientPhone, quoteId) {
+    if (!currentQuoteUrl || currentQuoteUrl.includes('Erro') || currentQuoteUrl.includes('Gerando')) {
+        showToast('Aguarde o carregamento do link', 'warning');
+        return;
+    }
+
+    if (!clientPhone) {
+        showToast('Telefone do cliente não disponível', 'error');
+        return;
+    }
+
+    // Clean phone number (remove non-digits)
+    const cleanPhone = clientPhone.replace(/\D/g, '');
+    
+    // Create WhatsApp message
+    const message = `Olá! Sua proposta da ON+AV está pronta para visualização e aprovação. Acesse o link abaixo:\n\n${currentQuoteUrl}\n\nQualquer dúvida, estamos à disposição!`;
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/55${cleanPhone}?text=${encodedMessage}`;
+    
+    window.open(whatsappUrl, '_blank');
 }
 
 // Product Management
@@ -2288,6 +2444,9 @@ async function loadUsersPage() {
                             <i class="fas fa-search"></i>
                             <input type="text" placeholder="Buscar usuários..." id="searchUsers">
                         </div>
+                        <button class="btn btn-secondary" id="syncPhoneBtn" style="margin-right: 10px;">
+                            <i class="fas fa-sync"></i> Sincronizar Telefones
+                        </button>
                         <button class="btn btn-primary" id="addUserBtn">
                             <i class="fas fa-plus"></i> Novo Usuário
                         </button>
@@ -2317,6 +2476,9 @@ async function loadUsersPage() {
         
         document.getElementById("addUserBtn").addEventListener("click", () => 
             openUserModal());
+        
+        document.getElementById("syncPhoneBtn").addEventListener("click", () => 
+            syncPhoneNumbers());
         
         // Add event listeners for user action buttons
         const tableBody = document.getElementById("usersTableBody");
@@ -2633,6 +2795,180 @@ async function toggleUserStatus(userId) {
     } catch (error) {
         console.error("Error toggling user status:", error);
         showToast(`Erro ao alterar status do usuário: ${error.message}`, "error");
+    }
+}
+
+async function syncPhoneNumbers() {
+    try {
+        // Show loading state
+        const syncBtn = document.getElementById("syncPhoneBtn");
+        const originalText = syncBtn.innerHTML;
+        syncBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sincronizando...';
+        syncBtn.disabled = true;
+        
+        // Call the sync endpoint
+        const response = await fetch('/api/users/sync-phone-numbers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to sync phone numbers');
+        }
+        
+        // Show success message
+        let message = result.message;
+        if (result.errors && result.errors.length > 0) {
+            message += ` (${result.errors.length} erros encontrados)`;
+            console.warn('Sync errors:', result.errors);
+        }
+        
+        showToast(message, "success");
+        
+        // Reload the users page to show updated data
+        loadPage("users");
+        
+    } catch (error) {
+        console.error("Error syncing phone numbers:", error);
+        showToast(`Erro ao sincronizar telefones: ${error.message}`, "error");
+    } finally {
+        // Reset button state
+        const syncBtn = document.getElementById("syncPhoneBtn");
+        if (syncBtn) {
+            syncBtn.innerHTML = '<i class="fas fa-sync"></i> Sincronizar Telefones';
+            syncBtn.disabled = false;
+        }
+    }
+}
+
+// Global discount management functions for edit quote modal
+function calculateNewTotal(originalTotal) {
+    const discountType = document.getElementById('discountType')?.value;
+    const discountValue = parseFloat(document.getElementById('discountValue')?.value) || 0;
+    const newTotalElement = document.getElementById('newTotal');
+    
+    if (!newTotalElement) return;
+    
+    let newTotal = originalTotal;
+    
+    if (discountType === 'percentage') {
+        // Global percentage discount
+        const discountAmount = (originalTotal * discountValue) / 100;
+        newTotal = originalTotal - discountAmount;
+    } else if (discountType === 'fixed') {
+        // Fixed amount discount
+        newTotal = originalTotal - discountValue;
+    }
+    
+    // Ensure total doesn't go below zero
+    newTotal = Math.max(0, newTotal);
+    
+    // Update display
+    newTotalElement.textContent = `R$ ${newTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+    
+    // Update discount amount display if percentage
+    if (discountType === 'percentage') {
+        const discountAmountDisplay = document.getElementById('discountAmountDisplay');
+        if (discountAmountDisplay) {
+            const discountAmount = (originalTotal * discountValue) / 100;
+            discountAmountDisplay.textContent = `R$ ${discountAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+        }
+    }
+}
+
+async function saveQuoteChanges(event, quoteId, originalTotal) {
+    event.preventDefault();
+    
+    try {
+        const status = document.getElementById('quoteStatus')?.value;
+        const discountType = document.getElementById('discountType')?.value;
+        const discountValue = parseFloat(document.getElementById('discountValue')?.value) || 0;
+        const discountReason = document.getElementById('discountReason')?.value || '';
+        
+        let newTotalPrice = originalTotal;
+        let discountPercentage = 0;
+        let discountAmount = 0;
+        
+        if (discountValue > 0) {
+            if (discountType === 'percentage') {
+                // Global percentage discount
+                discountPercentage = discountValue;
+                discountAmount = (originalTotal * discountValue) / 100;
+                newTotalPrice = originalTotal - discountAmount;
+            } else if (discountType === 'fixed') {
+                // Fixed amount discount - convert to percentage for storage
+                discountAmount = discountValue;
+                discountPercentage = (discountValue / originalTotal) * 100;
+                newTotalPrice = originalTotal - discountValue;
+            }
+        }
+        
+        // Ensure total doesn't go below zero
+        newTotalPrice = Math.max(0, newTotalPrice);
+        
+        // Format the final price as currency string
+        const formattedFinalPrice = new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+            minimumFractionDigits: 2
+        }).format(newTotalPrice);
+        
+        // Update the proposal
+        const updateData = {
+            status: status,
+            discount_percentage: discountPercentage,
+            discount_amount: discountAmount,
+            total_price: formattedFinalPrice,
+            discount_reason: discountReason || `Desconto ${discountType === 'percentage' ? 'percentual' : 'fixo'} aplicado manualmente`,
+            last_modified_at: new Date().toISOString(),
+            last_modified_by: currentUser?.email || 'admin'
+        };
+        
+        const { error } = await supabase
+            .from('proposals')
+            .update(updateData)
+            .eq('id', quoteId);
+            
+        if (error) throw error;
+        
+        // Create history entry
+        const historyEntry = {
+            proposal_id: quoteId,
+            change_type: 'quote_updated',
+            old_total_price: null, // We could track the previous value if needed
+            new_total_price: formattedFinalPrice,
+            new_status: status,
+            new_discount_percentage: discountPercentage,
+            new_discount_amount: discountAmount,
+            discount_type: discountType,
+            discount_value: discountValue,
+            discount_reason: discountReason,
+            changed_by: currentUser?.email || 'admin',
+            change_description: `Orçamento atualizado: ${discountType === 'percentage' ? discountValue + '%' : 'R$ ' + discountValue} desconto aplicado`,
+            created_at: new Date().toISOString()
+        };
+        
+        const { error: historyError } = await supabase
+            .from('quote_history')
+            .insert([historyEntry]);
+            
+        if (historyError) {
+            console.warn('Failed to create history entry:', historyError);
+        }
+        
+        showToast('Orçamento atualizado com sucesso!', 'success');
+        closeModal('quoteEditModal');
+        
+        // Reload the current page to show updated data
+        loadPage(currentPage);
+        
+    } catch (error) {
+        console.error('Error saving quote changes:', error);
+        showToast('Erro ao salvar alterações: ' + error.message, 'error');
     }
 }
 

@@ -488,13 +488,45 @@ class QuoteCartModal {
         }
         // --- End Equipe Especializada Disguise ---
 
-        console.log(`[renderCart Debug] Calculated Daily Total Price (before multiplication): ${formatCurrency(dailyTotalPrice)}`);
+        console.log(`[renderCart Debug] Calculated Daily Total Price (before discount): ${formatCurrency(dailyTotalPrice)}`);
 
-        // --- Update Total Price ---
-        console.log(`[renderCart Debug] Multiplying Daily Total ${formatCurrency(dailyTotalPrice)} by ${numberOfDays} days.`);
-        const finalTotalPrice = dailyTotalPrice * numberOfDays;
-        // Use formatCurrency for the final total display
-        this.totalPriceElement.textContent = `${formatCurrency(finalTotalPrice)} (${numberOfDays} dia${numberOfDays > 1 ? 's' : ''})`; // Show total and days
+        // --- Apply Progressive Discount Based on Days ---
+        let finalTotalPrice;
+        let discountInfo = null;
+        
+        if (window.DiscountCalculator && numberOfDays > 0) {
+            // Apply discount calculation
+            discountInfo = window.DiscountCalculator.applyDayBasedDiscount(dailyTotalPrice, numberOfDays);
+            finalTotalPrice = discountInfo.finalPrice;
+            
+            console.log(`[renderCart Debug] Discount applied:`, discountInfo);
+            
+            // Update total price display with discount information
+            if (discountInfo.discountPercentage > 0) {
+                this.totalPriceElement.innerHTML = `
+                    <div>
+                        <span style="text-decoration: line-through; color: #999; font-size: 0.9em;">
+                            ${formatCurrency(dailyTotalPrice * numberOfDays)}
+                        </span>
+                        <br>
+                        <span style="color: #e74c3c; font-weight: bold;">
+                            ${formatCurrency(finalTotalPrice)} 
+                        </span>
+                        <span style="color: #27ae60; font-size: 0.9em;">
+                            (${discountInfo.discountPercentage}% desconto - ${numberOfDays} dia${numberOfDays > 1 ? 's' : ''})
+                        </span>
+                    </div>
+                `;
+            } else {
+                // No discount for 1 day
+                this.totalPriceElement.textContent = `${formatCurrency(finalTotalPrice)} (${numberOfDays} dia${numberOfDays > 1 ? 's' : ''})`;
+            }
+        } else {
+            // Fallback to original calculation if discount calculator not available
+            finalTotalPrice = dailyTotalPrice * numberOfDays;
+            this.totalPriceElement.textContent = `${formatCurrency(finalTotalPrice)} (${numberOfDays} dia${numberOfDays > 1 ? 's' : ''})`;
+            console.warn('[renderCart] Discount calculator not available, using original pricing');
+        }
 
         console.log(`[renderCart] Render complete. Daily Total: ${formatCurrency(dailyTotalPrice)}, Days: ${numberOfDays}, Final Total: ${formatCurrency(finalTotalPrice)}`);
     }
@@ -707,11 +739,31 @@ class QuoteCartModal {
             // --- Get Selected Pod Type ---
             const selectedPodType = document.querySelector('input[name="disguise-mode"]:checked')?.value || '2d';
             
-            // --- Get Daily Rate and Total Price ---
+            // --- Get Daily Rate and Total Price with Discount Information ---
             const dailyRate = getNumberById('total-price'); // Raw number
             const rawTotalPriceString = getValueOrTextById('cart-total-price') || '';
             const totalPriceMatch = rawTotalPriceString.match(/R\$\s?[\d.,]+/); 
             const totalPrice = totalPriceMatch ? totalPriceMatch[0] : 'R$ 0,00';
+            
+            // Calculate discount information for saving
+            let discountPercentage = 0;
+            let originalTotalPrice = dailyRate * daysCount;
+            let discountAmount = 0;
+            let finalTotalPrice = originalTotalPrice; // Default to original if no discount
+            
+            if (window.DiscountCalculator && daysCount > 1) {
+                const discountInfo = window.DiscountCalculator.applyDayBasedDiscount(dailyRate, daysCount);
+                discountPercentage = discountInfo.discountPercentage;
+                discountAmount = (originalTotalPrice - discountInfo.finalPrice);
+                finalTotalPrice = discountInfo.finalPrice; // Use the calculated final price
+                console.log(`[submitQuote] Discount info for saving:`, {
+                    days: daysCount,
+                    originalTotal: originalTotalPrice,
+                    discountPercentage: discountPercentage,
+                    discountAmount: discountAmount,
+                    finalPrice: discountInfo.finalPrice
+                });
+            }
 
             // --- Prepare Data for Supabase ---
             const proposalDataToSave = {
@@ -757,7 +809,12 @@ class QuoteCartModal {
                 selected_pod_type: selectedPodType,
                 selected_services: selectedServices, // Use the array built from the rendered cart
                 daily_rate: dailyRate,
-                total_price: totalPrice // Save the cleaned currency string
+                total_price: formatCurrency(finalTotalPrice), // Save the calculated final price as formatted currency
+                
+                // Discount information
+                discount_percentage: discountPercentage,
+                discount_amount: discountAmount,
+                original_total_price: originalTotalPrice
             };
 
             console.log('[QuoteCartModal] Data prepared for saving:', proposalDataToSave);

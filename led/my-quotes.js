@@ -152,6 +152,9 @@ function displayQuotes(quotes, container) {
     const shootingPeriod = (shootingStart !== '-' && shootingEnd !== '-') ? 
       `${shootingStart} a ${shootingEnd}` : '-';
     
+    // Use the stored total_price which should now be the final discounted price
+    const listFinalPrice = quote.total_price || 'R$ 0,00';
+    
     quoteCard.innerHTML = `
       <div class="quote-header">
         <h3>${quote.project_name || 'Sem título'}</h3>
@@ -163,7 +166,13 @@ function displayQuotes(quotes, container) {
           <p><strong>Duração:</strong> ${quote.days_count || 1} dia(s)</p>
         </div>
         <div class="quote-price">
-          <p class="price">${quote.total_price || 'R$ 0,00'}</p>
+          ${quote.discount_percentage > 0 ? `
+            <p style="text-decoration: line-through; color: #999; font-size: 0.8em; margin: 0;">${formatCurrency(quote.original_total_price)}</p>
+            <p class="price" style="color: #e74c3c; margin: 5px 0;">${listFinalPrice}</p>
+            <p style="color: #27ae60; font-size: 0.8em; margin: 0;">${quote.discount_percentage}% desconto</p>
+          ` : `
+            <p class="price">${listFinalPrice}</p>
+          `}
           <button class="view-details-btn" data-id="${quote.id}">Ver Detalhes</button>
         </div>
       </div>
@@ -324,6 +333,8 @@ async function showQuoteDetails(quote) {
   const shootingStart = formatDate(quote.shooting_dates_start);
   const shootingEnd = formatDate(quote.shooting_dates_end);
   const daysCount = quote.days_count || 1; 
+  
+  // Use the stored total_price which should now be the final discounted price  
   const totalPrice = quote.total_price || formatCurrency(dailySubtotalSum * daysCount); 
 
   // LED Principal Data (Updated to use extended data)
@@ -377,7 +388,7 @@ async function showQuoteDetails(quote) {
               <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Data da Proposta:</strong> <span id="quote-details-created-date">${createdDate}</span></p>
               <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Período de Filmagem:</strong> <span id="quote-details-shooting-dates">${shootingStart} – ${shootingEnd}</span></p>
               <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Duração:</strong> <span id="quote-details-days-count">${daysCount}</span> dia(s)</p>
-              <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Numero do orçamento:</strong> <span id="quote-details-proposal-id">${proposalId}</span></p>
+              <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Numero do orçamento:</strong> <span id="quote-details-proposal-id">${proposalId.substring(0, 8)}</span></p>
             </div>
           </div>
         </div>
@@ -390,7 +401,6 @@ async function showQuoteDetails(quote) {
               <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Dimensões:</strong> <span id="led-principal-dimensions">${ledPWidth}</span>&nbsp;m × <span id="led-principal-height">${ledPHeight}</span>&nbsp;m</p>
               <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Curvatura:</strong> <span id="led-principal-curvature">${ledPCurvature}</span>°</p>
               <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Módulos:</strong> <span id="led-principal-modules">${formatNumber(ledPModules)}</span></p>
-              <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Resolução:</strong> <span id="led-principal-resolution">${ledPResolution}</span></p>
               <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Pixels (L×A):</strong> <span id="led-principal-pixels-wh">${formatNumber(ledPPixelsW)}</span> × <span id="led-principal-pixels-h">${formatNumber(ledPPixelsH)}</span> (<span id="led-principal-total-pixels">${ledPTotalPixels}</span> total)</p>
               <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Potência Máx./Média:</strong> <span id="led-principal-power">${ledPPowerMax}</span> / <span id="led-principal-power-avg">${ledPPowerAvg}</span></p>
               <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Peso:</strong> <span id="led-principal-weight">${ledPWeight}</span></p>
@@ -401,7 +411,6 @@ async function showQuoteDetails(quote) {
               <h4 style="margin-top: 0; margin-bottom: 15px; font-size: 1.1rem; color: #495057;">LED Teto</h4>
               <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Dimensões:</strong> <span id="led-teto-dimensions">${ledTWidth}</span>&nbsp;m × <span id="led-teto-height">${ledTHeight}</span>&nbsp;m</p>
               <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Módulos:</strong> <span id="led-teto-modules">${formatNumber(ledTModules)}</span></p>
-              <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Resolução:</strong> <span id="led-teto-resolution">${ledTResolution}</span></p>
               <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Pixels (L×A):</strong> <span id="led-teto-pixels-wh">${formatNumber(ledTPixelsW)}</span> × <span id="led-teto-pixels-h">${formatNumber(ledTPixelsH)}</span> (<span id="led-teto-total-pixels">${ledTTotalPixels}</span> total)</p>
               <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Potência Máx./Média:</strong> <span id="led-teto-power">${ledTPowerMax}</span> / <span id="led-teto-power-avg">${ledTPowerAvg}</span></p>
               <p style="margin: 5px 0; font-size: 0.95rem; color: #6c757d;"><strong>Peso:</strong> <span id="led-teto-weight">${ledTWeight}</span></p>
@@ -431,7 +440,7 @@ async function showQuoteDetails(quote) {
         </div>
 
         <!-- DISCOUNT INFORMATION SECTION -->
-        ${quote.total_discount_percentage > 0 ? `
+        ${quote.discount_percentage > 0 ? `
         <div class="section" style="margin-bottom: 25px;">
           <div class="card" style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
             <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 1.2rem; color: #856404;"><i class="fas fa-tag"></i> Desconto Aplicado</h3>
@@ -442,19 +451,17 @@ async function showQuoteDetails(quote) {
               </div>
               <div>
                 <strong>Desconto:</strong><br>
-                <span style="font-size: 1.1rem; color: #dc3545;">${quote.total_discount_percentage.toFixed(1)}% (${formatCurrency(quote.total_discount_amount)})</span>
+                <span style="font-size: 1.1rem; color: #dc3545;">${quote.discount_percentage.toFixed(1)}% (${formatCurrency((parseFloat(quote.original_total_price) * quote.discount_percentage) / 100)})</span>
               </div>
               <div>
                 <strong>Preço Final:</strong><br>
                 <span style="font-size: 1.1rem; color: #28a745; font-weight: bold;">${totalPrice}</span>
               </div>
             </div>
-            ${quote.discount_reason ? `
             <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ffeaa7;">
               <strong>Motivo do Desconto:</strong><br>
-              <span style="color: #856404;">${quote.discount_reason}</span>
+              <span style="color: #856404;">Desconto progressivo por ${daysCount} dias de locação</span>
             </div>
-            ` : ''}
           </div>
         </div>
         ` : ''}
@@ -462,8 +469,8 @@ async function showQuoteDetails(quote) {
         <!-- UPDATED TOTAL DISPLAY -->
         <div class="section" style="margin-bottom: 25px;">
           <div class="total-line" style="display: flex; justify-content: flex-end; align-items: center; padding-top: 15px; border-top: 1px solid #dee2e6; font-size: 1.2rem; font-weight: bold; color: #343a40;">
-            <span style="margin-right: 15px;">Total ${quote.total_discount_percentage > 0 ? 'com Desconto' : 'Estimado'} (${daysCount} ${daysCount > 1 ? 'dias' : 'dia'}):</span>
-            <span id="quote-details-total-price" style="color: ${quote.total_discount_percentage > 0 ? '#28a745' : '#343a40'};">${totalPrice}</span>
+            <span style="margin-right: 15px;">Total ${quote.discount_percentage > 0 ? 'com Desconto' : 'Estimado'} (${daysCount} ${daysCount > 1 ? 'dias' : 'dia'}):</span>
+            <span id="quote-details-total-price" style="color: ${quote.discount_percentage > 0 ? '#28a745' : '#343a40'};">${totalPrice}</span>
           </div>
         </div>
 

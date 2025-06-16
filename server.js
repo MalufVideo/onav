@@ -656,6 +656,7 @@ app.put('/api/users/:id', async (req, res) => {
     if (phone !== undefined) updateData.phone = phone;
     updateData.updated_at = new Date().toISOString();
 
+    // Update user profile table
     const { data, error } = await supabase
       .from('user_profiles')
       .update(updateData)
@@ -664,10 +665,108 @@ app.put('/api/users/:id', async (req, res) => {
       .single();
 
     if (error) throw error;
+
+    // If phone number was updated, also update auth metadata and existing quotes
+    if (phone !== undefined && supabaseServiceKey) {
+      try {
+        // Update Supabase Auth user metadata
+        const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(id, {
+          user_metadata: {
+            phone: phone
+          }
+        });
+
+        if (authError) {
+          console.warn('Failed to update auth metadata for user:', id, authError.message);
+        }
+
+        // Update existing quotes with new phone number
+        const { error: quotesError } = await supabase
+          .from('proposals')
+          .update({ client_phone: phone })
+          .eq('user_id', id);
+
+        if (quotesError) {
+          console.warn('Failed to update quotes phone number for user:', id, quotesError.message);
+        }
+
+        console.log(`Successfully synced phone number ${phone} for user ${id} across all systems`);
+      } catch (syncError) {
+        console.warn('Error syncing phone number:', syncError.message);
+        // Don't fail the main update if sync fails
+      }
+    }
+
     res.json(data);
   } catch (error) {
     console.error('Error updating user:', error.message);
     res.status(500).json({ error: 'Failed to update user', details: error.message });
+  }
+});
+
+// Sync phone numbers between user profiles and auth metadata (admin only)
+app.post('/api/users/sync-phone-numbers', async (req, res) => {
+  try {
+    if (!supabaseServiceKey) {
+      return res.status(500).json({ error: 'Service role key required for this operation' });
+    }
+
+    // Get all user profiles with phone numbers
+    const { data: profiles, error: profilesError } = await supabase
+      .from('user_profiles')
+      .select('id, phone, email')
+      .not('phone', 'is', null)
+      .neq('phone', '');
+
+    if (profilesError) throw profilesError;
+
+    let syncedCount = 0;
+    let errors = [];
+
+    for (const profile of profiles) {
+      try {
+        // Update auth metadata
+        const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(profile.id, {
+          user_metadata: {
+            phone: profile.phone
+          }
+        });
+
+        if (authError) {
+          errors.push(`Failed to update auth metadata for ${profile.email}: ${authError.message}`);
+          continue;
+        }
+
+        // Update existing quotes
+        const { error: quotesError } = await supabase
+          .from('proposals')
+          .update({ client_phone: profile.phone })
+          .eq('user_id', profile.id);
+
+        if (quotesError) {
+          errors.push(`Failed to update quotes for ${profile.email}: ${quotesError.message}`);
+          continue;
+        }
+
+        syncedCount++;
+        console.log(`Synced phone number for user: ${profile.email} (${profile.phone})`);
+
+      } catch (error) {
+        errors.push(`Error syncing ${profile.email}: ${error.message}`);
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Synced phone numbers for ${syncedCount} users`,
+      totalUsers: profiles.length,
+      syncedCount,
+      errors: errors.length > 0 ? errors : undefined
+    });
+
+  } catch (error) {
+    console.error('Error syncing phone numbers:', error.message);
+    res.status(500).json({ error: 'Failed to sync phone numbers', details: error.message });
   }
 });
 
@@ -1627,6 +1726,191 @@ app.post('/api/send-email', async (req, res) => {
 });
 
 // --- End Email API Route ---
+
+// --- Public Quote API Routes ---
+
+// Serve public quote page
+app.get('/quote/:slug', (req, res) => {
+  res.sendFile(path.join(__dirname, 'quote.html'));
+});
+
+// Get public quote data by slug
+app.get('/api/quotes/public/:slug', async (req, res) => {
+  try {
+    const { slug } = req.params;
+    
+    if (!slug) {
+      return res.status(400).json({ error: 'Quote slug is required' });
+    }
+
+    // Get quote by slug
+    const { data: quote, error } = await supabase
+      .from('proposals')
+      .select('*')
+      .eq('quote_url_slug', slug)
+      .single();
+
+    if (error) {
+      console.error('Error fetching quote:', error);
+      return res.status(404).json({ error: 'Quote not found' });
+    }
+
+    if (!quote) {
+      return res.status(404).json({ error: 'Quote not found' });
+    }
+
+    // Remove sensitive fields before sending to client
+    const publicQuote = {
+      id: quote.id,
+      project_name: quote.project_name,
+      client_name: quote.client_name,
+      client_company: quote.client_company,
+      client_email: quote.client_email,
+      client_phone: quote.client_phone,
+      created_at: quote.created_at,
+      shooting_dates_start: quote.shooting_dates_start,
+      shooting_dates_end: quote.shooting_dates_end,
+      days_count: quote.days_count,
+      status: quote.status,
+      led_principal_width: quote.led_principal_width,
+      led_principal_height: quote.led_principal_height,
+      led_principal_curvature: quote.led_principal_curvature,
+      led_principal_modules: quote.led_principal_modules,
+      led_teto_width: quote.led_teto_width,
+      led_teto_height: quote.led_teto_height,
+      led_teto_modules: quote.led_teto_modules,
+      selected_services: quote.selected_services,
+      total_price: quote.total_price,
+      original_total_price: quote.original_total_price,
+      discount_percentage: quote.discount_percentage,
+      discount_amount: quote.discount_amount,
+      discount_reason: quote.discount_reason,
+      quote_approved: quote.quote_approved,
+      quote_approved_at: quote.quote_approved_at
+    };
+
+    res.json({ quote: publicQuote });
+
+  } catch (error) {
+    console.error('Error in public quote endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Approve quote by slug
+app.post('/api/quotes/approve/:slug', async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+    
+    if (!slug) {
+      return res.status(400).json({ error: 'Quote slug is required' });
+    }
+
+    // First, check if quote exists and is not already approved
+    const { data: existingQuote, error: fetchError } = await supabase
+      .from('proposals')
+      .select('id, quote_approved, project_name, client_email')
+      .eq('quote_url_slug', slug)
+      .single();
+
+    if (fetchError || !existingQuote) {
+      return res.status(404).json({ error: 'Quote not found' });
+    }
+
+    if (existingQuote.quote_approved) {
+      return res.status(400).json({ error: 'Quote has already been approved' });
+    }
+
+    // Update quote with approval
+    const approvedAt = new Date().toISOString();
+    const { error: updateError } = await supabase
+      .from('proposals')
+      .update({
+        quote_approved: true,
+        quote_approved_at: approvedAt,
+        quote_approval_ip: clientIP,
+        status: 'approved'
+      })
+      .eq('quote_url_slug', slug);
+
+    if (updateError) {
+      console.error('Error updating quote approval:', updateError);
+      return res.status(500).json({ error: 'Failed to approve quote' });
+    }
+
+    // TODO: Send approval notification email to admin/sales team
+    console.log(`Quote approved: ${existingQuote.project_name} by client at ${clientIP}`);
+
+    res.json({ 
+      success: true, 
+      message: 'Quote approved successfully',
+      approvedAt: approvedAt
+    });
+
+  } catch (error) {
+    console.error('Error in quote approval endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Generate URL slug for a proposal
+app.post('/api/proposals/:id/generate-slug', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    if (!id) {
+      return res.status(400).json({ error: 'Proposal ID is required' });
+    }
+
+    // Get current proposal
+    const { data: proposal, error: fetchError } = await supabase
+      .from('proposals')
+      .select('project_name, quote_url_slug')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !proposal) {
+      return res.status(404).json({ error: 'Proposal not found' });
+    }
+
+    // If already has a slug, return it
+    if (proposal.quote_url_slug) {
+      return res.json({ slug: proposal.quote_url_slug });
+    }
+
+    // Generate slug using the database function
+    const { data: slugResult, error: slugError } = await supabase
+      .rpc('generate_url_slug', {
+        project_name: proposal.project_name,
+        proposal_id: id
+      });
+
+    if (slugError) {
+      console.error('Error generating slug:', slugError);
+      return res.status(500).json({ error: 'Failed to generate URL slug' });
+    }
+
+    // Update proposal with the generated slug
+    const { error: updateError } = await supabase
+      .from('proposals')
+      .update({ quote_url_slug: slugResult })
+      .eq('id', id);
+
+    if (updateError) {
+      console.error('Error updating proposal with slug:', updateError);
+      return res.status(500).json({ error: 'Failed to update proposal with slug' });
+    }
+
+    res.json({ slug: slugResult });
+
+  } catch (error) {
+    console.error('Error in generate slug endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// --- End Public Quote API Routes ---
 
 // --- End User and Lead Management Routes ---
 
