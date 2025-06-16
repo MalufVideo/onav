@@ -198,12 +198,21 @@
         }
         /* Custom select dropdown arrow */
         select {
-           appearance: none; /* Remove default arrow */
-           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2300ff9d' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E"); /* Custom SVG arrow (primary color) */
-           background-position: right 0.5rem center;
-           background-repeat: no-repeat;
-           background-size: 1.5em 1.5em;
-           padding-right: 2.5rem; /* Space for the arrow */
+           -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-color: #000000;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2300ff9d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1em;
+            padding-right: 2.5rem;
+        }
+        
+        /* Style the dropdown options */
+        select option {
+            background-color: #000000;
+            color: #ffffff;
         }
 
         /* Navigation bar background adjusted for blobs */
@@ -992,7 +1001,7 @@
                 </div>
 
                 <div class="lg:w-1/2">
-                    <form class="glass-card rounded-xl p-8 border border-gray-700">
+                    <form class="glass-card rounded-xl p-8 border border-gray-700" method="POST" action="/api/send-email">
                         <h3 class="text-2xl font-semibold mb-6 text-center text-light-text">Envie sua Mensagem</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
@@ -1047,7 +1056,7 @@
             <button id="closeOrcamentoModal" class="absolute top-3 right-3 text-primary text-2xl hover:text-green-400 focus:outline-none" aria-label="Fechar Modal">&times;</button>
             <h2 class="text-2xl font-bold mb-6 text-primary" style="color: #00ff9d;">Simular Orçamento</h2>
             <div class="flex flex-col w-full gap-4">
-                <a href="led/index.html" class="w-full">
+                <a href="auth.html" class="w-full">
                     <button class="producao-virtual-btn w-full py-3 rounded-lg border-2 border-primary bg-black text-primary font-semibold text-lg transition-all duration-200 hover:bg-primary" style="border-color: #00ff9d; color: #00ff9d;">Produção Virtual</button>
                 </a>
                 <button class="w-full py-3 rounded-lg border-2 border-gray-700 bg-gray-900 text-gray-500 font-semibold text-lg cursor-not-allowed opacity-60" disabled>xR</button>
@@ -2094,5 +2103,51 @@
         </div>
     </footer>
 
+<script>
+     document.addEventListener('DOMContentLoaded', function () {
+       const contactForm = document.querySelector('#contact form.glass-card');
+       if (contactForm) {
+         contactForm.addEventListener('submit', async function (event) {
+           event.preventDefault(); // Prevent default form submission
+
+           const submitButton = contactForm.querySelector('button[type="submit"]');
+           const originalButtonText = submitButton.innerHTML;
+           submitButton.innerHTML = 'Enviando...';
+           submitButton.disabled = true;
+
+           const formData = new FormData(contactForm);
+           const formObject = {};
+           formData.forEach((value, key) => {
+             formObject[key] = value;
+           });
+
+           try {
+             const response = await fetch('/api/send-email', { // Matches your form's action attribute
+               method: 'POST',
+               headers: {
+                 'Content-Type': 'application/json',
+               },
+               body: JSON.stringify(formObject),
+             });
+
+             const result = await response.json();
+
+             if (response.ok) {
+               alert('Mensagem enviada com sucesso!'); // Or update a div with the message
+               contactForm.reset(); // Clear the form
+             } else {
+               alert('Erro ao enviar mensagem: ' + (result.details || result.message || 'Por favor, tente novamente.'));
+             }
+           } catch (error) {
+             console.error('Fetch Error:', error);
+             alert('Ocorreu um erro ao enviar sua mensagem. Verifique sua conexão e tente novamente.');
+           } finally {
+             submitButton.innerHTML = originalButtonText;
+             submitButton.disabled = false;
+           }
+         });
+       }
+     });
+   </script>
 </body>
 </html>

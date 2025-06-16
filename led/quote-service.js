@@ -97,6 +97,31 @@ async function saveQuote(quoteData) {
     }
     
     // console.log('Proposal saved successfully:', data);
+    
+    // Generate URL slug for the new proposal
+    if (data && data[0] && data[0].id) {
+      try {
+        const slugResponse = await fetch(`/api/proposals/${data[0].id}/generate-slug`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (slugResponse.ok) {
+          const slugData = await slugResponse.json();
+          console.log('URL slug generated:', slugData.slug);
+          // Add slug to the returned data
+          data[0].quote_url_slug = slugData.slug;
+        } else {
+          console.warn('Failed to generate URL slug for new proposal');
+        }
+      } catch (slugError) {
+        console.warn('Error generating URL slug:', slugError);
+        // Don't fail the quote creation if slug generation fails
+      }
+    }
+    
     return { data, error: null };
     
   } catch (error) {

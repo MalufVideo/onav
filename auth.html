@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - On + Av</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020202;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 157, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 85% 80%, rgba(0, 102, 255, 0.12) 0%, transparent 45%);
+            color: #e0e0e0;
+        }
+        .glass-card {
+            background: rgba(10, 10, 10, 0.65);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+    <div class="glass-card rounded-xl p-8 w-full max-w-md">
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-white mb-2">Entrar</h1>
+            <p class="text-gray-400">Acesse sua conta On + Av</p>
+        </div>
+        
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-300 mb-2">
+                    Email
+                </label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    required 
+                    class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 text-white"
+                    placeholder="seu@email.com"
+                >
+            </div>
+            
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-300 mb-2">
+                    Senha
+                </label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    required 
+                    class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500 text-white"
+                    placeholder="Sua senha"
+                >
+            </div>
+            
+            <button 
+                type="submit" 
+                id="loginBtn"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+            >
+                Entrar
+            </button>
+        </form>
+        
+        <div id="message" class="mt-4 text-center text-sm hidden"></div>
+        
+        <div class="mt-6 text-center">
+            <p class="text-gray-400 text-sm">
+                Não tem conta? 
+                <a href="/led/signup.html" class="text-blue-400 hover:text-blue-300">Cadastre-se</a>
+            </p>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <a href="/" class="text-gray-400 hover:text-gray-300 text-sm">
+                ← Voltar ao site
+            </a>
+        </div>
+    </div>
+
+    <!-- Load Auth System -->
+    <script src="/led/auth-config.js"></script>
+    <script src="/led/auth.js"></script>
+    
+    <script>
+        let isSubmitting = false;
+        
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (isSubmitting) return;
+            isSubmitting = true;
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const messageDiv = document.getElementById('message');
+            
+            // Update button state
+            loginBtn.textContent = 'Entrando...';
+            loginBtn.disabled = true;
+            messageDiv.classList.add('hidden');
+            
+            try {
+                // Initialize auth if not already done
+                if (!window.auth.getCurrentUser()) {
+                    await window.auth.initAuth();
+                }
+                
+                // Sign in
+                const result = await window.auth.signIn(email, password);
+                
+                if (result.success) {
+                    messageDiv.textContent = 'Login realizado com sucesso! Redirecionando...';
+                    messageDiv.className = 'mt-4 text-center text-sm text-green-400';
+                    messageDiv.classList.remove('hidden');
+                    
+                    // Role-based redirect will happen automatically in auth.js
+                    // But we'll add a fallback timeout
+                    setTimeout(() => {
+                        const user = window.auth.getCurrentUser();
+                        if (user) {
+                            // Fallback redirect if auto-redirect doesn't work
+                            window.location.href = '/led/';
+                        }
+                    }, 2000);
+                } else {
+                    messageDiv.textContent = result.error || 'Erro ao fazer login';
+                    messageDiv.className = 'mt-4 text-center text-sm text-red-400';
+                    messageDiv.classList.remove('hidden');
+                }
+            } catch (error) {
+                messageDiv.textContent = 'Erro de conexão. Tente novamente.';
+                messageDiv.className = 'mt-4 text-center text-sm text-red-400';
+                messageDiv.classList.remove('hidden');
+            } finally {
+                // Reset button state
+                loginBtn.textContent = 'Entrar';
+                loginBtn.disabled = false;
+                isSubmitting = false;
+            }
+        });
+        
+        // Check if already logged in
+        window.addEventListener('load', async function() {
+            try {
+                await window.auth.initAuth();
+                const user = window.auth.getCurrentUser();
+                if (user) {
+                    // User is already logged in, redirect based on role
+                    window.auth.redirectBasedOnRole();
+                }
+            } catch (error) {
+                console.log('Not logged in or error checking auth status');
+            }
+        });
+    </script>
+</body>
+</html>

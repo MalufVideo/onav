@@ -156,6 +156,11 @@ async function signIn(email, password) {
       } catch (updateError) {
         console.warn('Error updating last login:', updateError);
       }
+      
+      // Auto-redirect based on role after successful login
+      setTimeout(() => {
+        redirectBasedOnRole();
+      }, 1000); // Small delay to ensure auth state is updated
     }
     
     return { success: true, user: data.user };
@@ -243,6 +248,33 @@ async function hasRole(role) {
   return profile?.role === role;
 }
 
+// Role-based redirect after login
+async function redirectBasedOnRole() {
+  if (!currentUser) return;
+  
+  try {
+    const profile = await getUserProfile();
+    const userRole = profile?.role || 'end_user';
+    
+    // Check for master admin emails
+    const masterAdminEmails = [
+      'nelson.maluf@onprojecoes.com.br',
+      'nelson@avdesign.video'
+    ];
+    
+    if (masterAdminEmails.includes(currentUser.email) || userRole === 'admin' || userRole === 'sales_rep') {
+      // Redirect to dashboard for admin/sales rep
+      window.location.href = '/admin/dashboard.html';
+    } else {
+      // Stay in calculator for end users/clients
+      console.log('End user - staying in calculator');
+    }
+  } catch (error) {
+    console.error('Error checking user role for redirect:', error);
+    // Default to calculator on error
+  }
+}
+
 // Export auth functions
 window.auth = {
   initAuth,
@@ -254,5 +286,6 @@ window.auth = {
   onAuthStateChange,
   getSupabaseClient,
   getUserProfile,
-  hasRole
+  hasRole,
+  redirectBasedOnRole
 };

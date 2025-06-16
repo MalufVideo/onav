@@ -3,125 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criação de Conteúdo AV | On + Av</title>
+    <title>Criação de Conteúdo Imersivo | On + Av</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, #00ff9d 0%, #0066ff 50%, #9370db 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #00ff9d;
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 255, 157, 0.1);
+        }
+        
+        .neon-glow {
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+        }
+        
+        .floating-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .parallax-bg {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+    </style>
     <script>
-        // Tailwind CSS configuration (Consistent with other pages)
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         primary: '#00ff9d',
                         secondary: '#0066ff',
-                        purpleish: '#9370DB',
+                        accent: '#9370db',
                         dark: '#0a0a0a',
-                        darker: '#020202',
-                        'light-text': '#e0e0e0',
-                        'medium-text': '#a0a0a0',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['Fira Code', 'monospace'],
-                    },
-                    animation: {
-                        'subtle-float': 'subtle-float 6s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        'subtle-float': {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-8px)' },
-                        }
                     }
                 }
             }
         }
     </script>
-    <style>
-        /* Import Google Fonts */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400&display=swap');
-
-        /* Base body styles with Blob Background */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #020202;
-            background-image:
-                radial-gradient(circle at 10% 20%, rgba(0, 255, 157, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 85% 80%, rgba(0, 102, 255, 0.12) 0%, transparent 45%),
-                radial-gradient(circle at 90% 30%, rgba(0, 255, 157, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 20% 70%, rgba(0, 102, 255, 0.1) 0%, transparent 55%),
-                radial-gradient(circle at 15% 90%, rgba(147, 112, 219, 0.20) 0%, transparent 60%);
-            background-attachment: fixed;
-            color: #e0e0e0;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
-        }
-
-        /* Utilities */
-        .gradient-text { background: linear-gradient(90deg, #00ff9d, #0066ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .glow-text-primary { text-shadow: 0 0 12px rgba(0, 255, 157, 0.6); }
-        .glow-box-primary { box-shadow: 0 0 25px rgba(0, 255, 157, 0.25); }
-        .glow-text-secondary { text-shadow: 0 0 12px rgba(0, 102, 255, 0.6); }
-        .glow-box-secondary { box-shadow: 0 0 25px rgba(0, 102, 255, 0.25); }
-
-        /* Card Styles */
-        .content-section, .service-card {
-            background: rgba(15, 15, 15, 0.65); /* Unified card background */
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease-in-out; /* Added transform back for cards */
-        }
-         .content-section:hover, .service-card:hover {
-            border-color: rgba(0, 255, 157, 0.6);
-            transform: translateY(-5px);
-         }
-         /* Keep static sections non-transformable on hover */
-         #synergy-section:hover {
-             transform: none;
-             border-color: #00ff9d;
-         }
-
-        /* Button Styles */
-        .btn-primary, .btn-secondary { transition: all 0.3s ease; border-radius: 0.375rem; padding: 0.5rem 1.5rem; font-size: 0.875rem; font-weight: 500; display: inline-block; }
-        .btn-primary { background: linear-gradient(90deg, #00ff9d, #0066ff); color: #050505; }
-        .btn-primary:hover { opacity: 0.9; box-shadow: 0 5px 15px rgba(0, 255, 157, 0.3); transform: translateY(-2px); }
-        .btn-secondary { border: 2px solid #00ff9d; color: #00ff9d; }
-        .btn-secondary:hover { background-color: rgba(0, 255, 157, 0.1); transform: translateY(-2px); }
-
-        /* Nav and Footer */
-        nav.fixed { background-color: rgba(2, 2, 2, 0.8); }
-        footer { background-color: #050505; }
-
-        /* List Styling */
-        .styled-list li { display: flex; align-items: flex-start; margin-bottom: 0.5rem; }
-        .styled-list li i { color: #00ff9d; margin-right: 0.75rem; margin-top: 0.25rem; flex-shrink: 0; }
-
-    </style>
 </head>
 <body class="antialiased">
+    <!-- Navigation -->
     <nav class="fixed w-full bg-opacity-90 backdrop-blur-md z-50 border-b border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
                 <div class="flex items-center">
-                    <a href="index.html" class="flex-shrink-0 flex items-center"> <img src="img/on+av_logo_v2.png" alt="On + Av Logo" style="height:40px;" onerror="this.onerror=null; this.alt='On + Av'; this.src='https://placehold.co/120x40/020202/00ff9d?text=On%2BAv';">
+                    <a href="index.html" class="flex-shrink-0 flex items-center">
+                        <img src="img/on+av_logo_v2.png" alt="On + Av Logo" style="height:40px;" onerror="this.onerror=null; this.alt='On + Av'; this.src='https://placehold.co/120x40/020202/00ff9d?text=On%2BAv';">
                     </a>
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-center space-x-6 lg:space-x-8">
-                         <a href="index.html#services" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Serviços</a>
+                        <a href="index.html#services" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Serviços</a>
                         <a href="index.html#industries" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Indústrias</a>
                         <a href="index.html#expertise" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Expertise</a>
                         <a href="index.html#cases" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Cases</a>
                         <a href="index.html#about" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Quem Somos</a>
-                        <a href="#insights" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Insights</a> <a href="index.html#contact" class="btn-primary text-sm font-bold px-5 py-2 rounded-md hover:bg-opacity-90 transition-all duration-200">Contato</a>
+                        <a href="#insights" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Insights</a>
+                        <a href="index.html#contact" class="btn-primary text-sm font-bold px-5 py-2 rounded-md hover:bg-opacity-90 transition-all duration-200">Contato</a>
                     </div>
                 </div>
                 <div class="-mr-2 flex md:hidden">
                     <button type="button" class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none" aria-controls="mobile-menu" aria-expanded="false">
                         <span class="sr-only">Abrir menu principal</span>
-                        <i class="fas fa-bars text-xl"></i> </button>
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -138,244 +116,696 @@
         </div>
     </nav>
 
-    <main class="pt-24 pb-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-            <div class="text-center mb-16 mt-8" data-aos="fade-up">
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4">
-                    Criação de <span class="gradient-text">Conteúdo Visual</span>
-                </h1>
-                <p class="text-xl text-light-text max-w-3xl mx-auto">
-                    Desenvolvimento de conteúdo visual impactante e otimizado para LED, projeções, produção virtual e ambientes xR.
-                </p>
-            </div>
-
-             <section class="mb-16" data-aos="fade-up">
-                 <h2 class="text-3xl md:text-4xl font-bold text-center mb-10">Nossos <span class="gradient-text">Serviços de Conteúdo</span></h2>
-                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="service-card rounded-lg p-6 text-center">
-                        <div class="mb-4 text-primary text-4xl"><i class="fas fa-pencil-ruler"></i></div>
-                        <h3 class="text-xl font-semibold mb-2 text-light-text">Design e Animação 2D/3D</h3>
-                        <p class="text-medium-text text-sm">Criação de motion graphics, animações e elementos visuais sob medida para o seu projeto, desde conceitos iniciais até a entrega final otimizada.</p>
-                    </div>
-                    <div class="service-card rounded-lg p-6 text-center">
-                         <div class="mb-4 text-primary text-4xl"><i class="fas fa-cubes"></i></div>
-                        <h3 class="text-xl font-semibold mb-2 text-light-text">Desenvolvimento de Conteúdo 3D</h3>
-                        <p class="text-medium-text text-sm">Modelagem, texturização e animação de ambientes e objetos 3D fotorrealistas ou estilizados para produção virtual e projeção mapeada.</p>
-                    </div>
-                     <div class="service-card rounded-lg p-6 text-center">
-                         <div class="mb-4 text-primary text-4xl"><i class="fas fa-project-diagram"></i></div>
-                        <h3 class="text-xl font-semibold mb-2 text-light-text">Integração com Sistemas</h3>
-                        <p class="text-medium-text text-sm">Preparamos e otimizamos o conteúdo para integração perfeita com plataformas como Disguise, Unreal Engine e Notch, incluindo programação e controlo.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section id="synergy-section" class="mb-16 content-section rounded-xl p-8 md:p-12" data-aos="fade-up">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                    <div>
-                        <h2 class="text-3xl font-bold mb-4 text-primary glow-text-primary">Sinergia Tecnológica para Conteúdo de Ponta</h2>
-                        <p class="text-light-text mb-4 leading-relaxed">
-                            Dominamos a integração das ferramentas mais poderosas do mercado para criar conteúdo visual sem limites. Combinamos a robustez e o controle centralizado do <span class="font-semibold text-light-text">Disguise</span> com o poder de renderização fotorrealista em tempo real do <span class="font-semibold text-light-text">Unreal Engine</span> e a flexibilidade criativa para efeitos generativos e interativos do <span class="font-semibold text-light-text">Notch</span>.
-                        </p>
-                        <p class="text-medium-text mb-6 leading-relaxed">
-                           Esta sinergia permite-nos desenvolver desde ambientes virtuais imersivos e efeitos visuais cinematográficos (ICVFX) até visuais generativos que reagem à música ou ao movimento, tudo orquestrado com precisão pela plataforma Disguise.
-                        </p>
-                         <a href="producao-virtual-xr.html" class="btn-secondary mr-3">Saiba Mais sobre VP/xR</a>
-                         <a href="projecao-mapeada.html" class="btn-secondary">Saiba Mais sobre Mapeamento</a>
-                    </div>
-                    <div class="flex justify-center items-center">
-                         <img src="https://placehold.co/500x400/0a0a0a/00ff9d?text=Disguise+UE+Notch" alt="Logos Disguise, Unreal Engine e Notch" class="rounded-lg shadow-lg glow-box-primary w-full h-auto object-cover">
-                    </div>
-                </div>
-            </section>
-
-            <section class="mb-16" data-aos="fade-up">
-                <h2 class="text-3xl md:text-4xl font-bold text-center mb-10">Otimização e Pipeline <span class="gradient-text">Eficiente</span></h2>
-                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                    <div class="content-section rounded-lg p-8">
-                         <div class="flex items-center mb-4">
-                             <i class="fas fa-tachometer-alt text-secondary text-3xl mr-4"></i>
-                             <h3 class="text-2xl font-semibold text-secondary glow-text-secondary">Otimização de Performance</h3>
-                         </div>
-                        <p class="text-light-text mb-4 text-sm leading-relaxed">
-                            Criar conteúdo visualmente impressionante é apenas metade da batalha. Garantimos que cada asset seja meticulosamente otimizado para reprodução em tempo real ou pré-renderizada, utilizando as melhores práticas para codecs (DXV, HAP, NotchLC), resolução, taxas de quadros e complexidade de shaders/geometria.
-                        </p>
-                         <p class="text-medium-text text-sm leading-relaxed">
-                            Isso assegura uma performance impecável e sem quebras de frames, mesmo nas produções mais exigentes, seja em Unreal Engine, Notch ou vídeo tradicional.
-                        </p>
-                    </div>
-                    <div class="content-section rounded-lg p-8">
-                         <div class="flex items-center mb-4">
-                             <i class="fas fa-project-diagram text-secondary text-3xl mr-4"></i>
-                             <h3 class="text-2xl font-semibold text-secondary glow-text-secondary">Pipeline de Conteúdo Gerenciado</h3>
-                         </div>
-                        <p class="text-light-text mb-4 text-sm leading-relaxed">
-                            Implementamos um pipeline de gestão de conteúdo robusto, aproveitando as ferramentas de versionamento e proxies do Disguise. Seguimos convenções de nomenclatura rigorosas para garantir atualizações automáticas e colaboração eficiente.
-                        </p>
-                         <p class="text-medium-text text-sm leading-relaxed">
-                            Desde a ingestão inicial até as revisões finais, nosso processo garante organização, rastreabilidade e entrega pontual do conteúdo correto para sua produção.
-                        </p>
-                    </div>
-                 </div>
-            </section>
-
-            <section class="text-center py-16" data-aos="fade-up">
-                 <h2 class="text-3xl md:text-4xl font-bold mb-6 text-light-text">Pronto para Criar Visuais <span class="gradient-text">Inesquecíveis?</span></h2>
-                 <p class="text-xl text-light-text mb-10 max-w-3xl mx-auto">Nossa equipe criativa e técnica está pronta para transformar suas ideias em conteúdo visual de alto impacto.</p>
-                 <a href="index.html#contact" class="btn-primary font-bold py-3 px-8 rounded-md text-lg">Discutir Seu Projeto de Conteúdo</a>
-            </section>
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('img/vp_content.webp');"></div>
+        <div class="absolute inset-0 bg-black/70"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <h1 class="text-6xl md:text-8xl font-bold mb-8 hero-gradient" data-aos="fade-up">
+                Criamos Experiências
+            </h1>
+            <p class="text-2xl md:text-3xl mb-8 text-gray-300" data-aos="fade-up" data-aos-delay="200">
+                Onde o <span class="text-primary">físico</span> encontra o <span class="text-secondary">digital</span>
+            </p>
+            <p class="text-xl max-w-4xl mx-auto mb-12 leading-relaxed" data-aos="fade-up" data-aos-delay="400">
+                Criamos momentos que despertam admiração coletiva através da fusão entre tecnologia de ponta e narrativas emocionantes.
+            </p>
 
         </div>
-    </main>
+    </section>
 
-    <footer class="bg-dark py-12 border-t border-gray-800">
+    <!-- Our Philosophy -->
+    <section class="py-20 relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-                <div>
-                     <a href="index.html" class="flex items-center mb-4"> <span class="text-xl font-bold gradient-text">On + Av</span></a>
-                    <p class="text-medium-text text-sm">A principal referência em tecnologia Disguise no Brasil, oferecendo soluções completas para produções visuais de alto nível.</p>
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-bold mb-6 hero-gradient" data-aos="fade-up">Nossa Filosofia</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="200">
+                    Acreditamos no poder transformador da tecnologia quando guiada pela criatividade humana
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div data-aos="fade-right">
+                    <h3 class="text-3xl font-bold mb-6 text-primary">Unindo Mundos</h3>
+                    <p class="text-lg text-gray-300 mb-6 leading-relaxed">
+                        Eliminamos as fronteiras entre o real, o imaginado e o digital para desbloquear novas formas 
+                        de contar histórias, engajar os sentidos e provocar emoções profundas e duradouras.
+                    </p>
+                    <p class="text-lg text-gray-300 leading-relaxed">
+                        Experiências imersivas bem-sucedidas acontecem através da orquestração precisa de elementos 
+                        tangíveis e digitais - música, movimento, vídeo, iluminação, arquitetura e efeitos especiais 
+                        unidos em um todo.
+                    </p>
                 </div>
-                <div>
-                    <h4 class="text-light-text font-semibold mb-4 uppercase tracking-wider text-sm">Serviços</h4>
-                    <ul class="space-y-2">
-                        <li><a href="equipamentos.html" class="text-medium-text hover:text-primary transition duration-300 text-sm">Aluguel de Equipamentos</a></li>
-                        <li><a href="producao-virtual-xr.html" class="text-medium-text hover:text-primary transition duration-300 text-sm">Produção Virtual (xR)</a></li>
-                        <li><a href="projecao-mapeada.html" class="text-medium-text hover:text-primary transition duration-300 text-sm">Projeção Mapeada</a></li>
-                        <li><a href="consultoria-suporte.html" class="text-medium-text hover:text-primary transition duration-300 text-sm">Consultoria e Suporte</a></li>
-                        <li><a href="#" class="text-medium-text hover:text-primary transition duration-300 text-sm">Criação de Conteúdo</a></li> <li><a href="consultoria-suporte.html#training" class="text-medium-text hover:text-primary transition duration-300 text-sm">Treinamentos</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-light-text font-semibold mb-4 uppercase tracking-wider text-sm">Links Rápidos</h4>
-                    <ul class="space-y-2">
-                         <li><a href="index.html#about" class="text-medium-text hover:text-primary transition duration-300 text-sm">Quem Somos</a></li>
-                        <li><a href="index.html#industries" class="text-medium-text hover:text-primary transition duration-300 text-sm">Indústrias</a></li>
-                         <li><a href="index.html#cases" class="text-medium-text hover:text-primary transition duration-300 text-sm">Cases</a></li>
-                        <li><a href="index.html#expertise" class="text-medium-text hover:text-primary transition duration-300 text-sm">Expertise</a></li>
-                        <li><a href="index.html#contact" class="text-medium-text hover:text-primary transition duration-300 text-sm">Contato</a></li>
-                        <li><a href="#insights" class="text-medium-text hover:text-primary transition duration-300 text-sm">Insights</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-light-text font-semibold mb-4 uppercase tracking-wider text-sm">Newsletter</h4>
-                    <p class="text-medium-text text-sm mb-4">Receba novidades sobre tecnologia AV, cases e insights.</p>
-                    <form class="flex" id="newsletter-form">
-                        <input type="email" placeholder="Seu email" required class="px-3 py-2 text-sm rounded-l-md focus:outline-none bg-darker text-light-text border border-gray-700 flex-grow focus:border-primary">
-                        <button type="submit" class="bg-primary text-dark px-3 py-2 rounded-r-md font-bold text-sm hover:opacity-90 transition">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </form>
-                     <div class="mt-6">
-                         <h4 class="text-light-text font-semibold mb-2 uppercase tracking-wider text-sm">Siga-nos</h4>
-                         <div class="flex space-x-3">
-                              <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="Instagram"><i class="fab fa-instagram text-base"></i></a>
-                              <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="LinkedIn"><i class="fab fa-linkedin-in text-base"></i></a>
-                              <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="YouTube"><i class="fab fa-youtube text-base"></i></a>
-                               <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="Vimeo"><i class="fab fa-vimeo-v text-base"></i></a>
-                         </div>
-                       </div>
+                <div class="glass-card p-8" data-aos="fade-left">
+                    <div class="text-center">
+                        <i class="fas fa-infinity text-6xl text-primary mb-6"></i>
+                        <h4 class="text-2xl font-bold mb-4">Criatividade ∞ Tecnologia</h4>
+                        <p class="text-gray-300">
+                            Criatividade e tecnologia em perfeita sintonia: nossa fórmula para experiências verdadeiramente inovadoras.
+                        </p>
+                    </div>
                 </div>
             </div>
-            <div class="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
-                 <p class="text-medium-text text-xs mb-4 md:mb-0">© <span id="current-year"></span> On + Av. Todos os direitos reservados.</p>
-                <div class="flex space-x-4">
-                    <a href="#" class="text-medium-text hover:text-primary text-xs transition duration-300">Termos de Serviço</a>
-                    <a href="#" class="text-medium-text hover:text-primary text-xs transition duration-300">Política de Privacidade</a>
-                    <a href="#" class="text-medium-text hover:text-primary text-xs transition duration-300">Política de Cookies</a>
+        </div>
+    </section>
+
+    <!-- Virtual Production Section -->
+    <section class="py-20 bg-gradient-to-r from-primary/5 to-secondary/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-bold mb-6 hero-gradient" data-aos="fade-up">Produção Virtual</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="200">
+                    Revolucionando a criação audiovisual com tecnologia de ponta em tempo real
+                </p>
+            </div>
+            
+            <div class="grid lg:grid-cols-3 gap-8 mb-16">
+                <div class="glass-card p-8" data-aos="fade-up">
+                    <div class="text-center mb-6">
+                        <i class="fab fa-unreal-engine text-6xl text-primary mb-4"></i>
+                        <h3 class="text-2xl font-bold">Unreal Engine</h3>
+                    </div>
+                    <ul class="space-y-3 text-gray-300">
+                        <li><i class="fas fa-check text-primary mr-3"></i>Otimização de projetos fotorrealísticos Unreal para playback em tempo real</li>
+                        <li><i class="fas fa-check text-primary mr-3"></i>Ambientes virtuais complexos e dinâmicos</li>
+                        <li><i class="fas fa-check text-primary mr-3"></i>Integração perfeita com hardware Disguise</li>
+                        <li><i class="fas fa-check text-primary mr-3"></i>Pipeline otimizado para painéis de LED e projeção</li>
+                    </ul>
                 </div>
+                
+                <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-center mb-6">
+                        <i class="fas fa-code text-6xl text-secondary mb-4"></i>
+                        <h3 class="text-2xl font-bold">Programação de Blueprints</h3>
+                    </div>
+                    <ul class="space-y-3 text-gray-300">
+                        <li><i class="fas fa-check text-secondary mr-3"></i>Controle de parâmetros interativo</li>
+                        <li><i class="fas fa-check text-secondary mr-3"></i>Automação de sequências complexas</li>
+                        <li><i class="fas fa-check text-secondary mr-3"></i>Interface customizadas</li>
+                        <li><i class="fas fa-check text-secondary mr-3"></i>Sincronização precisa com sistemas externos</li>
+                    </ul>
+                </div>
+                
+                <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="400">
+                    <div class="text-center mb-6">
+                        <i class="fas fa-tv text-6xl text-accent mb-4"></i>
+                        <h3 class="text-2xl font-bold">Integração com Disguise</h3>
+                    </div>
+                    <ul class="space-y-3 text-gray-300">
+                        <li><i class="fas fa-check text-accent mr-3"></i>Controle total de painéis de LED</li>
+                        <li><i class="fas fa-check text-accent mr-3"></i>Mapeamento pixel-perfect</li>
+                        <li><i class="fas fa-check text-accent mr-3"></i>Blend e warp avançados</li>
+                        <li><i class="fas fa-check text-accent mr-3"></i>Timeline show control</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="glass-card p-12" data-aos="zoom-in">
+                <div class="text-center">
+                    <h3 class="text-3xl font-bold mb-6 hero-gradient">Experiências com painéis de LED e projeções</h3>
+                    <p class="text-xl text-gray-300 mb-8 max-w-4xl mx-auto">
+                        Desenvolvemos conteúdo otimizado especificamente para painéis de LED e projeções, desde conceituação até 
+                        implementação, garantindo qualidade visual excepcional e performance impecável em 
+                        ambientes de produção virtual e apresentações ao vivo.
+                    </p>
+                    <div class="grid md:grid-cols-4 gap-6 text-center">
+                        <div>
+                            <div class="bg-primary/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-palette text-primary text-2xl"></i>
+                            </div>
+                            <p class="font-semibold">Design Conceitual</p>
+                        </div>
+                        <div>
+                            <div class="bg-secondary/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-cogs text-secondary text-2xl"></i>
+                            </div>
+                            <p class="font-semibold">Desenvolvimento Técnico</p>
+                        </div>
+                        <div>
+                            <div class="bg-accent/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-play text-accent text-2xl"></i>
+                            </div>
+                            <p class="font-semibold">Implementação</p>
+                        </div>
+                        <div>
+                            <div class="bg-primary/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-headset text-primary text-2xl"></i>
+                            </div>
+                            <p class="font-semibold">Suporte Técnico</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Notch & Live Shows -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div data-aos="fade-right">
+                    <h2 class="text-5xl font-bold mb-6 hero-gradient">Conteúdo para ao vivo</h2>
+                    <p class="text-xl text-gray-300 mb-8">
+                        Criamos conteúdo visual espetacular para tours e apresentações ao vivo usando diversas ferramentas como Touch Designer ou
+                        Notch, o padrão da indústria para renderização em tempo real.
+                    </p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-primary/20 rounded-full p-3 flex-shrink-0">
+                                <i class="fas fa-bolt text-primary"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-2">Performance em Tempo Real</h3>
+                                <p class="text-gray-300">Renderização de alta qualidade com performance excepcional, garantindo fluidez perfeita durante apresentações ao vivo.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-secondary/20 rounded-full p-3 flex-shrink-0">
+                                <i class="fas fa-music text-secondary"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-2">Sincronização Musical</h3>
+                                <p class="text-gray-300">Visuais que respondem dinamicamente à música, criando experiências sensoriais únicas e envolventes.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-accent/20 rounded-full p-3 flex-shrink-0">
+                                <i class="fas fa-route text-accent"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-2">Flexibilidade para Tours</h3>
+                                <p class="text-gray-300">Conteúdo adaptável para diferentes configurações de venues, resoluções e formatos de tela.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card p-8" data-aos="fade-left">
+                    <div class="text-center mb-8">
+                        <h3 class="text-3xl font-bold">Experiências Memoráveis</h3>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <i class="fas fa-music text-primary text-xl mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-white mb-1">Shows e Concertos</h4>
+                                <p class="text-sm text-gray-400">Visuais dinâmicos que amplificam a energia musical</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <i class="fas fa-briefcase text-primary text-xl mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-white mb-1">Eventos Corporativos</h4>
+                                <p class="text-sm text-gray-400">Apresentações impactantes para lançamentos e convenções</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <i class="fas fa-users text-primary text-xl mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-white mb-1">Festivais</h4>
+                                <p class="text-sm text-gray-400">Experiências imersivas para multidões</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <i class="fas fa-eye text-primary text-xl mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-white mb-1">Experiências Visuais Imersivas</h4>
+                                <p class="text-sm text-gray-400">Ambientes digitais que transportam o público para outra realidade.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <i class="fas fa-hand-pointer text-primary text-xl mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-white mb-1">Instalações Interativas</h4>
+                                <p class="text-sm text-gray-400">Arte digital responsiva e envolvente</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Advanced Technologies Section -->
+    <section class="py-20 bg-gradient-to-r from-accent/5 to-primary/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-bold mb-6 hero-gradient" data-aos="fade-up">Tecnologias Avançadas</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="200">
+                    Técnicas de renderização e captura tridimensional para experiências visuais únicas
+                </p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-16 mb-16">
+                <div class="glass-card p-8" data-aos="fade-right">
+                    <div class="text-center mb-8">
+                        <i class="fas fa-layer-group text-6xl text-primary mb-4"></i>
+                        <h3 class="text-3xl font-bold mb-4">2.5D</h3>
+                    </div>
+                    
+                    <p class="text-gray-300 mb-6 leading-relaxed">
+                        Criamos profundidade visual convincente através de técnicas de paralaxe artificial, 
+                        transformando imagens 2D em experiências pseudo-tridimensionais que respondem ao movimento 
+                        e perspectiva do observador.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-check text-primary mt-1"></i>
+                            <div>
+                                <h4 class="font-semibold mb-1">Camadas Inteligentes</h4>
+                                <p class="text-sm text-gray-400">Separação de elementos em múltiplas camadas de profundidade</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-check text-primary mt-1"></i>
+                            <div>
+                                <h4 class="font-semibold mb-1">Movimento Responsivo</h4>
+                                <p class="text-sm text-gray-400">Efeitos que reagem ao posicionamento de câmeras virtuais</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-check text-primary mt-1"></i>
+                            <div>
+                                <h4 class="font-semibold mb-1">Otimização para LED</h4>
+                                <p class="text-sm text-gray-400">Adaptado especificamente para painéis de LED de alta resolução</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card p-8" data-aos="fade-left">
+                    <div class="text-center mb-8">
+                        <i class="fas fa-cube text-6xl text-secondary mb-4"></i>
+                        <h3 class="text-3xl font-bold mb-4">Gaussian Splats</h3>
+                    </div>
+                    
+                    <p class="text-gray-300 mb-6 leading-relaxed">
+                        Utilizamos a mais avançada tecnologia de renderização 3D em tempo real, superando 
+                        NeRFs em velocidade e qualidade. Ideal para capturar e reproduzir ambientes 
+                        fotorrealísticos com eficiência incomparável.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-check text-secondary mt-1"></i>
+                            <div>
+                                <h4 class="font-semibold mb-1">Renderização Instantânea</h4>
+                                <p class="text-sm text-gray-400">Visualização em tempo real de cenas 3D complexas</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-check text-secondary mt-1"></i>
+                            <div>
+                                <h4 class="font-semibold mb-1">Qualidade Fotorrealística</h4>
+                                <p class="text-sm text-gray-400">Representação visual ultra-realista de ambientes capturados</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-check text-secondary mt-1"></i>
+                            <div>
+                                <h4 class="font-semibold mb-1">Integração Virtual Production</h4>
+                                <p class="text-sm text-gray-400">Perfeita compatibilidade com workflows de produção virtual</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass-card p-12 text-center" data-aos="zoom-in">
+                <h3 class="text-3xl font-bold mb-6 hero-gradient">O Futuro da Captura 3D</h3>
+                <p class="text-xl text-gray-300 mb-8 max-w-4xl mx-auto">
+                    Estas tecnologias revolucionárias nos permitem criar experiências visuais que antes eram impensáveis, 
+                    oferecendo realismo extremo com performance otimizada para aplicações em tempo real.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="p-4">
+                        <div class="bg-primary/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-camera text-primary text-2xl"></i>
+                        </div>
+                        <h4 class="font-bold mb-2">Captura Volumétrica</h4>
+                        <p class="text-sm text-gray-400">Ambientes e objetos em 360°</p>
+                    </div>
+                    <div class="p-4">
+                        <div class="bg-secondary/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-clock text-secondary text-2xl"></i>
+                        </div>
+                        <h4 class="font-bold mb-2">Tempo Real</h4>
+                        <p class="text-sm text-gray-400">Visualização instantânea</p>
+                    </div>
+                    <div class="p-4">
+                        <div class="bg-accent/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-expand text-accent text-2xl"></i>
+                        </div>
+                        <h4 class="font-bold mb-2">Escalabilidade</h4>
+                        <p class="text-sm text-gray-400">Qualquer resolução ou formato</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Co-Creation Section -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-bold mb-6 hero-gradient" data-aos="fade-up">Co-Criação & Colaboração</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="200">
+                    Trabalhamos lado a lado com sua equipe criativa, combinando visões artísticas 
+                    com nossa expertise técnica para resultados extraordinários
+                </p>
+            </div>
+            
+            <div class="glass-card p-12 mb-16" data-aos="zoom-in">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h3 class="text-3xl font-bold mb-6 text-primary">Parceria Criativa Completa</h3>
+                        <p class="text-lg text-gray-300 mb-6 leading-relaxed">
+                            Não apenas executamos suas ideias - nós as expandimos. Nossa abordagem colaborativa 
+                            une sua visão criativa com nossa experiência técnica, resultando em projetos que 
+                            superam expectativas e redefinem possibilidades.
+                        </p>
+                        <p class="text-gray-300 leading-relaxed">
+                            Nosso time multidisciplinar de designers, programadores e artistas técnicos trabalha 
+                            integrado com sua equipe desde a conceituação até a entrega final.
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <div class="relative">
+                            <div class="bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full w-48 h-48 flex items-center justify-center mx-auto mb-6">
+                                <i class="fas fa-handshake text-6xl text-primary"></i>
+                            </div>
+                            <div class="absolute -top-4 -right-4 bg-secondary/20 rounded-full w-16 h-16 flex items-center justify-center">
+                                <i class="fas fa-lightbulb text-secondary text-xl"></i>
+                            </div>
+                            <div class="absolute -bottom-4 -left-4 bg-accent/20 rounded-full w-16 h-16 flex items-center justify-center">
+                                <i class="fas fa-cogs text-accent text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid lg:grid-cols-3 gap-8 mb-16">
+                <div class="glass-card p-8" data-aos="fade-up">
+                    <div class="text-center mb-6">
+                        <i class="fas fa-palette text-4xl text-primary mb-4"></i>
+                        <h3 class="text-2xl font-bold">Adaptação Criativa</h3>
+                    </div>
+                    <p class="text-gray-300 mb-6">
+                        Transformamos suas criações existentes para funcionarem perfeitamente em 
+                        projeções, LED walls e ambientes interativos.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-arrow-right text-primary mt-1 text-sm"></i>
+                            <span class="text-sm text-gray-400">Otimização para diferentes resoluções</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-arrow-right text-primary mt-1 text-sm"></i>
+                            <span class="text-sm text-gray-400">Calibração de cores para LED</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-arrow-right text-primary mt-1 text-sm"></i>
+                            <span class="text-sm text-gray-400">Conversão para formatos técnicos</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-center mb-6">
+                        <i class="fas fa-code text-4xl text-secondary mb-4"></i>
+                        <h3 class="text-2xl font-bold">Programação Interativa</h3>
+                    </div>
+                    <p class="text-gray-300 mb-6">
+                        Nossos programadores especialistas adicionam camadas de interatividade 
+                        e controle em tempo real às suas criações.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-arrow-right text-secondary mt-1 text-sm"></i>
+                            <span class="text-sm text-gray-400">Sensores e triggers personalizados</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-arrow-right text-secondary mt-1 text-sm"></i>
+                            <span class="text-sm text-gray-400">Interfaces de controle intuitivas</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-arrow-right text-secondary mt-1 text-sm"></i>
+                            <span class="text-sm text-gray-400">Automação de sequências</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="400">
+                    <div class="text-center mb-6">
+                        <i class="fas fa-users text-4xl text-accent mb-4"></i>
+                        <h3 class="text-2xl font-bold">Capacitação de Equipes</h3>
+                    </div>
+                    <p class="text-gray-300 mb-6">
+                        Treinamos sua equipe para operar e manter as soluções implementadas, 
+                        garantindo autonomia e continuidade.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-arrow-right text-accent mt-1 text-sm"></i>
+                            <span class="text-sm text-gray-400">Workshops técnicos práticos</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-arrow-right text-accent mt-1 text-sm"></i>
+                            <span class="text-sm text-gray-400">Documentação detalhada</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i class="fas fa-arrow-right text-accent mt-1 text-sm"></i>
+                            <span class="text-sm text-gray-400">Suporte continuado</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="glass-card p-12" data-aos="zoom-in">
+                <div class="text-center">
+                    <h3 class="text-3xl font-bold mb-8 hero-gradient">Processo de Co-Criação</h3>
+                    <div class="grid md:grid-cols-5 gap-6">
+                        <div class="relative">
+                            <div class="bg-primary/20 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                                <span class="text-2xl font-bold text-primary">1</span>
+                            </div>
+                            <h4 class="font-bold mb-2">Descoberta</h4>
+                            <p class="text-sm text-gray-400">Entendemos sua visão e objetivos</p>
+                            <div class="hidden md:block absolute top-10 left-full w-8 border-t border-dashed border-gray-600"></div>
+                        </div>
+                        <div class="relative">
+                            <div class="bg-secondary/20 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                                <span class="text-2xl font-bold text-secondary">2</span>
+                            </div>
+                            <h4 class="font-bold mb-2">Conceituação</h4>
+                            <p class="text-sm text-gray-400">Desenvolvemos conceitos técnicos</p>
+                            <div class="hidden md:block absolute top-10 left-full w-8 border-t border-dashed border-gray-600"></div>
+                        </div>
+                        <div class="relative">
+                            <div class="bg-accent/20 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                                <span class="text-2xl font-bold text-accent">3</span>
+                            </div>
+                            <h4 class="font-bold mb-2">Prototipagem</h4>
+                            <p class="text-sm text-gray-400">Testamos e refinamos ideias</p>
+                            <div class="hidden md:block absolute top-10 left-full w-8 border-t border-dashed border-gray-600"></div>
+                        </div>
+                        <div class="relative">
+                            <div class="bg-primary/20 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                                <span class="text-2xl font-bold text-primary">4</span>
+                            </div>
+                            <h4 class="font-bold mb-2">Desenvolvimento</h4>
+                            <p class="text-sm text-gray-400">Construímos a solução final</p>
+                            <div class="hidden md:block absolute top-10 left-full w-8 border-t border-dashed border-gray-600"></div>
+                        </div>
+                        <div>
+                            <div class="bg-secondary/20 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                                <span class="text-2xl font-bold text-secondary">5</span>
+                            </div>
+                            <h4 class="font-bold mb-2">Implementação</h4>
+                            <p class="text-sm text-gray-400">Entregamos e capacitamos</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Expertise -->
+    <section class="py-20 bg-gradient-to-r from-secondary/5 to-accent/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-bold mb-6 hero-gradient" data-aos="fade-up">Nossa Expertise</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="200">
+                    Décadas de experiência convergem em cada projeto, criando soluções inovadoras e impactantes
+                </p>
+            </div>
+            
+            <div class="grid lg:grid-cols-4 gap-8">
+                <div class="glass-card p-6 text-center" data-aos="fade-up">
+                    <i class="fas fa-video text-4xl text-primary mb-4"></i>
+                    <h3 class="text-xl font-bold mb-3">Vídeo & Motion</h3>
+                    <p class="text-gray-300 text-sm">Narrativas visuais dinâmicas e impactantes</p>
+                </div>
+                <div class="glass-card p-6 text-center" data-aos="fade-up" data-aos-delay="100">
+                    <i class="fas fa-lightbulb text-4xl text-secondary mb-4"></i>
+                    <h3 class="text-xl font-bold mb-3">Iluminação</h3>
+                    <p class="text-gray-300 text-sm">Design de luz artístico e tecnológico</p>
+                </div>
+                <div class="glass-card p-6 text-center" data-aos="fade-up" data-aos-delay="200">
+                    <i class="fas fa-volume-up text-4xl text-accent mb-4"></i>
+                    <h3 class="text-xl font-bold mb-3">Áudio</h3>
+                    <p class="text-gray-300 text-sm">Paisagens sonoras envolventes</p>
+                </div>
+                <div class="glass-card p-6 text-center" data-aos="fade-up" data-aos-delay="300">
+                    <i class="fas fa-hand-pointer text-4xl text-primary mb-4"></i>
+                    <h3 class="text-xl font-bold mb-3">Interatividade</h3>
+                    <p class="text-gray-300 text-sm">Experiências responsivas e participativas</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Innovation -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-card p-12" data-aos="zoom-in">
+                <div class="text-center">
+                    <h2 class="text-5xl font-bold mb-6 hero-gradient">Redefinindo Possibilidades</h2>
+                    <p class="text-xl text-gray-300 mb-12 max-w-4xl mx-auto">
+                        Nossa busca por novas formas de experiências humanas alimenta cada dimensão do nosso trabalho, 
+                        colocando a inovação no coração do nosso estúdio. Experimentamos técnicas de storytelling 
+                        não convencionais e prototipamos as mais recentes tecnologias.
+                    </p>
+                    
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <div class="p-6">
+                            <div class="bg-primary/20 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-rocket text-primary text-3xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3">Inovação Constante</h3>
+                            <p class="text-gray-300">Sempre testando novas tecnologias e abordagens criativas</p>
+                        </div>
+                        <div class="p-6">
+                            <div class="bg-secondary/20 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-users text-secondary text-3xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3">Conexão Humana</h3>
+                            <p class="text-gray-300">Criando momentos que aproximam pessoas e geram admiração coletiva</p>
+                        </div>
+                        <div class="p-6">
+                            <div class="bg-accent/20 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-magic text-accent text-3xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3">Magia Tecnológica</h3>
+                            <p class="text-gray-300">Transformando visões em realidades através da tecnologia</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-r from-primary/10 to-secondary/10">
+        <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+            <h2 class="text-5xl font-bold mb-6 hero-gradient" data-aos="fade-up">Vamos Criar Juntos?</h2>
+            <p class="text-xl text-gray-300 mb-8" data-aos="fade-up" data-aos-delay="200">
+                Transforme sua visão em uma experiência inesquecível que conecta, emociona e inspira.
+            </p>
+            <a href="index.html#contact" class="inline-flex items-center bg-primary text-black px-8 py-4 rounded-full text-lg font-bold hover:bg-opacity-80 transition-all neon-glow" data-aos="zoom-in" data-aos-delay="400">
+                <i class="fas fa-rocket mr-3"></i>
+                Iniciar Projeto
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4 text-primary">On + Av</h3>
+                    <p class="text-gray-400">Criando experiências imersivas que unem o físico e o digital.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Serviços</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="led-wall.html" class="hover:text-primary transition-colors">LED Wall</a></li>
+                        <li><a href="projecao.html" class="hover:text-primary transition-colors">Projeção</a></li>
+                        <li><a href="criacao-conteudo.html" class="hover:text-primary transition-colors">Criação de Conteúdo</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Tecnologias</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li>Unreal Engine</li>
+                        <li>Notch VFX</li>
+                        <li>Disguise</li>
+                        <li>Virtual Production</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Contato</h4>
+                    <p class="text-gray-400">contato@onav.com.br</p>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; <span id="current-year">2024</span> On + Av. Todos os direitos reservados.</p>
             </div>
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     <script>
-        // Initialize AOS
-        AOS.init({ duration: 800, once: true });
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic',
+            once: true,
+            offset: 50
+        });
 
-        // Mobile menu toggle
-        const mobileMenuButton = document.querySelector('.mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-        // ... (rest of mobile menu logic - same as previous pages) ...
+        // Update current year
+        document.getElementById('current-year').textContent = new Date().getFullYear();
 
-        // Newsletter Form simulation
-        const newsletterForm = document.getElementById('newsletter-form');
-        // ... (rest of newsletter logic - same as previous pages) ...
-
-         // Intersection Observer (for sections on this page)
-        const animatedElements = document.querySelectorAll('.content-section, .service-card'); // Target relevant sections/cards
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-        animatedElements.forEach(el => {
-              // Apply initial styles for animation, except for static sections
-              if (!el.matches('#synergy-section')) { // Example: Don't animate the synergy section initially if desired
-                  el.style.opacity = '0';
-                  el.style.transform = 'translateY(30px)';
-                  el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-              } else {
-                   el.style.opacity = '1';
-                   el.style.transform = 'translateY(0)';
-              }
-              observer.observe(el);
-         });
-
-         // Update copyright year
-         const currentYearSpan = document.getElementById('current-year');
-         if (currentYearSpan) { currentYearSpan.textContent = new Date().getFullYear(); }
-
-         // --- Full Mobile Menu Logic (for completeness) ---
-         if (mobileMenuButton && mobileMenu) {
-            mobileMenuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-                const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
-                mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
-                const icon = mobileMenuButton.querySelector('i');
-                if (icon) { icon.classList.toggle('fa-bars'); icon.classList.toggle('fa-times'); }
-            });
-         }
-         const mobileMenuLinks = mobileMenu?.querySelectorAll('a');
-         if (mobileMenuLinks && mobileMenu && mobileMenuButton) {
-            mobileMenuLinks.forEach(link => {
-                if (link.getAttribute('href')?.startsWith('#') || link.getAttribute('href')?.includes('index.html#')) {
-                     link.addEventListener('click', () => {
-                        mobileMenu.classList.add('hidden');
-                        mobileMenuButton.setAttribute('aria-expanded', 'false');
-                        const icon = mobileMenuButton.querySelector('i');
-                        if (icon) { icon.classList.remove('fa-times'); icon.classList.add('fa-bars'); }
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
                     });
                 }
             });
-         }
-         // --- End Full Mobile Menu Logic ---
+        });
 
-         // --- Full Newsletter Logic (for completeness) ---
-         if (newsletterForm) {
-             newsletterForm.addEventListener('submit', (e) => {
-                 e.preventDefault();
-                 const emailInput = newsletterForm.querySelector('input[type="email"]');
-                 const submitButton = newsletterForm.querySelector('button[type="submit"]');
-                 const originalButtonContent = submitButton.innerHTML;
-                 if (emailInput.value) {
-                     submitButton.disabled = true;
-                     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                     setTimeout(() => {
-                         emailInput.value = '';
-                         submitButton.disabled = false;
-                         submitButton.innerHTML = '<i class="fas fa-check"></i>';
-                         setTimeout(() => { submitButton.innerHTML = originalButtonContent; }, 2000);
-                     }, 1000);
-                 }
-             });
-        }
-        // --- End Full Newsletter Logic ---
-
+        // Parallax effect for hero section
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallax = document.querySelector('.floating-animation');
+            if (parallax) {
+                parallax.style.transform = `translateY(${scrolled * 0.2}px)`;
+            }
+        });
     </script>
 </body>
 </html>
