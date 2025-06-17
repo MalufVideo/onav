@@ -922,6 +922,35 @@
         </div>
     </section>
 
+    <!-- Scrolly Video Section Wrapper for 'O Estúdio' -->
+    <div id="estudio-scrolly-section-wrapper" style="position: relative; height: 400vh; /* Adjust for scroll length, e.g., 4x viewport height */">
+        
+        <!-- Video Container for ScrollyVideo -->
+        <div id="estudio-video-container" style="position: sticky; top: 0; left: 0; width: 100%; height: 100vh; z-index: 1; overflow: hidden;">
+            <!-- Video will be injected here by ScrollyVideo -->
+        </div>
+
+        <!-- Content Container: This will hold the title, subtitle, and CTA button -->
+        <div id="estudio-scrolly-content-container" style="position: sticky; top: 0; left: 0; width: 100%; height: 100vh; z-index: 10; display: flex; flex-direction: column; justify-content: space-between; align-items: center; pointer-events: none;">
+            <!-- Top title section -->
+            <div class="w-full pt-32 px-4 sm:px-6 lg:px-8 text-center pointer-events-auto">
+                <div data-aos="fade-down" data-aos-anchor="#estudio-scrolly-section-wrapper">
+                    <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">O Estúdio de Produção Virtual<br><span class="gradient-text">mais Avançado do Brasil</span></h1>
+                    <p class="text-lg text-light-text max-w-3xl mx-auto">Powered by Disguise, com LED HDR 10 bits e tracking de câmera</p>
+                </div>
+            </div>
+            
+            <!-- Bottom CTA section -->
+            <div class="w-full pb-16 px-4 sm:px-6 lg:px-8 text-center pointer-events-auto">
+                <div data-aos="fade-up" data-aos-anchor="#estudio-scrolly-section-wrapper">
+
+                    <a href="estudio_v2.html" class="btn-primary font-bold py-3 px-8 rounded-md inline-block">Conheça o Estúdio</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Scrolly Video Section Wrapper -->
+
     <section class="py-20 bg-gradient-to-r from-primary/10 via-dark to-secondary/10"> <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
             <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-light-text">Pronto para <span class="gradient-text">Elevar</span> Sua Produção?</h2>
             <p class="text-xl text-light-text mb-10">Nossa equipe de especialistas está pronta para entender suas necessidades e oferecer a melhor solução em tecnologia visual para seu projeto.</p>
@@ -2103,8 +2132,38 @@
         </div>
     </footer>
 
-<script>
+    <script src="https://cdn.jsdelivr.net/npm/scrolly-video@latest/dist/scrolly-video.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
      document.addEventListener('DOMContentLoaded', function () {
+        // Initialize ScrollyVideo for Estudio section
+        const estudioScrollyVideoDOMContainer = document.getElementById('estudio-video-container');
+        if (estudioScrollyVideoDOMContainer) {
+          new ScrollyVideo({
+            scrollyVideoContainer: "estudio-video-container",
+            src: "img/videos/medidas_estudio.mp4",
+            height: '100vh',
+            cover: false,
+            sticky: true,
+            full: false,
+            trackScroll: true,
+            transitionSpeed: 1,
+            frameThreshold: 0.02,
+            debug: false
+          });
+        } else {
+          console.error('ScrollyVideo container #estudio-video-container not found.');
+        }
+        
+        // No overlay fade effect needed for Estudio section
+        
+        // Initialize AOS (Animate on Scroll)
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 50
+        });
+        
        const contactForm = document.querySelector('#contact form.glass-card');
        if (contactForm) {
          contactForm.addEventListener('submit', async function (event) {

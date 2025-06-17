@@ -54,6 +54,7 @@
             color: #e0e0e0;
             overflow-x: hidden;
             scroll-behavior: smooth;
+            
         }
         .gradient-text { background: linear-gradient(90deg, #00ff9d, #0066ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .glow-text-primary { text-shadow: 0 0 12px rgba(0, 255, 157, 0.6); }
@@ -97,7 +98,7 @@
     </style>
 </head>
 <body class="antialiased">
-    <nav class="fixed w-full bg-opacity-90 backdrop-blur-md z-50 border-b border-gray-800">
+    <nav class="fixed w-full bg-black/70 backdrop-blur-sm z-50 border-b border-gray-800 transition-all duration-300 hover:bg-black/80 hover:backdrop-blur">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
                 <div class="flex items-center">
@@ -107,12 +108,12 @@
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-center space-x-6 lg:space-x-8">
-                        <a href="index.html#about" class="text-medium-text hover:text-white transition-colors duration-300 font-medium">Sobre Nós</a>
-                        <a href="producao-virtual-xr.html" class="text-white hover:text-primary transition-colors duration-300 font-medium">Produção Virtual & xR</a>
-                        <a href="produtos.html" class="text-medium-text hover:text-white transition-colors duration-300 font-medium">Equipamentos</a>
-                        <a href="estudio_v2.html" class="text-primary hover:text-white transition-colors duration-300 font-bold">Nosso Estúdio</a>
-                        <a href="index.html#portfolio" class="text-medium-text hover:text-white transition-colors duration-300 font-medium">Portfólio</a>
-                        <a href="index.html#contact" class="btn-primary text-sm font-bold">Contato</a>
+                         <a href="index.html#services" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Serviços</a>
+                        <a href="index.html#industries" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Indústrias</a>
+                        <a href="index.html#expertise" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Expertise</a>
+                        <a href="index.html#cases" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Cases</a>
+                        <a href="index.html#about" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Quem Somos</a>
+                        <a href="#insights" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Insights</a> <a href="index.html#contact" class="btn-primary text-sm font-bold px-5 py-2 rounded-md hover:bg-opacity-90 transition-all duration-200">Contato</a>
                     </div>
                 </div>
                 <div class="-mr-2 flex md:hidden">
@@ -125,11 +126,12 @@
         </div>
         <div class="hidden md:hidden bg-darker border-t border-gray-800" id="mobile-menu">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="index.html#about" class="text-medium-text hover:text-white block px-3 py-2 rounded-md text-base font-medium">Sobre Nós</a>
-                <a href="producao-virtual-xr.html" class="text-white block px-3 py-2 rounded-md text-base font-medium">Produção Virtual & xR</a>
-                <a href="produtos.html" class="text-medium-text hover:text-white block px-3 py-2 rounded-md text-base font-medium">Equipamentos</a>
-                <a href="estudio_v2.html" class="text-primary hover:text-white block px-3 py-2 rounded-md text-base font-bold">Nosso Estúdio</a>
-                <a href="index.html#portfolio" class="text-medium-text hover:text-white block px-3 py-2 rounded-md text-base font-medium">Portfólio</a>
+                <a href="index.html#services" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Serviços</a>
+                <a href="index.html#industries" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Indústrias</a>
+                <a href="index.html#expertise" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Expertise</a>
+                <a href="index.html#cases" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Cases</a>
+                <a href="index.html#about" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Quem Somos</a>
+                <a href="#insights" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Insights</a>
                 <a href="index.html#contact" class="btn-primary text-base font-bold block px-3 py-2 rounded-md text-center mt-2">Contato</a>
             </div>
         </div>
@@ -242,7 +244,7 @@
         <h3 class="text-2xl font-semibold text-white">Painel Reto 12×5m</h3>
     </div>
     <ul class="styled-list text-medium-text space-y-2">
-        <li><i class="fas fa-check-circle"></i>Painéis laterais móveis para preenchimento.</li>
+        <li><i class="fas fa-check-circle"></i>Se sua produção necessitar paineis de LED reto, temos o painel montado para você, com painéis opcionais laterais móveis para preenchimento.</li>
     </ul>
 </div>
 <div class="glass-card p-8 rounded-xl" data-aos="fade-up" data-aos-delay="300">
@@ -286,7 +288,7 @@
         </div>
         <!-- End Scrolly Video Section Wrapper -->
 
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 md:mb-24">
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 md:mb-24 pt-12">
             <div class="text-center mb-12" data-aos="fade-up">
                 <i class="fas fa-thumbs-up section-icon"></i>
                 <h2 class="text-3xl md:text-4xl font-bold text-white mb-4"><span class="gradient-text">Vantagens</span> Exclusivas</h2>
@@ -374,40 +376,53 @@
         </section>
     </main>
 
-    <footer class="border-t border-gray-800 py-12 md:py-16">
+    <footer class="bg-darker py-12 md:py-16 border-t border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
                 <div>
                     <img src="img/on+av_logo_v2.png" alt="On + Av Logo" class="h-10 mb-4" onerror="this.onerror=null; this.alt='On + Av'; this.src='https://placehold.co/120x40/050505/00ff9d?text=On%2BAv';">
-                    <p class="text-medium-text text-sm leading-relaxed">Elevando suas produções audiovisuais com tecnologia de ponta e expertise incomparável.</p>
+                    <p class="text-light-text text-sm leading-relaxed">Transformando ideias em experiências visuais extraordinárias através da tecnologia de ponta em produção virtual.</p>
                 </div>
                 <div>
                     <h5 class="text-lg font-semibold text-white mb-4">Links Rápidos</h5>
                     <ul class="space-y-2">
-                        <li><a href="index.html#about" class="text-medium-text hover:text-primary transition-colors">Sobre Nós</a></li>
-                        <li><a href="producao-virtual-xr.html" class="text-medium-text hover:text-primary transition-colors">Produção Virtual & xR</a></li>
-                        <li><a href="produtos.html" class="text-medium-text hover:text-primary transition-colors">Equipamentos</a></li>
-                        <li><a href="estudio_v2.html" class="text-medium-text hover:text-primary transition-colors">Nosso Estúdio</a></li>
-                        <li><a href="index.html#contact" class="text-medium-text hover:text-primary transition-colors">Contato</a></li>
+                        <li><a href="index.html#services" class="text-light-text hover:text-primary transition-colors">Serviços</a></li>
+                        <li><a href="index.html#industries" class="text-light-text hover:text-primary transition-colors">Indústrias</a></li>
+                        <li><a href="index.html#expertise" class="text-light-text hover:text-primary transition-colors">Expertise</a></li>
+                        <li><a href="index.html#cases" class="text-light-text hover:text-primary transition-colors">Cases</a></li>
+                        <li><a href="index.html#about" class="text-light-text hover:text-primary transition-colors">Quem Somos</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h5 class="text-lg font-semibold text-white mb-4">Siga-nos</h5>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-medium-text hover:text-primary text-2xl transition-colors"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-medium-text hover:text-primary text-2xl transition-colors"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#" class="text-medium-text hover:text-primary text-2xl transition-colors"><i class="fab fa-youtube"></i></a>
+                    <h5 class="text-lg font-semibold text-white mb-4">Contato</h5>
+                    <ul class="space-y-2 text-light-text">
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt mt-1 mr-3 text-primary"></i>
+                            <span>São Paulo - SP, Brasil</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-3 text-primary"></i>
+                            <a href="mailto:contato@onmaisav.com" class="hover:text-primary transition-colors">contato@onmaisav.com</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone-alt mr-3 text-primary"></i>
+                            <a href="tel:+5511999999999" class="hover:text-primary transition-colors">+55 11 99999-9999</a>
+                        </li>
+                    </ul>
+                    <div class="mt-6">
+                        <h5 class="text-lg font-semibold text-white mb-4">Siga-nos</h5>
+                        <div class="flex space-x-4">
+                            <a href="#" class="text-light-text hover:text-primary text-xl transition-colors" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="text-light-text hover:text-primary text-xl transition-colors" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="text-light-text hover:text-primary text-xl transition-colors" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                            <a href="#" class="text-light-text hover:text-primary text-xl transition-colors" aria-label="Vimeo"><i class="fab fa-vimeo-v"></i></a>
+                        </div>
                     </div>
-                    <h5 class="text-lg font-semibold text-white mt-6 mb-3">Newsletter</h5>
-                    <form class="flex" id="newsletter-form-footer">
-                        <input type="email" placeholder="Seu melhor e-mail" class="flex-grow p-3 rounded-l-md bg-dark border border-gray-700 text-light-text focus:ring-primary focus:border-primary outline-none text-sm" required>
-                        <button type="submit" class="bg-primary text-darker p-3 rounded-r-md font-semibold hover:opacity-90 text-sm"><i class="fas fa-paper-plane"></i></button>
-                    </form>
                 </div>
             </div>
-            <div class="border-t border-gray-800 pt-8 text-center text-medium-text text-sm">
-                <p>&copy; <span id="current-year"></span> On + Av Soluções Audiovisuais. Todos os direitos reservados.</p>
-                <p>CNPJ: XX.XXX.XXX/0001-XX | São Paulo - SP</p>
+            <div class="border-t border-gray-800 pt-8 text-center text-light-text text-sm">
+                <p>&copy; <span id="current-year">2024</span> On + Av Soluções Audiovisuais. Todos os direitos reservados.</p>
+                <p class="mt-1">CNPJ: XX.XXX.XXX/0001-XX | São Paulo - SP</p>
             </div>
         </div>
     </footer>
@@ -452,9 +467,9 @@
             scrollyVideoContainer: "o-que-criar-video-container",
             src: "img/videos/output_contrast_1.2.mp4",
             height: '100vh',
-            cover: true,
+            cover: false,
             sticky: true,
-            full: true,
+            full: false,
             trackScroll: true,
             transitionSpeed: 1,
             frameThreshold: 0.02,

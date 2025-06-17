@@ -911,15 +911,32 @@ class QuoteCartModal {
         const confirmationCloseBtn = document.getElementById('confirmation-close-btn');
         const viewMyProposalsBtn = document.getElementById('view-my-proposals-btn');
 
+        // Get user name for personalized message
+        const currentUser = window.auth?.getCurrentUser();
+        let userName = 'Cliente'; // Default fallback
+        
+        if (currentUser) {
+            // Try user metadata first
+            userName = currentUser.user_metadata?.full_name;
+            
+            // If not available, extract from email
+            if (!userName) {
+                const emailName = currentUser.email?.split('@')[0] || '';
+                userName = emailName
+                    .replace(/[._]/g, ' ')
+                    .replace(/\b\w/g, l => l.toUpperCase()) || 'Cliente';
+            }
+        }
+
         // Update modal content as per requirements
         if (confirmationHeader) {
-            confirmationHeader.innerHTML = `<h2>Proposta Requisitada!</h2>`;
+            confirmationHeader.innerHTML = `<h2>Obrigado!</h2>`;
         }
         if (confirmationBody) {
             confirmationBody.innerHTML = `
-                <p>Sua requisição para o projeto "<strong>${projectName}</strong>" foi enviada com sucesso!</p>
-                <p>Vamos enviar os detalhes completos para o seu email em instantes.</p>
-                <p>Você também pode visualizar suas propostas na seção "Minhas Propostas" a qualquer momento.</p>
+                <p>Obrigado <strong>${userName}</strong>. Sua estimativa do projeto <strong>${projectName}</strong> foi enviada e você já recebeu no seu email.</p>
+                <br>
+                <p><strong>${userName}</strong>, saiba que a <strong>ONAV</strong> tem um desconto extra para esse projeto. Clique em "Falar com Especialista" e agende uma conversa sobre seu projeto e converta a estimativa em proposta oficial com desconto.</p>
             `;
         }
         if (confirmationFooter) {
@@ -948,9 +965,8 @@ class QuoteCartModal {
             }
             if (talkBtn) {
                 talkBtn.onclick = () => {
-                    // Show Cal.com inline embed if present
-                    const calEmbed = document.getElementById('my-cal-inline');
-                    if (calEmbed) calEmbed.style.display = 'block';
+                    // Open Cal.com in new tab
+                    window.open('https://cal.com/onav.com.br/30min?overlayCalendar=true', '_blank');
                 };
             }
         }, 0);
