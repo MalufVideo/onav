@@ -231,7 +231,34 @@ async function getUserProfile() {
       .single();
     
     if (error) {
-      console.warn('User profile not found, treating as end user');
+      console.warn('User profile not found for:', currentUser.email);
+      
+      // Auto-create profile for known sales rep
+      if (currentUser.email === 'nelson@avdesign.video') {
+        try {
+          const { data: newProfile, error: createError } = await supabase
+            .from('user_profiles')
+            .insert([{
+              id: currentUser.id,
+              email: currentUser.email,
+              full_name: 'Nelson (Sales Rep)',
+              role: 'sales_rep',
+              is_active: true,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }])
+            .select()
+            .single();
+          
+          if (!createError) {
+            console.log('Auto-created sales rep profile');
+            return newProfile;
+          }
+        } catch (createErr) {
+          console.warn('Could not auto-create sales rep profile:', createErr.message);
+        }
+      }
+      
       return { role: 'end_user', full_name: currentUser.email };
     }
     

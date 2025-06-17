@@ -328,6 +328,8 @@ class QuoteCartModal {
             numberOfDays = 1; // Default if dates aren't fully selected
         }
         console.log(`[renderCart] Date Range: Start=${debugStart}, End=${debugEnd}, Calculated Days=${numberOfDays}`);
+        console.log(`[renderCart] DiscountCalculator available:`, !!window.DiscountCalculator);
+        console.log(`[renderCart] Daily total before discount:`, dailyTotalPrice);
 
         // --- Render Items ---
         const expected3DItems = [
@@ -694,6 +696,9 @@ class QuoteCartModal {
 
             console.log('[submitQuote] Processing rendered cart items:', cartItemElements);
 
+            // --- Calculate Daily Rate from Rendered Cart Items (MOVED HERE) ---
+            let calculatedDailyRate = 0;
+
             cartItemElements.forEach(element => {
                 const nameElement = element.querySelector('.cart-item-name');
                 // The subtotal displayed in the cart UI is the final, correct daily price for the item/quantity
@@ -712,9 +717,14 @@ class QuoteCartModal {
                     const unitPrice = parseCurrency(unitPriceString); // Use helper to parse unit price
                     const subtotal = parseCurrency(subtotalString); // Parse subtotal (used for filtering)
 
+                    // Add to daily rate calculation for ALL items (not just valid services)
+                    if (!name.startsWith('Config:') && subtotal > 0) {
+                        calculatedDailyRate += subtotal;
+                    }
+
                     // Filter out configuration lines and items with zero subtotal or zero quantity
                     if (!name.startsWith('Config:') && subtotal > 0 && quantity > 0) { 
-                        console.log(`[submitQuote] Adding service: ${name} | Qty: ${quantity} | Unit Price: ${unitPrice}`);
+                        console.log(`[submitQuote] Adding service: ${name} | Qty: ${quantity} | Unit Price: ${unitPrice} | Subtotal: ${subtotal}`);
                         selectedServices.push({
                             name: name, // Keep the name as rendered (may include units)
                             quantity: quantity, // Correct parsed quantity
@@ -739,11 +749,12 @@ class QuoteCartModal {
             // --- Get Selected Pod Type ---
             const selectedPodType = document.querySelector('input[name="disguise-mode"]:checked')?.value || '2d';
             
-            // --- Get Daily Rate and Total Price with Discount Information ---
-            const dailyRate = getNumberById('total-price'); // Raw number
+            const dailyRate = calculatedDailyRate; // Use calculated daily rate from cart items
             const rawTotalPriceString = getValueOrTextById('cart-total-price') || '';
             const totalPriceMatch = rawTotalPriceString.match(/R\$\s?[\d.,]+/); 
             const totalPrice = totalPriceMatch ? totalPriceMatch[0] : 'R$ 0,00';
+            
+            console.log(`[submitQuote] Calculated daily rate from cart: ${dailyRate}`);
             
             // Calculate discount information for saving
             let discountPercentage = 0;

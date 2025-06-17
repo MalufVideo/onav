@@ -292,6 +292,7 @@ app.post('/api/setup-quote-history', async (req, res) => {
       // Add missing columns for complete quote display
       `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS comercial TEXT`,
       `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS sales_rep_name TEXT`,
+      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS sales_rep_id UUID`,
       `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS principal_power_max INTEGER`,
       `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS principal_power_avg INTEGER`,
       `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS principal_weight INTEGER`,
@@ -704,6 +705,120 @@ app.put('/api/users/:id', async (req, res) => {
   }
 });
 
+// Delete user (admin only) - deletes from both user_profiles and Supabase auth
+app.delete('/api/users/:id', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: 'No authorization header' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    // Get user profile to determine role
+    const { data: userProfile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    // Special handling for master admin
+    let userRole = userProfile?.role;
+    
+    if (user.email === 'nelson.maluf@onprojecoes.com.br') {
+      userRole = 'admin';
+      console.log('Master admin detected, granting admin role');
+    }
+
+    // If no profile found but user exists, and it's a known sales rep email, grant sales_rep role
+    if (!userRole && user.email === 'nelson@avdesign.video') {
+      userRole = 'sales_rep';
+      console.log('Known sales rep email detected, granting sales_rep role');
+    }
+
+    if (!userRole || !['admin', 'sales_rep'].includes(userRole)) {
+      console.error('Authorization failed for user deletion:', {
+        user_email: user.email,
+        user_role: userRole,
+        profile_found: !!userProfile,
+        profile_error: profileError
+      });
+      return res.status(403).json({ 
+        error: 'Unauthorized: Only admins and sales reps can delete users',
+        debug: {
+          user_email: user.email,
+          user_role: userRole,
+          profile_found: !!userProfile,
+          profile_error: profileError?.message
+        }
+      });
+    }
+
+    const { id } = req.params;
+
+    // Get user to delete for validation
+    const { data: userToDelete, error: fetchError } = await supabase
+      .from('user_profiles')
+      .select('email, role')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !userToDelete) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Prevent deletion of master admin
+    if (userToDelete.email === 'nelson.maluf@onprojecoes.com.br') {
+      return res.status(403).json({ error: 'Cannot delete master admin account' });
+    }
+
+    // Delete from user_profiles table first
+    const { error: profileDeleteError } = await supabase
+      .from('user_profiles')
+      .delete()
+      .eq('id', id);
+
+    if (profileDeleteError) {
+      console.error('Error deleting user profile:', profileDeleteError);
+      throw profileDeleteError;
+    }
+
+    // Delete from Supabase auth if service key is available
+    if (supabaseServiceKey) {
+      try {
+        const { error: authDeleteError } = await supabaseAdmin.auth.admin.deleteUser(id);
+        
+        if (authDeleteError) {
+          console.error('Error deleting user from auth:', authDeleteError);
+          // Don't throw here - profile is already deleted, just log the auth error
+          console.warn(`User profile deleted but auth deletion failed for user ${id}:`, authDeleteError.message);
+        } else {
+          console.log(`Successfully deleted user ${id} from both profile and auth`);
+        }
+      } catch (authError) {
+        console.error('Error during auth deletion:', authError);
+        // Don't throw here - profile is already deleted
+      }
+    } else {
+      console.warn('Service role key not available - user deleted from profiles only');
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'User deleted successfully',
+      deletedFromAuth: !!supabaseServiceKey
+    });
+  } catch (error) {
+    console.error('Error deleting user:', error.message);
+    res.status(500).json({ error: 'Failed to delete user', details: error.message });
+  }
+});
+
 // Sync phone numbers between user profiles and auth metadata (admin only)
 app.post('/api/users/sync-phone-numbers', async (req, res) => {
   try {
@@ -883,6 +998,41 @@ app.get('/api/proposals', async (req, res) => {
       .eq('id', user.id)
       .single();
 
+    // Special handling for master admin
+    let userRole = userProfile?.role;
+    
+    if (user.email === 'nelson.maluf@onprojecoes.com.br') {
+      userRole = 'admin';
+      console.log('Master admin detected, granting admin role for proposals');
+    }
+
+    // If no profile found but user exists, and it's a known sales rep email, grant sales_rep role
+    if (!userRole && user.email === 'nelson@avdesign.video') {
+      userRole = 'sales_rep';
+      console.log('Known sales rep email detected, granting sales_rep role for proposals');
+      
+      // Auto-create profile for known sales rep
+      try {
+        const { error: createError } = await supabase
+          .from('user_profiles')
+          .insert([{
+            id: user.id,
+            email: user.email,
+            full_name: 'Nelson (Sales Rep)',
+            role: 'sales_rep',
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }]);
+        
+        if (!createError) {
+          console.log('Created user profile for sales rep:', user.email);
+        }
+      } catch (err) {
+        console.warn('Could not auto-create sales rep profile:', err.message);
+      }
+    }
+
     const context = req.query.context || 'my-quotes';
     let query = supabase
       .from('proposals')
@@ -890,10 +1040,10 @@ app.get('/api/proposals', async (req, res) => {
 
     // Apply filtering based on user role and context
     if (context === 'my-quotes') {
-      if (userProfile?.role === 'sales_rep') {
+      if (userRole === 'sales_rep') {
         // Sales reps see quotes they created
         query = query.eq('sales_rep_id', user.id);
-      } else if (userProfile?.role === 'admin') {
+      } else if (userRole === 'admin') {
         // Admins accessing my-quotes should see their own quotes only
         query = query.or(`user_id.eq.${user.id},sales_rep_id.eq.${user.id}`);
       } else {
@@ -901,11 +1051,14 @@ app.get('/api/proposals', async (req, res) => {
         query = query.eq('user_id', user.id);
       }
     } else if (context === 'dashboard') {
-      // Dashboard context - only admins should access this
-      if (userProfile?.role !== 'admin') {
-        return res.status(403).json({ error: 'Unauthorized: Only admins can access dashboard view' });
+      // Dashboard context - only admins and sales reps should access this
+      if (!['admin', 'sales_rep'].includes(userRole)) {
+        return res.status(403).json({ error: 'Unauthorized: Only admins and sales reps can access dashboard view' });
       }
-      // Admins see all quotes in dashboard
+      // Admins see all quotes, sales reps see quotes they created
+      if (userRole === 'sales_rep') {
+        query = query.eq('sales_rep_id', user.id);
+      }
     } else {
       // Default: user sees only their own quotes
       query = query.eq('user_id', user.id);
@@ -914,6 +1067,9 @@ app.get('/api/proposals', async (req, res) => {
     const { data, error: queryError } = await query.order('created_at', { ascending: false });
     
     if (queryError) throw queryError;
+    
+    console.log(`[/api/proposals] User: ${user.email} (${user.id}), Role: ${userRole}, Context: ${context}, Found ${data.length} quotes`);
+    
     res.json(data);
   } catch (error) {
     console.error('Error fetching proposals:', error.message);
@@ -1022,6 +1178,25 @@ app.post('/api/save-proposal', async (req, res) => {
       proposalData.daily_rate = safeNumber(rawProposalData.daily_rate);
     }
     
+    // Add progressive discount information if provided
+    if (rawProposalData.discount_percentage !== undefined) {
+      proposalData.discount_percentage = safeNumber(rawProposalData.discount_percentage);
+    }
+    if (rawProposalData.discount_amount !== undefined) {
+      proposalData.discount_amount = safeNumber(rawProposalData.discount_amount);
+    }
+    if (rawProposalData.original_total_price !== undefined) {
+      proposalData.original_total_price = rawProposalData.original_total_price;
+    }
+    if (rawProposalData.discount_reason !== undefined) {
+      proposalData.discount_reason = rawProposalData.discount_reason;
+    }
+    
+    // Add selected services if provided
+    if (rawProposalData.selected_services && Array.isArray(rawProposalData.selected_services)) {
+      proposalData.selected_services = JSON.stringify(rawProposalData.selected_services);
+    }
+    
     // Add sales rep information directly (using existing discount_description field to store structured data)
     if (rawProposalData.sales_rep_name) {
       // Store sales rep name in an existing column that we know exists
@@ -1031,11 +1206,21 @@ app.post('/api/save-proposal', async (req, res) => {
     // Store all additional data in discount_description as JSON
     // This includes power, weight, pixels, and sales rep data
     
+    // Store sales rep information in dedicated columns
+    if (rawProposalData.sales_rep_id) {
+      proposalData.sales_rep_id = rawProposalData.sales_rep_id;
+    } else {
+      proposalData.sales_rep_id = user.id; // Default to current user
+    }
+    if (rawProposalData.sales_rep_name) {
+      proposalData.sales_rep_name = rawProposalData.sales_rep_name;
+    }
+    
+    console.log(`[save-proposal] Setting sales_rep_id: ${proposalData.sales_rep_id} for user: ${user.email} (${user.id})`);
+    
     // Store dashboard-specific data as JSON in discount_description
     const dashboardData = {
       created_by_dashboard: rawProposalData.created_by_dashboard || false,
-      sales_rep_id: rawProposalData.sales_rep_id || user.id,
-      sales_rep_name: rawProposalData.sales_rep_name,
       
       // Power and weight data
       principal_power_max: safeInteger(rawProposalData.principal_power_max),
@@ -1070,6 +1255,17 @@ app.post('/api/save-proposal', async (req, res) => {
     
     console.log('Final proposal data to insert:', JSON.stringify(proposalData, null, 2));
     console.log('Discount description content:', proposalData.discount_description);
+    
+    // Log progressive discount fields specifically for debugging
+    if (proposalData.discount_percentage > 0) {
+      console.log('Progressive discount applied:', {
+        percentage: proposalData.discount_percentage,
+        amount: proposalData.discount_amount,
+        original: proposalData.original_total_price,
+        final: proposalData.total_price,
+        reason: proposalData.discount_reason
+      });
+    }
 
     const { data, error } = await supabaseAdmin
       .from('proposals')
@@ -1125,23 +1321,53 @@ app.post('/api/check-user-by-email', async (req, res) => {
 
     // Special handling for master admin
     let userRole = userProfile?.role;
-    const masterAdminEmails = [
-      'nelson.maluf@onprojecoes.com.br',
-      'nelson@avdesign.video'
-    ];
     
-    if (masterAdminEmails.includes(user.email)) {
+    if (user.email === 'nelson.maluf@onprojecoes.com.br') {
       userRole = 'admin';
       console.log('Master admin detected, granting admin role');
     }
 
+    // If no profile found but user exists, and it's a known sales rep email, grant sales_rep role
+    if (!userRole && user.email === 'nelson@avdesign.video') {
+      userRole = 'sales_rep';
+      console.log('Known sales rep email detected, granting sales_rep role');
+      
+      // Auto-create profile for known sales rep
+      try {
+        const { error: createError } = await supabase
+          .from('user_profiles')
+          .insert([{
+            id: user.id,
+            email: user.email,
+            full_name: 'Nelson (Sales Rep)',
+            role: 'sales_rep',
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }]);
+        
+        if (!createError) {
+          console.log('Created user profile for sales rep in check-user-by-email:', user.email);
+        }
+      } catch (err) {
+        console.warn('Could not auto-create sales rep profile in check-user-by-email:', err.message);
+      }
+    }
+
     if (!userRole || !['admin', 'sales_rep'].includes(userRole)) {
+      console.error('Authorization failed:', {
+        user_email: user.email,
+        user_role: userRole,
+        profile_found: !!userProfile,
+        profile_error: profileError
+      });
       return res.status(403).json({ 
         error: 'Unauthorized: Only admins and sales reps can check users',
         debug: {
           user_email: user.email,
           user_role: userRole,
-          profile_found: !!userProfile
+          profile_found: !!userProfile,
+          profile_error: profileError?.message
         }
       });
     }
@@ -1222,22 +1448,32 @@ app.post('/api/create-client-user', async (req, res) => {
 
     // Special handling for master admin
     let userRole = userProfile?.role;
-    const masterAdminEmails = [
-      'nelson.maluf@onprojecoes.com.br',
-      'nelson@avdesign.video'
-    ];
     
-    if (masterAdminEmails.includes(user.email)) {
+    if (user.email === 'nelson.maluf@onprojecoes.com.br') {
       userRole = 'admin';
+      console.log('Master admin detected, granting admin role');
+    }
+
+    // If no profile found but user exists, and it's a known sales rep email, grant sales_rep role
+    if (!userRole && user.email === 'nelson@avdesign.video') {
+      userRole = 'sales_rep';
+      console.log('Known sales rep email detected, granting sales_rep role');
     }
 
     if (!userRole || !['admin', 'sales_rep'].includes(userRole)) {
+      console.error('Authorization failed:', {
+        user_email: user.email,
+        user_role: userRole,
+        profile_found: !!userProfile,
+        profile_error: userProfileError
+      });
       return res.status(403).json({ 
         error: 'Unauthorized: Only admins and sales reps can create users',
         debug: {
           user_email: user.email,
           user_role: userRole,
-          profile_found: !!userProfile
+          profile_found: !!userProfile,
+          profile_error: userProfileError?.message
         }
       });
     }
@@ -1331,12 +1567,8 @@ app.put('/api/update-user-profile', async (req, res) => {
 
     // Special handling for master admin
     let userRole = userProfile?.role;
-    const masterAdminEmails = [
-      'nelson.maluf@onprojecoes.com.br',
-      'nelson@avdesign.video'
-    ];
     
-    if (masterAdminEmails.includes(user.email)) {
+    if (user.email === 'nelson.maluf@onprojecoes.com.br') {
       userRole = 'admin';
     }
 
@@ -1444,17 +1676,13 @@ app.post('/api/setup-admin-profile', async (req, res) => {
     }
 
     // Only allow master admin to set up profiles
-    const masterAdminEmails = [
-      'nelson.maluf@onprojecoes.com.br',
-      'nelson@avdesign.video'
-    ];
     
-    if (!masterAdminEmails.includes(user.email)) {
+    if (user.email !== 'nelson.maluf@onprojecoes.com.br') {
       return res.status(403).json({ error: 'Only master admin can setup profiles' });
     }
 
     // Create or update profile for current user
-    const adminName = user.email === 'nelson@avdesign.video' ? 'Nelson (Admin)' : 'Nelson Maluf (Master Admin)';
+    const adminName = 'Nelson Maluf (Master Admin)';
     
     const { data: profile, error: setupProfileError } = await supabaseAdmin
       .from('user_profiles')
@@ -1494,17 +1722,13 @@ app.post('/api/bootstrap-admin', async (req, res) => {
     }
 
     // Only allow for master admin emails
-    const masterAdminEmails = [
-      'nelson.maluf@onprojecoes.com.br',
-      'nelson@avdesign.video'
-    ];
     
-    if (!masterAdminEmails.includes(email)) {
+    if (email !== 'nelson.maluf@onprojecoes.com.br') {
       return res.status(403).json({ error: 'Only master admin can be bootstrapped' });
     }
 
     // Create or update profile for the user
-    const adminName = email === 'nelson@avdesign.video' ? 'Nelson (Admin)' : 'Nelson Maluf (Master Admin)';
+    const adminName = 'Nelson Maluf (Master Admin)';
     
     const { data: profile, error: bootstrapError } = await supabaseAdmin
       .from('user_profiles')
@@ -1759,6 +1983,34 @@ app.get('/api/quotes/public/:slug', async (req, res) => {
       return res.status(404).json({ error: 'Quote not found' });
     }
 
+    // Parse services data - it can be stored in multiple places
+    let parsedServices = [];
+    
+    // First, try to parse selected_services column
+    if (quote.selected_services) {
+      try {
+        if (typeof quote.selected_services === 'string') {
+          parsedServices = JSON.parse(quote.selected_services);
+        } else if (Array.isArray(quote.selected_services)) {
+          parsedServices = quote.selected_services;
+        }
+      } catch (e) {
+        console.error('Error parsing selected_services:', e);
+      }
+    }
+    
+    // If no services found, try discount_description field (for dashboard-created quotes)
+    if (parsedServices.length === 0 && quote.discount_description) {
+      try {
+        const dashboardData = JSON.parse(quote.discount_description);
+        if (dashboardData.services && Array.isArray(dashboardData.services)) {
+          parsedServices = dashboardData.services;
+        }
+      } catch (e) {
+        console.error('Error parsing services from discount_description:', e);
+      }
+    }
+
     // Remove sensitive fields before sending to client
     const publicQuote = {
       id: quote.id,
@@ -1779,7 +2031,7 @@ app.get('/api/quotes/public/:slug', async (req, res) => {
       led_teto_width: quote.led_teto_width,
       led_teto_height: quote.led_teto_height,
       led_teto_modules: quote.led_teto_modules,
-      selected_services: quote.selected_services,
+      selected_services: parsedServices, // Now properly parsed as array
       total_price: quote.total_price,
       original_total_price: quote.original_total_price,
       discount_percentage: quote.discount_percentage,

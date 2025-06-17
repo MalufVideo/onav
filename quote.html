@@ -395,7 +395,22 @@
             const tbody = document.getElementById('services-table-body');
             tbody.innerHTML = '';
 
-            if (!services || services.length === 0) {
+            // Ensure services is an array
+            if (!services) {
+                services = [];
+            } else if (typeof services === 'string') {
+                try {
+                    services = JSON.parse(services);
+                } catch (e) {
+                    console.error('Error parsing services JSON:', e);
+                    services = [];
+                }
+            } else if (!Array.isArray(services)) {
+                console.error('Services data is not an array:', services);
+                services = [];
+            }
+
+            if (services.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">Nenhum serviço selecionado</td></tr>';
                 return;
             }

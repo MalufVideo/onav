@@ -73,9 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // --- Add properties to store dynamic data ---
             this.totalModules = 0;
             this.moduleUnitPrice = 0;
-            // You might want to add processor count/price here too if needed later
-            // this.processorsNeeded = 0;
-            // this.processorUnitPrice = 0;
+            this.processorsNeeded = 0;
+            this.processorUnitPrice = 0;
 
             if (!this.pricingPodElement) {
                 console.error('[PricingPodsController] Pricing pod element #card-custo-3d not found!');
@@ -87,9 +86,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('[pricing-pods.js] Received ledWallDataCalculated event:', event.detail);
                 this.totalModules = event.detail.totalModules || 0;
                 this.moduleUnitPrice = event.detail.moduleUnitPrice || 0;
-                // Store other values if needed
-                // this.processorsNeeded = event.detail.processorsNeeded || 0;
-                // this.processorUnitPrice = event.detail.processorUnitPrice || 0;
+                this.processorsNeeded = event.detail.processorsNeeded || 0;
+                this.processorUnitPrice = event.detail.processorUnitPrice || 0;
 
                 this.ledDataReady = true; // Set flag
 
@@ -139,10 +137,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Handle error appropriately, maybe set default prices or show an error message
                 this.productPrices = { // Fallback basic prices (consider removing if error handling is robust)
                     'LED Module': 85,
-                    'Processadores MX-40 Pro': 1890,
-                    'Disguise VX4n': 10000,
+                    'MX-40 Pro Processor': 1890,
+                    'Disguise VX4n (Base)': 10000,
                     'Disguise RXII Unit': 7750, // Price per unit
-                    'Stype Tracking': 3990
+                    'Stype Tracking': 3890
                 };
                 this.pricesReady = true; // Set flag even on error (using fallback)
                 this.triggerInitialCalculationCheck('Prices Ready (Error/Fallback)'); // Check if ready
@@ -290,8 +288,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // --- Get Unit Prices from fetched data ---
             const modulePrice = this.productPrices['LED Module'] || 0;
-            const processorPrice = this.productPrices['Processadores MX-40 Pro'] || 0;
-            const vx4nBasePrice = this.productPrices['Disguise VX4n'] || 0;
+            const processorPrice = this.productPrices['MX-40 Pro Processor'] || 0;
+            const vx4nBasePrice = this.productPrices['Disguise VX4n (Base)'] || 0;
             const rxiiUnitPrice = this.productPrices['Disguise RXII Unit'] || 0; // Per unit price
             const trackingPrice = this.productPrices['Stype Tracking'] || 0;
 
@@ -306,12 +304,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 modulesPriceSpan.dataset.price = modulesTotalCost; // Update data attribute too
             }
 
-            // 2. Processors (Read base price from data-price)
+            // 2. Processors (Use actual calculated quantity from led-wall.js)
             const processorsPriceElement = pod.querySelector('#processors-price');
-            const processorsCost = processorPrice;
+            const processorsQuantity = this.processorsNeeded || 1; // Use calculated quantity, fallback to 1
+            const processorsCost = processorsQuantity * processorPrice;
             total += processorsCost;
-            // TODO: Consider getting processor count from ledWallDataCalculated if needed
-            itemsForCart.push({ id: 'processors', name: 'Processadores MX-40 Pro', quantity: 1, price: processorsCost });
+            itemsForCart.push({ id: 'processors', name: 'Processadores MX-40 Pro', quantity: processorsQuantity, price: processorPrice });
+            if (processorsPriceElement) processorsPriceElement.textContent = formatPrice(processorsCost);
 
             // 3. Disguise Server (VX4n price depends on backup status)
             const serverPriceElement = pod.querySelector('#server-price');

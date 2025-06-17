@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Estudio ScrollyVideo</title>
+    <style>
+        /* To make the page scrollable */
+        body {
+            height: 200vh;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="scrolly-video"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/scrolly-video@latest/dist/scrolly-video.js"></script>
+    <script type="text/javascript">
+      new ScrollyVideo({
+        scrollyVideoContainer: "scrolly-video",
+        src: "img/videos/volume2.mp4",
+        transitionSpeed: 2
+      });
+    </script>
+
+</body>
+</html>

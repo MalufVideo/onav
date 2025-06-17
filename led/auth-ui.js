@@ -267,7 +267,7 @@ function closeAllModals() {
 }
 
 // Update UI based on authentication state
-function updateAuthUI() {
+async function updateAuthUI() {
   const currentUser = window.auth.getCurrentUser();
   const loginButton = document.getElementById('login-button');
   const registerButton = document.getElementById('register-button');
@@ -280,10 +280,31 @@ function updateAuthUI() {
     registerButton.style.display = 'none';
     userProfile.style.display = 'flex';
     
-    // Get user metadata to display name
-    const userData = currentUser.user_metadata || {};
-    // Display name if available, otherwise company, otherwise email
-    let displayName = userData.name || userData.company || currentUser.email;
+    let displayName;
+    
+    // Special handling for known sales rep email
+    if (currentUser.email === 'nelson@avdesign.video') {
+      displayName = 'Nelson (Sales Rep)';
+    } else if (currentUser.email === 'nelson.maluf@onprojecoes.com.br') {
+      displayName = 'Nelson Maluf (Admin)';
+    } else {
+      // Try to get user profile first
+      try {
+        const userProfile = await window.auth.getUserProfile();
+        if (userProfile && userProfile.full_name) {
+          displayName = userProfile.full_name;
+        } else {
+          // Fall back to user metadata
+          const userData = currentUser.user_metadata || {};
+          displayName = userData.name || userData.company || currentUser.email;
+        }
+      } catch (error) {
+        // Fall back to user metadata if profile fetch fails
+        const userData = currentUser.user_metadata || {};
+        displayName = userData.name || userData.company || currentUser.email;
+      }
+    }
+    
     // Limit the display name length
     if (displayName && displayName.length > 15) {
       displayName = displayName.substring(0, 12) + '...';

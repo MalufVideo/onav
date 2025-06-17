@@ -271,7 +271,27 @@ async function loadLeadsPage() {
 
 async function loadQuotesPage() {
     pageTitle.textContent = 'Gerenciamento de Orçamentos';
-    const { data: quotes } = await supabase.from('proposals').select('*').order('created_at', { ascending: false });
+    
+    // Use API endpoint with role-based filtering instead of direct Supabase query
+    let quotes = [];
+    try {
+        const response = await fetch('/api/proposals?context=dashboard', {
+            headers: {
+                'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+            }
+        });
+        
+        if (response.ok) {
+            quotes = await response.json();
+        } else {
+            console.error('Failed to fetch quotes from API:', response.status);
+            showToast('Erro ao carregar orçamentos', 'error');
+        }
+    } catch (error) {
+        console.error('Error fetching quotes:', error);
+        showToast('Erro ao carregar orçamentos', 'error');
+    }
+    
     pageContent.innerHTML = `
         <div class="data-table">
             <div class="table-header">
@@ -2110,30 +2130,102 @@ async function checkExistingClient(email) {
         const result = await response.json();
         
         if (result.exists && result.profile) {
-            // User exists with complete profile - auto-populate the form
-            document.getElementById('clientName').value = result.profile.full_name || '';
-            document.getElementById('clientCompany').value = result.profile.company || '';
-            document.getElementById('clientPhone').value = result.profile.phone || '';
-            document.getElementById('clientPassword').value = '';
-            document.getElementById('clientPassword').placeholder = 'Cliente já existe - senha não necessária';
-            document.getElementById('clientPassword').disabled = true;
-            document.getElementById('clientPassword').required = false;
-            
-            // Store the user ID for later use
-            window.existingClientUserId = result.user_id;
-            
-            showToast('Cliente encontrado! Dados preenchidos automaticamente.', 'success');
+            // Check if current user is a sales rep and if this client belongs to them
+            if (userProfile?.role === 'sales_rep') {
+                // Check if this client has previous quotes with this sales rep
+                const quotesResponse = await fetch(`/api/proposals?context=my-quotes`, {
+                    headers: {
+                        'Authorization': `Bearer ${session.session.access_token}`
+                    }
+                });
+                
+                if (quotesResponse.ok) {
+                    const salesRepQuotes = await quotesResponse.json();
+                    const existingClientQuote = salesRepQuotes.find(quote => quote.user_id === result.user_id);
+                    
+                    if (existingClientQuote) {
+                        // Client belongs to this sales rep - allow normal flow
+                        document.getElementById('clientName').value = result.profile.full_name || '';
+                        document.getElementById('clientCompany').value = result.profile.company || '';
+                        document.getElementById('clientPhone').value = result.profile.phone || '';
+                        document.getElementById('clientPassword').value = '';
+                        document.getElementById('clientPassword').placeholder = 'Cliente já existe - senha não necessária';
+                        document.getElementById('clientPassword').disabled = true;
+                        document.getElementById('clientPassword').required = false;
+                        
+                        // Store the user ID for later use
+                        window.existingClientUserId = result.user_id;
+                        
+                        showToast('Cliente encontrado! Dados preenchidos automaticamente.', 'success');
+                    } else {
+                        // Client exists but doesn't belong to this sales rep - redirect to calculator
+                        closeNewQuoteModal();
+                        
+                        // Store client info for the calculator
+                        window.selectedClientForQuote = {
+                            userId: result.user_id,
+                            email: email,
+                            name: result.profile.full_name || '',
+                            company: result.profile.company || '',
+                            phone: result.profile.phone || '',
+                            isNew: false
+                        };
+                        
+                        // Open the LED calculator modal directly
+                        openLedCalculatorModal();
+                        
+                        showToast('Cliente já existe no sistema. Redirecionando para a calculadora.', 'info');
+                        return;
+                    }
+                } else {
+                    // Error checking quotes - treat as new client relationship
+                    document.getElementById('clientName').value = result.profile.full_name || '';
+                    document.getElementById('clientCompany').value = result.profile.company || '';
+                    document.getElementById('clientPhone').value = result.profile.phone || '';
+                    document.getElementById('clientPassword').value = '';
+                    document.getElementById('clientPassword').placeholder = 'Cliente já existe - senha não necessária';
+                    document.getElementById('clientPassword').disabled = true;
+                    document.getElementById('clientPassword').required = false;
+                    
+                    // Store the user ID for later use
+                    window.existingClientUserId = result.user_id;
+                    
+                    showToast('Cliente encontrado! Dados preenchidos automaticamente.', 'success');
+                }
+            } else {
+                // Admin can access any client
+                document.getElementById('clientName').value = result.profile.full_name || '';
+                document.getElementById('clientCompany').value = result.profile.company || '';
+                document.getElementById('clientPhone').value = result.profile.phone || '';
+                document.getElementById('clientPassword').value = '';
+                document.getElementById('clientPassword').placeholder = 'Cliente já existe - senha não necessária';
+                document.getElementById('clientPassword').disabled = true;
+                document.getElementById('clientPassword').required = false;
+                
+                // Store the user ID for later use
+                window.existingClientUserId = result.user_id;
+                
+                showToast('Cliente encontrado! Dados preenchidos automaticamente.', 'success');
+            }
         } else if (result.exists && !result.profile) {
-            // User exists in auth but no profile - clear form and enable password
-            clearClientForm();
-            document.getElementById('clientPassword').disabled = false;
-            document.getElementById('clientPassword').placeholder = 'Cliente existe mas sem perfil completo';
-            document.getElementById('clientPassword').required = false;
+            // User exists in auth but no profile - redirect to calculator directly
+            closeNewQuoteModal();
             
-            // Store the user ID for later use
-            window.existingClientUserId = result.user_id;
+            // Store client info for the calculator with basic info
+            window.selectedClientForQuote = {
+                userId: result.user_id,
+                email: email,
+                name: '', // Will be filled in calculator
+                company: '',
+                phone: '',
+                isNew: false
+            };
             
-            showToast('Email encontrado no sistema. Complete os dados do perfil.', 'info');
+            // Open the LED calculator modal directly
+            openLedCalculatorModal();
+            
+            showToast('Cliente encontrado no sistema. Redirecionando para a calculadora.', 'info');
+            return;
         } else {
             // User doesn't exist - clear form and enable password
             clearClientForm();
@@ -2750,14 +2842,32 @@ async function deleteUser(userId) {
     }
     
     try {
-        const { error } = await supabase
-            .from("user_profiles")
-            .delete()
-            .eq("id", userId);
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            throw new Error('Not authenticated');
+        }
+
+        const response = await fetch(`/api/users/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${session.access_token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('User deletion result:', result);
         
-        if (error) throw error;
+        const message = result.deletedFromAuth 
+            ? "Usuário excluído com sucesso do sistema e autenticação!" 
+            : "Usuário excluído do sistema (perfil removido)!";
         
-        showToast("Usuário excluído com sucesso!", "success");
+        showToast(message, "success");
         loadPage("users");
         
     } catch (error) {

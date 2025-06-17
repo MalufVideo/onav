@@ -26,6 +26,9 @@
         // Modify the quote submission behavior
         modifyQuoteSubmission();
         
+        // Override auth UI to maintain client name display
+        overrideAuthUI();
+        
         // Listen for messages from parent window
         window.addEventListener('message', handleParentMessage);
         
@@ -94,6 +97,40 @@
                 }
             }
         });
+        
+        // Update the user display name to show the client's name instead of the sales rep's name
+        updateUserDisplayName();
+    }
+    
+    // Update the user display name in the calculator interface
+    function updateUserDisplayName() {
+        if (!clientInfo) return;
+        
+        const userName = document.getElementById('user-name');
+        if (userName && clientInfo.name) {
+            // Display the client's name with a prefix to indicate it's for the client
+            let displayName = `Cliente: ${clientInfo.name}`;
+            // Limit the display name length
+            if (displayName.length > 20) {
+                displayName = `Cliente: ${clientInfo.name.substring(0, 12)}...`;
+            }
+            userName.textContent = displayName;
+            console.log('[Dashboard Integration] Updated user display name to:', displayName);
+        }
+    }
+    
+    // Override the updateAuthUI function to maintain client name display
+    function overrideAuthUI() {
+        if (window.authUI && typeof window.authUI.updateAuthUI === 'function') {
+            const originalUpdateAuthUI = window.authUI.updateAuthUI;
+            window.authUI.updateAuthUI = async function() {
+                await originalUpdateAuthUI();
+                // After the original update, override with client name if available
+                if (clientInfo) {
+                    updateUserDisplayName();
+                }
+            };
+        }
     }
     
     // Modify quote submission to communicate with dashboard
@@ -157,6 +194,19 @@
                 return;
             }
             
+            // IMPORTANT: Set the cart modal's date properties for discount calculation
+            if (window.quoteCartModal) {
+                window.quoteCartModal.selectedStartDate = startDateInput.value;
+                window.quoteCartModal.selectedEndDate = endDateInput.value;
+                console.log('[Dashboard Integration] Set cart modal dates:', {
+                    start: startDateInput.value,
+                    end: endDateInput.value
+                });
+                
+                // Trigger cart re-render to apply progressive discount
+                window.quoteCartModal.renderCart();
+            }
+            
             // Collect all the quote data (same as original submitQuote but without saving)
             const quoteData = await collectQuoteData(projectName, startDateInput.value, endDateInput.value);
             
@@ -166,7 +216,7 @@
                 quoteData: quoteData
             }, window.location.origin);
             
-            console.log('[Dashboard Integration] Quote data sent to dashboard');
+            console.log('[Dashboard Integration] Quote data sent to dashboard:', JSON.stringify(quoteData, null, 2));
             
         } catch (error) {
             console.error('[Dashboard Integration] Error during dashboard submission:', error);
@@ -261,9 +311,10 @@
         const tetoPowerAvg = getValueOrTextById('teto-power-avg');
         const tetoWeight = getValueOrTextById('teto-total-weight');
         
-        // Get selected services from cart
+        // Get selected services from cart and calculate daily rate
         const selectedServices = [];
         const cartItemElements = document.querySelectorAll('#cart-items-container .cart-item:not(.cart-header):not(.cart-info-item)');
+        let calculatedDailyRate = 0;
         
         cartItemElements.forEach(element => {
             const nameElement = element.querySelector('.cart-item-name');
@@ -277,6 +328,11 @@
                 const unitPrice = parseCurrency(unitPriceElement.textContent.trim());
                 const subtotal = parseCurrency(subtotalElement.textContent.trim());
                 
+                // Add to daily rate calculation for ALL items (not just valid services)
+                if (!name.startsWith('Config:') && subtotal > 0) {
+                    calculatedDailyRate += subtotal;
+                }
+                
                 if (!name.startsWith('Config:') && subtotal > 0 && quantity > 0) {
                     selectedServices.push({
                         name: name,
@@ -289,10 +345,33 @@
         
         // Get pod type and pricing
         const selectedPodType = document.querySelector('input[name="disguise-mode"]:checked')?.value || '2d';
-        const dailyRate = getNumberById('total-price');
+        const dailyRate = calculatedDailyRate; // Use calculated daily rate from cart items
+        
+        console.log('[Dashboard Integration] Calculated daily rate from cart items:', dailyRate);
         const rawTotalPriceString = getValueOrTextById('cart-total-price') || '';
         const totalPriceMatch = rawTotalPriceString.match(/R\$\s?[\d.,]+/);
         const totalPrice = totalPriceMatch ? totalPriceMatch[0] : 'R$ 0,00';
+        
+        // Calculate progressive discount information
+        let discountPercentage = 0;
+        let discountAmount = 0;
+        let originalTotalPrice = dailyRate * daysCount;
+        let finalTotalPrice = originalTotalPrice;
+        
+        if (window.DiscountCalculator && daysCount > 1) {
+            const discountInfo = window.DiscountCalculator.applyDayBasedDiscount(dailyRate, daysCount);
+            discountPercentage = discountInfo.discountPercentage;
+            discountAmount = originalTotalPrice - discountInfo.finalPrice;
+            finalTotalPrice = discountInfo.finalPrice;
+            console.log('[Dashboard Integration] Calculated discount info:', {
+                days: daysCount,
+                dailyRate: dailyRate,
+                originalTotal: originalTotalPrice,
+                discountPercentage: discountPercentage,
+                discountAmount: discountAmount,
+                finalPrice: finalTotalPrice
+            });
+        }
         
         return {
             project_name: projectName,
@@ -331,7 +410,13 @@
             selected_pod_type: selectedPodType,
             selected_services: selectedServices,
             daily_rate: dailyRate,
-            total_price: totalPrice
+            total_price: `R$ ${finalTotalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            
+            // Progressive discount information
+            discount_percentage: discountPercentage,
+            discount_amount: discountAmount,
+            original_total_price: originalTotalPrice,
+            discount_reason: discountPercentage > 0 ? `Desconto progressivo por ${daysCount} dias` : null
         };
     }
     
