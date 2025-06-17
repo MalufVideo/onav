@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estúdio Virtual São Paulo | O Maior e Mais Avançado | On + Av</title>
+    <meta name="description" content="O maior estúdio de produção virtual de São Paulo. 436m² de tecnologia de ponta, 7 metros de altura, projetores 4K 50.000 ANSI Lumens, painéis LED HDR. Certified Disguise.">
+    <meta name="keywords" content="Estúdio virtual São Paulo, produção virtual Brasil, LED wall São Paulo, xR studio Brasil, Disguise certified, projetor 50000 lumens, REC2020, HDR 10 bits, Unreal Engine São Paulo, cenário virtual, produção audiovisual SP, estúdio 4K, rastreamento de câmera Stype">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <script>
+        // Tailwind CSS configuration
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00ff9d',
+                        secondary: '#0066ff',
+                        purpleish: '#9370DB',
+                        dark: '#0a0a0a',
+                        darker: '#020202',
+                        'light-text': '#e0e0e0',
+                        'medium-text': '#a0a0a0',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    animation: {
+                        'subtle-float': 'subtle-float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        'subtle-float': {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Import Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400&display=swap');
+
+        /* Base body styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020202;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 157, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 85% 80%, rgba(0, 102, 255, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 90% 30%, rgba(0, 255, 157, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 20% 70%, rgba(0, 102, 255, 0.1) 0%, transparent 55%),
+                radial-gradient(circle at 15% 90%, rgba(147, 112, 219, 0.20) 0%, transparent 60%);
+            background-attachment: fixed;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Utilities */
+        .gradient-text { background: linear-gradient(90deg, #00ff9d, #0066ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .glow-text-primary { text-shadow: 0 0 12px rgba(0, 255, 157, 0.6); }
+        .glow-box-primary { box-shadow: 0 0 25px rgba(0, 255, 157, 0.25); }
+        .glow-text-secondary { text-shadow: 0 0 12px rgba(0, 102, 255, 0.6); }
+        .glow-box-secondary { box-shadow: 0 0 25px rgba(0, 102, 255, 0.25); }
+
+        /* Card Styles */
+        .glass-card, .content-section {
+            background: rgba(15, 15, 15, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease-in-out;
+        }
+        .glass-card:hover {
+            border-color: rgba(0, 255, 157, 0.6);
+            transform: translateY(-5px);
+        }
+        .content-section { transform: none; }
+        .content-section:hover { transform: none; border-color: #00ff9d; }
+
+        /* Button Styles */
+        .btn-primary, .btn-secondary { transition: all 0.3s ease; border-radius: 0.375rem; padding: 0.75rem 2rem; font-size: 0.875rem; font-weight: 600; }
+        .btn-primary { background: linear-gradient(90deg, #00ff9d, #0066ff); color: #050505; }
+        .btn-primary:hover { opacity: 0.9; box-shadow: 0 5px 15px rgba(0, 255, 157, 0.3); transform: translateY(-2px); }
+        .btn-secondary { border: 2px solid #00ff9d; color: #00ff9d; }
+        .btn-secondary:hover { background-color: rgba(0, 255, 157, 0.1); transform: translateY(-2px); }
+
+        /* Nav and Footer */
+        nav.fixed { background-color: rgba(2, 2, 2, 0.8); }
+        footer { background-color: #050505; }
+
+        /* List Styling */
+        .styled-list li { display: flex; align-items: flex-start; margin-bottom: 0.75rem; }
+        .styled-list li i { color: #00ff9d; margin-right: 0.75rem; margin-top: 0.25rem; flex-shrink: 0; }
+
+        .hero-complex-gradient {
+            background-image: linear-gradient(
+                to bottom,
+                rgba(2, 2, 2, 0.8) 0%,
+                rgba(2, 2, 2, 0) 30%,
+                rgba(2, 2, 2, 0) 70%,
+                rgba(2, 2, 2, 0.9) 100%
+            );
+        }
+
+        .stat-card {
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+        }
+
+        .feature-icon {
+            background: linear-gradient(135deg, #00ff9d, #0066ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <nav class="fixed w-full bg-opacity-90 backdrop-blur-md z-50 border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex-shrink-0 flex items-center">
+                        <img src="img/on+av_logo_v2.png" alt="On + Av Logo" style="height:40px;" onerror="this.onerror=null; this.alt='On + Av'; this.src='https://placehold.co/120x40/020202/00ff9d?text=On%2BAv';">
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-6 lg:space-x-8">
+                        <a href="index.html#services" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Serviços</a>
+                        <a href="index.html#industries" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Indústrias</a>
+                        <a href="index.html#expertise" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Expertise</a>
+                        <a href="index.html#cases" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Cases</a>
+                        <a href="index.html#about" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Quem Somos</a>
+                        <a href="#insights" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Insights</a>
+                        <a href="index.html#contact" class="btn-primary text-sm font-bold px-5 py-2 rounded-md hover:bg-opacity-90 transition-all duration-200">Contato</a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Abrir menu principal</span>
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="hidden md:hidden bg-darker border-t border-gray-800" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="index.html#services" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Serviços</a>
+                <a href="index.html#industries" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Indústrias</a>
+                <a href="index.html#expertise" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Expertise</a>
+                <a href="index.html#cases" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Cases</a>
+                <a href="index.html#about" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Quem Somos</a>
+                <a href="#insights" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Insights</a>
+                <a href="index.html#contact" class="btn-primary text-base font-bold block px-3 py-2 rounded-md text-center mt-2">Contato</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero-estudio" class="relative w-full h-screen overflow-hidden pt-20">
+        <img src="img/disguise_ROE.webp" alt="Estúdio Virtual São Paulo - Disguise ROE" class="absolute inset-0 w-full h-full object-cover z-0">
+        <div class="absolute inset-0 hero-complex-gradient z-5"></div>
+        <div class="relative h-full flex flex-col justify-center items-center text-center p-4 md:p-8 z-10">
+            <div data-aos="fade-up" class="max-w-5xl">
+                <h1 class="text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-6 text-white">
+                    O Maior e Mais Avançado <span class="gradient-text">Estúdio</span> de Produção Virtual de São Paulo
+                </h1>
+                <p class="text-xl md:text-2xl text-light-text max-w-4xl mx-auto mb-8 leading-relaxed">
+                    Transforme Sua Visão em Realidade com Tecnologia de Ponta
+                </p>
+                <div class="flex flex-wrap justify-center gap-4 mb-8">
+                    <div class="stat-card px-6 py-3 rounded-lg">
+                        <span class="text-2xl font-bold text-primary">436m²</span>
+                        <span class="text-light-text ml-2">de Pura Inovação</span>
+                    </div>
+                    <div class="stat-card px-6 py-3 rounded-lg">
+                        <span class="text-2xl font-bold text-primary">7 Metros</span>
+                        <span class="text-light-text ml-2">de Altura</span>
+                    </div>
+                    <div class="stat-card px-6 py-3 rounded-lg">
+                        <span class="text-2xl font-bold text-primary">São Paulo</span>
+                        <span class="text-light-text ml-2">Acesso Fácil</span>
+                    </div>
+                </div>
+            </div>
+
+            <div data-aos="fade-up" data-aos-delay="200" class="max-w-4xl">
+                <p class="text-lg text-light-text mb-8 leading-relaxed">
+                    Bem-vindo ao futuro da produção audiovisual. Nosso estúdio de 31,63 x 13,80 metros oferece o espaço e a tecnologia que sua produção merece, com infraestrutura completa incluindo camarim profissional e refeitório.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="#orcamento" class="btn-primary">Solicite um Orçamento</a>
+                    <a href="#tour-virtual" class="btn-secondary">Tour Virtual</a>
+                    <a href="#especialista" class="btn-secondary">Fale com um Especialista</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="pb-16 relative z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <!-- Por Que Somos a Escolha #1 -->
+            <section class="mb-16 content-section rounded-xl p-8 md:p-12" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Por Que Somos a Escolha <span class="gradient-text">#1</span> em São Paulo</h2>
+                
+                <div class="space-y-12">
+                    <!-- Tecnologia Sem Igual -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-4 text-primary glow-text-primary flex items-center">
+                                <i class="fas fa-video mr-3 feature-icon"></i>
+                                Tecnologia Sem Igual no Brasil
+                            </h3>
+                            <ul class="styled-list text-light-text space-y-3">
+                                <li><i class="fas fa-check-circle"></i>Projetores de <span class="font-bold text-primary">50.000 ANSI Lumens</span> com resolução 4K nativa</li>
+                                <li><i class="fas fa-check-circle"></i>Espectro de cores <span class="font-bold text-secondary">REC2020</span> - a mais ampla gama cromática disponível</li>
+                                <li><i class="fas fa-check-circle"></i>Painéis LED HDR de <span class="font-bold text-primary">10 bits</span> exibindo mais de 1 bilhão de cores</li>
+                                <li><i class="fas fa-check-circle"></i>Certificação <span class="font-bold gradient-text">Disguise</span> - os primeiros e únicos no Brasil</li>
+                            </ul>
+                        </div>
+                        <div class="flex justify-center">
+                            <img src="img/disguise_ROE.webp" alt="Tecnologia Disguise ROE" class="rounded-lg glow-box-primary w-full max-w-md">
+                        </div>
+                    </div>
+
+                    <!-- Rastreamento de Precisão -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div class="flex justify-center md:order-first">
+                            <img src="img/camera_venice_LED_stype.webp" alt="Sistema Stype Rastreamento" class="rounded-lg glow-box-secondary w-full max-w-md">
+                        </div>
+                        <div class="md:order-last">
+                            <h3 class="text-2xl font-bold mb-4 text-secondary glow-text-secondary flex items-center">
+                                <i class="fas fa-crosshairs mr-3 feature-icon"></i>
+                                Rastreamento de Precisão Absoluta
+                            </h3>
+                            <p class="text-light-text leading-relaxed">
+                                Sistema <span class="font-bold text-primary">Stype</span> de rastreamento de câmera oferece efeitos de paralaxe perfeitos em tempo real, garantindo que cada movimento seja capturado com precisão milimétrica.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Realidade Estendida -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-4 text-primary glow-text-primary flex items-center">
+                                <i class="fas fa-globe mr-3 feature-icon"></i>
+                                Realidade Estendida (xR) Verdadeira
+                            </h3>
+                            <p class="text-light-text leading-relaxed">
+                                Integração perfeita entre servidores <span class="font-bold text-secondary">Disguise VX4</span> e <span class="font-bold text-secondary">RXII</span>, conectando o real ao <span class="font-bold text-primary">Unreal Engine</span> para criar mundos impossíveis com realismo impressionante.
+                            </p>
+                        </div>
+                        <div class="flex justify-center">
+                            <img src="img/unrealengine.webp" alt="Unreal Engine XR" class="rounded-lg glow-box-primary w-full max-w-md">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- O Que Você Pode Criar -->
+            <section class="mb-16" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">O Que Você Pode <span class="gradient-text">Criar Aqui</span></h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="glass-card p-6 text-center">
+                        <div class="mb-4 text-primary text-4xl"><i class="fas fa-film"></i></div>
+                        <h3 class="text-xl font-semibold mb-3 text-light-text">Produções Cinematográficas</h3>
+                        <p class="text-medium-text">com cenários virtuais ilimitados</p>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="mb-4 text-secondary text-4xl"><i class="fas fa-broadcast-tower"></i></div>
+                        <h3 class="text-xl font-semibold mb-3 text-light-text">Transmissões ao Vivo</h3>
+                        <p class="text-medium-text">com fundos dinâmicos em tempo real</p>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="mb-4 text-primary text-4xl"><i class="fas fa-building"></i></div>
+                        <h3 class="text-xl font-semibold mb-3 text-light-text">Eventos Corporativos</h3>
+                        <p class="text-medium-text">que impressionam e engajam</p>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="mb-4 text-secondary text-4xl"><i class="fas fa-shopping-cart"></i></div>
+                        <h3 class="text-xl font-semibold mb-3 text-light-text">Comerciais</h3>
+                        <p class="text-medium-text">com produção eficiente e resultados espetaculares</p>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="mb-4 text-primary text-4xl"><i class="fas fa-music"></i></div>
+                        <h3 class="text-xl font-semibold mb-3 text-light-text">Shows e Apresentações</h3>
+                        <p class="text-medium-text">com experiências imersivas únicas</p>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="mb-4 text-secondary text-4xl"><i class="fas fa-star"></i></div>
+                        <h3 class="text-xl font-semibold mb-3 text-light-text">E muito mais...</h3>
+                        <p class="text-medium-text">Sua imaginação é o limite</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vantagens Exclusivas -->
+            <section class="mb-16 content-section rounded-xl p-8 md:p-12" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Vantagens <span class="gradient-text">Exclusivas</span></h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-check text-dark text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-light-text mb-1">Economia de até 70%</h4>
+                                <p class="text-medium-text text-sm">comparado a locações tradicionais</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-8 h-8 bg-secondary rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-light-text mb-1">Zero limite criativo</h4>
+                                <p class="text-medium-text text-sm">de Marte a Manhattan em segundos</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-check text-dark text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-light-text mb-1">Produção sustentável</h4>
+                                <p class="text-medium-text text-sm">sem deslocamentos, sem desperdício</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-8 h-8 bg-secondary rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-light-text mb-1">Visualização em tempo real</h4>
+                                <p class="text-medium-text text-sm">veja o resultado final durante a gravação</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-check text-dark text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-light-text mb-1">Controle total</h4>
+                                <p class="text-medium-text text-sm">iluminação DMX, clima e ambiente sob comando</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Localização Estratégica -->
+            <section class="mb-16 content-section rounded-xl p-8 md:p-12" data-aos="fade-up">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Localização <span class="gradient-text">Estratégica</span></h2>
+                    <p class="text-light-text text-lg max-w-3xl mx-auto">
+                        Situado em São Paulo com acesso facilitado às principais vias, nosso estúdio elimina a logística complexa. Estacionamento amplo e infraestrutura completa para sua equipe.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="text-center">
+                        <div class="text-primary text-3xl mb-3"><i class="fas fa-map-marker-alt"></i></div>
+                        <h4 class="font-semibold text-light-text mb-2">Localização Premium</h4>
+                        <p class="text-medium-text text-sm">Acesso fácil às principais vias de São Paulo</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-secondary text-3xl mb-3"><i class="fas fa-parking"></i></div>
+                        <h4 class="font-semibold text-light-text mb-2">Estacionamento Amplo</h4>
+                        <p class="text-medium-text text-sm">Vagas suficientes para toda sua equipe</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-primary text-3xl mb-3"><i class="fas fa-tools"></i></div>
+                        <h4 class="font-semibold text-light-text mb-2">Infraestrutura Completa</h4>
+                        <p class="text-medium-text text-sm">Camarim, refeitório e suporte técnico</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Call to Action Final -->
+            <section class="mb-16 content-section rounded-xl p-8 md:p-12 text-center" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6">Agende Sua <span class="gradient-text">Visita Técnica</span></h2>
+                <p class="text-light-text text-lg mb-8 max-w-3xl mx-auto">
+                    Descubra como as maiores marcas estão revolucionando suas produções. Nossa equipe especializada está pronta para transformar sua visão em realidade.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4" id="cta-buttons">
+                    <a href="index.html#contact" class="btn-primary" id="orcamento">Solicite um Orçamento</a>
+                    <a href="#" class="btn-secondary" id="tour-virtual">Tour Virtual</a>
+                    <a href="index.html#contact" class="btn-secondary" id="especialista">Fale com um Especialista</a>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer class="bg-dark py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <a href="index.html" class="flex items-center mb-4">
+                        <span class="text-xl font-bold gradient-text">On + Av</span>
+                    </a>
+                    <p class="text-medium-text text-sm">A principal referência em tecnologia Disguise no Brasil, oferecendo soluções completas para produções visuais de alto nível.</p>
+                </div>
+                <div>
+                    <h4 class="text-light-text font-semibold mb-4 uppercase tracking-wider text-sm">Serviços</h4>
+                    <ul class="space-y-2">
+                        <li><a href="equipamentos.html" class="text-medium-text hover:text-primary transition duration-300 text-sm">Aluguel de Equipamentos</a></li>
+                        <li><a href="producao-virtual-xr.html" class="text-medium-text hover:text-primary transition duration-300 text-sm">Produção Virtual (xR)</a></li>
+                        <li><a href="estudio.html" class="text-medium-text hover:text-primary transition duration-300 text-sm">Estúdio Virtual SP</a></li>
+                        <li><a href="index.html#industries" class="text-medium-text hover:text-primary transition duration-300 text-sm">Projeção Mapeada</a></li>
+                        <li><a href="index.html#services" class="text-medium-text hover:text-primary transition duration-300 text-sm">Consultoria e Suporte</a></li>
+                        <li><a href="index.html#services" class="text-medium-text hover:text-primary transition duration-300 text-sm">Treinamentos</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-light-text font-semibold mb-4 uppercase tracking-wider text-sm">Links Rápidos</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html#about" class="text-medium-text hover:text-primary transition duration-300 text-sm">Quem Somos</a></li>
+                        <li><a href="index.html#industries" class="text-medium-text hover:text-primary transition duration-300 text-sm">Indústrias</a></li>
+                        <li><a href="index.html#cases" class="text-medium-text hover:text-primary transition duration-300 text-sm">Cases</a></li>
+                        <li><a href="index.html#expertise" class="text-medium-text hover:text-primary transition duration-300 text-sm">Expertise</a></li>
+                        <li><a href="index.html#contact" class="text-medium-text hover:text-primary transition duration-300 text-sm">Contato</a></li>
+                        <li><a href="#insights" class="text-medium-text hover:text-primary transition duration-300 text-sm">Insights</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-light-text font-semibold mb-4 uppercase tracking-wider text-sm">Newsletter</h4>
+                    <p class="text-medium-text text-sm mb-4">Receba novidades sobre tecnologia AV, cases e insights.</p>
+                    <form class="flex" id="newsletter-form">
+                        <input type="email" placeholder="Seu email" required class="px-3 py-2 text-sm rounded-l-md focus:outline-none bg-darker text-light-text border border-gray-700 flex-grow focus:border-primary">
+                        <button type="submit" class="bg-primary text-dark px-3 py-2 rounded-r-md font-bold text-sm hover:opacity-90 transition">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                    <div class="mt-6">
+                        <h4 class="text-light-text font-semibold mb-2 uppercase tracking-wider text-sm">Siga-nos</h4>
+                        <div class="flex space-x-3">
+                            <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="Instagram">
+                                <i class="fab fa-instagram text-base"></i>
+                            </a>
+                            <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="LinkedIn">
+                                <i class="fab fa-linkedin-in text-base"></i>
+                            </a>
+                            <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="YouTube">
+                                <i class="fab fa-youtube text-base"></i>
+                            </a>
+                            <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="Vimeo">
+                                <i class="fab fa-vimeo-v text-base"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-medium-text text-xs mb-4 md:mb-0">© 2024 On + Av. Todos os direitos reservados.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-medium-text hover:text-primary text-xs transition duration-300">Termos de Serviço</a>
+                    <a href="#" class="text-medium-text hover:text-primary text-xs transition duration-300">Política de Privacidade</a>
+                    <a href="#" class="text-medium-text hover:text-primary text-xs transition duration-300">Política de Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({ duration: 800, once: true });
+
+        // Mobile menu toggle
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+                mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+                const icon = mobileMenuButton.querySelector('i');
+                if (icon) {
+                    icon.classList.toggle('fa-bars');
+                    icon.classList.toggle('fa-times');
+                }
+            });
+        }
+
+        // Close mobile menu when clicking on links
+        const mobileMenuLinks = mobileMenu?.querySelectorAll('a');
+        if (mobileMenuLinks && mobileMenu && mobileMenuButton) {
+            mobileMenuLinks.forEach(link => {
+                if (link.getAttribute('href')?.startsWith('#') || link.getAttribute('href')?.includes('index.html#')) {
+                    link.addEventListener('click', () => {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenuButton.setAttribute('aria-expanded', 'false');
+                        const icon = mobileMenuButton.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('fa-times');
+                            icon.classList.add('fa-bars');
+                        }
+                    });
+                }
+            });
+        }
+
+        // Newsletter form
+        const newsletterForm = document.getElementById('newsletter-form');
+        if (newsletterForm) {
+            newsletterForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const emailInput = newsletterForm.querySelector('input[type="email"]');
+                const submitButton = newsletterForm.querySelector('button[type="submit"]');
+                const originalButtonContent = submitButton.innerHTML;
+                
+                if (emailInput.value) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    
+                    setTimeout(() => {
+                        emailInput.value = '';
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = '<i class="fas fa-check"></i>';
+                        
+                        setTimeout(() => {
+                            submitButton.innerHTML = originalButtonContent;
+                        }, 2000);
+                    }, 1000);
+                }
+            });
+        }
+
+        // Intersection Observer for animations
+        const animatedElements = document.querySelectorAll('.content-section, .glass-card');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        animatedElements.forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
