@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estúdio Virtual São Paulo | O Maior e Mais Avançado | On + Av</title>
-    <meta name="description" content="O maior estúdio de produção virtual de São Paulo. 436m² de tecnologia de ponta, 7 metros de altura, projetores 4K 50.000 ANSI Lumens, painéis LED HDR. Certified Disguise.">
+    <title>Estúdio de Produção Virtual de Ponta em São Paulo | On + Av</title>
+    <meta name="description" content="Descubra o maior e mais avançado estúdio de produção virtual em São Paulo. Tecnologia xR, painéis LED HDR, rastreamento Stype e Unreal Engine para transformar sua visão em realidade.">
     <meta name="keywords" content="Estúdio virtual São Paulo, produção virtual Brasil, LED wall São Paulo, xR studio Brasil, Disguise certified, projetor 50000 lumens, REC2020, HDR 10 bits, Unreal Engine São Paulo, cenário virtual, produção audiovisual SP, estúdio 4K, rastreamento de câmera Stype">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
     <script>
-        // Tailwind CSS configuration
         tailwind.config = {
             theme: {
                 extend: {
@@ -41,10 +40,7 @@
         }
     </script>
     <style>
-        /* Import Google Fonts */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400&display=swap');
-
-        /* Base body styles */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #020202;
@@ -58,16 +54,13 @@
             color: #e0e0e0;
             overflow-x: hidden;
             scroll-behavior: smooth;
+            
         }
-
-        /* Utilities */
         .gradient-text { background: linear-gradient(90deg, #00ff9d, #0066ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .glow-text-primary { text-shadow: 0 0 12px rgba(0, 255, 157, 0.6); }
         .glow-box-primary { box-shadow: 0 0 25px rgba(0, 255, 157, 0.25); }
         .glow-text-secondary { text-shadow: 0 0 12px rgba(0, 102, 255, 0.6); }
         .glow-box-secondary { box-shadow: 0 0 25px rgba(0, 102, 255, 0.25); }
-
-        /* Card Styles */
         .glass-card, .content-section {
             background: rgba(15, 15, 15, 0.65);
             backdrop-filter: blur(12px);
@@ -79,49 +72,33 @@
             border-color: rgba(0, 255, 157, 0.6);
             transform: translateY(-5px);
         }
-        .content-section { transform: none; }
-        .content-section:hover { transform: none; border-color: #00ff9d; }
-
-        /* Button Styles */
-        .btn-primary, .btn-secondary { transition: all 0.3s ease; border-radius: 0.375rem; padding: 0.75rem 2rem; font-size: 0.875rem; font-weight: 600; }
+        .content-section:hover { border-color: #00ff9d; }
+        .btn-primary, .btn-secondary {
+            transition: all 0.3s ease; border-radius: 0.375rem; padding: 0.75rem 2rem; font-size: 1rem; font-weight: 600; display: inline-block; text-align: center;
+        }
         .btn-primary { background: linear-gradient(90deg, #00ff9d, #0066ff); color: #050505; }
-        .btn-primary:hover { opacity: 0.9; box-shadow: 0 5px 15px rgba(0, 255, 157, 0.3); transform: translateY(-2px); }
-        .btn-secondary { border: 2px solid #00ff9d; color: #00ff9d; }
-        .btn-secondary:hover { background-color: rgba(0, 255, 157, 0.1); transform: translateY(-2px); }
-
-        /* Nav and Footer */
+        .btn-primary:hover { opacity: 0.9; box-shadow: 0 5px 20px rgba(0, 255, 157, 0.4); transform: translateY(-2px); }
+        .btn-secondary {
+            border: 2px solid #00ff9d; color: #00ff9d;
+        }
+        .btn-secondary:hover { background-color: rgba(0, 255, 157, 0.1); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 255, 157, 0.2); }
         nav.fixed { background-color: rgba(2, 2, 2, 0.8); }
         footer { background-color: #050505; }
-
-        /* List Styling */
         .styled-list li { display: flex; align-items: flex-start; margin-bottom: 0.75rem; }
-        .styled-list li i { color: #00ff9d; margin-right: 0.75rem; margin-top: 0.25rem; flex-shrink: 0; }
-
+        .styled-list li i { color: #00ff9d; margin-right: 0.875rem; margin-top: 0.3rem; flex-shrink: 0; font-size: 1.1em; }
         .hero-complex-gradient {
-            background-image: linear-gradient(
-                to bottom,
-                rgba(2, 2, 2, 0.8) 0%,
-                rgba(2, 2, 2, 0) 30%,
-                rgba(2, 2, 2, 0) 70%,
-                rgba(2, 2, 2, 0.9) 100%
+            background: linear-gradient(to bottom,
+                rgba(2, 2, 2, 0.3) 0%,
+                rgba(2, 2, 2, 0.5) 40%,
+                rgba(2, 2, 2, 0.85) 70%,
+                rgba(2, 2, 2, 1) 100%
             );
         }
-
-        .stat-card {
-            background: rgba(0, 255, 157, 0.1);
-            border: 1px solid rgba(0, 255, 157, 0.3);
-        }
-
-        .feature-icon {
-            background: linear-gradient(135deg, #00ff9d, #0066ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
+        .section-icon { font-size: 2.5rem; margin-bottom: 1rem; color: #00ff9d; }
     </style>
 </head>
 <body class="antialiased">
-    <nav class="fixed w-full bg-opacity-90 backdrop-blur-md z-50 border-b border-gray-800">
+    <nav class="fixed w-full bg-black/70 backdrop-blur-sm z-50 border-b border-gray-800 transition-all duration-300 hover:bg-black/80 hover:backdrop-blur">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
                 <div class="flex items-center">
@@ -131,13 +108,12 @@
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-center space-x-6 lg:space-x-8">
-                        <a href="index.html#services" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Serviços</a>
+                         <a href="index.html#services" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Serviços</a>
                         <a href="index.html#industries" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Indústrias</a>
                         <a href="index.html#expertise" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Expertise</a>
                         <a href="index.html#cases" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Cases</a>
                         <a href="index.html#about" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Quem Somos</a>
-                        <a href="#insights" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Insights</a>
-                        <a href="index.html#contact" class="btn-primary text-sm font-bold px-5 py-2 rounded-md hover:bg-opacity-90 transition-all duration-200">Contato</a>
+                        <a href="#insights" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Insights</a> <a href="index.html#contact" class="btn-primary text-sm font-bold px-5 py-2 rounded-md hover:bg-opacity-90 transition-all duration-200">Contato</a>
                     </div>
                 </div>
                 <div class="-mr-2 flex md:hidden">
@@ -161,327 +137,383 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <section id="hero-estudio" class="relative w-full h-screen overflow-hidden pt-20">
-        <img src="img/disguise_ROE.webp" alt="Estúdio Virtual São Paulo - Disguise ROE" class="absolute inset-0 w-full h-full object-cover z-0">
+        <img src="img/disguise_ROE.webp" alt="Estúdio de Produção Virtual On+Av" class="absolute inset-0 w-full h-full object-cover z-0"
+             onerror="this.onerror=null; this.src='https://placehold.co/1920x1080/020202/00ff9d?text=Estúdio+On%2BAv'; this.alt='Imagem do Estúdio On+Av';">
         <div class="absolute inset-0 hero-complex-gradient z-5"></div>
-        <div class="relative h-full flex flex-col justify-center items-center text-center p-4 md:p-8 z-10">
-            <div data-aos="fade-up" class="max-w-5xl">
-                <h1 class="text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-6 text-white">
-                    O Maior e Mais Avançado <span class="gradient-text">Estúdio</span> de Produção Virtual de São Paulo
-                </h1>
-                <p class="text-xl md:text-2xl text-light-text max-w-4xl mx-auto mb-8 leading-relaxed">
-                    Transforme Sua Visão em Realidade com Tecnologia de Ponta
-                </p>
-                <div class="flex flex-wrap justify-center gap-4 mb-8">
-                    <div class="stat-card px-6 py-3 rounded-lg">
-                        <span class="text-2xl font-bold text-primary">436m²</span>
-                        <span class="text-light-text ml-2">de Pura Inovação</span>
-                    </div>
-                    <div class="stat-card px-6 py-3 rounded-lg">
-                        <span class="text-2xl font-bold text-primary">7 Metros</span>
-                        <span class="text-light-text ml-2">de Altura</span>
-                    </div>
-                    <div class="stat-card px-6 py-3 rounded-lg">
-                        <span class="text-2xl font-bold text-primary">São Paulo</span>
-                        <span class="text-light-text ml-2">Acesso Fácil</span>
-                    </div>
-                </div>
-            </div>
-
-            <div data-aos="fade-up" data-aos-delay="200" class="max-w-4xl">
-                <p class="text-lg text-light-text mb-8 leading-relaxed">
-                    Bem-vindo ao futuro da produção audiovisual. Nosso estúdio de 31,63 x 13,80 metros oferece o espaço e a tecnologia que sua produção merece, com infraestrutura completa incluindo camarim profissional e refeitório.
-                </p>
-                <div class="flex flex-wrap justify-center gap-4">
-                    <a href="#orcamento" class="btn-primary">Solicite um Orçamento</a>
-                    <a href="#tour-virtual" class="btn-secondary">Tour Virtual</a>
-                    <a href="#especialista" class="btn-secondary">Fale com um Especialista</a>
-                </div>
+        <div class="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 pt-10 sm:pt-0">
+            <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-4 text-white animate-subtle-float" data-aos="fade-up">
+                O Mais Avançado Estúdio de <br><span class="gradient-text">Produção Virtual</span> de São Paulo
+            </h1>
+            <p class="text-xl sm:text-2xl md:text-3xl text-light-text mb-6 max-w-4xl" data-aos="fade-up" data-aos-delay="200">
+                Transforme Sua Visão em Realidade com Tecnologia de Ponta
+            </p>
+            <p class="text-lg sm:text-xl text-medium-text mb-10 max-w-3xl" data-aos="fade-up" data-aos-delay="400">
+                436m² de Pura Inovação • Acesso Fácil em São Paulo
+            </p>
+            <div data-aos="fade-up" data-aos-delay="600">
+                <a href="#contato-estudio" class="btn-primary mr-4">Solicite um Orçamento</a>
+                <a href="#tour-virtual" class="btn-secondary">Tour Virtual</a>
             </div>
         </div>
     </section>
 
-    <main class="pb-16 relative z-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <main class="py-16 md:py-24 bg-darker">
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 md:mb-24 text-center" data-aos="fade-up">
+            <i class="fas fa-door-open section-icon"></i>
+            <h2 class="text-3xl md:text-4xl font-bold mb-6 text-white">Bem-vindo ao <span class="gradient-text">Futuro da Produção</span> Audiovisual</h2>
+            <p class="text-lg md:text-xl text-light-text max-w-3xl mx-auto leading-relaxed">
+                O estúdio de <strong class="text-primary">31,63 x 13,80 metros (436m²) com 7 metros de altura</strong> oferece o espaço e a tecnologia de ponta que sua produção merece. Com uma infraestrutura completa, painéis LED e servidores montados e pronto para filmar, incluindo camarim profissional, refeitório e todos os ambientes com ar condicionado, garantimos conforto e eficiência para sua equipe.
+            </p>
+        </section>
 
-            <!-- Por Que Somos a Escolha #1 -->
-            <section class="mb-16 content-section rounded-xl p-8 md:p-12" data-aos="fade-up">
-                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Por Que Somos a Escolha <span class="gradient-text">#1</span> em São Paulo</h2>
-                
-                <div class="space-y-12">
-                    <!-- Tecnologia Sem Igual -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                        <div>
-                            <h3 class="text-2xl font-bold mb-4 text-primary glow-text-primary flex items-center">
-                                <i class="fas fa-video mr-3 feature-icon"></i>
-                                Tecnologia Sem Igual no Brasil
-                            </h3>
-                            <ul class="styled-list text-light-text space-y-3">
-                                <li><i class="fas fa-check-circle"></i>Projetores de <span class="font-bold text-primary">50.000 ANSI Lumens</span> com resolução 4K nativa</li>
-                                <li><i class="fas fa-check-circle"></i>Espectro de cores <span class="font-bold text-secondary">REC2020</span> - a mais ampla gama cromática disponível</li>
-                                <li><i class="fas fa-check-circle"></i>Painéis LED HDR de <span class="font-bold text-primary">10 bits</span> exibindo mais de 1 bilhão de cores</li>
-                                <li><i class="fas fa-check-circle"></i>Certificação <span class="font-bold gradient-text">Disguise</span> - os primeiros e únicos no Brasil</li>
-                            </ul>
-                        </div>
-                        <div class="flex justify-center">
-                            <img src="img/disguise_ROE.webp" alt="Tecnologia Disguise ROE" class="rounded-lg glow-box-primary w-full max-w-md">
-                        </div>
-                    </div>
+        <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 my-16 md:my-24" data-aos="fade-up">
+            <div class="rounded-xl overflow-hidden shadow-2xl">
+                <img src="img/estudio_3d_v2.webp" alt="Render 3D do Estúdio On+Av" class="w-full h-auto object-contain">
+            </div>
+        </section>
 
-                    <!-- Rastreamento de Precisão -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                        <div class="flex justify-center md:order-first">
-                            <img src="img/camera_venice_LED_stype.webp" alt="Sistema Stype Rastreamento" class="rounded-lg glow-box-secondary w-full max-w-md">
-                        </div>
-                        <div class="md:order-last">
-                            <h3 class="text-2xl font-bold mb-4 text-secondary glow-text-secondary flex items-center">
-                                <i class="fas fa-crosshairs mr-3 feature-icon"></i>
-                                Rastreamento de Precisão Absoluta
-                            </h3>
-                            <p class="text-light-text leading-relaxed">
-                                Sistema <span class="font-bold text-primary">Stype</span> de rastreamento de câmera oferece efeitos de paralaxe perfeitos em tempo real, garantindo que cada movimento seja capturado com precisão milimétrica.
-                            </p>
-                        </div>
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 md:mb-24">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <i class="fas fa-star section-icon"></i>
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Por Que Somos a <span class="gradient-text">Escolha #1</span> em São Paulo?</h2>
+                <p class="text-lg text-medium-text max-w-2xl mx-auto">Descubra os diferenciais que colocam nosso estúdio na vanguarda da produção virtual.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass-card p-8 rounded-xl" data-aos="fade-up" data-aos-delay="100">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-microchip text-primary text-3xl mr-4"></i>
+                        <h3 class="text-2xl font-semibold text-white">Tecnologia Sem Igual</h3>
                     </div>
-
-                    <!-- Realidade Estendida -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                        <div>
-                            <h3 class="text-2xl font-bold mb-4 text-primary glow-text-primary flex items-center">
-                                <i class="fas fa-globe mr-3 feature-icon"></i>
-                                Realidade Estendida (xR) Verdadeira
-                            </h3>
-                            <p class="text-light-text leading-relaxed">
-                                Integração perfeita entre servidores <span class="font-bold text-secondary">Disguise VX4</span> e <span class="font-bold text-secondary">RXII</span>, conectando o real ao <span class="font-bold text-primary">Unreal Engine</span> para criar mundos impossíveis com realismo impressionante.
-                            </p>
-                        </div>
-                        <div class="flex justify-center">
-                            <img src="img/unrealengine.webp" alt="Unreal Engine XR" class="rounded-lg glow-box-primary w-full max-w-md">
-                        </div>
-                    </div>
+                    <ul class="styled-list text-medium-text space-y-2">
+                        <li><i class="fas fa-check-circle"></i>Painéis LED HDR de 10 bits com mais de 1 bilhão de cores.</li>
+                        <li><i class="fas fa-check-circle"></i>Tecnologia Disguise em todo estúdio</li>
+                        <li><i class="fas fa-check-circle"></i>Projetores de 50.000 ANSI Lumens com resolução 4K nativa.</li>
+                        <li><i class="fas fa-check-circle"></i>REC.2020: a revolução na fidelidade de cores, com a gama mais abrangente já registrada.</li>
+                    </ul>
                 </div>
-            </section>
-
-            <!-- O Que Você Pode Criar -->
-            <section class="mb-16" data-aos="fade-up">
-                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">O Que Você Pode <span class="gradient-text">Criar Aqui</span></h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div class="glass-card p-6 text-center">
-                        <div class="mb-4 text-primary text-4xl"><i class="fas fa-film"></i></div>
-                        <h3 class="text-xl font-semibold mb-3 text-light-text">Produções Cinematográficas</h3>
-                        <p class="text-medium-text">com cenários virtuais ilimitados</p>
+                <div class="glass-card p-8 rounded-xl" data-aos="fade-up" data-aos-delay="200">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-crosshairs text-primary text-3xl mr-4"></i>
+                        <h3 class="text-2xl font-semibold text-white">Tracking de câmera</h3>
                     </div>
-                    <div class="glass-card p-6 text-center">
-                        <div class="mb-4 text-secondary text-4xl"><i class="fas fa-broadcast-tower"></i></div>
-                        <h3 class="text-xl font-semibold mb-3 text-light-text">Transmissões ao Vivo</h3>
-                        <p class="text-medium-text">com fundos dinâmicos em tempo real</p>
-                    </div>
-                    <div class="glass-card p-6 text-center">
-                        <div class="mb-4 text-primary text-4xl"><i class="fas fa-building"></i></div>
-                        <h3 class="text-xl font-semibold mb-3 text-light-text">Eventos Corporativos</h3>
-                        <p class="text-medium-text">que impressionam e engajam</p>
-                    </div>
-                    <div class="glass-card p-6 text-center">
-                        <div class="mb-4 text-secondary text-4xl"><i class="fas fa-shopping-cart"></i></div>
-                        <h3 class="text-xl font-semibold mb-3 text-light-text">Comerciais</h3>
-                        <p class="text-medium-text">com produção eficiente e resultados espetaculares</p>
-                    </div>
-                    <div class="glass-card p-6 text-center">
-                        <div class="mb-4 text-primary text-4xl"><i class="fas fa-music"></i></div>
-                        <h3 class="text-xl font-semibold mb-3 text-light-text">Shows e Apresentações</h3>
-                        <p class="text-medium-text">com experiências imersivas únicas</p>
-                    </div>
-                    <div class="glass-card p-6 text-center">
-                        <div class="mb-4 text-secondary text-4xl"><i class="fas fa-star"></i></div>
-                        <h3 class="text-xl font-semibold mb-3 text-light-text">E muito mais...</h3>
-                        <p class="text-medium-text">Sua imaginação é o limite</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Vantagens Exclusivas -->
-            <section class="mb-16 content-section rounded-xl p-8 md:p-12" data-aos="fade-up">
-                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Vantagens <span class="gradient-text">Exclusivas</span></h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="space-y-6">
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-4">
-                                <i class="fas fa-check text-dark text-sm"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-light-text mb-1">Economia de até 70%</h4>
-                                <p class="text-medium-text text-sm">comparado a locações tradicionais</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0 w-8 h-8 bg-secondary rounded-full flex items-center justify-center mr-4">
-                                <i class="fas fa-check text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-light-text mb-1">Zero limite criativo</h4>
-                                <p class="text-medium-text text-sm">de Marte a Manhattan em segundos</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-4">
-                                <i class="fas fa-check text-dark text-sm"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-light-text mb-1">Produção sustentável</h4>
-                                <p class="text-medium-text text-sm">sem deslocamentos, sem desperdício</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="space-y-6">
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0 w-8 h-8 bg-secondary rounded-full flex items-center justify-center mr-4">
-                                <i class="fas fa-check text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-light-text mb-1">Visualização em tempo real</h4>
-                                <p class="text-medium-text text-sm">veja o resultado final durante a gravação</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-4">
-                                <i class="fas fa-check text-dark text-sm"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-light-text mb-1">Controle total</h4>
-                                <p class="text-medium-text text-sm">iluminação DMX, clima e ambiente sob comando</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Localização Estratégica -->
-            <section class="mb-16 content-section rounded-xl p-8 md:p-12" data-aos="fade-up">
-                <div class="text-center mb-8">
-                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Localização <span class="gradient-text">Estratégica</span></h2>
-                    <p class="text-light-text text-lg max-w-3xl mx-auto">
-                        Situado em São Paulo com acesso facilitado às principais vias, nosso estúdio elimina a logística complexa. Estacionamento amplo e infraestrutura completa para sua equipe.
+                    <p class="text-medium-text leading-relaxed">
+                        Nosso sistema <strong class="text-light-text">Stype RedSpy</strong> de tracking de câmera oferece precisão de posição perfeitos para parallax  em tempo real, garantindo que cada movimento seja capturado com precisão milimétrica para uma imersão total.
                     </p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="text-center">
-                        <div class="text-primary text-3xl mb-3"><i class="fas fa-map-marker-alt"></i></div>
-                        <h4 class="font-semibold text-light-text mb-2">Localização Premium</h4>
-                        <p class="text-medium-text text-sm">Acesso fácil às principais vias de São Paulo</p>
+                <div class="glass-card p-8 rounded-xl" data-aos="fade-up" data-aos-delay="300">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-vr-cardboard text-primary text-3xl mr-4"></i>
+                        <h3 class="text-2xl font-semibold text-white">Realidade Estendida (xR)</h3>
                     </div>
-                    <div class="text-center">
-                        <div class="text-secondary text-3xl mb-3"><i class="fas fa-parking"></i></div>
-                        <h4 class="font-semibold text-light-text mb-2">Estacionamento Amplo</h4>
-                        <p class="text-medium-text text-sm">Vagas suficientes para toda sua equipe</p>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-primary text-3xl mb-3"><i class="fas fa-tools"></i></div>
-                        <h4 class="font-semibold text-light-text mb-2">Infraestrutura Completa</h4>
-                        <p class="text-medium-text text-sm">Camarim, refeitório e suporte técnico</p>
-                    </div>
+                    <p class="text-medium-text leading-relaxed">
+                        Integração perfeita entre servidores <strong class="text-light-text">Disguise VX4+ e RXII</strong>, conectando o real ao <strong class="text-light-text">Unreal Engine</strong> para criar mundos impossíveis com realismo impressionante e interatividade dinâmica.
+                    </p>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Call to Action Final -->
-            <section class="mb-16 content-section rounded-xl p-8 md:p-12 text-center" data-aos="fade-up">
-                <h2 class="text-3xl md:text-4xl font-bold mb-6">Agende Sua <span class="gradient-text">Visita Técnica</span></h2>
-                <p class="text-light-text text-lg mb-8 max-w-3xl mx-auto">
-                    Descubra como as maiores marcas estão revolucionando suas produções. Nossa equipe especializada está pronta para transformar sua visão em realidade.
-                </p>
-                <div class="flex flex-wrap justify-center gap-4" id="cta-buttons">
-                    <a href="index.html#contact" class="btn-primary" id="orcamento">Solicite um Orçamento</a>
-                    <a href="#" class="btn-secondary" id="tour-virtual">Tour Virtual</a>
-                    <a href="index.html#contact" class="btn-secondary" id="especialista">Fale com um Especialista</a>
-                </div>
-            </section>
-
+        <!-- Desenho Técnico do Estúdio -->
+        <div class="flex justify-center my-12">
+            <img src="img/volume_drawing.webp" alt="Desenho técnico do estúdio" class="rounded-2xl shadow-xl max-w-full md:max-w-3xl">
         </div>
-    </main>
 
-    <footer class="bg-dark py-12 border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-                <div>
-                    <a href="index.html" class="flex items-center mb-4">
-                        <span class="text-xl font-bold gradient-text">On + Av</span>
-                    </a>
-                    <p class="text-medium-text text-sm">A principal referência em tecnologia Disguise no Brasil, oferecendo soluções completas para produções visuais de alto nível.</p>
+        <!-- Painéis de LED Pré-Montados Section -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 md:mb-24">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <i class="fas fa-layer-group section-icon"></i>
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Painéis de LED já pré-montados</h2>
+                <p class="text-lg text-medium-text max-w-2xl mx-auto">Um curvo e um reto. Estúdio totalmente planejado para você não perder tempo: filme de um lado enquanto finaliza sua cenografia do outro e, enquanto troca de lado, prepara a próxima cenografia.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass-card p-8 rounded-xl" data-aos="fade-up" data-aos-delay="100">
+    <div class="flex items-center mb-4">
+        <i class="fa-solid fa-street-view text-primary text-3xl mr-4"></i>
+        <h3 class="text-2xl font-semibold text-white">Volume de LED 15×5m</h3>
+    </div>
+    <ul class="styled-list text-medium-text space-y-2">
+        <li><i class="fas fa-check-circle"></i>Painel curvo com 5 graus por coluna</li>
+        <li><i class="fas fa-check-circle"></i>Expansível até 20×5m</li>
+        <li><i class="fas fa-check-circle"></i>Teto para iluminação e reflexo</li>
+        <li><i class="fas fa-check-circle"></i>Boca de cena 11 metros de diâmetro</li>
+    </ul>
+</div>
+<div class="glass-card p-8 rounded-xl" data-aos="fade-up" data-aos-delay="200">
+    <div class="flex items-center mb-4">
+        <i class="fas fa-border-style text-primary text-3xl mr-4"></i>
+        <h3 class="text-2xl font-semibold text-white">Painel Reto 12×5m</h3>
+    </div>
+    <ul class="styled-list text-medium-text space-y-2">
+        <li><i class="fas fa-check-circle"></i>Se sua produção necessitar paineis de LED reto, temos o painel montado para você, com painéis opcionais laterais móveis para preenchimento.</li>
+    </ul>
+</div>
+<div class="glass-card p-8 rounded-xl" data-aos="fade-up" data-aos-delay="300">
+    <div class="flex items-center mb-4">
+        <i class="fas fa-cube text-primary text-3xl mr-4"></i>
+        <h3 class="text-2xl font-semibold text-white">xR semi cubo</h3>
+    </div>
+    <ul class="styled-list text-medium-text space-y-2">
+        <li><i class="fas fa-check-circle"></i>Quina viva 90 graus</li>
+        <li><i class="fas fa-check-circle"></i>Piso de LED</li>
+        <li><i class="fas fa-check-circle"></i>Imersão com realidade aumentada</li>
+    </ul>
+</div>
+            </div>
+        </section>
+
+        <!-- Scrolly Video Section Wrapper for 'O Que Você Pode Criar Aqui?' -->
+        <div id="scrolly-section-wrapper" style="position: relative; height: 400vh; /* Adjust for scroll length, e.g., 4x viewport height */">
+            
+            <!-- Video Container for ScrollyVideo -->
+            <div id="o-que-criar-video-container" style="position: sticky; top: 0; left: 0; width: 100%; height: 100vh; z-index: 1; overflow: hidden;">
+                <!-- Video will be injected here by ScrollyVideo -->
+            </div>
+
+            <!-- Transparent Overlay -->
+            <div id="video-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: rgba(0,0,0,0.0); z-index: 5; transition: background-color 0.3s ease-in-out; pointer-events: none;"></div>
+
+            <!-- Content Container: This will hold the title, paragraph, and cards -->
+            <div id="scrolly-content-container" style="position: sticky; top: 0; left: 0; width: 100%; height: 100vh; z-index: 10; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none;">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pointer-events-auto">
+                    <div class="mb-12" data-aos="fade-up" data-aos-anchor="#scrolly-section-wrapper"> <!-- AOS anchor to help with scroll-based triggering -->
+                        <i class="fas fa-magic section-icon"></i>
+                        <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">O Que Você Pode <span class="gradient-text">Criar Aqui?</span></h2>
+                        <p class="text-lg text-medium-text max-w-2xl mx-auto">Liberte sua criatividade em um espaço projetado para todas as formas de produção audiovisual.</p>
+                    </div>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="creation-items-container">
+                        <!-- Content will be dynamically inserted here by JavaScript -->
+                    </div>
                 </div>
-                <div>
-                    <h4 class="text-light-text font-semibold mb-4 uppercase tracking-wider text-sm">Serviços</h4>
-                    <ul class="space-y-2">
-                        <li><a href="equipamentos.html" class="text-medium-text hover:text-primary transition duration-300 text-sm">Aluguel de Equipamentos</a></li>
-                        <li><a href="producao-virtual-xr.html" class="text-medium-text hover:text-primary transition duration-300 text-sm">Produção Virtual (xR)</a></li>
-                        <li><a href="estudio.html" class="text-medium-text hover:text-primary transition duration-300 text-sm">Estúdio Virtual SP</a></li>
-                        <li><a href="index.html#industries" class="text-medium-text hover:text-primary transition duration-300 text-sm">Projeção Mapeada</a></li>
-                        <li><a href="index.html#services" class="text-medium-text hover:text-primary transition duration-300 text-sm">Consultoria e Suporte</a></li>
-                        <li><a href="index.html#services" class="text-medium-text hover:text-primary transition duration-300 text-sm">Treinamentos</a></li>
-                    </ul>
+            </div>
+        </div>
+        <!-- End Scrolly Video Section Wrapper -->
+
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 md:mb-24 pt-12">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <i class="fas fa-thumbs-up section-icon"></i>
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4"><span class="gradient-text">Vantagens</span> Exclusivas</h2>
+                 <p class="text-lg text-medium-text max-w-2xl mx-auto">Produza mais, gaste menos e explore possibilidades ilimitadas.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="glass-card p-8 rounded-xl" data-aos="fade-right">
+                    <div class="flex flex-col space-y-8">
+                        <!-- Item 1 -->
+                        <div class="flex items-start space-x-4">
+                            <i class="fas fa-dollar-sign text-primary text-2xl w-8 text-center flex-shrink-0 mt-1"></i>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-1">Economia de até 70%</h4>
+                                <p class="text-medium-text text-sm leading-relaxed">Comparado a locações tradicionais e pós-produção complexa.</p>
+                            </div>
+                        </div>
+                        <!-- Item 2 -->
+                        <div class="flex items-start space-x-4">
+                            <i class="fas fa-infinity text-primary text-2xl w-8 text-center flex-shrink-0 mt-1"></i>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-1">Zero limite criativo</h4>
+                                <p class="text-medium-text text-sm leading-relaxed">De Marte a Manhattan em segundos, sem sair do estúdio.</p>
+                            </div>
+                        </div>
+                        <!-- Item 3 -->
+                        <div class="flex items-start space-x-4">
+                            <i class="fas fa-leaf text-primary text-2xl w-8 text-center flex-shrink-0 mt-1"></i>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-1">Produção sustentável</h4>
+                                <p class="text-medium-text text-sm leading-relaxed">Menos deslocamentos, menos desperdício de materiais.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <h4 class="text-light-text font-semibold mb-4 uppercase tracking-wider text-sm">Links Rápidos</h4>
-                    <ul class="space-y-2">
-                        <li><a href="index.html#about" class="text-medium-text hover:text-primary transition duration-300 text-sm">Quem Somos</a></li>
-                        <li><a href="index.html#industries" class="text-medium-text hover:text-primary transition duration-300 text-sm">Indústrias</a></li>
-                        <li><a href="index.html#cases" class="text-medium-text hover:text-primary transition duration-300 text-sm">Cases</a></li>
-                        <li><a href="index.html#expertise" class="text-medium-text hover:text-primary transition duration-300 text-sm">Expertise</a></li>
-                        <li><a href="index.html#contact" class="text-medium-text hover:text-primary transition duration-300 text-sm">Contato</a></li>
-                        <li><a href="#insights" class="text-medium-text hover:text-primary transition duration-300 text-sm">Insights</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-light-text font-semibold mb-4 uppercase tracking-wider text-sm">Newsletter</h4>
-                    <p class="text-medium-text text-sm mb-4">Receba novidades sobre tecnologia AV, cases e insights.</p>
-                    <form class="flex" id="newsletter-form">
-                        <input type="email" placeholder="Seu email" required class="px-3 py-2 text-sm rounded-l-md focus:outline-none bg-darker text-light-text border border-gray-700 flex-grow focus:border-primary">
-                        <button type="submit" class="bg-primary text-dark px-3 py-2 rounded-r-md font-bold text-sm hover:opacity-90 transition">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </form>
-                    <div class="mt-6">
-                        <h4 class="text-light-text font-semibold mb-2 uppercase tracking-wider text-sm">Siga-nos</h4>
-                        <div class="flex space-x-3">
-                            <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="Instagram">
-                                <i class="fab fa-instagram text-base"></i>
-                            </a>
-                            <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="LinkedIn">
-                                <i class="fab fa-linkedin-in text-base"></i>
-                            </a>
-                            <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="YouTube">
-                                <i class="fab fa-youtube text-base"></i>
-                            </a>
-                            <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="Vimeo">
-                                <i class="fab fa-vimeo-v text-base"></i>
-                            </a>
+                <div class="glass-card p-8 rounded-xl" data-aos="fade-left">
+                     <div class="flex flex-col space-y-8">
+                        <!-- Item 4 -->
+                        <div class="flex items-start space-x-4">
+                            <i class="fas fa-eye text-primary text-2xl w-8 text-center flex-shrink-0 mt-1"></i>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-1">Visualização em tempo real</h4>
+                                <p class="text-medium-text text-sm leading-relaxed">Veja o resultado final durante a gravação, agilizando decisões.</p>
+                            </div>
+                        </div>
+                        <!-- Item 5 -->
+                        <div class="flex items-start space-x-4">
+                            <i class="fas fa-cogs text-primary text-2xl w-8 text-center flex-shrink-0 mt-1"></i>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-1">Controle total</h4>
+                                <p class="text-medium-text text-sm leading-relaxed">Iluminação DMX e parâmetros de cena ajustáveis remotamente via iPads.</p>
+                            </div>
+                        </div>
+                        <!-- Item 6 -->
+                        <div class="flex items-start space-x-4">
+                            <i class="fas fa-headset text-primary text-2xl w-8 text-center flex-shrink-0 mt-1"></i>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-1">Equipe especializada</h4>
+                                <p class="text-medium-text text-sm leading-relaxed">Suporte técnico dedicado durante toda a produção.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
-                <p class="text-medium-text text-xs mb-4 md:mb-0">© 2024 On + Av. Todos os direitos reservados.</p>
-                <div class="flex space-x-4">
-                    <a href="#" class="text-medium-text hover:text-primary text-xs transition duration-300">Termos de Serviço</a>
-                    <a href="#" class="text-medium-text hover:text-primary text-xs transition duration-300">Política de Privacidade</a>
-                    <a href="#" class="text-medium-text hover:text-primary text-xs transition duration-300">Política de Cookies</a>
+        </section>
+
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 md:mb-24 text-center content-section py-12 rounded-xl" data-aos="zoom-in">
+            <i class="fas fa-map-marked-alt section-icon"></i>
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Localização <span class="gradient-text">Estratégica</span></h2>
+            <p class="text-lg md:text-xl text-light-text max-w-3xl mx-auto leading-relaxed">
+                Situado em São Paulo com acesso facilitado às principais vias, nosso estúdio elimina a logística complexa. Oferecemos estacionamento amplo e seguro, além de toda a infraestrutura de apoio para sua equipe, incluindo áreas de descanso e alimentação.
+            </p>
+        </section>
+
+        <section id="contato-estudio" class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-12 md:py-20 glass-card rounded-xl" data-aos="fade-up">
+            <i class="fas fa-calendar-check section-icon"></i>
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Agende Sua <span class="gradient-text">Visita Técnica</span></h2>
+            <p class="text-lg md:text-xl text-light-text max-w-2xl mx-auto mb-10 leading-relaxed">
+                Descubra como as maiores marcas e produtoras estão revolucionando suas criações em nosso estúdio. Nossa equipe especializada está pronta para entender seu projeto e transformar sua visão em realidade.
+            </p>
+            <div class="space-y-4 sm:space-y-0 sm:space-x-4">
+                <a href="#contact" class="btn-primary">Solicite um Orçamento</a>
+                <a href="#" id="tour-virtual" class="btn-secondary">Tour Virtual 360º (Em Breve)</a>
+                <a href="tel:+5511999999999" class="btn-secondary"><i class="fas fa-phone-alt mr-2"></i>Fale com um Especialista</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-darker py-12 md:py-16 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <img src="img/on+av_logo_v2.png" alt="On + Av Logo" class="h-10 mb-4" onerror="this.onerror=null; this.alt='On + Av'; this.src='https://placehold.co/120x40/050505/00ff9d?text=On%2BAv';">
+                    <p class="text-light-text text-sm leading-relaxed">Transformando ideias em experiências visuais extraordinárias através da tecnologia de ponta em produção virtual.</p>
                 </div>
+                <div>
+                    <h5 class="text-lg font-semibold text-white mb-4">Links Rápidos</h5>
+                    <ul class="space-y-2">
+                        <li><a href="index.html#services" class="text-light-text hover:text-primary transition-colors">Serviços</a></li>
+                        <li><a href="index.html#industries" class="text-light-text hover:text-primary transition-colors">Indústrias</a></li>
+                        <li><a href="index.html#expertise" class="text-light-text hover:text-primary transition-colors">Expertise</a></li>
+                        <li><a href="index.html#cases" class="text-light-text hover:text-primary transition-colors">Cases</a></li>
+                        <li><a href="index.html#about" class="text-light-text hover:text-primary transition-colors">Quem Somos</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="text-lg font-semibold text-white mb-4">Contato</h5>
+                    <ul class="space-y-2 text-light-text">
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt mt-1 mr-3 text-primary"></i>
+                            <span>São Paulo - SP, Brasil</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-3 text-primary"></i>
+                            <a href="mailto:contato@onmaisav.com" class="hover:text-primary transition-colors">contato@onmaisav.com</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone-alt mr-3 text-primary"></i>
+                            <a href="tel:+5511999999999" class="hover:text-primary transition-colors">+55 11 99999-9999</a>
+                        </li>
+                    </ul>
+                    <div class="mt-6">
+                        <h5 class="text-lg font-semibold text-white mb-4">Siga-nos</h5>
+                        <div class="flex space-x-4">
+                            <a href="#" class="text-light-text hover:text-primary text-xl transition-colors" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="text-light-text hover:text-primary text-xl transition-colors" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="text-light-text hover:text-primary text-xl transition-colors" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                            <a href="#" class="text-light-text hover:text-primary text-xl transition-colors" aria-label="Vimeo"><i class="fab fa-vimeo-v"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 text-center text-light-text text-sm">
+                <p>&copy; <span id="current-year">2024</span> On + Av Soluções Audiovisuais. Todos os direitos reservados.</p>
+                <p class="mt-1">CNPJ: XX.XXX.XXX/0001-XX | São Paulo - SP</p>
             </div>
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/scrolly-video@latest/dist/scrolly-video.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     <script>
-        // Initialize AOS
-        AOS.init({ duration: 800, once: true });
+    document.addEventListener('DOMContentLoaded', function() {
+        // 1. Dynamic Card Creation for 'O Que Você Pode Criar Aqui?'
+        const creationItemsData = [
+            { "icon": "fa-film", "title": "Produções Cinematográficas", "desc": "Cenários virtuais ilimitados para filmes e séries com qualidade de cinema.", "delay": "0" },
+            { "icon": "fa-broadcast-tower", "title": "Transmissões ao Vivo", "desc": "Engaje sua audiência com fundos dinâmicos e interativos em tempo real.", "delay": "150" },
+            { "icon": "fa-briefcase", "title": "Eventos Corporativos", "desc": "Apresentações, lançamentos e conferências que impressionam e engajam.", "delay": "300" },
+            { "icon": "fa-bullhorn", "title": "Comerciais Impactantes", "desc": "Produção eficiente e resultados espetaculares para suas campanhas.", "delay": "450" },
+            { "icon": "fa-music", "title": "Shows e Apresentações", "desc": "Crie experiências imersivas únicas para performances artísticas e musicais.", "delay": "600" },
+            { "icon": "fa-rocket", "title": "Projetos Inovadores", "desc": "Seja qual for sua visão, nosso estúdio tem a tecnologia para realizá-la.", "delay": "750" }
+        ];
+        const creationContainer = document.getElementById('creation-items-container');
+        if (creationContainer) {
+            let htmlContent = '';
+            creationItemsData.forEach(item => {
+                const aosDelay = item.delay || '0';
+                htmlContent += `
+                    <div class="glass-card p-6 rounded-xl flex items-start space-x-4" data-aos="fade-up" data-aos-delay="${aosDelay}">
+                        <i class="fas ${item.icon} text-secondary text-3xl mt-1"></i>
+                        <div>
+                            <h3 class="text-xl font-semibold text-white mb-2">${item.title}</h3>
+                            <p class="text-medium-text text-sm leading-relaxed">${item.desc}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            creationContainer.innerHTML = htmlContent;
+        } else {
+            console.error('Error: creation-items-container not found.');
+        }
 
-        // Mobile menu toggle
+        // 2. ScrollyVideo Initialization
+        const scrollyVideoDOMContainer = document.getElementById('o-que-criar-video-container');
+        if (scrollyVideoDOMContainer) {
+          new ScrollyVideo({
+            scrollyVideoContainer: "o-que-criar-video-container",
+            src: "img/videos/output_contrast_1.2.mp4",
+            height: '100vh',
+            cover: false,
+            sticky: true,
+            full: false,
+            trackScroll: true,
+            transitionSpeed: 1,
+            frameThreshold: 0.02,
+            debug: false
+          });
+        } else {
+          console.error('ScrollyVideo container #o-que-criar-video-container not found.');
+        }
+
+        // 3. Scroll-based Overlay Fade
+        const scrollySectionWrapper = document.getElementById('scrolly-section-wrapper');
+        const videoOverlay = document.getElementById('video-overlay');
+        if (scrollySectionWrapper && videoOverlay) {
+          window.addEventListener('scroll', function() {
+            const rect = scrollySectionWrapper.getBoundingClientRect();
+            const scrollableSectionHeight = scrollySectionWrapper.offsetHeight - window.innerHeight;
+            let scrollProgress = 0;
+            if (rect.top <= 0 && rect.bottom >= window.innerHeight) {
+                scrollProgress = (-rect.top) / scrollableSectionHeight;
+            }
+            scrollProgress = Math.min(1, Math.max(0, scrollProgress));
+            let overlayOpacity = 0;
+            if (scrollProgress > 0.15) {
+                overlayOpacity = Math.min(0.75, (scrollProgress - 0.15) / 0.35);
+            }
+            videoOverlay.style.backgroundColor = `rgba(0,0,0,${overlayOpacity.toFixed(2)})`;
+          });
+        }
+
+        // 4. AOS Initialization
+        AOS.init({
+            duration: 800,
+            once: true, // Whether animation should happen only once - while scrolling down
+            offset: 50 // Offset (in px) from the original trigger point
+        });
+
+        // 5. Mobile Menu Toggle
         const mobileMenuButton = document.querySelector('.mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
-
+        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
         if (mobileMenuButton && mobileMenu) {
             mobileMenuButton.addEventListener('click', () => {
                 mobileMenu.classList.toggle('hidden');
-                const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+                const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true' || false;
                 mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
                 const icon = mobileMenuButton.querySelector('i');
                 if (icon) {
@@ -489,70 +521,156 @@
                     icon.classList.toggle('fa-times');
                 }
             });
-        }
-
-        // Close mobile menu when clicking on links
-        const mobileMenuLinks = mobileMenu?.querySelectorAll('a');
-        if (mobileMenuLinks && mobileMenu && mobileMenuButton) {
             mobileMenuLinks.forEach(link => {
-                if (link.getAttribute('href')?.startsWith('#') || link.getAttribute('href')?.includes('index.html#')) {
-                    link.addEventListener('click', () => {
+                if (link.getAttribute('href').startsWith('#') || (link.getAttribute('href').includes('index.html#'))) {
+                    link.addEventListener('click', (e) => {
                         mobileMenu.classList.add('hidden');
                         mobileMenuButton.setAttribute('aria-expanded', 'false');
                         const icon = mobileMenuButton.querySelector('i');
-                        if (icon) {
-                            icon.classList.remove('fa-times');
-                            icon.classList.add('fa-bars');
+                        if (icon) { icon.classList.remove('fa-times'); icon.classList.add('fa-bars'); }
+                        const targetId = link.getAttribute('href').split('#')[1];
+                        if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
+                            e.preventDefault();
+                            const targetElement = document.getElementById(targetId);
+                            if (targetElement) {
+                                targetElement.scrollIntoView({ behavior: 'smooth' });
+                            }
+                        } else if (targetId) {
+                             window.location.href = 'index.html#' + targetId;
                         }
+                    });
+                } else {
+                     link.addEventListener('click', () => {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenuButton.setAttribute('aria-expanded', 'false');
+                        const icon = mobileMenuButton.querySelector('i');
+                        if (icon) { icon.classList.remove('fa-times'); icon.classList.add('fa-bars'); }
                     });
                 }
             });
         }
 
-        // Newsletter form
-        const newsletterForm = document.getElementById('newsletter-form');
-        if (newsletterForm) {
-            newsletterForm.addEventListener('submit', (e) => {
+        // 6. Newsletter Form Handling
+        const newsletterFormFooter = document.getElementById('newsletter-form-footer');
+        if (newsletterFormFooter) {
+            newsletterFormFooter.addEventListener('submit', (e) => {
                 e.preventDefault();
-                const emailInput = newsletterForm.querySelector('input[type="email"]');
-                const submitButton = newsletterForm.querySelector('button[type="submit"]');
+                const emailInput = newsletterFormFooter.querySelector('input[type="email"]');
+                const submitButton = newsletterFormFooter.querySelector('button[type="submit"]');
                 const originalButtonContent = submitButton.innerHTML;
-                
                 if (emailInput.value) {
                     submitButton.disabled = true;
                     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                    
                     setTimeout(() => {
                         emailInput.value = '';
                         submitButton.disabled = false;
                         submitButton.innerHTML = '<i class="fas fa-check"></i>';
-                        
-                        setTimeout(() => {
-                            submitButton.innerHTML = originalButtonContent;
-                        }, 2000);
+                        setTimeout(() => { submitButton.innerHTML = originalButtonContent; }, 2000);
                     }, 1000);
                 }
             });
         }
 
-        // Intersection Observer for animations
-        const animatedElements = document.querySelectorAll('.content-section, .glass-card');
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                    observer.unobserve(entry.target);
+        // 7. Current Year Update
+        const currentYearSpan = document.getElementById('current-year');
+        if (currentYearSpan) { currentYearSpan.textContent = new Date().getFullYear(); }
+
+        // 8. Tour Virtual Placeholder
+        const tourVirtualButton = document.getElementById('tour-virtual');
+        if(tourVirtualButton) {
+            tourVirtualButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                alert('Tour Virtual 360º em breve!');
+            });
+        }
+    });
+    </script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 50
+        });
+
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true' || false;
+                mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+                const icon = mobileMenuButton.querySelector('i');
+                if (icon) {
+                    icon.classList.toggle('fa-bars');
+                    icon.classList.toggle('fa-times');
                 }
             });
-        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+            mobileMenuLinks.forEach(link => {
+                 // Smooth scroll for internal links, direct navigation for external/other pages
+                if (link.getAttribute('href').startsWith('#') || (link.getAttribute('href').includes('index.html#'))) {
+                    link.addEventListener('click', (e) => {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenuButton.setAttribute('aria-expanded', 'false');
+                        const icon = mobileMenuButton.querySelector('i');
+                        if (icon) { icon.classList.remove('fa-times'); icon.classList.add('fa-bars'); }
+                        
+                        const targetId = link.getAttribute('href').split('#')[1];
+                        if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') { // if on index page
+                            e.preventDefault();
+                            const targetElement = document.getElementById(targetId);
+                            if (targetElement) {
+                                targetElement.scrollIntoView({ behavior: 'smooth' });
+                            }
+                        } else if (targetId) { // if on other page and link has hash
+                             window.location.href = 'index.html#' + targetId;
+                        }
+                        // if it's a full page link like 'produtos.html', default behavior is fine
+                    });
+                } else {
+                     link.addEventListener('click', () => {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenuButton.setAttribute('aria-expanded', 'false');
+                        const icon = mobileMenuButton.querySelector('i');
+                        if (icon) { icon.classList.remove('fa-times'); icon.classList.add('fa-bars'); }
+                    });
+                }
+            });
+        }
 
-        animatedElements.forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-            observer.observe(el);
-        });
+        const newsletterFormFooter = document.getElementById('newsletter-form-footer');
+        if (newsletterFormFooter) {
+            newsletterFormFooter.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const emailInput = newsletterFormFooter.querySelector('input[type="email"]');
+                const submitButton = newsletterFormFooter.querySelector('button[type="submit"]');
+                const originalButtonContent = submitButton.innerHTML;
+                if (emailInput.value) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    setTimeout(() => {
+                        emailInput.value = '';
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = '<i class="fas fa-check"></i>';
+                        setTimeout(() => { submitButton.innerHTML = originalButtonContent; }, 2000);
+                    }, 1000);
+                }
+            });
+        }
+
+        const currentYearSpan = document.getElementById('current-year');
+        if (currentYearSpan) { currentYearSpan.textContent = new Date().getFullYear(); }
+
+        // Placeholder for Tour Virtual - can be linked to a modal or a future page
+        const tourVirtualButton = document.getElementById('tour-virtual');
+        if(tourVirtualButton) {
+            tourVirtualButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Replace with actual tour functionality when available
+                alert('Tour Virtual 360º em breve!');
+            });
+        }
     </script>
 </body>
 </html>
