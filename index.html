@@ -774,6 +774,45 @@
                 </div>
             </div>
 
+            <!-- Fourth Row of Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+                <!-- Card 1: New Case Study 1 -->
+                <div class="glass-card rounded-xl overflow-hidden case-study-trigger-new1">
+                    <div class="relative">
+                        <img src="img/globo_agro_thumb.webp" alt="Globo Agro" class="w-full h-48 object-cover">
+                        <div class="absolute bottom-0 left-0 bg-primary text-dark px-3 py-1 text-[10px] font-bold uppercase tracking-wider">Broadcast</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-1 text-light-text">Globo Agro</h3>
+                        <p class="text-medium-text text-xs">Disguise VX4 e RXII processando Unreal no LED 2.6mm HDR</p>
+                    </div>
+                </div>
+
+                <!-- Card 2: Sporting Bet -->
+                <div class="glass-card rounded-xl overflow-hidden case-study-trigger-new2">
+                    <div class="relative">
+                        <img src="img/sporting_bet.webp" alt="Sporting Bet" class="w-full h-48 object-cover">
+                        <div class="absolute bottom-0 left-0 bg-primary text-dark px-3 py-1 text-[10px] font-bold uppercase tracking-wider">Publicidade</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-1 text-light-text">Sporting Bet</h3>
+                        <p class="text-medium-text text-xs">Painel de LED 2.9mm curvo e LED 1.9mm reto</p>
+                    </div>
+                </div>
+
+                <!-- Card 3: New Case Study 3 -->
+                <div class="glass-card rounded-xl overflow-hidden case-study-trigger-new3">
+                    <div class="relative">
+                        <img src="https://img.youtube.com/vi/O9XJVbup43M/maxresdefault.jpg" alt="New Case Study 3" class="w-full h-48 object-cover">
+                        <div class="absolute bottom-0 left-0 bg-primary text-dark px-3 py-1 text-[10px] font-bold uppercase tracking-wider">Broadcast</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-1 text-light-text">New Case Study 3</h3>
+                        <p class="text-medium-text text-xs">Placeholder description for new case study 3 - content will be replaced later.</p>
+                    </div>
+                </div>
+            </div>
+
              <div class="mt-16 text-center">
                   <a href="#contact" class="btn-secondary font-bold py-3 px-8 rounded-md">
                       Discutir meu Projeto <i class="fas fa-arrow-right ml-2"></i>
@@ -945,7 +984,7 @@
             <div class="w-full pb-16 px-4 sm:px-6 lg:px-8 text-center pointer-events-auto">
                 <div data-aos="fade-up" data-aos-anchor="#estudio-scrolly-section-wrapper">
 
-                    <a href="estudio_v2.html" class="btn-primary font-bold py-3 px-8 rounded-md inline-block">Conheça o Estúdio</a>
+                    <a href="estudio.html" class="btn-primary font-bold py-3 px-8 rounded-md inline-block" style="color: #000 !important;">Conheça o Estúdio</a>
                 </div>
             </div>
         </div>
@@ -1622,6 +1661,125 @@
     </div>
   </div>
 
+  <!-- Globo Agro Modal -->
+  <div id="new1CaseStudyModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center;">
+    <div style="background-color: #1f1f1f; color: #e0e0e0; margin: auto; padding: 20px; border-radius: 20px; width: 90%; max-width: 900px; position: relative; top: 20px; border: 2px solid #00ffaa; box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 8px #00aaff, 0 0 12px #aa00ff;">
+      <span id="closeNew1CaseStudyModal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 20px;">&times;</span>
+      <h3 class="text-xl font-bold mb-2 text-light-text" style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.5rem; color: #f0f0f0;">Globo Agro</h3>
+      
+      <!-- Video Player -->
+      <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
+        <div id="globoAgroVideoContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #000;">
+          <!-- Custom play button overlay -->
+          <div id="globoAgroPlayOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.4); cursor: pointer; z-index: 2;">
+            <div style="width: 80px; height: 80px; border-radius: 50%; background-color: #00ffaa; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,255,170,0.5);">
+              <div style="width: 0; height: 0; border-top: 20px solid transparent; border-left: 35px solid #121212; border-bottom: 20px solid transparent; margin-left: 8px;"></div>
+            </div>
+          </div>
+          <!-- Video element -->
+          <video id="globoAgroVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" controls controlsList="nodownload" poster="img/globo_agro_thumb.webp" preload="auto">
+            <source src="img/videos/globo_agro_acai_720p.mp4" type="video/mp4">
+            Seu navegador não suporta a tag de vídeo.
+          </video>
+        </div>
+      </div>
+
+      <!-- Case Study Content -->
+      <div id="new1CaseStudyContent">
+        <p class="text-medium-text text-sm mb-4" style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">Disguise VX4 e RXII processando Unreal no LED 2.6mm HDR</p>
+        
+        <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Disguise VX4</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">RXII</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Unreal Engine</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">LED 2.6mm HDR</span>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Desafio do Projeto</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Integrar processamento Unreal Engine em tempo real com painéis LED HDR para produção agrícola de alto impacto visual.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Nossa Solução</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Placeholder content for solution description - will be updated with specific technical implementation details later.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Resultados</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Placeholder content for results and outcomes - will be updated with specific project results later.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Case Study 2 Modal -->
+  <div id="new2CaseStudyModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center;">
+    <div style="background-color: #1f1f1f; color: #e0e0e0; margin: auto; padding: 20px; border-radius: 20px; width: 90%; max-width: 900px; position: relative; top: 20px; border: 2px solid #00ffaa; box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 8px #00aaff, 0 0 12px #aa00ff;">
+      <span id="closeNew2CaseStudyModal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 20px;">&times;</span>
+      <h3 class="text-xl font-bold mb-2 text-light-text" style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.5rem; color: #f0f0f0;">Sporting Bet</h3>
+      
+      <!-- Video Player -->
+      <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
+        <div id="new2CaseStudyVideoContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+          <div id="sportingBetOverlay" style="position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index:2; cursor:pointer;">
+            <button id="sportingBetPlayBtn" style="background: #00ffaa; color: #121212; border: none; border-radius: 50%; width: 64px; height: 64px; font-size: 2rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 12px #00ffaa55;">
+              ▶
+            </button>
+          </div>
+          <iframe id="new2CaseStudyVideo" width="560" height="315" style="width:100%; height:100%;" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+      </div>
+
+      <!-- Case Study Content -->
+      <div id="new2CaseStudyContent">
+        <p class="text-medium-text text-sm mb-4" style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">Painel de LED 2.9mm curvo e LED 1.9mm reto</p>
+        
+        <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Technology Tag 1</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Technology Tag 2</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Technology Tag 3</span>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Desafio do Projeto</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Placeholder content for project challenge - will be updated with specific project details later.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Nossa Solução</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Placeholder content for solution description - will be updated with specific technical implementation details later.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Resultados</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Placeholder content for results and outcomes - will be updated with specific project results later.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Case Study 3 Modal -->
+  <div id="new3CaseStudyModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center;">
+    <div style="background-color: #1f1f1f; color: #e0e0e0; margin: auto; padding: 20px; border-radius: 20px; width: 90%; max-width: 900px; position: relative; top: 20px; border: 2px solid #00ffaa; box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 8px #00aaff, 0 0 12px #aa00ff;">
+      <span id="closeNew3CaseStudyModal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 20px;">&times;</span>
+      <h3 class="text-xl font-bold mb-2 text-light-text" style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.5rem; color: #f0f0f0;">New Case Study 3</h3>
+      
+      <!-- Video Player -->
+      <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
+        <iframe id="new3CaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/O9XJVbup43M" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+
+      <!-- Case Study Content -->
+      <div id="new3CaseStudyContent">
+        <p class="text-medium-text text-sm mb-4" style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">Placeholder description for new case study 3 - content will be updated later.</p>
+        
+        <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Technology Tag 1</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Technology Tag 2</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Technology Tag 3</span>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Desafio do Projeto</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Placeholder content for project challenge - will be updated with specific project details later.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Nossa Solução</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Placeholder content for solution description - will be updated with specific technical implementation details later.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Resultados</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Placeholder content for results and outcomes - will be updated with specific project results later.</p>
+      </div>
+    </div>
+  </div>
+
     <script>
         // Mobile menu toggle
         const mobileMenuButton = document.querySelector('.mobile-menu-button');
@@ -2060,6 +2218,78 @@
                 jquestCaseStudyModal.style.display = 'none';
             }
         });
+        
+        // New Case Study 1 Modal Elements
+        const new1CaseStudyModal = document.getElementById('new1CaseStudyModal');
+        const closeNew1CaseStudyModalBtn = document.getElementById('closeNew1CaseStudyModal');
+        const new1CaseStudyTrigger = document.querySelector('.case-study-trigger-new1');
+
+        if (new1CaseStudyTrigger) {
+            new1CaseStudyTrigger.style.cursor = 'pointer'; // Indicate it's clickable
+            new1CaseStudyTrigger.addEventListener('click', () => {
+                new1CaseStudyModal.style.display = 'flex'; // Use flex to center content
+            });
+        }
+
+        if (closeNew1CaseStudyModalBtn) {
+            closeNew1CaseStudyModalBtn.addEventListener('click', () => {
+                new1CaseStudyModal.style.display = 'none';
+            });
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target === new1CaseStudyModal) {
+                new1CaseStudyModal.style.display = 'none';
+            }
+        });
+        
+        // New Case Study 2 Modal Elements
+        const new2CaseStudyModal = document.getElementById('new2CaseStudyModal');
+        const closeNew2CaseStudyModalBtn = document.getElementById('closeNew2CaseStudyModal');
+        const new2CaseStudyTrigger = document.querySelector('.case-study-trigger-new2');
+
+        if (new2CaseStudyTrigger) {
+            new2CaseStudyTrigger.style.cursor = 'pointer'; // Indicate it's clickable
+            new2CaseStudyTrigger.addEventListener('click', () => {
+                new2CaseStudyModal.style.display = 'flex'; // Use flex to center content
+            });
+        }
+
+        if (closeNew2CaseStudyModalBtn) {
+            closeNew2CaseStudyModalBtn.addEventListener('click', () => {
+                new2CaseStudyModal.style.display = 'none';
+            });
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target === new2CaseStudyModal) {
+                new2CaseStudyModal.style.display = 'none';
+            }
+        });
+        
+        // New Case Study 3 Modal Elements
+        const new3CaseStudyModal = document.getElementById('new3CaseStudyModal');
+        const closeNew3CaseStudyModalBtn = document.getElementById('closeNew3CaseStudyModal');
+        const new3CaseStudyTrigger = document.querySelector('.case-study-trigger-new3');
+
+        if (new3CaseStudyTrigger) {
+            new3CaseStudyTrigger.style.cursor = 'pointer'; // Indicate it's clickable
+            new3CaseStudyTrigger.addEventListener('click', () => {
+                new3CaseStudyModal.style.display = 'flex'; // Use flex to center content
+            });
+        }
+
+        if (closeNew3CaseStudyModalBtn) {
+            closeNew3CaseStudyModalBtn.addEventListener('click', () => {
+                new3CaseStudyModal.style.display = 'none';
+            });
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target === new3CaseStudyModal) {
+                new3CaseStudyModal.style.display = 'none';
+            }
+        });
     </script>
 
     <footer class="bg-dark py-12 border-t border-gray-800"> 
@@ -2209,5 +2439,225 @@
        }
      });
    </script>
+<script>
+// Dynamic nav highlight on scroll
+const navLinks = [
+  { id: 'services',    selector: 'a[href="#services"]' },
+  { id: 'industries',  selector: 'a[href="#industries"]' },
+  { id: 'expertise',   selector: 'a[href="#expertise"]' },
+  { id: 'cases',       selector: 'a[href="#cases"]' },
+  { id: 'about',       selector: 'a[href="#about"]' },
+  { id: 'insights',    selector: 'a[href="#insights"]' }
+];
+
+function onScrollNavHighlight() {
+  // If Estúdio section is active, do not highlight any nav item except Estúdio
+  if (window.estudioSectionActive) {
+    navLinks.forEach(link => {
+      document.querySelectorAll(link.selector).forEach(el => {
+        el.classList.remove('text-primary');
+        el.classList.add('text-light-text');
+      });
+    });
+    return;
+  }
+  let scrollPos = window.scrollY || window.pageYOffset;
+  let offset = 120; // adjust if you have a sticky/fixed header
+  let found = false;
+
+  for (let i = navLinks.length - 1; i >= 0; i--) {
+    const section = document.getElementById(navLinks[i].id);
+    if (section) {
+      const sectionTop = section.offsetTop - offset;
+      if (scrollPos >= sectionTop) {
+        // Remove highlight from all
+        navLinks.forEach(link => {
+          document.querySelectorAll(link.selector).forEach(el => {
+            el.classList.remove('text-primary');
+            el.classList.add('text-light-text');
+          });
+        });
+        // Highlight current
+        document.querySelectorAll(navLinks[i].selector).forEach(el => {
+          el.classList.add('text-primary');
+          el.classList.remove('text-light-text');
+        });
+        found = true;
+        break;
+      }
+    }
+  }
+  if (!found) {
+    // If above all sections, remove highlight
+    navLinks.forEach(link => {
+      document.querySelectorAll(link.selector).forEach(el => {
+        el.classList.remove('text-primary');
+        el.classList.add('text-light-text');
+      });
+    });
+  }
+}
+window.addEventListener('scroll', onScrollNavHighlight);
+window.addEventListener('DOMContentLoaded', onScrollNavHighlight);
+
+// Highlight 'Estúdio' menu item when the scrolly section is visible
+(function() {
+  const estudioNavLinks = document.querySelectorAll('a[href="estudio.html"]');
+  const scrollyContainer = document.getElementById('estudio-scrolly-content-container');
+  if (!estudioNavLinks.length || !scrollyContainer) return;
+
+  let estudioActive = false;
+
+  function setEstudioHighlight(active) {
+    estudioNavLinks.forEach(link => {
+      if (active) {
+        link.classList.add('text-primary');
+        link.classList.remove('text-light-text');
+      } else {
+        link.classList.remove('text-primary');
+        link.classList.add('text-light-text');
+      }
+    });
+  }
+
+  // Use Intersection Observer for robust detection
+  const observer = new window.IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting) {
+        setEstudioHighlight(true);
+        estudioActive = true;
+        window.estudioSectionActive = true;
+        // Remove highlight from all other nav items
+        navLinks.forEach(link => {
+          document.querySelectorAll(link.selector).forEach(el => {
+            el.classList.remove('text-primary');
+            el.classList.add('text-light-text');
+          });
+        });
+      } else {
+        setEstudioHighlight(false);
+        estudioActive = false;
+        window.estudioSectionActive = false;
+        onScrollNavHighlight(); // re-run section highlight
+      }
+    },
+    {
+      root: null,
+      threshold: 0.4 // 40% visible triggers highlight
+    }
+  );
+  observer.observe(scrollyContainer);
+})();
+</script>
+<script>
+// Sporting Bet modal: swap iframe and play from 1:25 when user hits play
+(function() {
+    var sportingBetCard = document.querySelector('.case-study-trigger-new2');
+    var sportingBetModal = document.getElementById('new2CaseStudyModal');
+    var sportingBetIframe = document.getElementById('new2CaseStudyVideo');
+    var playBtn = document.getElementById('sportingBetPlayBtn');
+    var overlay = document.getElementById('sportingBetOverlay');
+    var closeBtn = document.getElementById('closeNew2CaseStudyModal');
+    var embedBase = 'https://www.youtube.com/embed/mSS8R5a4IWo?si=5EZ4ZRZAXu83AfYI&start=85&autoplay=1';
+
+    function resetSportingBetVideo() {
+        if (sportingBetIframe) sportingBetIframe.src = '';
+        if (overlay) overlay.style.display = 'flex';
+    }
+    function playSportingBetVideo() {
+        if (sportingBetIframe) sportingBetIframe.src = embedBase;
+        if (overlay) overlay.style.display = 'none';
+    }
+
+    // Open modal: always reset video
+    if (sportingBetCard && sportingBetModal && sportingBetIframe) {
+        sportingBetCard.addEventListener('click', function() {
+            resetSportingBetVideo();
+        });
+    }
+    // Play button
+    if (playBtn) {
+        playBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            playSportingBetVideo();
+        });
+    }
+    if (overlay) {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay || e.target === playBtn) {
+                playSportingBetVideo();
+            }
+        });
+    }
+    // Close modal: stop video
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            resetSportingBetVideo();
+        });
+    }
+    // On page load, ensure overlay is visible and video is stopped
+    resetSportingBetVideo();
+})();
+</script>
+<script>
+// Handle Globo Agro video to play from the beginning (0:00)
+(function() {
+    const globoAgroVideo = document.getElementById('globoAgroVideo');
+    const globoAgroModal = document.getElementById('new1CaseStudyModal');
+    const closeGloboAgroModal = document.getElementById('closeNew1CaseStudyModal');
+    const playOverlay = document.getElementById('globoAgroPlayOverlay');
+    
+    function playVideo() {
+        if (globoAgroVideo) {
+            // Hide overlay
+            if (playOverlay) playOverlay.style.display = 'none';
+            
+            // Play video from the beginning
+            globoAgroVideo.currentTime = 0;
+            
+            const playPromise = globoAgroVideo.play();
+            
+            // Handle play promise to avoid DOMException
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    // Auto-play was prevented
+                    console.log('Auto-play was prevented:', error);
+                    // Show overlay again
+                    if (playOverlay) playOverlay.style.display = 'flex';
+                });
+            }
+        }
+    }
+    
+    function resetVideo() {
+        if (globoAgroVideo) {
+            globoAgroVideo.pause();
+            globoAgroVideo.currentTime = 0;
+            if (playOverlay) playOverlay.style.display = 'flex';
+        }
+    }
+    
+    // Add click event to play overlay
+    if (playOverlay) {
+        playOverlay.addEventListener('click', function() {
+            playVideo();
+        });
+    }
+    
+    // Reset video when modal is closed
+    if (closeGloboAgroModal) {
+        closeGloboAgroModal.addEventListener('click', resetVideo);
+    }
+    
+    // Reset video when modal is opened
+    const globoAgroTrigger = document.querySelector('.case-study-trigger-new1');
+    if (globoAgroTrigger) {
+        globoAgroTrigger.addEventListener('click', resetVideo);
+    }
+    
+    // Initialize on page load
+    resetVideo();
+})();
+</script>
 </body>
 </html>
