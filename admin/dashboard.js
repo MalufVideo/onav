@@ -1,8 +1,17 @@
 // Dashboard JavaScript - Complete Admin Control System
-// Initialize Supabase
+// Initialize Supabase with service role key for admin operations
 const SUPABASE_URL = 'https://qhhjvpsxkfjcxitpnhxi.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1ODk4NzksImV4cCI6MjA1NTE2NTg3OX0.kAcBsHJnlr56fJ6qvXSLOWRiLTnQR7ilXUi_2Qzj4RE';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1ODk4NzksImV4cCI6MjA1NTE2NTg3OX0.kAcBsHJnlr56fJ6qvXSLOWRiLTnQR7ilXUi_2Qzj4RE';
+const SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczOTU4OTg3OSwiZXhwIjoyMDU1MTY1ODc5fQ.z2VbGSyj6HCxtFyji69JX9uoBw1fRPWM74YSZisdDCU';
+
+// Create both clients: anon for regular operations, service role for admin operations
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+});
 
 // Global state
 let currentPage = 'overview';
@@ -410,9 +419,12 @@ async function loadUsersPage() {
         let authUsers = [];
         if (userProfile?.role === 'admin') {
             try {
-                const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
-                if (!authError) {
+                const { data: authData, error: authError } = await supabaseAdmin.auth.admin.listUsers();
+                if (!authError && authData) {
                     authUsers = authData.users;
+                    console.log(`Found ${authUsers.length} users in auth`);
+                } else {
+                    console.warn('Auth error or no data:', authError);
                 }
             } catch (authError) {
                 console.warn('Could not fetch auth data:', authError);
@@ -3135,7 +3147,7 @@ async function saveQuoteChanges(event, quoteId, originalTotal) {
 async function createUserProfile(userId) {
     try {
         // Get the auth user data
-        const { data: authData, error: authError } = await supabase.auth.admin.getUserById(userId);
+        const { data: authData, error: authError } = await supabaseAdmin.auth.admin.getUserById(userId);
         if (authError) throw authError;
         
         const authUser = authData.user;
