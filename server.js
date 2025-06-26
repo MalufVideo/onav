@@ -1039,15 +1039,20 @@ app.get('/api/proposals', async (req, res) => {
       .select('*');
 
     // Apply filtering based on user role and context
+    console.log(`[DEBUG] Applying filters - Role: ${userRole}, Context: ${context}, User ID: ${user.id}`);
+    
     if (context === 'my-quotes') {
       if (userRole === 'sales_rep') {
         // Sales reps see quotes they created
+        console.log('[DEBUG] Sales rep - filtering by sales_rep_id');
         query = query.eq('sales_rep_id', user.id);
       } else if (userRole === 'admin') {
         // Admins accessing my-quotes should see their own quotes only
+        console.log('[DEBUG] Admin in my-quotes - filtering by user_id OR sales_rep_id');
         query = query.or(`user_id.eq.${user.id},sales_rep_id.eq.${user.id}`);
       } else {
         // End users see only their own quotes
+        console.log('[DEBUG] End user - filtering by user_id');
         query = query.eq('user_id', user.id);
       }
     } else if (context === 'dashboard') {
@@ -1057,11 +1062,15 @@ app.get('/api/proposals', async (req, res) => {
       }
       // Admins see all quotes, sales reps see quotes they created
       if (userRole === 'sales_rep') {
+        console.log('[DEBUG] Sales rep in dashboard - filtering by sales_rep_id');
         query = query.eq('sales_rep_id', user.id);
+      } else if (userRole === 'admin') {
+        console.log('[DEBUG] ADMIN in dashboard - NO FILTER applied, should see ALL quotes');
       }
       // Note: For admin users, we don't add any filter - they see ALL quotes
     } else {
       // Default: user sees only their own quotes
+      console.log('[DEBUG] Default context - filtering by user_id');
       query = query.eq('user_id', user.id);
     }
 
