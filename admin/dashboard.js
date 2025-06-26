@@ -406,15 +406,7 @@ async function loadUsersPage() {
     // Fetch users from Supabase with auth data
     let users = [];
     try {
-        // Get user profiles
-        const { data: profiles, error: profileError } = await supabase
-            .from('user_profiles')
-            .select('*')
-            .order('created_at', { ascending: false });
-        
-        if (profileError) throw profileError;
-        
-        // Get auth users data for last sign-in info (admin only)
+        // Get auth users data first (this shows ALL users including those without profiles)
         let authUsers = [];
         if (userProfile?.role === 'admin') {
             try {
@@ -424,18 +416,47 @@ async function loadUsersPage() {
                 }
             } catch (authError) {
                 console.warn('Could not fetch auth data:', authError);
+                showToast('Erro ao carregar dados de autenticação', 'error');
             }
         }
         
-        // Merge profile and auth data
-        users = profiles.map(profile => {
-            const authUser = authUsers.find(au => au.id === profile.id);
+        // Get user profiles
+        const { data: profiles, error: profileError } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (profileError && profileError.code !== 'PGRST116') { // PGRST116 means table doesn't exist or no rows
+            console.warn('Error fetching profiles:', profileError);
+        }
+        
+        // Start with all auth users and merge profile data when available
+        users = authUsers.map(authUser => {
+            const profile = profiles?.find(p => p.id === authUser.id);
+            
             return {
-                ...profile,
-                last_sign_in_at: authUser?.last_sign_in_at,
-                phone: authUser?.phone || profile.phone
+                id: authUser.id,
+                email: authUser.email,
+                phone: authUser.phone || profile?.phone,
+                created_at: authUser.created_at,
+                last_sign_in_at: authUser.last_sign_in_at,
+                // Profile data (may be null for users without profiles)
+                full_name: profile?.full_name || authUser.user_metadata?.name || authUser.user_metadata?.full_name,
+                role: profile?.role || 'end_user',
+                is_active: profile?.is_active !== false, // Default to true if no profile
+                last_login_at: profile?.last_login_at || authUser.last_sign_in_at,
+                // Mark if this user has a profile or not
+                has_profile: !!profile,
+                // Include auth metadata
+                raw_user_meta_data: authUser.user_metadata,
+                email_confirmed_at: authUser.email_confirmed_at,
+                // Use profile created_at if available, otherwise auth created_at
+                created_at: profile?.created_at || authUser.created_at
             };
         });
+        
+        // Sort by creation date (newest first)
+        users.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         
     } catch (error) {
         console.error('Error fetching users:', error);
@@ -485,6 +506,8 @@ async function loadUsersPage() {
             
             if (button.classList.contains('edit-user-btn')) {
                 openUserModal(userId);
+            } else if (button.classList.contains('create-profile-btn')) {
+                createUserProfile(userId);
             } else if (button.classList.contains('toggle-user-btn')) {
                 toggleUserStatus(userId);
             }
@@ -2601,18 +2624,18 @@ async function loadUsersPage() {
 
 function generateUsersTable(users) {
     if (!users || users.length === 0) {
-        return "<tr><td colspan=\"7\" class=\"text-center\">Nenhum usuário encontrado</td></tr>";
+        return "<tr><td colspan=\"8\" class=\"text-center\">Nenhum usuário encontrado</td></tr>";
     }
     
     return users.map(user => {
         const roleLabel = getRoleLabel(user.role);
         
-        // Format phone number - prioritize user_profiles.phone first
+        // Format phone number
         let phoneNumber = user.phone || "N/A";
         
-        // Format last login from user_profiles table
-        const lastSignIn = user.last_login_at ? 
-            new Date(user.last_login_at).toLocaleString('pt-BR', {
+        // Format last login - use the most recent between profile and auth data
+        const lastSignIn = user.last_sign_in_at ? 
+            new Date(user.last_sign_in_at).toLocaleString('pt-BR', {
                 day: '2-digit',
                 month: '2-digit', 
                 year: 'numeric',
@@ -2620,20 +2643,46 @@ function generateUsersTable(users) {
                 minute: '2-digit'
             }) : "Nunca logou";
         
+        // Status indicators
+        const emailConfirmed = user.email_confirmed_at ? 
+            '<span style="color: green;" title="Email confirmado"><i class="fas fa-check-circle"></i></span>' : 
+            '<span style="color: orange;" title="Email não confirmado"><i class="fas fa-exclamation-circle"></i></span>';
+        
+        const profileStatus = user.has_profile ? 
+            '<span style="color: blue;" title="Tem perfil"><i class="fas fa-user-check"></i></span>' : 
+            '<span style="color: gray;" title="Sem perfil"><i class="fas fa-user-plus"></i></span>';
+        
         return `
-            <tr data-status="${user.is_active ? "active" : "inactive"}">
-                <td>${user.full_name || user.raw_user_meta_data?.name || "N/A"}</td>
-                <td>${user.email || "N/A"}</td>
+            <tr data-status="${user.is_active ? "active" : "inactive"}" ${!user.has_profile ? 'style="background-color: #fff3cd;"' : ''}>
+                <td>
+                    ${user.full_name || user.raw_user_meta_data?.name || user.raw_user_meta_data?.full_name || "N/A"}
+                    ${!user.has_profile ? '<br><small style="color: #856404;"><i class="fas fa-exclamation-triangle"></i> Sem perfil</small>' : ''}
+                </td>
+                <td>
+                    ${user.email || "N/A"}
+                    <br><small>${emailConfirmed} ${profileStatus}</small>
+                </td>
                 <td>${phoneNumber}</td>
                 <td>${roleLabel}</td>
-                <td>${formatDate(user.created_at)}</td>
+                <td>
+                    <span class="status-badge ${user.is_active ? 'active' : 'inactive'}">
+                        ${user.is_active ? 'Ativo' : 'Inativo'}
+                    </span>
+                </td>
                 <td>${lastSignIn}</td>
+                <td>${formatDate(user.created_at)}</td>
                 <td>
                     <div class="action-buttons">
                         <button class="btn btn-sm btn-secondary edit-user-btn" 
                                 data-user-id="${user.id}" title="Editar">
                             <i class="fas fa-edit"></i>
                         </button>
+                        ${!user.has_profile ? `
+                            <button class="btn btn-sm btn-info create-profile-btn" 
+                                    data-user-id="${user.id}" title="Criar Perfil">
+                                <i class="fas fa-user-plus"></i>
+                            </button>
+                        ` : ''}
                         <button class="btn btn-sm ${user.is_active ? "btn-warning" : "btn-success"} toggle-status-btn" 
                                 data-user-id="${user.id}" 
                                 title="${user.is_active ? "Desativar" : "Ativar"}">
@@ -3079,6 +3128,51 @@ async function saveQuoteChanges(event, quoteId, originalTotal) {
     } catch (error) {
         console.error('Error saving quote changes:', error);
         showToast('Erro ao salvar alterações: ' + error.message, 'error');
+    }
+}
+
+// Create profile for users who only exist in auth but don't have a profile
+async function createUserProfile(userId) {
+    try {
+        // Get the auth user data
+        const { data: authData, error: authError } = await supabase.auth.admin.getUserById(userId);
+        if (authError) throw authError;
+        
+        const authUser = authData.user;
+        if (!authUser) {
+            showToast('Usuário não encontrado', 'error');
+            return;
+        }
+        
+        // Create a basic profile with auth data
+        const profileData = {
+            id: authUser.id,
+            email: authUser.email,
+            full_name: authUser.user_metadata?.name || authUser.user_metadata?.full_name || authUser.email.split('@')[0],
+            phone: authUser.phone || null,
+            role: 'end_user',
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        
+        // Insert the profile
+        const { data: profile, error: profileError } = await supabase
+            .from('user_profiles')
+            .insert([profileData])
+            .select()
+            .single();
+        
+        if (profileError) throw profileError;
+        
+        showToast('Perfil criado com sucesso', 'success');
+        
+        // Reload the users page to show the updated data
+        loadPage('users');
+        
+    } catch (error) {
+        console.error('Error creating user profile:', error);
+        showToast('Erro ao criar perfil: ' + error.message, 'error');
     }
 }
 
