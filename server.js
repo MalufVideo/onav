@@ -2130,14 +2130,15 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
       return res.status(400).json({ error: 'Proposal ID is required' });
     }
 
-    // Get current proposal
-    const { data: proposal, error: fetchError } = await supabase
+    // Use admin client to bypass RLS
+    const { data: proposal, error: fetchError } = await supabaseAdmin
       .from('proposals')
       .select('project_name, quote_url_slug')
       .eq('id', id)
       .single();
 
     if (fetchError || !proposal) {
+      console.error('Error fetching proposal:', fetchError);
       return res.status(404).json({ error: 'Proposal not found' });
     }
 
@@ -2146,22 +2147,39 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
       return res.json({ slug: proposal.quote_url_slug });
     }
 
-    // Generate slug using the database function
-    const { data: slugResult, error: slugError } = await supabase
-      .rpc('generate_url_slug', {
-        project_name: proposal.project_name,
-        proposal_id: id
-      });
+    // Generate a simple slug from project name
+    function generateSlug(projectName) {
+      return projectName
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '') // Remove special characters
+        .replace(/\s+/g, '-')     // Replace spaces with hyphens
+        .replace(/-+/g, '-')      // Replace multiple hyphens with single
+        .trim('-');               // Remove leading/trailing hyphens
+    }
 
-    if (slugError) {
-      console.error('Error generating slug:', slugError);
-      return res.status(500).json({ error: 'Failed to generate URL slug' });
+    let baseSlug = generateSlug(proposal.project_name);
+    let finalSlug = baseSlug;
+    let counter = 1;
+
+    // Check for existing slugs and make unique
+    while (true) {
+      const { data: existing } = await supabaseAdmin
+        .from('proposals')
+        .select('id')
+        .eq('quote_url_slug', finalSlug)
+        .neq('id', id)
+        .single();
+
+      if (!existing) break; // Slug is unique
+      
+      finalSlug = `${baseSlug}-${counter}`;
+      counter++;
     }
 
     // Update proposal with the generated slug
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseAdmin
       .from('proposals')
-      .update({ quote_url_slug: slugResult })
+      .update({ quote_url_slug: finalSlug })
       .eq('id', id);
 
     if (updateError) {
@@ -2169,7 +2187,7 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
       return res.status(500).json({ error: 'Failed to update proposal with slug' });
     }
 
-    res.json({ slug: slugResult });
+    res.json({ slug: finalSlug });
 
   } catch (error) {
     console.error('Error in generate slug endpoint:', error);
