@@ -1034,7 +1034,12 @@ app.get('/api/proposals', async (req, res) => {
     }
 
     const context = req.query.context || 'my-quotes';
-    let query = supabase
+    
+    // For admin users in dashboard context, use service role client to bypass RLS
+    const clientToUse = (userRole === 'admin' && context === 'dashboard') ? supabaseAdmin : supabase;
+    console.log(`[DEBUG] Using ${clientToUse === supabaseAdmin ? 'ADMIN' : 'ANON'} client for query`);
+    
+    let query = clientToUse
       .from('proposals')
       .select('*');
 
