@@ -1059,6 +1059,7 @@ app.get('/api/proposals', async (req, res) => {
       if (userRole === 'sales_rep') {
         query = query.eq('sales_rep_id', user.id);
       }
+      // Note: For admin users, we don't add any filter - they see ALL quotes
     } else {
       // Default: user sees only their own quotes
       query = query.eq('user_id', user.id);
