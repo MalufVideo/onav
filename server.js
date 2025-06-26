@@ -587,13 +587,46 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-// Get auth data for users (admin only) - Simplified version without admin API
+// Get auth data for users (admin only) - Uses service role key
 app.get('/api/users/auth-data', async (req, res) => {
   try {
-    // For now, return empty auth data since we don't have service role access
-    // This will make the dashboard work with basic user profile data
-    console.log('Auth data endpoint called - returning empty data due to service role limitation');
-    res.json([]);
+    console.log('Auth data endpoint called with service role access');
+    
+    // Verify user has admin role
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: 'No authorization header' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    // Check if user is admin
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile || (profile.role !== 'admin' && user.email !== 'nelson.maluf@onprojecoes.com.br')) {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    // Use service role client to get all auth users
+    const { data: authData, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+    
+    if (listError) {
+      console.error('Error listing users:', listError);
+      return res.status(500).json({ error: 'Failed to fetch auth users', details: listError.message });
+    }
+
+    console.log(`Successfully fetched ${authData.users.length} auth users`);
+    res.json(authData.users);
+    
   } catch (error) {
     console.error('Error fetching auth data:', error.message);
     res.status(500).json({ error: 'Failed to fetch auth data', details: error.message });

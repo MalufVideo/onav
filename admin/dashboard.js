@@ -419,15 +419,23 @@ async function loadUsersPage() {
         let authUsers = [];
         if (userProfile?.role === 'admin') {
             try {
-                const { data: authData, error: authError } = await supabaseAdmin.auth.admin.listUsers();
-                if (!authError && authData) {
-                    authUsers = authData.users;
-                    console.log(`Found ${authUsers.length} users in auth`);
+                // Use API endpoint with proper authentication
+                const { data: session } = await supabase.auth.getSession();
+                const response = await fetch('/api/users/auth-data', {
+                    headers: {
+                        'Authorization': `Bearer ${session?.session?.access_token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    authUsers = await response.json();
+                    console.log(`Found ${authUsers.length} users in auth via API`);
                 } else {
-                    console.warn('Auth error or no data:', authError);
+                    const errorData = await response.json();
+                    console.warn('Auth API error:', errorData);
                 }
             } catch (authError) {
-                console.warn('Could not fetch auth data:', authError);
+                console.warn('Could not fetch auth data via API:', authError);
                 showToast('Erro ao carregar dados de autenticação', 'error');
             }
         }
@@ -3146,11 +3154,21 @@ async function saveQuoteChanges(event, quoteId, originalTotal) {
 // Create profile for users who only exist in auth but don't have a profile
 async function createUserProfile(userId) {
     try {
-        // Get the auth user data
-        const { data: authData, error: authError } = await supabaseAdmin.auth.admin.getUserById(userId);
-        if (authError) throw authError;
+        // Get the auth user data via API
+        const { data: session } = await supabase.auth.getSession();
+        const response = await fetch('/api/users/auth-data', {
+            headers: {
+                'Authorization': `Bearer ${session?.session?.access_token}`
+            }
+        });
         
-        const authUser = authData.user;
+        if (!response.ok) {
+            throw new Error('Failed to fetch auth users');
+        }
+        
+        const authUsers = await response.json();
+        const authUser = authUsers.find(user => user.id === userId);
+        
         if (!authUser) {
             showToast('Usuário não encontrado', 'error');
             return;
