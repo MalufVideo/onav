@@ -421,9 +421,16 @@ async function loadUsersPage() {
             try {
                 // Use API endpoint with proper authentication
                 const { data: session } = await supabase.auth.getSession();
+                console.log('Session status:', session?.session ? 'Active' : 'No session');
+                
+                if (!session?.session?.access_token) {
+                    console.warn('No access token available for auth API call');
+                    return;
+                }
+                
                 const response = await fetch('/api/users/auth-data', {
                     headers: {
-                        'Authorization': `Bearer ${session?.session?.access_token}`
+                        'Authorization': `Bearer ${session.session.access_token}`
                     }
                 });
                 
@@ -431,8 +438,27 @@ async function loadUsersPage() {
                     authUsers = await response.json();
                     console.log(`Found ${authUsers.length} users in auth via API`);
                 } else {
-                    const errorData = await response.json();
-                    console.warn('Auth API error:', errorData);
+                    const errorData = await response.text();
+                    console.warn('Auth API error:', response.status, errorData);
+                    
+                    // If unauthorized, try to refresh session
+                    if (response.status === 401) {
+                        console.log('Attempting to refresh session...');
+                        const { data: refreshedSession } = await supabase.auth.refreshSession();
+                        if (refreshedSession?.session) {
+                            console.log('Session refreshed, retrying auth API call...');
+                            const retryResponse = await fetch('/api/users/auth-data', {
+                                headers: {
+                                    'Authorization': `Bearer ${refreshedSession.session.access_token}`
+                                }
+                            });
+                            
+                            if (retryResponse.ok) {
+                                authUsers = await retryResponse.json();
+                                console.log(`Found ${authUsers.length} users in auth via API (after refresh)`);
+                            }
+                        }
+                    }
                 }
             } catch (authError) {
                 console.warn('Could not fetch auth data via API:', authError);

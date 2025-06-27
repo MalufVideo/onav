@@ -594,27 +594,40 @@ app.get('/api/users/auth-data', async (req, res) => {
     
     // Verify user has admin role
     const authHeader = req.headers.authorization;
+    console.log('Auth header present:', !!authHeader);
+    
     if (!authHeader) {
+      console.log('No authorization header provided');
       return res.status(401).json({ error: 'No authorization header' });
     }
 
     const token = authHeader.replace('Bearer ', '');
+    console.log('Token length:', token.length);
+    
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !user) {
-      return res.status(401).json({ error: 'Invalid token' });
+      console.log('Auth error:', authError?.message || 'No user found');
+      return res.status(401).json({ error: 'Invalid token', details: authError?.message });
     }
 
+    console.log('Authenticated user:', user.email);
+
     // Check if user is admin
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('user_profiles')
       .select('role')
       .eq('id', user.id)
       .single();
 
+    console.log('Profile lookup result:', profile, 'Error:', profileError?.message);
+
     if (!profile || (profile.role !== 'admin' && user.email !== 'nelson.maluf@onprojecoes.com.br')) {
+      console.log('Access denied - not admin:', profile?.role, user.email);
       return res.status(403).json({ error: 'Admin access required' });
     }
+
+    console.log('Admin access confirmed for:', user.email);
 
     // Use service role client to get all auth users
     const { data: authData, error: listError } = await supabaseAdmin.auth.admin.listUsers();
