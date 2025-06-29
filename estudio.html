@@ -9,6 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.2.0/css/glightbox.min.css">
     <script>
         tailwind.config = {
             theme: {
@@ -170,11 +171,34 @@
             </p>
         </section>
 
-        <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 my-16 md:my-24" data-aos="fade-up">
-            <div class="rounded-xl overflow-hidden shadow-2xl">
-                <img src="img/estudio_3d_v2.webp" alt="Render 3D do Estúdio On+Av" class="w-full h-auto object-contain">
+        <!-- Scrolly Video Section Wrapper for 'O Estúdio' -->
+        <div id="estudio-scrolly-section-wrapper" style="position: relative; height: 400vh; /* Adjust for scroll length, e.g., 4x viewport height */">
+            
+            <!-- Video Container for ScrollyVideo -->
+            <div id="estudio-video-container" style="position: sticky; top: 0; left: 0; width: 100%; height: 100vh; z-index: 1; overflow: hidden;">
+                <!-- Video will be injected here by ScrollyVideo -->
             </div>
-        </section>
+
+            <!-- Content Container: This will hold the title, subtitle, and CTA button -->
+            <div id="estudio-scrolly-content-container" style="position: sticky; top: 0; left: 0; width: 100%; height: 100vh; z-index: 10; display: flex; flex-direction: column; justify-content: space-between; align-items: center; pointer-events: none;">
+                <!-- Top title section -->
+                <div class="w-full pt-32 px-4 sm:px-6 lg:px-8 text-center pointer-events-auto">
+                    <div data-aos="fade-down" data-aos-anchor="#estudio-scrolly-section-wrapper">
+                        <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">O Estúdio de Produção Virtual<br><span class="gradient-text">mais Avançado do Brasil</span></h1>
+                        <p class="text-lg text-light-text max-w-3xl mx-auto">Powered by Disguise, com LED HDR 10 bits e tracking de câmera</p>
+                    </div>
+                </div>
+                
+                <!-- Bottom CTA section -->
+                <div class="w-full pb-16 px-4 sm:px-6 lg:px-8 text-center pointer-events-auto">
+                    <div data-aos="fade-up" data-aos-anchor="#estudio-scrolly-section-wrapper">
+
+                        <a href="estudio.html" class="btn-primary font-bold py-3 px-8 rounded-md inline-block" style="color: #000 !important;">Conheça o Estúdio</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Scrolly Video Section Wrapper -->
 
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 md:mb-24">
             <div class="text-center mb-12" data-aos="fade-up">
@@ -220,6 +244,47 @@
         <div class="flex justify-center my-12">
             <img src="img/volume_drawing.webp" alt="Desenho técnico do estúdio" class="rounded-2xl shadow-xl max-w-full md:max-w-3xl">
         </div>
+
+        <!-- Galeria do Estúdio -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 md:mb-24">
+            <div class="text-center mb-8" data-aos="fade-up">
+                <i class="fas fa-images section-icon"></i>
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Galeria do <span class="gradient-text">Estúdio</span></h2>
+                <p class="text-lg text-medium-text max-w-2xl mx-auto">Conheça cada detalhe do nosso estúdio de produção virtual através de imagens exclusivas</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
+                <a href="img/estudio.mp4" class="gallery-item glightbox glass-card p-2 rounded-xl relative" data-gallery="estudio-gallery">
+                    <img src="img/estudio.webp" alt="Vídeo do estúdio em funcionamento" class="rounded-lg w-full h-56 object-cover hover:scale-105 transition-transform duration-300">
+                    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 rounded-lg hover:bg-opacity-20 transition-all duration-300">
+                        <i class="fas fa-play-circle text-white text-4xl opacity-90"></i>
+                    </div>
+                </a>
+                <a href="img/estudio_draco.webp" class="gallery-item glightbox glass-card p-2 rounded-xl" data-gallery="estudio-gallery">
+                    <img src="img/estudio_draco.webp" alt="Estúdio com sistema Draco em operação" class="rounded-lg w-full h-56 object-cover hover:scale-105 transition-transform duration-300">
+                </a>
+                <a href="img/estudio.webp" class="gallery-item glightbox glass-card p-2 rounded-xl" data-gallery="estudio-gallery">
+                    <img src="img/estudio.webp" alt="Vista geral do estúdio de produção virtual" class="rounded-lg w-full h-56 object-cover hover:scale-105 transition-transform duration-300">
+                </a>
+                <a href="img/camarim.webp" class="gallery-item glightbox glass-card p-2 rounded-xl" data-gallery="estudio-gallery">
+                    <img src="img/camarim.webp" alt="Camarim profissional do estúdio" class="rounded-lg w-full h-56 object-cover hover:scale-105 transition-transform duration-300">
+                </a>
+                <a href="img/camarim2.webp" class="gallery-item glightbox glass-card p-2 rounded-xl" data-gallery="estudio-gallery">
+                    <img src="img/camarim2.webp" alt="Área de descanso e preparação" class="rounded-lg w-full h-56 object-cover hover:scale-105 transition-transform duration-300">
+                </a>
+                <a href="img/estudio2.webp" class="gallery-item glightbox glass-card p-2 rounded-xl" data-gallery="estudio-gallery">
+                    <img src="img/estudio2.webp" alt="Ângulo alternativo do estúdio" class="rounded-lg w-full h-56 object-cover hover:scale-105 transition-transform duration-300">
+                </a>
+                <a href="img/led_curvo.webp" class="gallery-item glightbox glass-card p-2 rounded-xl" data-gallery="estudio-gallery">
+                    <img src="img/led_curvo.webp" alt="Detalhe do painel LED curvo" class="rounded-lg w-full h-56 object-cover hover:scale-105 transition-transform duration-300">
+                </a>
+                <a href="img/painel_reto.webp" class="gallery-item glightbox glass-card p-2 rounded-xl" data-gallery="estudio-gallery">
+                    <img src="img/painel_reto.webp" alt="Painel LED reto para diferentes configurações" class="rounded-lg w-full h-56 object-cover hover:scale-105 transition-transform duration-300">
+                </a>
+                <a href="img/painelreto.webp" class="gallery-item glightbox glass-card p-2 rounded-xl" data-gallery="estudio-gallery">
+                    <img src="img/painelreto.webp" alt="Configuração do painel reto em uso" class="rounded-lg w-full h-56 object-cover hover:scale-105 transition-transform duration-300">
+                </a>
+            </div>
+        </section>
 
         <!-- Painéis de LED Pré-Montados Section -->
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 md:mb-24">
@@ -432,6 +497,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/scrolly-video@latest/dist/scrolly-video.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.2.0/js/glightbox.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         // 1. Dynamic Card Creation for 'O Que Você Pode Criar Aqui?'
@@ -480,6 +546,25 @@
           });
         } else {
           console.error('ScrollyVideo container #o-que-criar-video-container not found.');
+        }
+
+        // 2.1 ScrollyVideo Initialization for Estudio Section
+        const estudioVideoDOMContainer = document.getElementById('estudio-video-container');
+        if (estudioVideoDOMContainer) {
+          new ScrollyVideo({
+            scrollyVideoContainer: "estudio-video-container",
+            src: "img/videos/medidas_estudio.mp4",
+            height: '100vh',
+            cover: false,
+            sticky: true,
+            full: false,
+            trackScroll: true,
+            transitionSpeed: 1,
+            frameThreshold: 0.02,
+            debug: false
+          });
+        } else {
+          console.error('ScrollyVideo container #estudio-video-container not found.');
         }
 
         // 3. Scroll-based Overlay Fade
@@ -586,6 +671,14 @@
                 alert('Tour Virtual 360º em breve!');
             });
         }
+
+        // 9. GLightbox Gallery Initialization
+        const lightbox = GLightbox({
+            touchNavigation: true,
+            loop: true,
+            autoplayVideos: true,
+            selector: '.glightbox'
+        });
     });
     </script>
     <script>
