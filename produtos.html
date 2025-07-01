@@ -548,6 +548,66 @@
                     </div>
                 </section>
 
+                <section id="telescopic-jib" class="equipment-section rounded-xl p-8 md:p-12">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div class="flex justify-center items-center md:order-last">
+                            <img src="img/grua_telescopica.gif" alt="Grua Telescópica em Ação" class="rounded-lg shadow-lg glow-box-primary w-full h-auto object-cover">
+                        </div>
+                        <div class="md:order-first">
+                            <h2 class="text-3xl font-bold mb-4 text-primary glow-text-primary">Grua Telescópica</h2>
+                            <p class="text-light-text mb-6 leading-relaxed">
+                                A grua telescópica é uma ferramenta essencial para movimentos de câmera dinâmicos e cinematográficos. Com seu braço telescópico versátil, permite capturar ângulos únicos e movimentos fluidos que elevam a qualidade visual de qualquer produção. Ideal para cenas que exigem movimentos verticais amplos, transições suaves e perspectivas diferenciadas, nossa grua oferece controle preciso e estabilidade incomparável. Seja para documentários, filmes publicitários, eventos ao vivo ou produções corporativas, a grua telescópica proporciona a liberdade criativa necessária para criar imagens impactantes e profissionais.
+                            </p>
+                            <button class="accordion-button btn-secondary font-medium py-2 px-6 rounded-md text-sm inline-flex items-center" data-target="details-jib">
+                                <span class="button-text">Ver Especificações</span>
+                                <i class="fas fa-chevron-down accordion-icon ml-2 text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="details-jib" class="equipment-details mt-6">
+                        <div class="space-y-6">
+                            <div class="equipment-item p-6 flex flex-col md:flex-row gap-6 items-center">
+                                <img src="img/grua_telescopica.gif" alt="Grua Telescópica Detalhes" class="rounded w-full md:w-1/3 lg:w-1/4 h-auto object-cover flex-shrink-0">
+                                <div class="flex-grow">
+                                    <h4 class="text-xl font-semibold text-light-text mb-4">Especificações Técnicas</h4>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                        <div>
+                                            <h5 class="text-lg font-semibold text-light-text mb-3">Recursos Principais</h5>
+                                            <ul class="space-y-2 text-sm text-medium-text">
+                                                <li class="flex items-center"><i class="fas fa-check text-primary mr-2 text-xs"></i>Braço telescópico com extensão variável</li>
+                                                <li class="flex items-center"><i class="fas fa-check text-primary mr-2 text-xs"></i>Controle remoto de pan, tilt e zoom</li>
+                                                <li class="flex items-center"><i class="fas fa-check text-primary mr-2 text-xs"></i>Movimentos suaves e silenciosos</li>
+                                                <li class="flex items-center"><i class="fas fa-check text-primary mr-2 text-xs"></i>Compatível com câmeras profissionais</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <h5 class="text-lg font-semibold text-light-text mb-3">Aplicações</h5>
+                                            <ul class="space-y-2 text-sm text-medium-text">
+                                                <li class="flex items-center"><i class="fas fa-check text-primary mr-2 text-xs"></i>Produções cinematográficas</li>
+                                                <li class="flex items-center"><i class="fas fa-check text-primary mr-2 text-xs"></i>Eventos e shows ao vivo</li>
+                                                <li class="flex items-center"><i class="fas fa-check text-primary mr-2 text-xs"></i>Filmagens publicitárias</li>
+                                                <li class="flex items-center"><i class="fas fa-check text-primary mr-2 text-xs"></i>Documentários e transmissões</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-gradient-to-r from-primary/10 to-secondary/10 p-4 rounded-lg border border-primary/30">
+                                        <h5 class="text-lg font-semibold text-light-text mb-2">Vantagens</h5>
+                                        <p class="text-sm text-medium-text">
+                                            A grua telescópica oferece flexibilidade incomparável para criar movimentos de câmera cinematográficos. Com capacidade de extensão variável e controle preciso, permite capturar desde planos amplos até detalhes íntimos, proporcionando valor de produção elevado e resultados profissionais.
+                                        </p>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <a href="index.html#contact" class="text-primary hover:underline text-sm font-medium">Solicitar Orçamento <i class="fas fa-external-link-alt ml-1"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
             </div>
         </div>
     </main>
@@ -702,6 +762,7 @@
                                 else if(sectionTitle.includes('Tracking')) categoryName = "Sistemas";
                                 else if(sectionTitle.includes('Unidades')) categoryName = "UMs";
                                 else if(sectionTitle.includes('Draco')) categoryName = "Especificações";
+                                else if(sectionTitle.includes('Grua')) categoryName = "Especificações";
                             }
                             buttonTextSpan.textContent = `Ver ${categoryName}`;
                          }

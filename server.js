@@ -613,18 +613,23 @@ app.get('/api/users/auth-data', async (req, res) => {
 
     console.log('Authenticated user:', user.email);
 
-    // Check if user is admin
-    const { data: profile, error: profileError } = await supabase
-      .from('user_profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
+    // Check if user is admin - special handling for master admin
+    if (user.email === 'nelson.maluf@onprojecoes.com.br') {
+      console.log('Master admin access granted for:', user.email);
+    } else {
+      // Check if user is admin via user_profiles table
+      const { data: profile, error: profileError } = await supabaseAdmin
+        .from('user_profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
 
-    console.log('Profile lookup result:', profile, 'Error:', profileError?.message);
+      console.log('Profile lookup result:', profile, 'Error:', profileError?.message);
 
-    if (!profile || (profile.role !== 'admin' && user.email !== 'nelson.maluf@onprojecoes.com.br')) {
-      console.log('Access denied - not admin:', profile?.role, user.email);
-      return res.status(403).json({ error: 'Admin access required' });
+      if (!profile || profile.role !== 'admin') {
+        console.log('Access denied - not admin:', profile?.role, user.email);
+        return res.status(403).json({ error: 'Admin access required' });
+      }
     }
 
     console.log('Admin access confirmed for:', user.email);

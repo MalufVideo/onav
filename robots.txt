@@ -1,0 +1,50 @@
+# Robots.txt for onav.live
+# Main site robots configuration
+
+User-agent: *
+
+# Block private quote system
+Disallow: /quotes/
+Disallow: /bluefit/
+
+# Block admin areas
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /login/
+
+# Block database and config files
+Disallow: /*.sql
+Disallow: /*.log
+Disallow: /*.env
+Disallow: /config/
+
+# Block tracking and debug files
+Disallow: /track_*
+Disallow: /debug_*
+Disallow: /test_*
+
+# Allow main content
+Allow: /
+Allow: /produtos.html
+Allow: /index.html
+Allow: /img/
+Allow: /css/
+Allow: /js/
+
+# Specific search engine directives
+User-agent: Googlebot
+Disallow: /quotes/
+Disallow: /bluefit/
+Disallow: /admin/
+
+User-agent: Bingbot
+Disallow: /quotes/
+Disallow: /bluefit/
+Disallow: /admin/
+
+# Crawl delay for aggressive bots
+User-agent: *
+Crawl-delay: 1
+
+# Sitemap location (add when you create one)
+# Sitemap: https://onav.live/sitemap.xml

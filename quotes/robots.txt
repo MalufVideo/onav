@@ -1,0 +1,53 @@
+# Robots.txt for quotes folder
+# Prevent indexing of quote pages and analytics
+
+User-agent: *
+Disallow: /quotes/
+Disallow: /bluefit/
+
+# Specifically block quote files
+Disallow: /quotes/bluefit.php
+Disallow: /quotes/bluefit.html
+Disallow: /quotes/dashboard.php
+Disallow: /quotes/reset_data.php
+Disallow: /quotes/track_*.php
+Disallow: /quotes/debug_*.php
+Disallow: /quotes/test_*.php
+
+# Block database and config files
+Disallow: /quotes/*.sql
+Disallow: /quotes/*.log
+
+# Block image folder if contains sensitive content
+Disallow: /quotes/img/
+
+# Major search engines
+User-agent: Googlebot
+Disallow: /quotes/
+Disallow: /bluefit/
+
+User-agent: Bingbot
+Disallow: /quotes/
+Disallow: /bluefit/
+
+User-agent: Slurp
+Disallow: /quotes/
+Disallow: /bluefit/
+
+User-agent: DuckDuckBot
+Disallow: /quotes/
+Disallow: /bluefit/
+
+User-agent: Baiduspider
+Disallow: /quotes/
+Disallow: /bluefit/
+
+User-agent: YandexBot
+Disallow: /quotes/
+Disallow: /bluefit/
+
+# Allow your main site
+Allow: /
+
+# Sitemap (if you have one for your main site)
+# Sitemap: https://onav.live/sitemap.xml

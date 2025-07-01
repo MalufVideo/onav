@@ -420,17 +420,24 @@ async function loadUsersPage() {
         if (userProfile?.role === 'admin') {
             try {
                 // Use API endpoint with proper authentication
-                const { data: session } = await supabase.auth.getSession();
-                console.log('Session status:', session?.session ? 'Active' : 'No session');
+                const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+                console.log('Session data:', sessionData);
+                console.log('Session error:', sessionError);
+                console.log('Session status:', sessionData?.session ? 'Active' : 'No session');
                 
-                if (!session?.session?.access_token) {
+                if (!sessionData?.session?.access_token) {
                     console.warn('No access token available for auth API call');
+                    console.log('Session details:', sessionData);
                     return;
                 }
                 
+                console.log('Making API call with token length:', sessionData.session.access_token.length);
+                
                 const response = await fetch('/api/users/auth-data', {
+                    method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${session.session.access_token}`
+                        'Authorization': `Bearer ${sessionData.session.access_token}`,
+                        'Content-Type': 'application/json'
                     }
                 });
                 
@@ -448,8 +455,10 @@ async function loadUsersPage() {
                         if (refreshedSession?.session) {
                             console.log('Session refreshed, retrying auth API call...');
                             const retryResponse = await fetch('/api/users/auth-data', {
+                                method: 'GET',
                                 headers: {
-                                    'Authorization': `Bearer ${refreshedSession.session.access_token}`
+                                    'Authorization': `Bearer ${refreshedSession.session.access_token}`,
+                                    'Content-Type': 'application/json'
                                 }
                             });
                             
@@ -2576,12 +2585,31 @@ async function loadUsersPage() {
         // Get auth data for last sign-in information via server API
         let usersWithAuthData = users;
         try {
-            const response = await fetch('/api/users/auth-data');
+            // Get current session token for authentication
+            const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+            console.log('Session available for auth API:', !!sessionData?.session?.access_token);
+            
+            if (!sessionData?.session?.access_token) {
+                console.warn('No session token available for auth API call');
+                return;
+            }
+            
+            const response = await fetch('/api/users/auth-data', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${sessionData.session.access_token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            console.log('Auth API response status:', response.status);
+            
             if (response.ok) {
                 const authData = await response.json();
+                console.log('Auth data received:', authData.length, 'auth users');
                 
-                // Merge user profiles with auth data
-                usersWithAuthData = users.map(user => {
+                // Merge user profiles with auth data AND include auth-only users
+                const mergedUsers = users.map(user => {
                     const authUser = authData.find(auth => auth.id === user.id);
                     return {
                         ...user,
@@ -2589,8 +2617,27 @@ async function loadUsersPage() {
                         raw_user_meta_data: authUser?.raw_user_meta_data || authUser?.user_metadata
                     };
                 });
+                
+                // Add auth users who don't have profiles yet
+                const authOnlyUsers = authData.filter(authUser => 
+                    !users.find(user => user.id === authUser.id)
+                ).map(authUser => ({
+                    id: authUser.id,
+                    email: authUser.email,
+                    full_name: authUser.raw_user_meta_data?.full_name || authUser.user_metadata?.full_name || null,
+                    role: 'end_user', // Default role for new users
+                    is_active: true,
+                    created_at: authUser.created_at,
+                    last_sign_in_at: authUser.last_sign_in_at,
+                    raw_user_meta_data: authUser.raw_user_meta_data || authUser.user_metadata,
+                    hasProfile: false // Flag to indicate this user needs a profile
+                }));
+                
+                usersWithAuthData = [...mergedUsers, ...authOnlyUsers];
+                console.log('Total users after merge:', usersWithAuthData.length, 'profiles +', authOnlyUsers.length, 'auth-only');
             } else {
-                console.warn('Could not fetch auth data from server');
+                const errorText = await response.text();
+                console.warn('Could not fetch auth data from server:', response.status, errorText);
             }
         } catch (authError) {
             console.warn('Error fetching auth data:', authError);
@@ -2766,14 +2813,47 @@ async function openUserModal(userId = null) {
     
     if (userId) {
         try {
+            // First try to get from user_profiles table
             const { data: userData, error } = await supabase
                 .from("user_profiles")
                 .select("*")
                 .eq("id", userId)
                 .single();
             
-            if (error) throw error;
-            if (userData) user = userData;
+            if (error && error.code !== 'PGRST116') {
+                // PGRST116 means no rows found, which is expected for auth-only users
+                throw error;
+            }
+            
+            if (userData) {
+                user = userData;
+            } else {
+                // User doesn't have a profile yet, get data from auth via API
+                console.log('User has no profile, fetching from auth data...');
+                const response = await fetch('/api/users/auth-data', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session.access_token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const authData = await response.json();
+                    const authUser = authData.find(auth => auth.id === userId);
+                    if (authUser) {
+                        user = {
+                            id: authUser.id,
+                            email: authUser.email,
+                            full_name: authUser.raw_user_meta_data?.full_name || authUser.user_metadata?.full_name || "",
+                            phone: authUser.raw_user_meta_data?.phone || authUser.user_metadata?.phone || "",
+                            role: "end_user", // Default role for new profiles
+                            is_active: true,
+                            isNewProfile: true // Flag to indicate this will create a new profile
+                        };
+                    }
+                }
+            }
         } catch (error) {
             console.error("Error fetching user for edit:", error);
             showToast("Erro ao carregar dados do usuário", "error");
