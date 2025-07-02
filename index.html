@@ -104,18 +104,80 @@
     <!-- Load critical fonts with font-display swap -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- External CSS and JS Files -->
-    <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <!-- Critical CSS - Inline for Performance -->
+    <style>
+        /* Base body styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020202;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        
+        /* Critical utilities */
+        .gradient-text {
+            background: linear-gradient(135deg, #00ff9d 0%, #0066ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .text-primary { color: #00ff9d; }
+        .text-light-text { color: #e0e0e0; }
+        .hidden { display: none; }
+        
+        /* Critical navigation */
+        nav.fixed {
+            background-color: rgba(2, 2, 2, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Critical buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #00ff9d 0%, #00cc7a 100%);
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        /* Critical glass effect */
+        .glass-card {
+            background: rgba(2, 2, 2, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+        }
+    </style>
+    
+    <!-- Non-critical CSS - Load async -->
+    <link rel="preload" href="/css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/css/main.css"></noscript>
+    
+    <!-- Font Awesome - Deferred -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
     
     <!-- Tailwind CSS - Deferred -->
-    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script>
+        // Load Tailwind CSS asynchronously
+        const tailwindScript = document.createElement('script');
+        tailwindScript.src = 'https://cdn.tailwindcss.com';
+        tailwindScript.defer = true;
+        document.head.appendChild(tailwindScript);
+    </script>
     
-    <!-- External JS Files -->
+    <!-- External JS Files - Deferred -->
     <script src="/js/main.js" defer></script>
     <style>
-        /* Page-specific blob background override */
+        /* Page-specific blob background */
         body {
             background-image:
                 radial-gradient(circle at 10% 20%, rgba(0, 255, 157, 0.15) 0%, transparent 50%),
@@ -125,15 +187,9 @@
                 radial-gradient(circle at 15% 90%, rgba(147, 112, 219, 0.20) 0%, transparent 60%);
             background-attachment: fixed;
         }
-        
-        /* Enhanced glass card for homepage */
-        .glass-card {
-            background: rgba(10, 10, 10, 0.65);
-            backdrop-filter: blur(12px);
-        }
     </style>
 </head>
-<body class="antialiased custom-background">
+<body class="antialiased">
     
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GT-MQPB9ZVQ"
