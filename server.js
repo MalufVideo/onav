@@ -63,6 +63,11 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'dashboard.html'));
 });
 
+// Route to serve the main index.html page for root path
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // --- API Routes for Products ---
 
 // GET all products
