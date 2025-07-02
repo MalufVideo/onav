@@ -96,8 +96,16 @@
     <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
     <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
     
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/img/on+av_logo_v3.png" as="image">
+    <link rel="preload" href="/img/hero-bg.webp" as="image">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    
+    <!-- Load critical fonts with font-display swap -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- Critical CSS and Scripts -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
     <script>
@@ -132,8 +140,7 @@
         }
     </script>
     <style>
-        /* Import Google Fonts */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400&display=swap');
+        /* Google Fonts already loaded above with preload */
 
         /* Base body styles with Blob Background (Purple Increased Visibility) */
         body {
@@ -3865,6 +3872,134 @@ function toggleFAQ(faqId) {
         content.classList.add('hidden');
         icon.style.transform = 'rotate(0deg)';
     }
+}
+</script>
+
+<!-- Performance Optimization Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Add lazy loading to all non-critical images
+    const imagesToLazyLoad = [
+        // Technology partners
+        'img[src*="disguise.webp"]',
+        'img[src*="unreal.webp"]', 
+        'img[src*="christie.webp"]',
+        'img[src*="notch.webp"]',
+        'img[src*="lg.webp"]',
+        'img[src*="stype-logo-black.webp"]',
+        // Case study images
+        'img[src*="youtube.com"]',
+        'img[src*="dvd_jquest"]',
+        'img[src*="team2.webp"]',
+        'img[src*="rafael_sa.webp"]',
+        'img[src*="doridio.jpg"]',
+        'img[src*="randomuser.me"]',
+        // Detailed case study images
+        'img[src*="olimpiadas_globo"]',
+        'img[src*="tate-disguise.webp"]',
+        'img[src*="belo_vp"]',
+        'img[src*="ludmilla_coachella"]',
+        'img[src*="gloob"]',
+        'img[src*="globo-volume-led.webp"]',
+        'img[src*="vp-neve.webp"]',
+        'img[src*="globo-venice.webp"]',
+        'img[src*="globo-producao-virtual"]'
+    ];
+    
+    imagesToLazyLoad.forEach(selector => {
+        const images = document.querySelectorAll(selector);
+        images.forEach(img => {
+            if (!img.hasAttribute('loading')) {
+                img.setAttribute('loading', 'lazy');
+            }
+        });
+    });
+    
+    // 2. Optimize Font Awesome loading
+    const fontAwesome = document.querySelector('link[href*="font-awesome"]');
+    if (fontAwesome && !fontAwesome.media) {
+        fontAwesome.media = 'print';
+        fontAwesome.onload = function() { this.media = 'all'; };
+    }
+    
+    // 3. Defer non-critical third-party scripts
+    setTimeout(() => {
+        // Load any non-critical scripts after initial paint
+        const scripts = document.querySelectorAll('script[data-defer]');
+        scripts.forEach(script => {
+            script.src = script.dataset.src;
+        });
+    }, 1000);
+    
+    // 4. Optimize images with intersection observer for better lazy loading
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    if (img.dataset.src) {
+                        img.src = img.dataset.src;
+                        img.classList.remove('lazy');
+                        observer.unobserve(img);
+                    }
+                }
+            });
+        }, {
+            rootMargin: '50px 0px'
+        });
+        
+        document.querySelectorAll('img[data-src]').forEach(img => {
+            imageObserver.observe(img);
+        });
+    }
+    
+    // 5. Preconnect to external domains used later
+    const preconnectDomains = [
+        'https://img.youtube.com',
+        'https://randomuser.me'
+    ];
+    
+    preconnectDomains.forEach(domain => {
+        const link = document.createElement('link');
+        link.rel = 'preconnect';
+        link.href = domain;
+        document.head.appendChild(link);
+    });
+    
+    // 6. Add resource hints for critical resources
+    const resourceHints = [
+        { rel: 'dns-prefetch', href: '//img.youtube.com' },
+        { rel: 'dns-prefetch', href: '//randomuser.me' }
+    ];
+    
+    resourceHints.forEach(hint => {
+        const link = document.createElement('link');
+        link.rel = hint.rel;
+        link.href = hint.href;
+        document.head.appendChild(link);
+    });
+    
+    // 7. Minimize main thread work by deferring heavy operations
+    function deferHeavyWork() {
+        // Any heavy calculations or DOM manipulations
+        // should be wrapped in requestIdleCallback or setTimeout
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => {
+                // Heavy work here
+                console.log('Heavy work completed during idle time');
+            });
+        }
+    }
+    
+    deferHeavyWork();
+});
+
+// 8. Service Worker for caching (optional, for advanced performance)
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        // Uncomment when ready to implement SW caching
+        // navigator.serviceWorker.register('/sw.js');
+    });
 }
 </script>
 
