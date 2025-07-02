@@ -110,7 +110,6 @@
     
     <!-- Preload critical resources -->
     <link rel="preload" href="/img/on+av_logo_v3.png" as="image">
-    <link rel="preload" href="/img/hero-bg.webp" as="image">
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     
     <!-- Load critical fonts with font-display swap -->
@@ -1128,7 +1127,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
                  </div>
                   <div class="testimonial-card rounded-xl p-8">
                        <div class="flex items-center mb-6">
-                           <img src="img/doridio.jpg" alt="Foto de Doridio Silva" class="w-12 h-12 rounded-full mr-4 border-2 border-primary" onerror="this.onerror=null; this.src='https://placehold.co/48x48/020202/e0e0e0?text=DS';">
+                           <img src="img/doridio.webp" alt="Foto de Doridio Silva" class="w-12 h-12 rounded-full mr-4 border-2 border-primary" width="48" height="48" onerror="this.onerror=null; this.src='https://placehold.co/48x48/020202/e0e0e0?text=DS';">
                            <div>
                                <h4 class="font-bold text-light-text">Doridio Silva</h4>
                                <p class="text-medium-text text-xs">Diretor, Elfus Eventos</p>
@@ -1210,7 +1209,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
                 </div>
                  <div class="lg:w-1/2">
                     <div class="relative">
-                        <img src="img/team2.webp" alt="Nossa Equipe em Ação" class="rounded-xl shadow-xl glow-box-secondary" onerror="this.onerror=null; this.src='https://placehold.co/600x400/020202/e0e0e0?text=Equipe+On+Av';">
+                        <img src="img/team2.webp" alt="Nossa Equipe em Ação" class="rounded-xl shadow-xl glow-box-secondary" width="600" height="400" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/600x400/020202/e0e0e0?text=Equipe+On+Av';">
                         <div class="absolute -bottom-6 -left-6 glass-card p-4 rounded-xl shadow-lg border border-secondary glow-box-secondary z-10 w-2/3 md:w-1/2">
                             <div class="flex items-center">
                                 <div class="bg-secondary bg-opacity-20 rounded-full p-3 mr-3">
@@ -2088,7 +2087,9 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
         <!-- YouTube Button -->
         <div style="position: relative; padding: 30px 0; margin-top: 30px; text-align: center; background-color: #121212; border-radius: 12px; overflow: hidden;">
           <div style="position: relative; z-index: 2;">
-            <img src="/img/youtube-logo.png" alt="YouTube Logo" style="height: 50px; margin: 0 auto 15px; display: block;" onerror="this.src='https://www.youtube.com/s/desktop/12d6b690/img/favicon_144x144.png'; this.style.height='40px';">
+            <div style="text-align: center; margin-bottom: 15px; color: #00ff9d; font-size: 24px;">
+                <i class="fab fa-youtube" style="font-size: 50px; color: #FF0000;"></i>
+            </div>
             <h4 style="color: #f0f0f0; margin-bottom: 20px; font-size: 1.2rem;">Assista ao vídeo no YouTube</h4>
             <a href="https://www.youtube.com/watch?v=7S-lfmsvd2A" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #ff0000; color: white; font-weight: bold; padding: 12px 24px; border-radius: 30px; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,0,0,0.3);">
               <span style="display: flex; align-items: center; justify-content: center;">
@@ -3224,14 +3225,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
         // ScrollyVideo temporarily disabled for performance
         console.log('ScrollyVideo disabled for performance optimization');
         if (false) {
-          // Temporarily disabled
-            trackScroll: true,
-            transitionSpeed: 1,
-            frameThreshold: 0.02,
-            debug: false
-          });
-        } else {
-          console.error('ScrollyVideo container #estudio-video-container not found.');
+          // Temporarily disabled - ScrollyVideo initialization would go here
         }
         
         // No overlay fade effect needed for Estudio section
@@ -3855,7 +3849,7 @@ document.addEventListener('DOMContentLoaded', function() {
         'img[src*="dvd_jquest"]',
         'img[src*="team2.webp"]',
         'img[src*="rafael_sa.webp"]',
-        'img[src*="doridio.jpg"]',
+        'img[src*="doridio.webp"]',
         'img[src*="randomuser.me"]',
         // Detailed case study images
         'img[src*="olimpiadas_globo"]',
