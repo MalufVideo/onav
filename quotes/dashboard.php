@@ -471,6 +471,8 @@ $recent_gallery_activity = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .status-paused { background-color: #ffc107; color: black; }
         .status-finished { background-color: #17a2b8; color: white; }
         .status-closed { background-color: #6c757d; color: white; }
+        .status-v1 { background-color: #1e3c72; color: white; }
+        .status-v2 { background-color: #dc3545; color: white; }
 
         .progress-bar {
             background-color: #e9ecef;
@@ -756,6 +758,7 @@ $recent_gallery_activity = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <thead>
                         <tr>
                             <th>Data/Hora</th>
+                            <th>Versão</th>
                             <th>IP do Visitante</th>
                             <th>Localização</th>
                             <th>Tempo na Página</th>
@@ -768,6 +771,11 @@ $recent_gallery_activity = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php foreach ($recent_views as $view): ?>
                         <tr>
                             <td><?= date('d/m/Y H:i', strtotime($view['view_time'])) ?></td>
+                            <td>
+                                <span class="status-badge status-<?= strtolower($view['quote_version'] ?? 'v1') ?>">
+                                    <?= strtoupper($view['quote_version'] ?? 'V1') ?>
+                                </span>
+                            </td>
                             <td><?= htmlspecialchars($view['visitor_ip']) ?></td>
                             <td><?= htmlspecialchars($view['city'] . ', ' . $view['region']) ?></td>
                             <td><?= $view['time_spent'] ?>s</td>

@@ -2289,7 +2289,14 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`API endpoints for products available at http://localhost:${PORT}/api/products`);
-});
+
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`API endpoints for products available at http://localhost:${PORT}/api/products`);
+  });
+}
+
+// Export the Express app for Vercel serverless functions
+module.exports = app;

@@ -16,7 +16,7 @@ try {
     $user_agent = $_SERVER['HTTP_USER_AGENT'];
     $referrer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'Direct';
     $visit_time = date('Y-m-d H:i:s');
-    $quote_id = 'bluefit_2025';
+    $quote_id = 'bluefit_2025_v2';
     
     // Get visitor location based on IP (using a simple geolocation service)
     $location_data = json_decode(file_get_contents("http://ip-api.com/json/$visitor_ip"), true);
@@ -33,7 +33,7 @@ try {
     
     // Track page view with version
     $stmt = $pdo->prepare("INSERT INTO quote_views (quote_id, session_id, visitor_ip, user_agent, referrer, country, region, city, timezone, view_time, quote_version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$quote_id, $session_id, $visitor_ip, $user_agent, $referrer, $country, $region, $city, $timezone, $visit_time, 'v1']);
+    $stmt->execute([$quote_id, $session_id, $visitor_ip, $user_agent, $referrer, $country, $region, $city, $timezone, $visit_time, 'v2']);
     
     // Track time on page with JavaScript
     echo "<script>
@@ -109,7 +109,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
     <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet">
-    <title>Orçamento - Convenção Supervisores Bluefit 2025</title>
+    <title>Orçamento V2 - Convenção Supervisores Bluefit 2025</title>
     <style>
         * {
             margin: 0;
@@ -422,7 +422,7 @@ try {
             <div class="logo-placeholder" style="border:none; background:none; justify-content:left;">
   <img src="img/on+av_logo_v2.png" alt="On+Av Logo" style="max-width:180px; max-height:60px; display:block;">
 </div>
-            <h1>Orçamento de Produção</h1>
+            <h1>Orçamento de Produção - Versão 2</h1>
             <p class="subtitle">Live Convenção Supervisores Bluefit 2025</p>
         </div>
 
@@ -459,27 +459,27 @@ try {
                     <div class="specs-grid">
                         <div class="spec-item">
                             <span class="spec-label">Dimensões:</span>
-                            <span class="spec-value">15m × 5m</span>
+                            <span class="spec-value">10m × 4m</span>
                         </div>
                         <div class="spec-item">
                             <span class="spec-label">Curvatura:</span>
-                            <span class="spec-value">5°</span>
+                            <span class="spec-value">0°</span>
                         </div>
                         <div class="spec-item">
                             <span class="spec-label">Módulos:</span>
-                            <span class="spec-value">300 unidades</span>
+                            <span class="spec-value">160 unidades</span>
                         </div>
                         <div class="spec-item">
                             <span class="spec-label">Pixels (L×A):</span>
-                            <span class="spec-value">5.760 × 1.920 (11.059.200 total)</span>
+                            <span class="spec-value">3.840 × 1.536 (5.898.240 total)</span>
                         </div>
                         <div class="spec-item">
                             <span class="spec-label">Potência Máx./Média:</span>
-                            <span class="spec-value">51.750 W / 17.250 W</span>
+                            <span class="spec-value">27.600 W / 9.200 W</span>
                         </div>
                         <div class="spec-item">
                             <span class="spec-label">Peso:</span>
-                            <span class="spec-value">2.250 kg</span>
+                            <span class="spec-value">1.200 kg</span>
                         </div>
                     </div>
                 </div>
@@ -496,16 +496,16 @@ try {
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Módulos LED (300 Unidades)</td>
-                            <td style="text-align: center;">300</td>
+                            <td>Módulos LED (160 Unidades)</td>
+                            <td style="text-align: center;">160</td>
                             <td style="text-align: right;" class="price">R$ 85,00</td>
-                            <td style="text-align: right;" class="price">R$ 25.500,00</td>
+                            <td style="text-align: right;" class="price">R$ 13.600,00</td>
                         </tr>
                         <tr>
                             <td>Processadores MX-40 Pro</td>
-                            <td style="text-align: center;">2</td>
+                            <td style="text-align: center;">1</td>
                             <td style="text-align: right;" class="price">R$ 1.890,00</td>
-                            <td style="text-align: right;" class="price">R$ 3.780,00</td>
+                            <td style="text-align: right;" class="price">R$ 1.890,00</td>
                         </tr>
                         <tr>
                             <td>Servidor</td>
@@ -580,7 +580,7 @@ try {
                         <tr>
                             <td>Câmeras Sony PMW-EX3 com operadores</td>
                             <td style="text-align: center;">2</td>
-                            <td style="text-align: right;" class="price">R$ 15.000,00</td>
+                            <td style="text-align: right;" class="price">R$ 13.000,00</td>
                         </tr>
                         <tr>
                             <td>DTV</td>
@@ -601,37 +601,7 @@ try {
                 </table>
             </section>
 
-            <section class="section">
-                <h2 class="section-title">
-                    <span class="section-icon">📦</span>
-                    Serviços Terceirizados (Valores Estimados)
-                </h2>
-                
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th style="text-align: center;">Descrição</th>
-                            <th style="text-align: right;">Valor Estimado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Mobiliário</td>
-                            <td style="text-align: center;">30 pessoas</td>
-                            <td style="text-align: right;" class="price">R$ 4.000,00*</td>
-                        </tr>
-                        <tr>
-                            <td>Gerador</td>
-                            <td style="text-align: center;">60kVA</td>
-                            <td style="text-align: right;" class="price">R$ 5.000,00*</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <p style="font-size: 0.9em; color: #6c757d; margin-top: 10px; font-style: italic;">
-                    * Valores estimados sujeitos a confirmação com fornecedores terceirizados
-                </p>
-            </section>
+            
 
             <section class="section">
                 <h2 class="section-title">
@@ -701,7 +671,6 @@ try {
                     .lightbox-content video {
                         max-width: 100%;
                         max-height: 80vh;
-                        border-radius: 4px;
                     }
                     .close-lightbox {
                         position: absolute;
@@ -710,43 +679,33 @@ try {
                         color: white;
                         font-size: 30px;
                         cursor: pointer;
-                    }
-                    @media (max-width: 768px) {
-                        .gallery-grid {
-                            grid-template-columns: repeat(2, 1fr);
-                        }
-                    }
-                    @media (max-width: 480px) {
-                        .gallery-grid {
-                            grid-template-columns: 1fr;
-                        }
+                        z-index: 1001;
                     }
                 </style>
                 
                 <div class="gallery-grid">
-                    <div class="gallery-item" onclick="openLightbox('video', 'img/medidas_estudio.mp4', 'Vídeo das medidas do estúdio')">
-                        <img src="img/medidas_estudio_thumb.png" alt="Vídeo das medidas do estúdio">
+                    <div class="gallery-item" onclick="openLightbox('img/estudio.webp', 'image', 'Visão geral do estúdio')">
+                        <img src="img/estudio.webp" alt="Visão geral do estúdio">
+                    </div>
+                    <div class="gallery-item" onclick="openLightbox('img/led_curvo.webp', 'image', 'Detalhe do LED')">
+                        <img src="img/led_curvo.webp" alt="Detalhe do LED">
+                    </div>
+                    <div class="gallery-item" onclick="openLightbox('img/camarim.webp', 'image', 'Área de camarim')">
+                        <img src="img/camarim.webp" alt="Área de camarim">
+                    </div>
+                    <div class="gallery-item" onclick="openLightbox('img/medidas_estudio.mp4', 'video', 'Medidas do estúdio')">
+                        <img src="img/medidas_estudio_thumb.png" alt="Medidas do estúdio">
                         <div class="play-icon">▶</div>
-                    </div>
-                    <div class="gallery-item" onclick="openLightbox('image', 'img/estudio.webp', 'Vista geral do estúdio')">
-                        <img src="img/estudio.webp" alt="Vista geral do estúdio de produção virtual">
-                    </div>
-                    <div class="gallery-item" onclick="openLightbox('image', 'img/camarim.webp', 'Camarim profissional')">
-                        <img src="img/camarim.webp" alt="Camarim profissional do estúdio">
-                    </div>
-                    <div class="gallery-item" onclick="openLightbox('image', 'img/led_curvo.webp', 'Detalhe do painel LED curvo')">
-                        <img src="img/led_curvo.webp" alt="Detalhe do painel LED curvo">
                     </div>
                 </div>
                 
-                <!-- Lightbox container -->
                 <div id="lightbox" class="lightbox" onclick="closeLightboxOnOutsideClick(event)">
-                    <span class="close-lightbox" onclick="closeLightbox()">&times;</span>
-                    <div class="lightbox-content" id="lightbox-content"></div>
+                    <div class="close-lightbox" onclick="closeLightbox()">×</div>
+                    <div id="lightbox-content" class="lightbox-content"></div>
                 </div>
                 
                 <script>
-                    function openLightbox(type, src, title) {
+                    function openLightbox(src, type, title) {
                         const lightbox = document.getElementById('lightbox');
                         const content = document.getElementById('lightbox-content');
                         content.innerHTML = '';
@@ -841,7 +800,7 @@ try {
 
         <div class="total-section">
             <div class="total-label">Valor Total Estimado (1 dia)</div>
-            <div class="total-amount">R$ 64.280,00</div>
+            <div class="total-amount">R$ 38.490,00</div>
         </div>
     </div>
 </body>
