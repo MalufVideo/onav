@@ -4,3 +4,19 @@ node_modules/
 *.log
 img/raw/
 website.tar.gz
+
+# Ignore quotes folder
+quotes/
+
+# Vercel
+.vercel
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.temp
