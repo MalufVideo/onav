@@ -4,41 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shows e Turnês | On + Av</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
-    <script>
-        // Tailwind CSS configuration (Consistent with other pages)
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#00ff9d',
-                        secondary: '#0066ff',
-                        purpleish: '#9370DB',
-                        dark: '#0a0a0a',
-                        darker: '#020202',
-                        'light-text': '#e0e0e0',
-                        'medium-text': '#a0a0a0',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['Fira Code', 'monospace'],
-                    },
-                    animation: {
-                        'subtle-float': 'subtle-float 6s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        'subtle-float': {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-8px)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
+    
+    <!-- External CSS Files -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" defer>
+    
+    <!-- Tailwind CSS - Deferred -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    
+    <!-- External JS Files -->
+    <script src="/js/main.js" defer></script>
+    
+    <!-- Page-specific styles -->
         /* Import Google Fonts */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400&display=swap');
 

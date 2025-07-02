@@ -1,0 +1,272 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400&display=swap');
+
+/* Base body styles with Blob Background */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #020202;
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(0, 255, 157, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 85% 80%, rgba(0, 102, 255, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 90% 30%, rgba(0, 255, 157, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 25% 60%, rgba(0, 102, 255, 0.08) 0%, transparent 35%),
+        radial-gradient(circle at 70% 10%, rgba(147, 112, 219, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 40% 90%, rgba(147, 112, 219, 0.08) 0%, transparent 30%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    color: #e0e0e0;
+}
+
+/* Glass Card Effect */
+.glass-card {
+    background: rgba(2, 2, 2, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 12px;
+}
+
+/* Glow Effects */
+.glow-box-primary {
+    box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+}
+
+.glow-box-secondary {
+    box-shadow: 0 0 20px rgba(0, 102, 255, 0.3);
+}
+
+/* Navigation Styles */
+.nav-blur {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* Button Styles */
+.btn-primary {
+    background: linear-gradient(135deg, #00ff9d 0%, #00cc7a 100%);
+    color: #000;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #00cc7a 0%, #00ff9d 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 255, 157, 0.3);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #0052cc 0%, #0066ff 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 102, 255, 0.3);
+}
+
+/* Text Gradients */
+.gradient-text {
+    background: linear-gradient(135deg, #00ff9d 0%, #0066ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Card Hover Effects */
+.hover-scale {
+    transition: transform 0.3s ease;
+}
+
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-content {
+    background: rgba(2, 2, 2, 0.95);
+    border: 1px solid rgba(0, 255, 157, 0.3);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #e0e0e0;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+/* FAQ Styles */
+.faq-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem 0;
+}
+
+.faq-question {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    color: #e0e0e0;
+}
+
+.faq-answer {
+    padding-top: 1rem;
+    color: #a0a0a0;
+    line-height: 1.6;
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.subtle-float {
+    animation: subtle-float 6s ease-in-out infinite;
+}
+
+@keyframes subtle-float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+}
+
+/* Responsive Image Gallery */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    padding: 1rem 0;
+}
+
+.gallery-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    background: rgba(2, 2, 2, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.gallery-item:hover img {
+    transform: scale(1.05);
+}
+
+/* Tour Card Styles */
+.tour-card {
+    background: rgba(2, 2, 2, 0.8);
+    border: 1px solid rgba(0, 255, 157, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.tour-card:hover {
+    border-color: rgba(0, 255, 157, 0.5);
+    box-shadow: 0 8px 25px rgba(0, 255, 157, 0.2);
+    transform: translateY(-5px);
+}
+
+/* Technology Partner Cards */
+.tech-card {
+    transition: all 0.3s ease;
+}
+
+.tech-card:hover {
+    background: rgba(0, 167, 125, 0.1) !important;
+    border-color: rgba(0, 167, 125, 0.6) !important;
+    box-shadow: 0 8px 25px rgba(0, 167, 125, 0.2) !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(2, 2, 2, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 157, 0.5);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 157, 0.7);
+}
+
+/* Utility Classes */
+.text-primary { color: #00ff9d; }
+.text-secondary { color: #0066ff; }
+.text-light-text { color: #e0e0e0; }
+.text-medium-text { color: #a0a0a0; }
+.bg-dark { background-color: #0a0a0a; }
+.bg-darker { background-color: #020202; }
+
+/* Performance Optimizations */
+* {
+    box-sizing: border-box;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

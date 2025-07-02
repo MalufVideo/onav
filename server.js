@@ -97,6 +97,62 @@ app.get('/estudio.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'estudio.html'));
 });
 
+// Routes for tours pages
+app.get('/tours/adele_munich.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'tours', 'adele_munich.html'));
+});
+
+app.get('/tours/adele_vegas.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'tours', 'adele_vegas.html'));
+});
+
+app.get('/tours/adele_weekends.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'tours', 'adele_weekends.html'));
+});
+
+app.get('/tours/beyonce_formation.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'tours', 'beyonce_formation.html'));
+});
+
+app.get('/tours/coldplay_musicofthespheres.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'tours', 'coldplay_musicofthespheres.html'));
+});
+
+app.get('/tours/ed_sheeran_mathematics.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'tours', 'ed_sheeran_mathematics.html'));
+});
+
+app.get('/tours/envie_seu_projeto.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'tours', 'envie_seu_projeto.html'));
+});
+
+app.get('/tours/justin_timberlake_manofthewoods.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'tours', 'justin_timberlake_manofthewoods.html'));
+});
+
+app.get('/tours/kiss_endoftheroad.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'tours', 'kiss_endoftheroad.html'));
+});
+
+app.get('/tours/phish_sphere.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'tours', 'phish_sphere.html'));
+});
+
+app.get('/tours/proximo_caso.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'tours', 'proximo_caso.html'));
+});
+
+app.get('/tours/u2_joshuatree.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'tours', 'u2_joshuatree.html'));
+});
+
+app.get('/tours/u2_sphere.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'tours', 'u2_sphere.html'));
+});
+
+// Serve static files from 'tours' directory under the /tours path
+app.use('/tours', express.static(path.join(__dirname, 'tours')));
+
 // --- API Routes for Products ---
 
 // GET all products
