@@ -169,9 +169,38 @@
         }
     </style>
     
-    <!-- Non-critical CSS - Load async -->
-    <link rel="preload" href="/css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="/css/main.css"></noscript>
+    <!-- Additional critical CSS inlined to fix MIME errors -->
+    <style>
+        /* Glass Card Effect */
+        .glass-card {
+            background: rgba(2, 2, 2, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+        }
+        
+        /* Glow Effects */
+        .glow-box-primary { box-shadow: 0 0 20px rgba(0, 255, 157, 0.3); }
+        .glow-box-secondary { box-shadow: 0 0 20px rgba(0, 102, 255, 0.3); }
+        
+        /* Enhanced button styles */
+        .btn-secondary {
+            background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #0052cc 0%, #0066ff 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 102, 255, 0.3);
+        }
+    </style>
     
     <!-- Font Awesome - Deferred -->
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -190,8 +219,38 @@
         });
     </script>
     
-    <!-- External JS Files - Deferred -->
-    <script src="/js/main.js" defer></script>
+    <!-- Critical JS inlined to fix loading errors -->
+    <script>
+        // Tailwind Configuration
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00ff9d',
+                        secondary: '#0066ff',
+                        purpleish: '#9370DB',
+                        dark: '#0a0a0a',
+                        darker: '#020202',
+                        'light-text': '#e0e0e0',
+                        'medium-text': '#a0a0a0',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    animation: {
+                        'subtle-float': 'subtle-float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        'subtle-float': {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        }
+                    }
+                }
+            }
+        };
+    </script>
     <style>
         /* Page-specific blob background */
         body {
