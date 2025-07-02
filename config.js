@@ -6,9 +6,9 @@ window.APP_CONFIG = {
     supabaseUrl: 'https://qhhjvpsxkfjcxitpnhxi.supabase.co'
   },
   
-  // Production (Supabase Edge Functions)
+  // Production (Vercel deployment)
   production: {
-    apiBaseUrl: 'https://qhhjvpsxkfjcxitpnhxi.supabase.co/functions/v1',
+    apiBaseUrl: '/api',
     supabaseUrl: 'https://qhhjvpsxkfjcxitpnhxi.supabase.co'
   },
   

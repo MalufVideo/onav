@@ -358,7 +358,7 @@ async function loadProductsPage() {
     // Fetch products from Express API instead of Supabase directly
     let products = [];
     try {
-        const response = await fetch('http://localhost:3000/api/products');
+        const response = await fetch('/api/products');
         if (response.ok) {
             products = await response.json();
         } else {
@@ -1772,7 +1772,7 @@ async function openProductModal(productId = null) {
     let product = { name: '', description: '', category: '', price: 0, unit_type: 'per_day' };
     if (productId) {
         try {
-            const response = await fetch('http://localhost:3000/api/products');
+            const response = await fetch('/api/products');
             if (response.ok) {
                 const products = await response.json();
                 const foundProduct = products.find(p => p.id === productId);
@@ -1836,7 +1836,7 @@ async function saveProduct(event, productId) {
     console.log('productData:', productData);
 
     try {
-        const url = productId ? `http://localhost:3000/api/products/${productId}` : 'http://localhost:3000/api/products';
+        const url = productId ? `/api/products/${productId}` : '/api/products';
         const method = productId ? 'PUT' : 'POST';
         
         console.log('Making request to:', url, 'with method:', method);
@@ -1870,7 +1870,7 @@ async function deleteProduct(productId) {
     if (!confirm('Tem certeza que deseja excluir este produto?')) return;
     
     try {
-        const response = await fetch(`http://localhost:3000/api/products/${productId}`, {
+        const response = await fetch(`/api/products/${productId}`, {
             method: 'DELETE',
         });
 

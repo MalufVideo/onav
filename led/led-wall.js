@@ -153,7 +153,7 @@ class LEDWallCalculator {
   // --- Price Handling ---
   async fetchProductPrices() {
     // Use absolute URL pointing to the backend server (assuming port 3000)
-    const backendUrl = 'http://localhost:3000/api/products';
+    const backendUrl = window.getApiUrl ? window.getApiUrl('/products') : '/api/products';
     const response = await fetch(backendUrl);
     if (!response.ok) {
       // Log the response status and text for better debugging
