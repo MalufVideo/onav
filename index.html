@@ -104,236 +104,32 @@
     <!-- Load critical fonts with font-display swap -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Critical CSS and Scripts -->
-    <script src="https://cdn.tailwindcss.com" defer></script>
+    <!-- External CSS and JS Files -->
+    <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
-    <script>
-        // Tailwind CSS configuration
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#00ff9d', // Bright Green/Aqua
-                        secondary: '#0066ff', // Strong Blue
-                        purpleish: '#9370DB', // Medium Purple for blob
-                        dark: '#0a0a0a',     // Dark background shade
-                        darker: '#020202',   // Base darker background shade
-                        'light-text': '#e0e0e0', // Light text color
-                        'medium-text': '#a0a0a0', // Medium text color (for less emphasis)
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'], // Primary sans-serif font
-                        mono: ['Fira Code', 'monospace'], // Monospace font (for code/tech elements)
-                    },
-                    animation: {
-                        'subtle-float': 'subtle-float 6s ease-in-out infinite', // Subtle floating animation
-                    },
-                    keyframes: {
-                        'subtle-float': { // Keyframes for the floating animation
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-8px)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    
+    <!-- Tailwind CSS - Deferred -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    
+    <!-- External JS Files -->
+    <script src="/js/main.js" defer></script>
     <style>
-        /* Google Fonts already loaded above with preload */
-
-        /* Base body styles with Blob Background (Purple Increased Visibility) */
+        /* Page-specific blob background override */
         body {
-            font-family: 'Inter', sans-serif;
-            /* --- Background Blob Effect --- */
-            background-color: #020202; /* Fallback solid color */
             background-image:
-                /* Blob 1: Primary color, top left */
                 radial-gradient(circle at 10% 20%, rgba(0, 255, 157, 0.15) 0%, transparent 50%),
-                /* Blob 2: Secondary color, bottom right */
                 radial-gradient(circle at 85% 80%, rgba(0, 102, 255, 0.12) 0%, transparent 45%),
-                /* Blob 3: Primary color, center right */
                 radial-gradient(circle at 90% 30%, rgba(0, 255, 157, 0.08) 0%, transparent 40%),
-                 /* Blob 4: Secondary color, mid left */
                 radial-gradient(circle at 20% 70%, rgba(0, 102, 255, 0.1) 0%, transparent 55%),
-                /* Blob 5: Purple color, bottom left - Increased Opacity and Size */
-                radial-gradient(circle at 15% 90%, rgba(147, 112, 219, 0.20) 0%, transparent 60%); /* Increased opacity to 0.20, size to 60% */
-            background-attachment: fixed; /* Keep blobs fixed during scroll */
-            /* --- End Background Blob Effect --- */
-            color: #e0e0e0; /* Default light text color */
-            overflow-x: hidden; /* Prevent horizontal scroll */
-            scroll-behavior: smooth; /* Enable smooth scrolling */
-        }
-
-        /* Hero section gradient overlay (Adjusted for blob background) */
-        .hero-gradient-overlay {
-             /* Kept subtle overlay */
-            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 157, 0.05) 0%, rgba(2, 2, 2, 0) 60%);
-        }
-
-        /* Gradient text utility */
-        .gradient-text {
-            background: linear-gradient(90deg, #00ff9d, #0066ff); /* Primary to Secondary gradient */
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        /* Text glow effects */
-        .glow-text-primary {
-            text-shadow: 0 0 12px rgba(0, 255, 157, 0.6);
-        }
-        .glow-text-secondary {
-            text-shadow: 0 0 12px rgba(0, 102, 255, 0.6);
-        }
-
-        /* Box glow effects */
-        .glow-box-primary {
-            box-shadow: 0 0 25px rgba(0, 255, 157, 0.25);
-        }
-        .glow-box-secondary {
-            box-shadow: 0 0 25px rgba(0, 102, 255, 0.25);
-        }
-
-        /* Glassmorphism card style (Adjusted background for better visibility over blobs) */
-        .glass-card {
-            background: rgba(10, 10, 10, 0.65); /* Slightly less transparent */
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px); /* Safari support */
-            border: 1px solid rgba(255, 255, 255, 0.1); /* Slightly stronger border */
-            transition: all 0.3s ease-in-out;
-        }
-        .glass-card:hover {
-            border-color: rgba(0, 255, 157, 0.6); /* Brighter border on hover */
-            transform: translateY(-5px); /* Slight lift effect */
-        }
-
-        /* Feature card style (Adjusted background) */
-        .feature-card {
-            background: rgba(15, 15, 15, 0.6); /* Adjusted background */
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .feature-card:hover {
-            border-color: #00ff9d; /* Primary border on hover */
-            transform: translateY(-5px);
-        }
-        .feature-icon {
-            transition: all 0.3s ease;
-            color: #00ff9d; /* Icon color */
-        }
-        .feature-card:hover .feature-icon {
-            transform: scale(1.1); /* Scale icon on hover */
-            filter: drop-shadow(0 0 8px rgba(0, 255, 157, 0.7)); /* Add glow to icon */
-        }
-
-        /* Tech card hover effect (Expertise section) */
-        .tech-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 255, 157, 0.15); /* Subtle primary glow */
-        }
-
-        /* Responsive video container */
-        .video-container {
-            position: relative;
-            padding-bottom: 56.25%; /* 16:9 aspect ratio */
-            height: 0;
-            overflow: hidden;
-            border-radius: 0.75rem; /* rounded-xl */
-        }
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 0;
-        }
-
-        /* Primary button style */
-        .btn-primary {
-            background: linear-gradient(90deg, #00ff9d, #0066ff); /* Gradient background */
-            color: #050505; /* Dark text for contrast */
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover {
-            opacity: 0.9; /* Slightly fade on hover */
-            box-shadow: 0 5px 15px rgba(0, 255, 157, 0.3); /* Primary glow */
-            transform: translateY(-2px); /* Slight lift */
-        }
-
-        /* Secondary button style (outline) */
-        .btn-secondary {
-            border: 2px solid #00ff9d; /* Primary color border */
-            color: #00ff9d; /* Primary color text */
-            transition: all 0.3s ease;
-        }
-        .btn-secondary:hover {
-            background-color: rgba(0, 255, 157, 0.1); /* Subtle primary background on hover */
-            transform: translateY(-2px); /* Slight lift */
-        }
-
-        /* Stats item style (adds left border) */
-        .stats-item {
-            border-left: 3px solid #00ff9d;
-        }
-
-        /* Testimonial card style (Adjusted background) */
-        .testimonial-card {
-            background: rgba(25, 25, 25, 0.7); /* Adjusted background */
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-        }
-
-        /* Form input/textarea/select styling */
-        input, textarea, select {
-            background: rgba(255, 255, 255, 0.05); /* Very subtle light background */
-            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
-            color: #e0e0e0; /* Light text color */
-            transition: all 0.3s ease;
-        }
-        input:focus, textarea:focus, select:focus {
-            outline: none; /* Remove default outline */
-            border-color: #00ff9d; /* Primary border on focus */
-            box-shadow: 0 0 0 3px rgba(0, 255, 157, 0.2); /* Primary glow on focus */
-        }
-        /* Custom select dropdown arrow */
-        select {
-           -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-color: #000000;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2300ff9d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 1em;
-            padding-right: 2.5rem;
+                radial-gradient(circle at 15% 90%, rgba(147, 112, 219, 0.20) 0%, transparent 60%);
+            background-attachment: fixed;
         }
         
-        /* Style the dropdown options */
-        select option {
-            background-color: #000000;
-            color: #ffffff;
-        }
-
-        /* Navigation bar background adjusted for blobs */
-        nav.fixed {
-             background-color: rgba(2, 2, 2, 0.8); /* Slightly more opaque base */
-        }
-
-        /* Footer background adjusted */
-        footer {
-            background-color: #050505; /* Slightly lighter dark for footer */
-        }
-
-        /* Ensure Produção Virtual button text turns black on hover, regardless of inline/Tailwind styles */
-        #orcamentoModal .producao-virtual-btn:hover {
-            color: #000 !important;
-        }
-    </style>
-    <style>
-        .hidden {
-            display: none;
+        /* Enhanced glass card for homepage */
+        .glass-card {
+            background: rgba(10, 10, 10, 0.65);
+            backdrop-filter: blur(12px);
         }
     </style>
 </head>
