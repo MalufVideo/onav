@@ -68,6 +68,35 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Routes for all HTML pages
+app.get('/produtos.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'produtos.html'));
+});
+
+app.get('/producao-virtual-xr.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'producao-virtual-xr.html'));
+});
+
+app.get('/consultoria-suporte.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'consultoria-suporte.html'));
+});
+
+app.get('/projecao-mapeada.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'projecao-mapeada.html'));
+});
+
+app.get('/shows.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'shows.html'));
+});
+
+app.get('/criacao-conteudo.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'criacao-conteudo.html'));
+});
+
+app.get('/estudio.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'estudio.html'));
+});
+
 // --- API Routes for Products ---
 
 // GET all products
