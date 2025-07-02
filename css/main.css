@@ -1,10 +1,20 @@
 /* Import Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400&display=swap');
 
-/* Base body styles with Blob Background */
+/* Base body styles */
 body {
     font-family: 'Inter', sans-serif;
     background-color: #020202;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    color: #e0e0e0;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+/* Default blob background for most pages */
+body:not(.custom-background) {
     background-image:
         radial-gradient(circle at 10% 20%, rgba(0, 255, 157, 0.15) 0%, transparent 50%),
         radial-gradient(circle at 85% 80%, rgba(0, 102, 255, 0.12) 0%, transparent 45%),
@@ -12,10 +22,7 @@ body {
         radial-gradient(circle at 25% 60%, rgba(0, 102, 255, 0.08) 0%, transparent 35%),
         radial-gradient(circle at 70% 10%, rgba(147, 112, 219, 0.12) 0%, transparent 45%),
         radial-gradient(circle at 40% 90%, rgba(147, 112, 219, 0.08) 0%, transparent 30%);
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
-    color: #e0e0e0;
+    background-attachment: fixed;
 }
 
 /* Glass Card Effect */
