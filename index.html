@@ -207,22 +207,15 @@
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
     
     <!-- Tailwind CSS - Deferred after page load -->
-    <script>
-        // Load Tailwind CSS after page load to avoid blocking
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                const tailwindScript = document.createElement('script');
-                tailwindScript.src = 'https://cdn.tailwindcss.com';
-                tailwindScript.async = true;
-                document.head.appendChild(tailwindScript);
-            }, 500);
-        });
-    </script>
+    <!-- Tailwind CSS - Load immediately for config -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
     
     <!-- Critical JS inlined to fix loading errors -->
     <script>
-        // Tailwind Configuration
-        tailwind.config = {
+        // Tailwind Configuration - Wait for Tailwind to load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof tailwind !== 'undefined') {
+                tailwind.config = {
             theme: {
                 extend: {
                     colors: {
@@ -250,6 +243,8 @@
                 }
             }
         };
+            }
+        });
     </script>
     <style>
         /* Page-specific blob background */
