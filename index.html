@@ -1471,10 +1471,19 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Main Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 20px;">
-        <video id="tateMainVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" controls>
-          <source src="img/videos/tate.mp4" type="video/mp4">
-          Seu navegador não suporta vídeos HTML5.
-        </video>
+        <div id="tateMainVideoContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #000;">
+          <!-- Custom play button overlay -->
+          <div id="tateMainPlayOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.4); cursor: pointer; z-index: 2;">
+            <div style="width: 80px; height: 80px; border-radius: 50%; background-color: #00ffaa; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,255,170,0.5);">
+              <div style="width: 0; height: 0; border-top: 20px solid transparent; border-left: 35px solid #121212; border-bottom: 20px solid transparent; margin-left: 8px;"></div>
+            </div>
+          </div>
+          <!-- Video element (will be loaded on demand) -->
+          <video id="tateMainVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;" controls>
+            <source data-src="img/videos/tate.mp4" type="video/mp4">
+            Seu navegador não suporta vídeos HTML5.
+          </video>
+        </div>
       </div>
 
       <!-- Case Study Content -->
@@ -1502,10 +1511,19 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
         
         <!-- Second Video -->
         <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-top: 20px;">
-          <video id="tateSecondVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" controls>
-            <source src="img/videos/tate-live-in-chile.mp4" type="video/mp4">
-            Seu navegador não suporta vídeos HTML5.
-          </video>
+          <div id="tateSecondVideoContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #000;">
+            <!-- Custom play button overlay -->
+            <div id="tateSecondPlayOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.4); cursor: pointer; z-index: 2;">
+              <div style="width: 80px; height: 80px; border-radius: 50%; background-color: #00ffaa; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,255,170,0.5);">
+                <div style="width: 0; height: 0; border-top: 20px solid transparent; border-left: 35px solid #121212; border-bottom: 20px solid transparent; margin-left: 8px;"></div>
+              </div>
+            </div>
+            <!-- Video element (will be loaded on demand) -->
+            <video id="tateSecondVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;" controls>
+              <source data-src="img/videos/tate-live-in-chile.mp4" type="video/mp4">
+              Seu navegador não suporta vídeos HTML5.
+            </video>
+          </div>
         </div>
       </div>
     </div>
@@ -1519,10 +1537,19 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Main Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 20px; border-radius: 10px; background: #000;">
-        <video id="beloCaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" controls>
-          <source src="img/videos/belo.mp4" type="video/mp4">
-          Seu navegador não suporta a reprodução de vídeo.
-        </video>
+        <div id="beloVideoContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #000;">
+          <!-- Custom play button overlay -->
+          <div id="beloPlayOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.4); cursor: pointer; z-index: 2;">
+            <div style="width: 80px; height: 80px; border-radius: 50%; background-color: #00ffaa; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,255,170,0.5);">
+              <div style="width: 0; height: 0; border-top: 20px solid transparent; border-left: 35px solid #121212; border-bottom: 20px solid transparent; margin-left: 8px;"></div>
+            </div>
+          </div>
+          <!-- Video element (will be loaded on demand) -->
+          <video id="beloCaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;" controls>
+            <source data-src="img/videos/belo.mp4" type="video/mp4">
+            Seu navegador não suporta a reprodução de vídeo.
+          </video>
+        </div>
       </div>
 
       <!-- Case Study Content -->
@@ -2192,9 +2219,9 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
               <div style="width: 0; height: 0; border-top: 20px solid transparent; border-left: 35px solid #121212; border-bottom: 20px solid transparent; margin-left: 8px;"></div>
             </div>
           </div>
-          <!-- Video element -->
-          <video id="globoAgroVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" controls controlsList="nodownload" poster="img/globo_agro_thumb.webp" preload="auto">
-            <source src="img/videos/globo_agro_acai_720p.mp4" type="video/mp4">
+          <!-- Video element (will be loaded on demand) -->
+          <video id="globoAgroVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;" controls controlsList="nodownload">
+            <source data-src="img/videos/globo_agro_acai_720p.mp4" type="video/mp4">
             Seu navegador não suporta a tag de vídeo.
           </video>
         </div>
@@ -2472,17 +2499,35 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
           <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Vídeos do Projeto</h4>
           
           <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-            <video controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px;">
-              <source src="img/videos/antartida_clip.mp4" type="video/mp4">
-              Seu navegador não suporta a tag de vídeo.
-            </video>
+            <div id="antartidaClipContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; border-radius: 12px;">
+              <!-- Custom play button overlay -->
+              <div id="antartidaClipPlayOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.4); cursor: pointer; z-index: 2; border-radius: 12px;">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background-color: #00ffaa; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,255,170,0.5);">
+                  <div style="width: 0; height: 0; border-top: 20px solid transparent; border-left: 35px solid #121212; border-bottom: 20px solid transparent; margin-left: 8px;"></div>
+                </div>
+              </div>
+              <!-- Video element (will be loaded on demand) -->
+              <video id="antartidaClipVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px; display: none;" controls>
+                <source data-src="img/videos/antartida_clip.mp4" type="video/mp4">
+                Seu navegador não suporta a tag de vídeo.
+              </video>
+            </div>
           </div>
           
           <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-            <video controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px;">
-              <source src="img/videos/antartida_bruno.mp4" type="video/mp4">
-              Seu navegador não suporta a tag de vídeo.
-            </video>
+            <div id="antartidaBrunoContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; border-radius: 12px;">
+              <!-- Custom play button overlay -->
+              <div id="antartidaBrunoPlayOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.4); cursor: pointer; z-index: 2; border-radius: 12px;">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background-color: #00ffaa; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,255,170,0.5);">
+                  <div style="width: 0; height: 0; border-top: 20px solid transparent; border-left: 35px solid #121212; border-bottom: 20px solid transparent; margin-left: 8px;"></div>
+                </div>
+              </div>
+              <!-- Video element (will be loaded on demand) -->
+              <video id="antartidaBrunoVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px; display: none;" controls>
+                <source data-src="img/videos/antartida_bruno.mp4" type="video/mp4">
+                Seu navegador não suporta a tag de vídeo.
+              </video>
+            </div>
           </div>
         </div>
       </div>
@@ -3915,6 +3960,88 @@ if ('serviceWorker' in navigator) {
         // navigator.serviceWorker.register('/sw.js');
     });
 }
+</script>
+
+<script>
+// Lazy Loading Video Implementation
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Video lazy loading setup
+    const videoConfigs = [
+        {
+            playOverlayId: 'tateMainPlayOverlay',
+            videoId: 'tateMainVideo',
+            dataSrc: 'img/videos/tate.mp4'
+        },
+        {
+            playOverlayId: 'tateSecondPlayOverlay',
+            videoId: 'tateSecondVideo',
+            dataSrc: 'img/videos/tate-live-in-chile.mp4'
+        },
+        {
+            playOverlayId: 'beloPlayOverlay',
+            videoId: 'beloCaseStudyVideo',
+            dataSrc: 'img/videos/belo.mp4'
+        },
+        {
+            playOverlayId: 'globoAgroPlayOverlay',
+            videoId: 'globoAgroVideo',
+            dataSrc: 'img/videos/globo_agro_acai_720p.mp4'
+        },
+        {
+            playOverlayId: 'antartidaClipPlayOverlay',
+            videoId: 'antartidaClipVideo',
+            dataSrc: 'img/videos/antartida_clip.mp4'
+        },
+        {
+            playOverlayId: 'antartidaBrunoPlayOverlay',
+            videoId: 'antartidaBrunoVideo',
+            dataSrc: 'img/videos/antartida_bruno.mp4'
+        }
+    ];
+    
+    // Function to load and play video
+    function loadAndPlayVideo(config) {
+        const playOverlay = document.getElementById(config.playOverlayId);
+        const video = document.getElementById(config.videoId);
+        
+        if (!playOverlay || !video) return;
+        
+        playOverlay.addEventListener('click', function() {
+            // Hide the overlay
+            playOverlay.style.display = 'none';
+            
+            // Show the video
+            video.style.display = 'block';
+            
+            // Set the video source if not already set
+            const source = video.querySelector('source');
+            if (source && source.getAttribute('data-src')) {
+                source.src = source.getAttribute('data-src');
+                source.removeAttribute('data-src');
+                
+                // Load and play the video
+                video.load();
+                video.play().catch(function(error) {
+                    console.log('Error playing video:', error);
+                    // Show overlay again if video fails to play
+                    playOverlay.style.display = 'flex';
+                    video.style.display = 'none';
+                });
+            } else {
+                // Video source already loaded, just play
+                video.play().catch(function(error) {
+                    console.log('Error playing video:', error);
+                });
+            }
+        });
+    }
+    
+    // Initialize all video lazy loaders
+    videoConfigs.forEach(config => {
+        loadAndPlayVideo(config);
+    });
+});
 </script>
 
 </body>
