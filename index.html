@@ -51,34 +51,46 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
     
-    <!-- Google Analytics 4 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HPLPNWR5LS"></script>
+    <!-- Analytics Scripts - Deferred for Performance -->
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-HPLPNWR5LS');
-    </script>
-    
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GT-MQPB9ZVQ');</script>
-    
-    <!-- Facebook Pixel -->
-    <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1485201939309596');
-    fbq('track', 'PageView');
+        // Defer analytics to avoid blocking main thread
+        window.addEventListener('load', function() {
+            // Google Analytics 4 - Deferred
+            setTimeout(function() {
+                var ga = document.createElement('script');
+                ga.async = true;
+                ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-HPLPNWR5LS';
+                document.head.appendChild(ga);
+                
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-HPLPNWR5LS');
+            }, 1000);
+            
+            // Google Tag Manager - Deferred
+            setTimeout(function() {
+                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                })(window,document,'script','dataLayer','GT-MQPB9ZVQ');
+            }, 1500);
+            
+            // Facebook Pixel - Deferred
+            setTimeout(function() {
+                !function(f,b,e,v,n,t,s)
+                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                n.queue=[];t=b.createElement(e);t.async=!0;
+                t.src=v;s=b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t,s)}(window, document,'script',
+                'https://connect.facebook.net/en_US/fbevents.js');
+                fbq('init', '1485201939309596');
+                fbq('track', 'PageView');
+            }, 2000);
+        });
     </script>
     <noscript><img height="1" width="1" style="display:none"
     src="https://www.facebook.com/tr?id=1485201939309596&ev=PageView&noscript=1"
@@ -165,13 +177,17 @@
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
     
-    <!-- Tailwind CSS - Deferred -->
+    <!-- Tailwind CSS - Deferred after page load -->
     <script>
-        // Load Tailwind CSS asynchronously
-        const tailwindScript = document.createElement('script');
-        tailwindScript.src = 'https://cdn.tailwindcss.com';
-        tailwindScript.defer = true;
-        document.head.appendChild(tailwindScript);
+        // Load Tailwind CSS after page load to avoid blocking
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const tailwindScript = document.createElement('script');
+                tailwindScript.src = 'https://cdn.tailwindcss.com';
+                tailwindScript.async = true;
+                document.head.appendChild(tailwindScript);
+            }, 500);
+        });
     </script>
     
     <!-- External JS Files - Deferred -->
@@ -292,7 +308,7 @@
             <div class="flex justify-between h-20 items-center">
                 <div class="flex items-center">
                     <a href="#" class="flex-shrink-0 flex items-center">
-                         <img src="img/on+av_logo_v2.png" alt="On + Av Logo" style="height:40px;">
+                         <img src="img/on+av_logo_v2.png" alt="On + Av Logo" width="120" height="40" style="height:40px;">
                     </a>
                 </div>
                 <div class="hidden md:block">
@@ -331,7 +347,7 @@
     <section class="relative pt-32 pb-20 md:pt-40 md:pb-32 hero-gradient-overlay overflow-hidden">
         <!-- Hero Image with Left-to-Right Opacity Gradient -->
         <div class="absolute inset-0 w-full h-full pointer-events-none z-0">
-            <img src="img/volume_disguise.webp" alt="Volume Disguise" class="w-full h-full object-cover" style="mask-image: linear-gradient(to right, transparent 0%, #000 100%); -webkit-mask-image: linear-gradient(to right, transparent 20%, #000 100%); opacity: 1;" />
+            <img src="img/volume_disguise.webp" alt="Volume Disguise" class="w-full h-full object-cover" width="1920" height="1080" style="mask-image: linear-gradient(to right, transparent 0%, #000 100%); -webkit-mask-image: linear-gradient(to right, transparent 20%, #000 100%); opacity: 1;" />
         </div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -352,9 +368,9 @@
                     </div>
                     <div class="mt-12 flex items-center justify-center md:justify-start space-x-4">
                          <div class="flex -space-x-2">
-                             <img class="w-10 h-10 rounded-full border-2 border-dark" src="https://randomuser.me/api/portraits/women/12.jpg" alt="Cliente 1" onerror="this.onerror=null; this.src='https://placehold.co/40x40/020202/e0e0e0?text=C1';">
-                             <img class="w-10 h-10 rounded-full border-2 border-dark" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Cliente 2" onerror="this.onerror=null; this.src='https://placehold.co/40x40/020202/e0e0e0?text=C2';">
-                             <img class="w-10 h-10 rounded-full border-2 border-dark" src="https://randomuser.me/api/portraits/women/45.jpg" alt="Cliente 3" onerror="this.onerror=null; this.src='https://placehold.co/40x40/020202/e0e0e0?text=C3';">
+                             <img class="w-10 h-10 rounded-full border-2 border-dark" src="https://randomuser.me/api/portraits/women/12.jpg" alt="Cliente 1" width="40" height="40" onerror="this.onerror=null; this.src='https://placehold.co/40x40/020202/e0e0e0?text=C1';">
+                             <img class="w-10 h-10 rounded-full border-2 border-dark" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Cliente 2" width="40" height="40" onerror="this.onerror=null; this.src='https://placehold.co/40x40/020202/e0e0e0?text=C2';">
+                             <img class="w-10 h-10 rounded-full border-2 border-dark" src="https://randomuser.me/api/portraits/women/45.jpg" alt="Cliente 3" width="40" height="40" onerror="this.onerror=null; this.src='https://placehold.co/40x40/020202/e0e0e0?text=C3';">
                          </div>
                          <div>
                              <p class="text-medium-text text-sm">Confiança de grandes players</p>
@@ -674,19 +690,19 @@
                         <div class="grid grid-cols-2 gap-6 mb-6">
                             <a href="https://www.disguise.one/en" target="_blank" rel="noopener noreferrer" class="bg-[#020b0b] p-4 rounded-lg flex flex-col items-center text-center tech-card border border-[#00a77d20] hover:border-[#00a77d60] transition-all duration-300" style="box-shadow: 0 0 15px rgba(0,167,125,0.1);">
                       
-                                <img src="img/disguise.webp" alt="Logo Disguise" class="h-12 mb-3 object-contain">
+                                <img src="img/disguise.webp" alt="Logo Disguise" class="h-12 mb-3 object-contain" width="120" height="48">
                    
                                 <p class="text-medium-text text-[10px]">Media Servers (VX/RX)</p>
                             </a>
                             <a href="https://www.unrealengine.com/en-US/uses/film-television" target="_blank" rel="noopener noreferrer" class="bg-[#020b0b] p-4 rounded-lg flex flex-col items-center text-center tech-card border border-[#00a77d20] hover:border-[#00a77d60] transition-all duration-300" style="box-shadow: 0 0 15px rgba(0,167,125,0.1);">
                     
-                                <img src="img/unreal.webp" alt="Logo Unreal Engine" class="h-16 w-auto mb-3 object-contain" style="max-height: 65px;">
+                                <img src="img/unreal.webp" alt="Logo Unreal Engine" class="h-16 w-auto mb-3 object-contain" width="120" height="64" style="max-height: 65px;">
                       
                                 <p class="text-medium-text text-[10px]">Real-time Rendering</p>
                             </a>
                             <a href="https://www.christiedigital.com/" target="_blank" rel="noopener noreferrer" class="bg-[#020b0b] p-4 rounded-lg flex flex-col items-center text-center tech-card border border-[#00a77d20] hover:border-[#00a77d60] transition-all duration-300" style="box-shadow: 0 0 15px rgba(0,167,125,0.1);">
                   
-                                <img src="img/christie.webp" alt="Logo Christie" class="h-12 mb-3 object-contain">
+                                <img src="img/christie.webp" alt="Logo Christie" class="h-12 mb-3 object-contain" width="120" height="48">
                          
                                 <p class="text-medium-text text-[10px]">High-Lumen 4K Projectors</p>
                             </a>
