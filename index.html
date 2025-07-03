@@ -121,6 +121,10 @@
     <link rel="preload" href="/img/on+av_logo_v2.webp" as="image">
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400&display=swap">
     
+    <!-- Preload Font Awesome fonts for faster loading -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+    
     <!-- Load critical fonts with font-display swap -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
     
@@ -321,11 +325,33 @@
         .text-primary { color: #00ff9d; }
         .text-light-text { color: #e0e0e0; }
         .hidden { display: none; }
+        
+        /* Fix for deprecated API warning - explicit font-size for H1 in semantic elements */
+        section h1, article h1, aside h1, nav h1 {
+            font-size: 2.25rem; /* 36px base */
+        }
+        
+        /* Responsive font sizes to match existing Tailwind classes */
+        @media (min-width: 768px) {
+            section h1, article h1, aside h1, nav h1 {
+                font-size: 3rem; /* 48px - md:text-4xl */
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            section h1, article h1, aside h1, nav h1 {
+                font-size: 3.75rem; /* 60px - lg:text-5xl */
+            }
+        }
     </style>
     
     <!-- Font Awesome - Load with media swap for performance -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    
+    <!-- Preload AOS CSS for smooth loading -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css"></noscript>
     
     <!-- Font Display Fix for FontAwesome -->
     <style>
@@ -3384,7 +3410,25 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
     </footer>
 
     <!-- ScrollyVideo temporarily removed for performance -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        // Load AOS library asynchronously for better performance
+        function loadAOS() {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js';
+            script.onload = function() {
+                // Initialize AOS after it loads
+                AOS.init({
+                    duration: 1000,
+                    once: true,
+                    offset: 100
+                });
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Load AOS after page is fully loaded
+        window.addEventListener('load', loadAOS);
+    </script>
     <script>
      document.addEventListener('DOMContentLoaded', function () {
         // ScrollyVideo temporarily disabled for performance
