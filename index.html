@@ -77,8 +77,12 @@
                 })(window,document,'script','dataLayer','GT-MQPB9ZVQ');
             }, 1500);
             
-            // Facebook Pixel - Deferred
-            setTimeout(function() {
+            // Facebook Pixel - Ultra Deferred (only after user interaction)
+            let fbPixelLoaded = false;
+            function loadFacebookPixel() {
+                if (fbPixelLoaded) return;
+                fbPixelLoaded = true;
+                
                 !function(f,b,e,v,n,t,s)
                 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
                 n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -89,7 +93,12 @@
                 'https://connect.facebook.net/en_US/fbevents.js');
                 fbq('init', '1485201939309596');
                 fbq('track', 'PageView');
-            }, 2000);
+            }
+            
+            // Load Facebook Pixel on first user interaction
+            ['click', 'scroll', 'keydown', 'touchstart'].forEach(function(eventType) {
+                window.addEventListener(eventType, loadFacebookPixel, { once: true, passive: true });
+            });
         });
     </script>
     <noscript><img height="1" width="1" style="display:none"
@@ -526,7 +535,7 @@
     <section class="relative pt-32 pb-20 md:pt-40 md:pb-32 hero-gradient-overlay overflow-hidden">
         <!-- Hero Image with Left-to-Right Opacity Gradient -->
         <div class="absolute inset-0 w-full h-full pointer-events-none z-0">
-            <img src="img/volume_disguise.webp" alt="Volume Disguise" class="w-full h-full object-cover" width="1920" height="1080" loading="eager" style="mask-image: linear-gradient(to right, transparent 0%, #000 100%); -webkit-mask-image: linear-gradient(to right, transparent 20%, #000 100%); opacity: 1;" />
+            <img src="img/hero_background.webp" alt="Volume Disguise" class="w-full h-full object-cover" width="1920" height="1080" loading="eager" style="mask-image: linear-gradient(to right, transparent 0%, #000 100%); -webkit-mask-image: linear-gradient(to right, transparent 20%, #000 100%); opacity: 1;" />
         </div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -1788,15 +1797,15 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
           O resultado foi um espetáculo visualmente deslumbrante que destacou a energia contagiante da Ludmilla no palco principal do Coachella, marcando presença marcante em um dos eventos mais importantes da música mundial.
         </p>
         
-        <!-- Instagram Reel Embed -->
+        <!-- Instagram Reel Embed - Lazy Loaded -->
         <div style="margin: 30px 0; text-align: center;">
           <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-bottom: 1rem;">Vídeo do Show</h4>
-          <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/C5woI5XPI_f/" data-instgrm-version="14" style="background: #222; border:0; border-radius: 12px; margin: 1rem auto; max-width: 540px; min-width: 326px; padding: 0; width: calc(100% - 2px);">
-            <div style="padding: 16px;">
-              <a href="https://www.instagram.com/reel/C5woI5XPI_f/" style="color: #00ffaa; text-decoration: none;" target="_blank">Ver esta publicação no Instagram</a>
-            </div>
-          </blockquote>
-          <script async src="//www.instagram.com/embed.js"></script>
+          <div id="instagram-embed-placeholder" style="background: #222; border:0; border-radius: 12px; margin: 1rem auto; max-width: 540px; min-width: 326px; padding: 40px 16px; width: calc(100% - 2px); text-align: center;">
+            <div style="color: #888; font-size: 14px; margin-bottom: 10px;">Instagram Reel</div>
+            <a href="https://www.instagram.com/reel/C5woI5XPI_f/" style="color: #00ffaa; text-decoration: none;" target="_blank">Ver esta publicação no Instagram</a>
+            <div style="color: #666; font-size: 12px; margin-top: 10px;">Carregando...</div>
+          </div>
+          <div id="instagram-embed-container" style="display: none;"></div>
         </div>
       </div>
     </div>
@@ -4071,6 +4080,58 @@ window.addEventListener('DOMContentLoaded', onScrollNavHighlight);
 </script>
 
 <script>
+// Instagram Lazy Loading Function
+function loadInstagramEmbed() {
+    const placeholder = document.getElementById('instagram-embed-placeholder');
+    const container = document.getElementById('instagram-embed-container');
+    
+    // Only load once
+    if (container.hasAttribute('data-loaded')) {
+        return;
+    }
+    
+    // Mark as loaded to prevent duplicate loading
+    container.setAttribute('data-loaded', 'true');
+    
+    // Create the Instagram embed
+    const embedHTML = `
+        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/C5woI5XPI_f/" data-instgrm-version="14" style="background: #222; border:0; border-radius: 12px; margin: 1rem auto; max-width: 540px; min-width: 326px; padding: 0; width: calc(100% - 2px);">
+            <div style="padding: 16px;">
+                <a href="https://www.instagram.com/reel/C5woI5XPI_f/" style="color: #00ffaa; text-decoration: none;" target="_blank">Ver esta publicação no Instagram</a>
+            </div>
+        </blockquote>
+    `;
+    
+    // Insert the embed HTML
+    container.innerHTML = embedHTML;
+    
+    // Load Instagram embed script
+    if (!document.querySelector('script[src*="instagram.com/embed.js"]')) {
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = '//www.instagram.com/embed.js';
+        document.head.appendChild(script);
+        
+        // Process the embed after script loads
+        script.onload = function() {
+            if (window.instgrm && window.instgrm.Embeds) {
+                window.instgrm.Embeds.process();
+            }
+        };
+    } else {
+        // Script already exists, just process the new embed
+        if (window.instgrm && window.instgrm.Embeds) {
+            window.instgrm.Embeds.process();
+        }
+    }
+    
+    // Hide placeholder and show embed
+    setTimeout(function() {
+        placeholder.style.display = 'none';
+        container.style.display = 'block';
+    }, 1000);
+}
+
 // Ludmilla no Coachella Modal Handlers
 (function() {
     const ludmillaTrigger = document.querySelector('.case-study-trigger-ludmilla');
@@ -4082,6 +4143,9 @@ window.addEventListener('DOMContentLoaded', onScrollNavHighlight);
         ludmillaTrigger.addEventListener('click', function() {
             ludmillaModal.style.display = 'flex';
             document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+            
+            // Lazy load Instagram embed when modal opens
+            loadInstagramEmbed();
         });
     }
     
