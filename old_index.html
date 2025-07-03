@@ -51,46 +51,34 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
     
-    <!-- Analytics Scripts - Deferred for Performance -->
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HPLPNWR5LS"></script>
     <script>
-        // Defer analytics to avoid blocking main thread
-        window.addEventListener('load', function() {
-            // Google Analytics 4 - Deferred
-            setTimeout(function() {
-                var ga = document.createElement('script');
-                ga.async = true;
-                ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-HPLPNWR5LS';
-                document.head.appendChild(ga);
-                
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', 'G-HPLPNWR5LS');
-            }, 1000);
-            
-            // Google Tag Manager - Deferred
-            setTimeout(function() {
-                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                })(window,document,'script','dataLayer','GT-MQPB9ZVQ');
-            }, 1500);
-            
-            // Facebook Pixel - Deferred
-            setTimeout(function() {
-                !function(f,b,e,v,n,t,s)
-                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-                n.queue=[];t=b.createElement(e);t.async=!0;
-                t.src=v;s=b.getElementsByTagName(e)[0];
-                s.parentNode.insertBefore(t,s)}(window, document,'script',
-                'https://connect.facebook.net/en_US/fbevents.js');
-                fbq('init', '1485201939309596');
-                fbq('track', 'PageView');
-            }, 2000);
-        });
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-HPLPNWR5LS');
+    </script>
+    
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GT-MQPB9ZVQ');</script>
+    
+    <!-- Facebook Pixel -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1485201939309596');
+    fbq('track', 'PageView');
     </script>
     <noscript><img height="1" width="1" style="display:none"
     src="https://www.facebook.com/tr?id=1485201939309596&ev=PageView&noscript=1"
@@ -108,14 +96,41 @@
     <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
     <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
     
-    <!-- Preload critical resources -->
-    <link rel="preload" href="/img/on+av_logo_v2.webp" as="image">
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
-    
-    <!-- Load critical fonts with font-display swap -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Complete CSS Styling - Restored from Original -->
+    <!-- Critical CSS and Scripts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <script>
+        // Tailwind CSS configuration
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00ff9d', // Bright Green/Aqua
+                        secondary: '#0066ff', // Strong Blue
+                        purpleish: '#9370DB', // Medium Purple for blob
+                        dark: '#0a0a0a',     // Dark background shade
+                        darker: '#020202',   // Base darker background shade
+                        'light-text': '#e0e0e0', // Light text color
+                        'medium-text': '#a0a0a0', // Medium text color (for less emphasis)
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'], // Primary sans-serif font
+                        mono: ['Fira Code', 'monospace'], // Monospace font (for code/tech elements)
+                    },
+                    animation: {
+                        'subtle-float': 'subtle-float 6s ease-in-out infinite', // Subtle floating animation
+                    },
+                    keyframes: {
+                        'subtle-float': { // Keyframes for the floating animation
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         /* Import Google Fonts */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400&display=swap');
@@ -308,57 +323,12 @@
         #orcamentoModal .producao-virtual-btn:hover {
             color: #000 !important;
         }
-        
-        /* Critical utilities */
-        .text-primary { color: #00ff9d; }
-        .text-light-text { color: #e0e0e0; }
-        .hidden { display: none; }
     </style>
-    
-    <!-- Font Awesome - Load with media swap for performance -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
-    
-    <!-- Tailwind CSS - Deferred after page load -->
-    <!-- Tailwind CSS - Load immediately for config -->
-    <script src="https://cdn.tailwindcss.com" defer></script>
-    
-    <!-- Critical JS inlined to fix loading errors -->
-    <script>
-        // Tailwind Configuration - Wait for Tailwind to load
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof tailwind !== 'undefined') {
-                tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#00ff9d',
-                        secondary: '#0066ff',
-                        purpleish: '#9370DB',
-                        dark: '#0a0a0a',
-                        darker: '#020202',
-                        'light-text': '#e0e0e0',
-                        'medium-text': '#a0a0a0',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['Fira Code', 'monospace'],
-                    },
-                    animation: {
-                        'subtle-float': 'subtle-float 6s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        'subtle-float': {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-8px)' },
-                        }
-                    }
-                }
-            }
-        };
-            }
-        });
-    </script>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body class="antialiased">
     
@@ -463,7 +433,7 @@
             <div class="flex justify-between h-20 items-center">
                 <div class="flex items-center">
                     <a href="#" class="flex-shrink-0 flex items-center">
-                         <img src="img/on+av_logo_v2.webp" alt="On + Av Logo" style="height:40px;">
+                         <img src="img/on+av_logo_v2.png" alt="On + Av Logo" style="height:40px;">
                     </a>
                 </div>
                 <div class="hidden md:block">
@@ -502,7 +472,7 @@
     <section class="relative pt-32 pb-20 md:pt-40 md:pb-32 hero-gradient-overlay overflow-hidden">
         <!-- Hero Image with Left-to-Right Opacity Gradient -->
         <div class="absolute inset-0 w-full h-full pointer-events-none z-0">
-            <img src="img/volume_disguise.webp" alt="Volume Disguise" class="w-full h-full object-cover" width="1920" height="1080" loading="eager" style="mask-image: linear-gradient(to right, transparent 0%, #000 100%); -webkit-mask-image: linear-gradient(to right, transparent 20%, #000 100%); opacity: 1;" />
+            <img src="img/volume_disguise.webp" alt="Volume Disguise" class="w-full h-full object-cover" style="mask-image: linear-gradient(to right, transparent 0%, #000 100%); -webkit-mask-image: linear-gradient(to right, transparent 20%, #000 100%); opacity: 1;" />
         </div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -523,9 +493,9 @@
                     </div>
                     <div class="mt-12 flex items-center justify-center md:justify-start space-x-4">
                          <div class="flex -space-x-2">
-                             <img class="w-10 h-10 rounded-full border-2 border-dark" src="https://randomuser.me/api/portraits/women/12.jpg" alt="Cliente 1" width="40" height="40" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/40x40/020202/e0e0e0?text=C1';">
-                             <img class="w-10 h-10 rounded-full border-2 border-dark" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Cliente 2" width="40" height="40" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/40x40/020202/e0e0e0?text=C2';">
-                             <img class="w-10 h-10 rounded-full border-2 border-dark" src="https://randomuser.me/api/portraits/women/45.jpg" alt="Cliente 3" width="40" height="40" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/40x40/020202/e0e0e0?text=C3';">
+                             <img class="w-10 h-10 rounded-full border-2 border-dark" src="https://randomuser.me/api/portraits/women/12.jpg" alt="Cliente 1" onerror="this.onerror=null; this.src='https://placehold.co/40x40/020202/e0e0e0?text=C1';">
+                             <img class="w-10 h-10 rounded-full border-2 border-dark" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Cliente 2" onerror="this.onerror=null; this.src='https://placehold.co/40x40/020202/e0e0e0?text=C2';">
+                             <img class="w-10 h-10 rounded-full border-2 border-dark" src="https://randomuser.me/api/portraits/women/45.jpg" alt="Cliente 3" onerror="this.onerror=null; this.src='https://placehold.co/40x40/020202/e0e0e0?text=C3';">
                          </div>
                          <div>
                              <p class="text-medium-text text-sm">Confiança de grandes players</p>
@@ -542,23 +512,13 @@
                 </div>
                 <div class="relative z-10">
                     <div class="relative rounded-xl overflow-hidden glow-box-primary">
-                        <!-- YouTube video temporarily replaced with image for performance -->
-                        <div class="relative">
-                            <img src="img/volume_disguise.webp" alt="On+Av Showreel Preview" class="w-full h-64 object-cover" width="600" height="400" loading="lazy">
-                            <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-                                <div class="text-center">
-                                    <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-4 mx-auto">
-                                        <i class="fas fa-play text-dark text-xl"></i>
-                                    </div>
-                                    <p class="text-white font-semibold">Showreel On+Av</p>
-                                    <p class="text-light-text text-sm">Temporarily optimized for performance</p>
-                                </div>
-                            </div>
+                        <div class="video-container">
+                            <iframe src="https://www.youtube.com/embed/ru-Q_s7dVWY?loop=1&playlist=ru-Q_s7dVWY&controls=0" allowfullscreen title="Showreel On+Av" tabindex="0"></iframe>
                         </div>
                     </div>
                     <div class="absolute -bottom-6 -left-6 bg-dark p-3 md:p-4 rounded-lg border border-gray-800 shadow-lg hidden md:block z-20 glass-card">
                         <div class="flex items-center">
-                            <img src="img/disguiseicon.webp" alt="Disguise Icon" class="w-8 h-8 object-contain mr-3" loading="lazy" />
+                            <img src="img/disguiseicon.png" alt="Disguise Icon" class="w-8 h-8 object-contain mr-3" />
                             <div>
                                 <p class="text-xs text-medium-text uppercase tracking-wider">Tecnologia Premiada</p>
                                 <p class="text-sm font-bold text-light-text">Disguise Partner</p>
@@ -855,37 +815,37 @@
                         <div class="grid grid-cols-2 gap-6 mb-6">
                             <a href="https://www.disguise.one/en" target="_blank" rel="noopener noreferrer" class="bg-[#020b0b] p-4 rounded-lg flex flex-col items-center text-center tech-card border border-[#00a77d20] hover:border-[#00a77d60] transition-all duration-300" style="box-shadow: 0 0 15px rgba(0,167,125,0.1);">
                       
-                                <img src="img/disguise.webp" alt="Logo Disguise" class="h-12 mb-3 object-contain" width="120" height="48" loading="lazy">
+                                <img src="img/disguise.webp" alt="Logo Disguise" class="h-12 mb-3 object-contain">
                    
                                 <p class="text-medium-text text-[10px]">Media Servers (VX/RX)</p>
                             </a>
                             <a href="https://www.unrealengine.com/en-US/uses/film-television" target="_blank" rel="noopener noreferrer" class="bg-[#020b0b] p-4 rounded-lg flex flex-col items-center text-center tech-card border border-[#00a77d20] hover:border-[#00a77d60] transition-all duration-300" style="box-shadow: 0 0 15px rgba(0,167,125,0.1);">
                     
-                                <img src="img/unreal.webp" alt="Logo Unreal Engine" class="h-16 w-auto mb-3 object-contain" width="120" height="64" style="max-height: 65px;" loading="lazy">
+                                <img src="img/unreal.webp" alt="Logo Unreal Engine" class="h-16 w-auto mb-3 object-contain" style="max-height: 65px;">
                       
                                 <p class="text-medium-text text-[10px]">Real-time Rendering</p>
                             </a>
                             <a href="https://www.christiedigital.com/" target="_blank" rel="noopener noreferrer" class="bg-[#020b0b] p-4 rounded-lg flex flex-col items-center text-center tech-card border border-[#00a77d20] hover:border-[#00a77d60] transition-all duration-300" style="box-shadow: 0 0 15px rgba(0,167,125,0.1);">
                   
-                                <img src="img/christie.webp" alt="Logo Christie" class="h-12 mb-3 object-contain" width="120" height="48" loading="lazy">
+                                <img src="img/christie.webp" alt="Logo Christie" class="h-12 mb-3 object-contain">
                          
                                 <p class="text-medium-text text-[10px]">High-Lumen 4K Projectors</p>
                             </a>
                             <a href="https://www.notch.one/" target="_blank" rel="noopener noreferrer" class="bg-[#020b0b] p-4 rounded-lg flex flex-col items-center text-center tech-card border border-[#00a77d20] hover:border-[#00a77d60] transition-all duration-300" style="box-shadow: 0 0 15px rgba(0,167,125,0.1);">
                    
-                                <img src="img/notch.webp" alt="Logo Notch" class="h-10 w-auto mb-3 object-contain" style="max-height: 40px;" loading="lazy">
+                                <img src="img/notch.webp" alt="Logo Notch" class="h-10 w-auto mb-3 object-contain" style="max-height: 40px;">
                          
                                 <p class="text-medium-text text-[10px]">Real-time Graphics</p>
                             </a>
                             <a href="https://www.lg-informationdisplay.com/industries/virtual-production" target="_blank" rel="noopener noreferrer" class="bg-[#020b0b] p-4 rounded-lg flex flex-col items-center text-center tech-card border border-[#00a77d20] hover:border-[#00a77d60] transition-all duration-300" style="box-shadow: 0 0 15px rgba(0,167,125,0.1);">
                    
-                                <img src="img/lg.webp" alt="Logo LG" class="h-10 w-auto mb-3 object-contain" style="max-height: 40px;" width="80" height="40" loading="lazy">
+                                <img src="img/lg.webp" alt="Logo LG" class="h-10 w-auto mb-3 object-contain" style="max-height: 40px;">
                          
                                 <p class="text-medium-text text-[10px]">Painel de LED HDR 10-bit</p>
                             </a>
                             <a href="https://stype.tv/" target="_blank" rel="noopener noreferrer" class="bg-[#020b0b] p-4 rounded-lg flex flex-col items-center text-center tech-card border border-[#00a77d20] hover:border-[#00a77d60] transition-all duration-300" style="box-shadow: 0 0 15px rgba(0,167,125,0.1);">
                    
-                                <img src="img/stype-logo-black.webp" alt="Logo Stype" class="h-10 w-auto mb-3 object-contain" style="max-height: 40px;" loading="lazy">
+                                <img src="img/stype-logo-black.webp" alt="Logo Stype" class="h-10 w-auto mb-3 object-contain" style="max-height: 40px;">
                          
                                 <p class="text-medium-text text-[10px]">Camera Tracking</p>
                             </a>
@@ -905,7 +865,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
                  <div class="glass-card rounded-xl overflow-hidden case-study-trigger">
                     <div class="relative">
-                        <img src="https://img.youtube.com/vi/OzOQQSURvu4/0.jpg" alt="Video Thumbnail" class="w-full h-64 object-cover" loading="lazy">
+                        <img src="https://img.youtube.com/vi/OzOQQSURvu4/0.jpg" alt="Video Thumbnail" class="w-full h-64 object-cover">
                         <div class="absolute bottom-0 left-0 bg-primary text-dark px-4 py-1 text-xs font-bold uppercase tracking-wider">TV</div>
                     </div>
                     <div class="p-6">
@@ -921,7 +881,7 @@
 
                 <div class="glass-card rounded-xl overflow-hidden case-study-trigger-tcross">
                     <div class="relative">
-                        <img src="https://img.youtube.com/vi/5InWksj7aNk/0.jpg" alt="Novo T-Cross | Uma Aventura SUVW | VW Brasil" class="w-full h-64 object-cover" loading="lazy">
+                        <img src="https://img.youtube.com/vi/5InWksj7aNk/0.jpg" alt="Novo T-Cross | Uma Aventura SUVW | VW Brasil" class="w-full h-64 object-cover">
                         <div class="absolute bottom-0 left-0 bg-primary text-dark px-4 py-1 text-xs font-bold uppercase tracking-wider">Publicidade</div>
                     </div>
                     <div class="p-6">
@@ -939,7 +899,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                  <div class="glass-card rounded-xl overflow-hidden case-study-trigger-creta">
                     <div class="relative">
-                        <img src="https://img.youtube.com/vi/O9XJVbup43M/maxresdefault.jpg" alt="Video Thumbnail" class="w-full h-48 object-cover" loading="lazy">
+                        <img src="https://img.youtube.com/vi/O9XJVbup43M/maxresdefault.jpg" alt="Video Thumbnail" class="w-full h-48 object-cover">
                         <div class="absolute bottom-0 left-0 bg-primary text-dark px-3 py-1 text-[10px] font-bold uppercase tracking-wider">Publicidade</div>
                     </div>
                     <div class="p-4">
@@ -950,7 +910,7 @@
 
                 <div class="glass-card rounded-xl overflow-hidden case-study-trigger-globo">
                     <div class="relative">
-                        <img src="https://img.youtube.com/vi/mJVcf-VkZSs/0.jpg" alt="Globo Promo Day" class="w-full h-48 object-cover" loading="lazy">
+                        <img src="https://img.youtube.com/vi/mJVcf-VkZSs/0.jpg" alt="Globo Promo Day" class="w-full h-48 object-cover">
                         <div class="absolute bottom-0 left-0 bg-primary text-dark px-3 py-1 text-[10px] font-bold uppercase tracking-wider">TV</div>
                     </div>
                     <div class="p-4">
@@ -961,7 +921,7 @@
 
                 <div class="glass-card rounded-xl overflow-hidden case-study-trigger-jquest">
                      <div class="relative">
-                         <img src="/img/dvd_jquest_disguise_v1.webp" alt="DVD Jota Quest" class="w-full h-48 object-cover" loading="lazy">
+                         <img src="/img/dvd_jquest_disguise_v1.webp" alt="DVD Jota Quest" class="w-full h-48 object-cover">
                           <div class="absolute bottom-0 left-0 bg-primary text-dark px-3 py-1 text-[10px] font-bold uppercase tracking-wider">Show</div>
                     </div>
                     <div class="p-4">
@@ -976,7 +936,7 @@
                  <!-- Card 1: Encontro C&A -->
                  <div class="glass-card rounded-xl overflow-hidden case-study-trigger-cea">
                     <div class="relative">
-                        <img src="https://img.youtube.com/vi/YA3WOyQboWA/maxresdefault.jpg" alt="Encontro C&A" class="w-full h-48 object-cover" loading="lazy">
+                        <img src="https://img.youtube.com/vi/YA3WOyQboWA/maxresdefault.jpg" alt="Encontro C&A" class="w-full h-48 object-cover">
                         <div class="absolute bottom-0 left-0 bg-primary text-dark px-3 py-1 text-[10px] font-bold uppercase tracking-wider">Publicidade</div>
                     </div>
                     <div class="p-4">
@@ -1143,7 +1103,7 @@
                     
                     <!-- Main Video Player -->
                     <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 20px;">
-                      <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+                      <iframe id="manowarCaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/jVAMWTCITVA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                     </div>
 
                     <!-- Case Study Content -->
@@ -1162,10 +1122,10 @@
                       <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Mais Vídeos</h4>
                       <div style="display: flex; gap: 15px; margin: 20px 0;">
                         <div style="flex: 1; position: relative; padding-bottom: 28.125%; height: 0; overflow: hidden;">
-                           <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+                           <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/tbhdN45U8Es" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                         </div>
                         <div style="flex: 1; position: relative; padding-bottom: 28.125%; height: 0; overflow: hidden;">
-                           <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+                           <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/lbbScd7kwTk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                         </div>
                       </div>
                     </div>
@@ -1211,7 +1171,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                  <div class="testimonial-card rounded-xl p-8">
                      <div class="flex items-center mb-6">
-                         <img src="img/rafael_sa.webp" alt="Foto de Rafael Sa" class="w-12 h-12 rounded-full mr-4 border-2 border-primary" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/48x48/020202/e0e0e0?text=RS';"> 
+                         <img src="img/rafael_sa.webp" alt="Foto de Rafael Sa" class="w-12 h-12 rounded-full mr-4 border-2 border-primary" onerror="this.onerror=null; this.src='https://placehold.co/48x48/020202/e0e0e0?text=RS';">
                          <div>
                              <h4 class="font-bold text-light-text">Rafael Sa</h4>
                              <p class="text-medium-text text-xs">Produtor de Tecnologia, Globo</p>
@@ -1225,7 +1185,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
                  </div>
                   <div class="testimonial-card rounded-xl p-8">
                        <div class="flex items-center mb-6">
-                           <img src="img/doridio.webp" alt="Foto de Doridio Silva" class="w-12 h-12 rounded-full mr-4 border-2 border-primary" width="48" height="48" onerror="this.onerror=null; this.src='https://placehold.co/48x48/020202/e0e0e0?text=DS';">
+                           <img src="img/doridio.jpg" alt="Foto de Doridio Silva" class="w-12 h-12 rounded-full mr-4 border-2 border-primary" onerror="this.onerror=null; this.src='https://placehold.co/48x48/020202/e0e0e0?text=DS';">
                            <div>
                                <h4 class="font-bold text-light-text">Doridio Silva</h4>
                                <p class="text-medium-text text-xs">Diretor, Elfus Eventos</p>
@@ -1238,7 +1198,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
                   </div>
                   <div class="testimonial-card rounded-xl p-8">
                        <div class="flex items-center mb-6">
-                           <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Foto de Ricardo Almeida" class="w-12 h-12 rounded-full mr-4 border-2 border-primary" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/48x48/020202/e0e0e0?text=RA';">
+                           <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Foto de Ricardo Almeida" class="w-12 h-12 rounded-full mr-4 border-2 border-primary" onerror="this.onerror=null; this.src='https://placehold.co/48x48/020202/e0e0e0?text=RA';">
                            <div>
                                <h4 class="font-bold text-light-text">Ricardo Almeida</h4>
                                <p class="text-medium-text text-xs">Diretor, Amazon Studios</p>
@@ -1307,7 +1267,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
                 </div>
                  <div class="lg:w-1/2">
                     <div class="relative">
-                        <img src="img/team2.webp" alt="Nossa Equipe em Ação" class="rounded-xl shadow-xl glow-box-secondary" width="600" height="400" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/600x400/020202/e0e0e0?text=Equipe+On+Av';">
+                        <img src="img/team2.webp" alt="Nossa Equipe em Ação" class="rounded-xl shadow-xl glow-box-secondary" onerror="this.onerror=null; this.src='https://placehold.co/600x400/020202/e0e0e0?text=Equipe+On+Av';">
                         <div class="absolute -bottom-6 -left-6 glass-card p-4 rounded-xl shadow-lg border border-secondary glow-box-secondary z-10 w-2/3 md:w-1/2">
                             <div class="flex items-center">
                                 <div class="bg-secondary bg-opacity-20 rounded-full p-3 mr-3">
@@ -1325,19 +1285,33 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
         </div>
     </section>
 
-    <!-- Scrolly Video Section - TEMPORARILY HIDDEN FOR PERFORMANCE -->
-    <div id="estudio-scrolly-section-wrapper" style="display: none;">
-        <!-- Hidden for performance testing -->
-    </div>
-    
-    <!-- Temporary Static Studio Section -->
-    <section class="py-20 bg-darker relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">O Estúdio de Produção Virtual<br><span class="gradient-text">mais Avançado do Brasil</span></h1>
-            <p class="text-lg text-light-text max-w-3xl mx-auto mb-8">Powered by Disguise, com LED HDR 10 bits e tracking de câmera</p>
-            <a href="estudio.html" class="btn-primary font-bold py-3 px-8 rounded-md inline-block" style="color: #000 !important;">Conheça o Estúdio</a>
+    <!-- Scrolly Video Section Wrapper for 'O Estúdio' -->
+    <div id="estudio-scrolly-section-wrapper" style="position: relative; height: 400vh; /* Adjust for scroll length, e.g., 4x viewport height */">
+        
+        <!-- Video Container for ScrollyVideo -->
+        <div id="estudio-video-container" style="position: sticky; top: 0; left: 0; width: 100%; height: 100vh; z-index: 1; overflow: hidden;">
+            <!-- Video will be injected here by ScrollyVideo -->
         </div>
-    </section>
+
+        <!-- Content Container: This will hold the title, subtitle, and CTA button -->
+        <div id="estudio-scrolly-content-container" style="position: sticky; top: 0; left: 0; width: 100%; height: 100vh; z-index: 10; display: flex; flex-direction: column; justify-content: space-between; align-items: center; pointer-events: none;">
+            <!-- Top title section -->
+            <div class="w-full pt-32 px-4 sm:px-6 lg:px-8 text-center pointer-events-auto">
+                <div data-aos="fade-down" data-aos-anchor="#estudio-scrolly-section-wrapper">
+                    <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">O Estúdio de Produção Virtual<br><span class="gradient-text">mais Avançado do Brasil</span></h1>
+                    <p class="text-lg text-light-text max-w-3xl mx-auto">Powered by Disguise, com LED HDR 10 bits e tracking de câmera</p>
+                </div>
+            </div>
+            
+            <!-- Bottom CTA section -->
+            <div class="w-full pb-16 px-4 sm:px-6 lg:px-8 text-center pointer-events-auto">
+                <div data-aos="fade-up" data-aos-anchor="#estudio-scrolly-section-wrapper">
+
+                    <a href="estudio.html" class="btn-primary font-bold py-3 px-8 rounded-md inline-block" style="color: #000 !important;">Conheça o Estúdio</a>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- End Scrolly Video Section Wrapper -->
 
     <section class="py-20 bg-gradient-to-r from-primary/10 via-dark to-secondary/10"> <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
@@ -1499,12 +1473,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
-        <div class="video-placeholder bg-gray-800 flex items-center justify-center cursor-pointer" style="background-image: url('img/paris.webp'); background-size: cover; background-position: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%;" onclick="playYouTubeVideo()">
-          <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center;">
-            <i class="fas fa-play text-primary text-4xl"></i>
-          </div>
-        </div>
-        <iframe id="youtubePlayer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;" frameborder="0" allowfullscreen></iframe>
+        <iframe id="caseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/OzOQQSURvu4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       </div>
 
       <!-- Case Study Content -->
@@ -1522,16 +1491,16 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
         
         <!-- Featured Image - Full Width -->
         <div style="width: 100%; margin: 30px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-          <img src="/img/olimpiadas_globo_v1.webp" alt="Produção Virtual Olimpíadas Globo - Estúdio Principal" style="width: 100%; display: block;" loading="lazy">
+          <img src="/img/olimpiadas_globo_v1.webp" alt="Produção Virtual Olimpíadas Globo - Estúdio Principal" style="width: 100%; display: block;">
         </div>
         
         <!-- Three Column Layout for Images -->
         <div style="display: flex; gap: 15px; margin: 30px 0;">
           <div style="flex: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-            <img src="/img/olimpiadas_globo_v4.webp" alt="Produção Virtual Olimpíadas Globo - Ambiente Interativo" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+            <img src="/img/olimpiadas_globo_v4.webp" alt="Produção Virtual Olimpíadas Globo - Ambiente Interativo" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
           <div style="flex: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-            <img src="/img/olimpiadas_globo_v5.webp" alt="Produção Virtual Olimpíadas Globo - Gráficos em Tempo Real" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+            <img src="/img/olimpiadas_globo_v5.webp" alt="Produção Virtual Olimpíadas Globo - Gráficos em Tempo Real" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
           <div style="flex: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
             <img src="/img/olimpiadas_globo_v6.webp" alt="Produção Virtual Olimpíadas Globo - Cenário Digital" style="width: 100%; height: 100%; object-fit: cover;">
@@ -1577,19 +1546,10 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Main Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 20px;">
-        <div id="tateMainVideoContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #000;">
-          <!-- Custom play button overlay -->
-          <div id="tateMainPlayOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.4); cursor: pointer; z-index: 2;">
-            <div style="width: 80px; height: 80px; border-radius: 50%; background-color: #00ffaa; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,255,170,0.5);">
-              <div style="width: 0; height: 0; border-top: 20px solid transparent; border-left: 35px solid #121212; border-bottom: 20px solid transparent; margin-left: 8px;"></div>
-            </div>
-          </div>
-          <!-- Video element (will be loaded on demand) -->
-          <video id="tateMainVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;" controls>
-            <source data-src="img/videos/tate.mp4" type="video/mp4">
-            Seu navegador não suporta vídeos HTML5.
-          </video>
-        </div>
+        <video id="tateMainVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" controls>
+          <source src="img/videos/tate.mp4" type="video/mp4">
+          Seu navegador não suporta vídeos HTML5.
+        </video>
       </div>
 
       <!-- Case Study Content -->
@@ -1617,19 +1577,10 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
         
         <!-- Second Video -->
         <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-top: 20px;">
-          <div id="tateSecondVideoContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #000;">
-            <!-- Custom play button overlay -->
-            <div id="tateSecondPlayOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.4); cursor: pointer; z-index: 2;">
-              <div style="width: 80px; height: 80px; border-radius: 50%; background-color: #00ffaa; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,255,170,0.5);">
-                <div style="width: 0; height: 0; border-top: 20px solid transparent; border-left: 35px solid #121212; border-bottom: 20px solid transparent; margin-left: 8px;"></div>
-              </div>
-            </div>
-            <!-- Video element (will be loaded on demand) -->
-            <video id="tateSecondVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;" controls>
-              <source data-src="img/videos/tate-live-in-chile.mp4" type="video/mp4">
-              Seu navegador não suporta vídeos HTML5.
-            </video>
-          </div>
+          <video id="tateSecondVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" controls>
+            <source src="img/videos/tate-live-in-chile.mp4" type="video/mp4">
+            Seu navegador não suporta vídeos HTML5.
+          </video>
         </div>
       </div>
     </div>
@@ -1643,19 +1594,10 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Main Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 20px; border-radius: 10px; background: #000;">
-        <div id="beloVideoContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #000;">
-          <!-- Custom play button overlay -->
-          <div id="beloPlayOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.4); cursor: pointer; z-index: 2;">
-            <div style="width: 80px; height: 80px; border-radius: 50%; background-color: #00ffaa; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,255,170,0.5);">
-              <div style="width: 0; height: 0; border-top: 20px solid transparent; border-left: 35px solid #121212; border-bottom: 20px solid transparent; margin-left: 8px;"></div>
-            </div>
-          </div>
-          <!-- Video element (will be loaded on demand) -->
-          <video id="beloCaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;" controls>
-            <source data-src="img/videos/belo.mp4" type="video/mp4">
-            Seu navegador não suporta a reprodução de vídeo.
-          </video>
-        </div>
+        <video id="beloCaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" controls>
+          <source src="img/videos/belo.mp4" type="video/mp4">
+          Seu navegador não suporta a reprodução de vídeo.
+        </video>
       </div>
 
       <!-- Case Study Content -->
@@ -1786,7 +1728,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Main Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 20px;">
-        <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+        <iframe id="gloobCaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/NS7ivNPzvXg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       </div>
 
       <!-- Case Study Content -->
@@ -1834,7 +1776,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
-        <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+        <iframe id="tcrossCaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/5InWksj7aNk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       </div>
 
       <!-- Case Study Content -->
@@ -1876,7 +1818,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
-        <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+        <iframe id="cretaCaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/O9XJVbup43M" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       </div>
 
       <!-- Case Study Content -->
@@ -1949,7 +1891,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Video Player -->
       <div class="video-container mb-6" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; background: #000;">
-        <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+        <iframe id="lupoVideo" width="100%" height="100%" src="https://www.youtube.com/embed/G6T20ZAvOgA?si=jITo5nnJ2FI8qpjk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
       </div>
       
       <div id="lupoCaseStudyContent">
@@ -2008,7 +1950,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
-        <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+        <iframe id="globoCaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/mJVcf-VkZSs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       </div>
 
       <!-- Case Study Content -->
@@ -2079,7 +2021,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
-        <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+        <iframe id="ceaCaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/YA3WOyQboWA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       </div>
 
       <!-- Case Study Content -->
@@ -2190,9 +2132,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
         <!-- YouTube Button -->
         <div style="position: relative; padding: 30px 0; margin-top: 30px; text-align: center; background-color: #121212; border-radius: 12px; overflow: hidden;">
           <div style="position: relative; z-index: 2;">
-            <div style="text-align: center; margin-bottom: 15px; color: #00ff9d; font-size: 24px;">
-                <i class="fab fa-youtube" style="font-size: 50px; color: #FF0000;"></i>
-            </div>
+            <img src="/img/youtube-logo.png" alt="YouTube Logo" style="height: 50px; margin: 0 auto 15px; display: block;" onerror="this.src='https://www.youtube.com/s/desktop/12d6b690/img/favicon_144x144.png'; this.style.height='40px';">
             <h4 style="color: #f0f0f0; margin-bottom: 20px; font-size: 1.2rem;">Assista ao vídeo no YouTube</h4>
             <a href="https://www.youtube.com/watch?v=7S-lfmsvd2A" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #ff0000; color: white; font-weight: bold; padding: 12px 24px; border-radius: 30px; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,0,0,0.3);">
               <span style="display: flex; align-items: center; justify-content: center;">
@@ -2217,7 +2157,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
-        <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+        <iframe id="pontofinalCaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/U9NumXGdxv0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       </div>
 
       <!-- Case Study Content -->
@@ -2327,9 +2267,9 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
               <div style="width: 0; height: 0; border-top: 20px solid transparent; border-left: 35px solid #121212; border-bottom: 20px solid transparent; margin-left: 8px;"></div>
             </div>
           </div>
-          <!-- Video element (will be loaded on demand) -->
-          <video id="globoAgroVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;" controls controlsList="nodownload">
-            <source data-src="img/videos/globo_agro_acai_720p.mp4" type="video/mp4">
+          <!-- Video element -->
+          <video id="globoAgroVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" controls controlsList="nodownload" poster="img/globo_agro_thumb.webp" preload="auto">
+            <source src="img/videos/globo_agro_acai_720p.mp4" type="video/mp4">
             Seu navegador não suporta a tag de vídeo.
           </video>
         </div>
@@ -2506,7 +2446,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
-        <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+        <iframe id="new3CaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/O9XJVbup43M" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       </div>
 
       <!-- Case Study Content -->
@@ -2607,35 +2547,17 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
           <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Vídeos do Projeto</h4>
           
           <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-            <div id="antartidaClipContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; border-radius: 12px;">
-              <!-- Custom play button overlay -->
-              <div id="antartidaClipPlayOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.4); cursor: pointer; z-index: 2; border-radius: 12px;">
-                <div style="width: 80px; height: 80px; border-radius: 50%; background-color: #00ffaa; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,255,170,0.5);">
-                  <div style="width: 0; height: 0; border-top: 20px solid transparent; border-left: 35px solid #121212; border-bottom: 20px solid transparent; margin-left: 8px;"></div>
-                </div>
-              </div>
-              <!-- Video element (will be loaded on demand) -->
-              <video id="antartidaClipVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px; display: none;" controls>
-                <source data-src="img/videos/antartida_clip.mp4" type="video/mp4">
-                Seu navegador não suporta a tag de vídeo.
-              </video>
-            </div>
+            <video controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px;">
+              <source src="img/videos/antartida_clip.mp4" type="video/mp4">
+              Seu navegador não suporta a tag de vídeo.
+            </video>
           </div>
           
           <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-            <div id="antartidaBrunoContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; border-radius: 12px;">
-              <!-- Custom play button overlay -->
-              <div id="antartidaBrunoPlayOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.4); cursor: pointer; z-index: 2; border-radius: 12px;">
-                <div style="width: 80px; height: 80px; border-radius: 50%; background-color: #00ffaa; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,255,170,0.5);">
-                  <div style="width: 0; height: 0; border-top: 20px solid transparent; border-left: 35px solid #121212; border-bottom: 20px solid transparent; margin-left: 8px;"></div>
-                </div>
-              </div>
-              <!-- Video element (will be loaded on demand) -->
-              <video id="antartidaBrunoVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px; display: none;" controls>
-                <source data-src="img/videos/antartida_bruno.mp4" type="video/mp4">
-                Seu navegador não suporta a tag de vídeo.
-              </video>
-            </div>
+            <video controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px;">
+              <source src="img/videos/antartida_bruno.mp4" type="video/mp4">
+              Seu navegador não suporta a tag de vídeo.
+            </video>
           </div>
         </div>
       </div>
@@ -3321,14 +3243,27 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
         </div>
     </footer>
 
-    <!-- ScrollyVideo temporarily removed for performance -->
+    <script src="https://cdn.jsdelivr.net/npm/scrolly-video@latest/dist/scrolly-video.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     <script>
      document.addEventListener('DOMContentLoaded', function () {
-        // ScrollyVideo temporarily disabled for performance
-        console.log('ScrollyVideo disabled for performance optimization');
-        if (false) {
-          // Temporarily disabled - ScrollyVideo initialization would go here
+        // Initialize ScrollyVideo for Estudio section
+        const estudioScrollyVideoDOMContainer = document.getElementById('estudio-video-container');
+        if (estudioScrollyVideoDOMContainer) {
+          new ScrollyVideo({
+            scrollyVideoContainer: "estudio-video-container",
+            src: "img/videos/medidas_estudio.mp4",
+            height: '100vh',
+            cover: false,
+            sticky: true,
+            full: false,
+            trackScroll: true,
+            transitionSpeed: 1,
+            frameThreshold: 0.02,
+            debug: false
+          });
+        } else {
+          console.error('ScrollyVideo container #estudio-video-container not found.');
         }
         
         // No overlay fade effect needed for Estudio section
@@ -3445,10 +3380,8 @@ function onScrollNavHighlight() {
 window.addEventListener('scroll', onScrollNavHighlight);
 window.addEventListener('DOMContentLoaded', onScrollNavHighlight);
 
-// ScrollyVideo navigation highlight temporarily disabled for performance
+// Highlight 'Estúdio' menu item when the scrolly section is visible
 (function() {
-  console.log('ScrollyVideo navigation disabled for performance');
-  return; // Temporarily disabled
   const estudioNavLinks = document.querySelectorAll('a[href="estudio.html"]');
   const scrollyContainer = document.getElementById('estudio-scrolly-content-container');
   if (!estudioNavLinks.length || !scrollyContainer) return;
@@ -3933,263 +3866,6 @@ function toggleFAQ(faqId) {
         icon.style.transform = 'rotate(0deg)';
     }
 }
-</script>
-
-<!-- Performance Optimization Script -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // 1. Add lazy loading to all non-critical images
-    const imagesToLazyLoad = [
-        // Technology partners
-        'img[src*="disguise.webp"]',
-        'img[src*="unreal.webp"]', 
-        'img[src*="christie.webp"]',
-        'img[src*="notch.webp"]',
-        'img[src*="lg.webp"]',
-        'img[src*="stype-logo-black.webp"]',
-        // Case study images
-        'img[src*="youtube.com"]',
-        'img[src*="dvd_jquest"]',
-        'img[src*="team2.webp"]',
-        'img[src*="rafael_sa.webp"]',
-        'img[src*="doridio.webp"]',
-        'img[src*="randomuser.me"]',
-        // Detailed case study images
-        'img[src*="olimpiadas_globo"]',
-        'img[src*="tate-disguise.webp"]',
-        'img[src*="belo_vp"]',
-        'img[src*="ludmilla_coachella"]',
-        'img[src*="gloob"]',
-        'img[src*="globo-volume-led.webp"]',
-        'img[src*="vp-neve.webp"]',
-        'img[src*="globo-venice.webp"]',
-        'img[src*="globo-producao-virtual"]'
-    ];
-    
-    imagesToLazyLoad.forEach(selector => {
-        const images = document.querySelectorAll(selector);
-        images.forEach(img => {
-            if (!img.hasAttribute('loading')) {
-                img.setAttribute('loading', 'lazy');
-            }
-        });
-    });
-    
-    // 2. Optimize Font Awesome loading
-    const fontAwesome = document.querySelector('link[href*="font-awesome"]');
-    if (fontAwesome && !fontAwesome.media) {
-        fontAwesome.media = 'print';
-        fontAwesome.onload = function() { this.media = 'all'; };
-    }
-    
-    // 3. Defer non-critical third-party scripts
-    setTimeout(() => {
-        // Load any non-critical scripts after initial paint
-        const scripts = document.querySelectorAll('script[data-defer]');
-        scripts.forEach(script => {
-            script.src = script.dataset.src;
-        });
-    }, 1000);
-    
-    // 4. Optimize images with intersection observer for better lazy loading
-    if ('IntersectionObserver' in window) {
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    if (img.dataset.src) {
-                        img.src = img.dataset.src;
-                        img.classList.remove('lazy');
-                        observer.unobserve(img);
-                    }
-                }
-            });
-        }, {
-            rootMargin: '50px 0px'
-        });
-        
-        document.querySelectorAll('img[data-src]').forEach(img => {
-            imageObserver.observe(img);
-        });
-    }
-    
-    // 5. Preconnect to external domains used later
-    const preconnectDomains = [
-        'https://img.youtube.com',
-        'https://randomuser.me'
-    ];
-    
-    preconnectDomains.forEach(domain => {
-        const link = document.createElement('link');
-        link.rel = 'preconnect';
-        link.href = domain;
-        document.head.appendChild(link);
-    });
-    
-    // 6. Add resource hints for critical resources
-    const resourceHints = [
-        { rel: 'dns-prefetch', href: '//img.youtube.com' },
-        { rel: 'dns-prefetch', href: '//randomuser.me' }
-    ];
-    
-    resourceHints.forEach(hint => {
-        const link = document.createElement('link');
-        link.rel = hint.rel;
-        link.href = hint.href;
-        document.head.appendChild(link);
-    });
-    
-    // 7. Minimize main thread work by deferring heavy operations
-    function deferHeavyWork() {
-        // Any heavy calculations or DOM manipulations
-        // should be wrapped in requestIdleCallback or setTimeout
-        if ('requestIdleCallback' in window) {
-            requestIdleCallback(() => {
-                // Heavy work here
-                console.log('Heavy work completed during idle time');
-            });
-        }
-    }
-    
-    deferHeavyWork();
-});
-
-// 8. Service Worker for caching (optional, for advanced performance)
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        // Uncomment when ready to implement SW caching
-        // navigator.serviceWorker.register('/sw.js');
-    });
-}
-</script>
-
-<script>
-// Lazy Loading Video Implementation
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // Video lazy loading setup
-    const videoConfigs = [
-        {
-            playOverlayId: 'tateMainPlayOverlay',
-            videoId: 'tateMainVideo',
-            dataSrc: 'img/videos/tate.mp4'
-        },
-        {
-            playOverlayId: 'tateSecondPlayOverlay',
-            videoId: 'tateSecondVideo',
-            dataSrc: 'img/videos/tate-live-in-chile.mp4'
-        },
-        {
-            playOverlayId: 'beloPlayOverlay',
-            videoId: 'beloCaseStudyVideo',
-            dataSrc: 'img/videos/belo.mp4'
-        },
-        {
-            playOverlayId: 'globoAgroPlayOverlay',
-            videoId: 'globoAgroVideo',
-            dataSrc: 'img/videos/globo_agro_acai_720p.mp4'
-        },
-        {
-            playOverlayId: 'antartidaClipPlayOverlay',
-            videoId: 'antartidaClipVideo',
-            dataSrc: 'img/videos/antartida_clip.mp4'
-        },
-        {
-            playOverlayId: 'antartidaBrunoPlayOverlay',
-            videoId: 'antartidaBrunoVideo',
-            dataSrc: 'img/videos/antartida_bruno.mp4'
-        }
-    ];
-    
-    // Function to load and play video
-    function loadAndPlayVideo(config) {
-        const playOverlay = document.getElementById(config.playOverlayId);
-        const video = document.getElementById(config.videoId);
-        
-        if (!playOverlay || !video) return;
-        
-        playOverlay.addEventListener('click', function() {
-            // Hide the overlay
-            playOverlay.style.display = 'none';
-            
-            // Show the video
-            video.style.display = 'block';
-            
-            // Set the video source if not already set
-            const source = video.querySelector('source');
-            if (source && source.getAttribute('data-src')) {
-                source.src = source.getAttribute('data-src');
-                source.removeAttribute('data-src');
-                
-                // Load and play the video
-                video.load();
-                video.play().catch(function(error) {
-                    console.log('Error playing video:', error);
-                    // Show overlay again if video fails to play
-                    playOverlay.style.display = 'flex';
-                    video.style.display = 'none';
-                });
-            } else {
-                // Video source already loaded, just play
-                video.play().catch(function(error) {
-                    console.log('Error playing video:', error);
-                });
-            }
-        });
-    }
-    
-    // Initialize all video lazy loaders
-    videoConfigs.forEach(config => {
-        loadAndPlayVideo(config);
-    });
-});
-</script>
-
-<script>
-// Handle YouTube video playback for caseStudyModal (Olimpíadas - Globo)
-function playYouTubeVideo() {
-    const videoPlaceholder = document.querySelector('#caseStudyModal .video-placeholder');
-    const youtubePlayer = document.getElementById('youtubePlayer');
-    
-    if (videoPlaceholder && youtubePlayer) {
-        // Hide placeholder and show YouTube iframe
-        videoPlaceholder.style.display = 'none';
-        youtubePlayer.style.display = 'block';
-        
-        // Set YouTube URL with autoplay and additional parameters for better compatibility
-        youtubePlayer.src = 'https://www.youtube.com/embed/OzOQQSURvu4?autoplay=1&rel=0&enablejsapi=1&mute=0&start=0';
-        
-        // Additional fallback: Use postMessage API to ensure playback
-        youtubePlayer.onload = function() {
-            setTimeout(function() {
-                try {
-                    youtubePlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                } catch (e) {
-                    console.log('YouTube API command failed:', e);
-                }
-            }, 1000);
-        };
-    }
-}
-
-// Reset video when modal is closed
-document.addEventListener('DOMContentLoaded', function() {
-    const closeModal = document.getElementById('closeCaseStudyModal');
-    if (closeModal) {
-        closeModal.addEventListener('click', function() {
-            const videoPlaceholder = document.querySelector('#caseStudyModal .video-placeholder');
-            const youtubePlayer = document.getElementById('youtubePlayer');
-            
-            if (videoPlaceholder && youtubePlayer) {
-                // Show placeholder and hide iframe
-                videoPlaceholder.style.display = 'flex';
-                youtubePlayer.style.display = 'none';
-                // Clear iframe src to stop video
-                youtubePlayer.src = '';
-            }
-        });
-    }
-});
 </script>
 
 </body>
