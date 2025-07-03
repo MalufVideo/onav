@@ -53,29 +53,41 @@
     
     <!-- Analytics Scripts - Deferred for Performance -->
     <script>
-        // Defer analytics to avoid blocking main thread
-        window.addEventListener('load', function() {
-            // Google Analytics 4 - Deferred
-            setTimeout(function() {
-                var ga = document.createElement('script');
-                ga.async = true;
-                ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-HPLPNWR5LS';
-                document.head.appendChild(ga);
-                
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', 'G-HPLPNWR5LS');
-            }, 1000);
+        // Defer analytics to avoid blocking main thread - Load only after user interaction
+        let analyticsLoaded = false;
+        
+        function loadAnalytics() {
+            if (analyticsLoaded) return;
+            analyticsLoaded = true;
             
-            // Google Tag Manager - Deferred
-            setTimeout(function() {
-                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                })(window,document,'script','dataLayer','GT-MQPB9ZVQ');
-            }, 1500);
+            // Google Analytics 4 - Minimal loading
+            const ga = document.createElement('script');
+            ga.async = true;
+            ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-HPLPNWR5LS';
+            document.head.appendChild(ga);
+            
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-HPLPNWR5LS', {
+                send_page_view: false,
+                custom_map: {'dimension1': 'user_engagement'}
+            });
+            
+            // Google Tag Manager - Minimal loading
+            const gtm = document.createElement('script');
+            gtm.async = true;
+            gtm.src = 'https://www.googletagmanager.com/gtm.js?id=GT-MQPB9ZVQ';
+            document.head.appendChild(gtm);
+        }
+        
+        // Load analytics on first user interaction (more efficient)
+        ['click', 'scroll', 'keydown', 'touchstart'].forEach(function(eventType) {
+            window.addEventListener(eventType, loadAnalytics, { once: true, passive: true });
+        });
+        
+        // Fallback: Load after 5 seconds if no interaction
+        setTimeout(loadAnalytics, 5000);
             
             // Facebook Pixel - Ultra Deferred (only after user interaction)
             let fbPixelLoaded = false;
@@ -346,42 +358,19 @@
         }
     </style>
     
-    <!-- Font Awesome - Load with media swap for performance -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <!-- Font Awesome Subset - Only used icons (optimized from 18KB to ~3KB) -->
+    <link rel="stylesheet" href="css/fontawesome-subset.css">
     
-    <!-- Preload AOS CSS for smooth loading -->
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css"></noscript>
     
-    <!-- Font Display Fix for FontAwesome -->
-    <style>
-        @font-face {
-            font-family: 'Font Awesome 6 Free';
-            font-style: normal;
-            font-weight: 400;
-            font-display: swap;
-            src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-regular-400.woff2') format('woff2');
-        }
-        @font-face {
-            font-family: 'Font Awesome 6 Free';
-            font-style: normal;
-            font-weight: 900;
-            font-display: swap;
-            src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2') format('woff2');
-        }
-        @font-face {
-            font-family: 'Font Awesome 6 Brands';
-            font-style: normal;
-            font-weight: 400;
-            font-display: swap;
-            src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2') format('woff2');
-        }
-    </style>
     
-    <!-- Tailwind CSS - Deferred after page load -->
-    <!-- Tailwind CSS - Load immediately for config -->
-    <script src="https://cdn.tailwindcss.com" defer></script>
+    <!-- Tailwind CSS - Optimized loading -->
+    <script>
+        // Load Tailwind CSS with minimal impact
+        const tailwindScript = document.createElement('script');
+        tailwindScript.src = 'https://cdn.tailwindcss.com';
+        tailwindScript.defer = true;
+        document.head.appendChild(tailwindScript);
+    </script>
     
     <!-- Critical JS inlined to fix loading errors -->
     <script>
@@ -3412,25 +3401,6 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
 
     <!-- ScrollyVideo temporarily removed for performance -->
     <script>
-        // Load AOS library asynchronously for better performance
-        function loadAOS() {
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js';
-            script.onload = function() {
-                // Initialize AOS after it loads
-                AOS.init({
-                    duration: 1000,
-                    once: true,
-                    offset: 100
-                });
-            };
-            document.head.appendChild(script);
-        }
-        
-        // Load AOS after page is fully loaded
-        window.addEventListener('load', loadAOS);
-    </script>
-    <script>
      document.addEventListener('DOMContentLoaded', function () {
         // ScrollyVideo temporarily disabled for performance
         console.log('ScrollyVideo disabled for performance optimization');
@@ -3440,12 +3410,6 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
         
         // No overlay fade effect needed for Estudio section
         
-        // Initialize AOS (Animate on Scroll)
-        AOS.init({
-            duration: 800,
-            once: true,
-            offset: 50
-        });
         
        const contactForm = document.querySelector('#contact form.glass-card');
        if (contactForm) {
