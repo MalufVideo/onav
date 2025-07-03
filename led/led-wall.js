@@ -28,20 +28,7 @@ class LEDWallCalculator {
     const container = document.getElementById('canvas-container');
     // For screens smaller than Full HD (1920px), use 60%, otherwise use 64%
     const widthPercent = window.innerWidth >= 1920 ? 0.64 : 0.60;
-    // Cache container dimensions to avoid forced reflows
-    let containerWidth;
-    if (container) {
-      // Use requestAnimationFrame to batch DOM reads
-      containerWidth = container.getBoundingClientRect().width;
-    } else {
-      containerWidth = window.innerWidth * widthPercent;
-    }
-    // Store dimensions for future use
-    this.cachedDimensions = {
-      width: containerWidth,
-      height: window.innerHeight,
-      lastUpdate: performance.now()
-    };
+    const containerWidth = container ? container.offsetWidth : (window.innerWidth * widthPercent);
     this.camera = new THREE.PerspectiveCamera(
       75,
       containerWidth / window.innerHeight,
@@ -146,15 +133,11 @@ class LEDWallCalculator {
     this.scene.add(ground);
 
 
-    // Responsive handling with debouncing to prevent forced reflows
-    let resizeTimeout;
+    // Responsive handling
     window.addEventListener('resize', () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
-        requestAnimationFrame(() => {
-          this.updateDimensions();
-        });
-      }, 16); // ~60fps throttling
+      this.camera.aspect = (window.innerWidth * 0.7) / window.innerHeight;
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(window.innerWidth * 0.7, window.innerHeight);
     });
 
     // Update HTML elements with dynamic prices *after* fetching
@@ -374,30 +357,18 @@ class LEDWallCalculator {
   
   // Handle window resize
   onWindowResize() {
-    this.updateDimensions();
-  }
-  
-  // Update dimensions helper method
-  updateDimensions() {
     const container = document.getElementById('canvas-container');
     if (!container) return;
     
-    // Use cached dimensions or update if stale (avoid forced reflows)
-    const now = performance.now();
-    if (!this.cachedDimensions || (now - this.cachedDimensions.lastUpdate) > 100) {
-      this.cachedDimensions = {
-        width: container.getBoundingClientRect().width,
-        height: window.innerHeight,
-        lastUpdate: now
-      };
-    }
+    // Get actual container width or calculate based on screen size
+    const containerWidth = container.offsetWidth;
     
-    // Update camera aspect ratio using cached dimensions
-    this.camera.aspect = this.cachedDimensions.width / this.cachedDimensions.height;
+    // Update camera aspect ratio
+    this.camera.aspect = containerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
     
     // Resize renderer to match container width
-    this.renderer.setSize(this.cachedDimensions.width, this.cachedDimensions.height);
+    this.renderer.setSize(containerWidth, window.innerHeight);
   }
 
   // --- Camera Movements ---

@@ -648,14 +648,11 @@
           });
         }
 
-        // 4. AOS Initialization with performance optimization
+        // 4. AOS Initialization
         AOS.init({
             duration: 800,
             once: true, // Whether animation should happen only once - while scrolling down
-            offset: 50, // Offset (in px) from the original trigger point
-            throttleDelay: 99, // Throttle delay for scroll events
-            debounceDelay: 50, // Debounce delay for window resize
-            disable: window.innerWidth < 768 // Disable on mobile for better performance
+            offset: 50 // Offset (in px) from the original trigger point
         });
 
         // 5. Mobile Menu Toggle
@@ -744,6 +741,93 @@
             selector: '.glightbox'
         });
     });
+    </script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 50
+        });
+
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true' || false;
+                mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+                const icon = mobileMenuButton.querySelector('i');
+                if (icon) {
+                    icon.classList.toggle('fa-bars');
+                    icon.classList.toggle('fa-times');
+                }
+            });
+            mobileMenuLinks.forEach(link => {
+                 // Smooth scroll for internal links, direct navigation for external/other pages
+                if (link.getAttribute('href').startsWith('#') || (link.getAttribute('href').includes('index.html#'))) {
+                    link.addEventListener('click', (e) => {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenuButton.setAttribute('aria-expanded', 'false');
+                        const icon = mobileMenuButton.querySelector('i');
+                        if (icon) { icon.classList.remove('fa-times'); icon.classList.add('fa-bars'); }
+                        
+                        const targetId = link.getAttribute('href').split('#')[1];
+                        if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') { // if on index page
+                            e.preventDefault();
+                            const targetElement = document.getElementById(targetId);
+                            if (targetElement) {
+                                targetElement.scrollIntoView({ behavior: 'smooth' });
+                            }
+                        } else if (targetId) { // if on other page and link has hash
+                             window.location.href = 'index.html#' + targetId;
+                        }
+                        // if it's a full page link like 'produtos.html', default behavior is fine
+                    });
+                } else {
+                     link.addEventListener('click', () => {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenuButton.setAttribute('aria-expanded', 'false');
+                        const icon = mobileMenuButton.querySelector('i');
+                        if (icon) { icon.classList.remove('fa-times'); icon.classList.add('fa-bars'); }
+                    });
+                }
+            });
+        }
+
+        const newsletterFormFooter = document.getElementById('newsletter-form-footer');
+        if (newsletterFormFooter) {
+            newsletterFormFooter.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const emailInput = newsletterFormFooter.querySelector('input[type="email"]');
+                const submitButton = newsletterFormFooter.querySelector('button[type="submit"]');
+                const originalButtonContent = submitButton.innerHTML;
+                if (emailInput.value) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    setTimeout(() => {
+                        emailInput.value = '';
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = '<i class="fas fa-check"></i>';
+                        setTimeout(() => { submitButton.innerHTML = originalButtonContent; }, 2000);
+                    }, 1000);
+                }
+            });
+        }
+
+        const currentYearSpan = document.getElementById('current-year');
+        if (currentYearSpan) { currentYearSpan.textContent = new Date().getFullYear(); }
+
+        // Placeholder for Tour Virtual - can be linked to a modal or a future page
+        const tourVirtualButton = document.getElementById('tour-virtual');
+        if(tourVirtualButton) {
+            tourVirtualButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Replace with actual tour functionality when available
+                alert('Tour Virtual 360º em breve!');
+            });
+        }
     </script>
 </body>
 </html>
