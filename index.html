@@ -604,7 +604,7 @@
                     <div class="relative rounded-xl overflow-hidden glow-box-primary">
                         <!-- YouTube video temporarily replaced with image for performance -->
                         <div class="relative">
-                            <img src="img/videos/hero_anime.webp" alt="On+Av Showreel Preview" class="w-full aspect-video object-cover" width="600" height="338" loading="lazy">
+                            <img id="heroAnimationImg" src="img/animation/still_03.webp" alt="On+Av Showreel Preview" class="w-full aspect-video object-cover" width="600" height="338" loading="lazy">
                             <div class="absolute inset-0 bg-black bg-opacity-30 flex flex-col items-center justify-center cursor-pointer text-center" id="heroPlayButton">
                                 <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-4">
                                     <i class="fas fa-play text-dark text-xl"></i>
@@ -4658,6 +4658,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 heroVideo.src = '';
             }
         });
+    }
+
+    // Hero image sequence animation
+    const heroAnimationImg = document.getElementById('heroAnimationImg');
+    if (heroAnimationImg) {
+        const animationFrames = [
+            'img/animation/still_03.webp',
+            'img/animation/still_06.webp',
+            'img/animation/still_07.webp',
+            'img/animation/still_08.webp',
+            'img/animation/still_09.webp',
+            'img/animation/still_19.webp',
+            'img/animation/still_20.webp',
+            'img/animation/still_26.webp',
+            'img/animation/still_34.webp'
+        ];
+        
+        let currentFrame = 0;
+        
+        function animateHero() {
+            heroAnimationImg.src = animationFrames[currentFrame];
+            currentFrame = (currentFrame + 1) % animationFrames.length;
+        }
+        
+        // Start animation after page load
+        setInterval(animateHero, 1000); // 1 second per frame
     }
 });
 </script>
