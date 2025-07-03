@@ -119,6 +119,10 @@ app.get('/sitemap.xml', (req, res) => {
   res.sendFile(path.join(__dirname, 'sitemap.xml'));
 });
 
+app.get('/BingSiteAuth.xml', (req, res) => {
+  res.sendFile(path.join(__dirname, 'BingSiteAuth.xml'));
+});
+
 // Routes for tours pages
 app.get('/tours/adele_munich.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'tours', 'adele_munich.html'));
