@@ -115,6 +115,10 @@ app.get('/estudio.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'estudio.html'));
 });
 
+app.get('/sitemap.xml', (req, res) => {
+  res.sendFile(path.join(__dirname, 'sitemap.xml'));
+});
+
 // Routes for tours pages
 app.get('/tours/adele_munich.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'tours', 'adele_munich.html'));
