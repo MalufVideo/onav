@@ -12,39 +12,7 @@
       "dest": "/server.js"
     },
     {
-      "src": "/css/(.*)",
-      "dest": "/css/$1"
-    },
-    {
-      "src": "/js/(.*)",
-      "dest": "/js/$1"
-    },
-    {
-      "src": "/img/(.*)",
-      "dest": "/img/$1"
-    },
-    {
-      "src": "/led/(.*)",
-      "dest": "/led/$1"
-    },
-    {
-      "src": "/admin/(.*)",
-      "dest": "/admin/$1"
-    },
-    {
-      "src": "/tours/(.*)",
-      "dest": "/tours/$1"
-    },
-    {
-      "src": "/quotes/(.*)",
-      "dest": "/quotes/$1"
-    },
-    {
-      "src": "/supabase/(.*)",
-      "dest": "/supabase/$1"
-    },
-    {
-      "src": "/(.*\\.(css|js|png|jpg|jpeg|gif|webp|svg|ico|woff|woff2|ttf|eot|mp4|webm|pdf))",
+      "src": "/(.*\\.(css|js|png|jpg|jpeg|gif|webp|svg|ico|woff|woff2|ttf|eot|mp4|webm|pdf|html))",
       "dest": "/$1"
     },
     {
