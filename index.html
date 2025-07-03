@@ -4488,21 +4488,19 @@ document.addEventListener('DOMContentLoaded', function() {
     if (heroPlayButton && heroVideoModal && heroVideo && closeHeroVideo) {
         heroPlayButton.addEventListener('click', function() {
             heroVideoModal.style.display = 'flex';
-            heroVideo.play();
+            heroVideo.src = 'https://www.youtube.com/embed/ru-Q_s7dVWY?autoplay=1&rel=0';
         });
         
         closeHeroVideo.addEventListener('click', function() {
             heroVideoModal.style.display = 'none';
-            heroVideo.pause();
-            heroVideo.currentTime = 0;
+            heroVideo.src = '';
         });
         
         // Close modal when clicking outside
         heroVideoModal.addEventListener('click', function(event) {
             if (event.target === heroVideoModal) {
                 heroVideoModal.style.display = 'none';
-                heroVideo.pause();
-                heroVideo.currentTime = 0;
+                heroVideo.src = '';
             }
         });
         
@@ -4510,8 +4508,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape' && heroVideoModal.style.display === 'flex') {
                 heroVideoModal.style.display = 'none';
-                heroVideo.pause();
-                heroVideo.currentTime = 0;
+                heroVideo.src = '';
             }
         });
     }
@@ -4521,10 +4518,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- Hero Video Modal -->
     <div id="heroVideoModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); z-index: 9999; justify-content: center; align-items: center;">
         <div style="position: relative; width: 75%; height: 75%; max-width: 1200px; max-height: 675px;">
-            <video id="heroVideo" controls style="width: 100%; height: 100%; object-fit: contain;">
-                <source src="img/videos/disguise_showreel.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
+            <iframe id="heroVideo" width="100%" height="100%" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border-radius: 8px;"></iframe>
             <button id="closeHeroVideo" style="position: absolute; top: -40px; right: -40px; background: rgba(255, 255, 255, 0.2); border: none; color: white; font-size: 24px; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
                 ×
             </button>
