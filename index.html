@@ -583,9 +583,9 @@
                     </div>
                     <div class="mt-12 flex items-center justify-center md:justify-start space-x-4">
                          <div class="flex -space-x-2">
-                             <img class="w-10 h-10 rounded-full border-2 border-dark" src="https://randomuser.me/api/portraits/women/12.jpg" alt="Cliente 1" width="40" height="40" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/40x40/020202/e0e0e0?text=C1';">
-                             <img class="w-10 h-10 rounded-full border-2 border-dark" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Cliente 2" width="40" height="40" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/40x40/020202/e0e0e0?text=C2';">
-                             <img class="w-10 h-10 rounded-full border-2 border-dark" src="https://randomuser.me/api/portraits/women/45.jpg" alt="Cliente 3" width="40" height="40" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/40x40/020202/e0e0e0?text=C3';">
+                             <div class="w-10 h-10 rounded-full border-2 border-dark bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-dark font-bold text-sm">C1</div>
+                             <div class="w-10 h-10 rounded-full border-2 border-dark bg-gradient-to-br from-secondary to-primary flex items-center justify-center text-dark font-bold text-sm">C2</div>
+                             <div class="w-10 h-10 rounded-full border-2 border-dark bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-dark font-bold text-sm">C3</div>
                          </div>
                          <div>
                              <p class="text-medium-text text-sm">Confiança de grandes players</p>
@@ -1292,19 +1292,6 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
                            </div>
                      </div>
                        <p class="text-light-text text-sm italic leading-relaxed mb-6">"Com tanta evolução no campo técnico e virtual, não podemos deixar de dizer que a On+AV, estão mil anos luz a frente em nosso País, técnicos habilitados, equipamento de ponta, nos deixam tranquilos e fazem uma entrega excepcional, obrigado sempre a todos vcs, parceiros espetaculares!"</p>
-                       <div class="flex text-yellow-400">
-                           <i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm"></i>
-                       </div>
-                  </div>
-                  <div class="testimonial-card rounded-xl p-8 hidden">
-                       <div class="flex items-center mb-6">
-                           <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Foto de Ricardo Almeida" class="w-12 h-12 rounded-full mr-4 border-2 border-primary" loading="lazy" onerror="this.onerror=null; this.src='https://placehold.co/48x48/020202/e0e0e0?text=RA';">
-                           <div>
-                               <h4 class="font-bold text-light-text">Ricardo Almeida</h4>
-                               <p class="text-medium-text text-xs">Diretor, Amazon Studios</p>
-                           </div>
-                     </div>
-                     <p class="text-light-text text-sm italic leading-relaxed mb-6">"Precisávamos de virtual production confiável para nossa série original. A On+Av forneceu equipamento e consultoria que aceleraram nossa produção."</p>
                        <div class="flex text-yellow-400">
                            <i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm mr-1"></i><i class="fas fa-star text-sm"></i>
                        </div>
@@ -4407,7 +4394,6 @@ document.addEventListener('DOMContentLoaded', function() {
         'img[src*="team2.webp"]',
         'img[src*="rafael_sa.webp"]',
         'img[src*="doridio.webp"]',
-        'img[src*="randomuser.me"]',
         // Detailed case study images
         'img[src*="olimpiadas_globo"]',
         'img[src*="tate-disguise.webp"]',
@@ -4470,7 +4456,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // 5. Preconnect to external domains used later
     const preconnectDomains = [
         'https://img.youtube.com',
-        'https://randomuser.me'
     ];
     
     preconnectDomains.forEach(domain => {
@@ -4483,7 +4468,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // 6. Add resource hints for critical resources
     const resourceHints = [
         { rel: 'dns-prefetch', href: '//img.youtube.com' },
-        { rel: 'dns-prefetch', href: '//randomuser.me' }
     ];
     
     resourceHints.forEach(hint => {
