@@ -118,6 +118,7 @@
     <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
     
     <!-- Preload critical resources -->
+    <link rel="preload" href="/img/hero_background.webp" as="image" fetchpriority="high">
     <link rel="preload" href="/img/on+av_logo_v2.webp" as="image">
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400&display=swap">
     
@@ -561,7 +562,7 @@
     <section class="relative pt-32 pb-20 md:pt-40 md:pb-32 hero-gradient-overlay overflow-hidden">
         <!-- Hero Image with Left-to-Right Opacity Gradient -->
         <div class="absolute inset-0 w-full h-full pointer-events-none z-0">
-            <img src="img/hero_background.webp" alt="Volume Disguise" class="w-full h-full object-cover" width="1920" height="1080" loading="eager" style="mask-image: linear-gradient(to right, transparent 0%, #000 100%); -webkit-mask-image: linear-gradient(to right, transparent 20%, #000 100%); opacity: 1;" />
+            <img src="img/hero_background.webp" alt="Volume Disguise" class="w-full h-full object-cover" width="1920" height="1080" loading="eager" fetchpriority="high" style="mask-image: linear-gradient(to right, transparent 0%, #000 100%); -webkit-mask-image: linear-gradient(to right, transparent 20%, #000 100%); opacity: 1;" />
         </div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -3761,6 +3762,21 @@ const navLinks = [
   // { id: 'insights',    selector: 'a[href="#insights"]' }
 ];
 
+// Cache section positions to avoid repeated offsetTop reads
+let sectionPositions = [];
+let ticking = false;
+
+function cacheSectionPositions() {
+  sectionPositions = navLinks.map(link => {
+    const section = document.getElementById(link.id);
+    return {
+      id: link.id,
+      selector: link.selector,
+      top: section ? section.offsetTop - 120 : 0
+    };
+  });
+}
+
 function onScrollNavHighlight() {
   // If Estúdio section is active, do not highlight any nav item except Estúdio
   if (window.estudioSectionActive) {
@@ -3772,32 +3788,30 @@ function onScrollNavHighlight() {
     });
     return;
   }
-  let scrollPos = window.scrollY || window.pageYOffset;
-  let offset = 120; // adjust if you have a sticky/fixed header
+  
+  const scrollPos = window.scrollY || window.pageYOffset;
   let found = false;
 
-  for (let i = navLinks.length - 1; i >= 0; i--) {
-    const section = document.getElementById(navLinks[i].id);
-    if (section) {
-      const sectionTop = section.offsetTop - offset;
-      if (scrollPos >= sectionTop) {
-        // Remove highlight from all
-        navLinks.forEach(link => {
-          document.querySelectorAll(link.selector).forEach(el => {
-            el.classList.remove('text-primary');
-            el.classList.add('text-light-text');
-          });
+  // Use cached positions instead of reading offsetTop repeatedly
+  for (let i = sectionPositions.length - 1; i >= 0; i--) {
+    if (scrollPos >= sectionPositions[i].top) {
+      // Remove highlight from all
+      navLinks.forEach(link => {
+        document.querySelectorAll(link.selector).forEach(el => {
+          el.classList.remove('text-primary');
+          el.classList.add('text-light-text');
         });
-        // Highlight current
-        document.querySelectorAll(navLinks[i].selector).forEach(el => {
-          el.classList.add('text-primary');
-          el.classList.remove('text-light-text');
-        });
-        found = true;
-        break;
-      }
+      });
+      // Highlight current
+      document.querySelectorAll(sectionPositions[i].selector).forEach(el => {
+        el.classList.add('text-primary');
+        el.classList.remove('text-light-text');
+      });
+      found = true;
+      break;
     }
   }
+  
   if (!found) {
     // If above all sections, remove highlight
     navLinks.forEach(link => {
@@ -3808,7 +3822,26 @@ function onScrollNavHighlight() {
     });
   }
 }
-window.addEventListener('scroll', onScrollNavHighlight);
+
+// Throttled scroll handler to reduce reflow frequency
+function handleScroll() {
+  if (!ticking) {
+    requestAnimationFrame(() => {
+      onScrollNavHighlight();
+      ticking = false;
+    });
+    ticking = true;
+  }
+}
+
+// Initialize section positions and set up optimized scroll handling
+window.addEventListener('load', () => {
+  cacheSectionPositions();
+  // Recache on resize
+  window.addEventListener('resize', cacheSectionPositions);
+});
+
+window.addEventListener('scroll', handleScroll, { passive: true });
 window.addEventListener('DOMContentLoaded', onScrollNavHighlight);
 
 // ScrollyVideo navigation highlight temporarily disabled for performance
