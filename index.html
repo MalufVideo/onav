@@ -1834,7 +1834,12 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
-        <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+        <div id="tcrossVideoPlaceholder" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('img/vw.webp'); background-size: cover; background-position: center; cursor: pointer; border-radius: 8px; overflow: hidden;">
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+            <i class="fas fa-play" style="color: #00ffaa; font-size: 24px; margin-left: 4px;"></i>
+          </div>
+        </div>
+        <div id="tcrossVideoIframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;"></div>
       </div>
 
       <!-- Case Study Content -->
@@ -1876,7 +1881,12 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
-        <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+        <div id="cretaVideoPlaceholder" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('img/creta.webp'); background-size: cover; background-position: center; cursor: pointer; border-radius: 8px; overflow: hidden;">
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+            <i class="fas fa-play" style="color: #00ffaa; font-size: 24px; margin-left: 4px;"></i>
+          </div>
+        </div>
+        <div id="cretaVideoIframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;"></div>
       </div>
 
       <!-- Case Study Content -->
@@ -1949,7 +1959,12 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Video Player -->
       <div class="video-container mb-6" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; background: #000;">
-        <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+        <div id="lupoVideoPlaceholder" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('img/lupo.webp'); background-size: cover; background-position: center; cursor: pointer; border-radius: 8px; overflow: hidden;">
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+            <i class="fas fa-play" style="color: #00ffaa; font-size: 24px; margin-left: 4px;"></i>
+          </div>
+        </div>
+        <div id="lupoVideoIframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;"></div>
       </div>
       
       <div id="lupoCaseStudyContent">
@@ -2008,7 +2023,12 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
-        <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+        <div id="globoVideoPlaceholder" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('img/promo.webp'); background-size: cover; background-position: center; cursor: pointer; border-radius: 8px; overflow: hidden;">
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+            <i class="fas fa-play" style="color: #00ffaa; font-size: 24px; margin-left: 4px;"></i>
+          </div>
+        </div>
+        <div id="globoVideoIframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;"></div>
       </div>
 
       <!-- Case Study Content -->
@@ -2079,7 +2099,12 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
-        <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+        <div id="ceaVideoPlaceholder" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('img/lima.webp'); background-size: cover; background-position: center; cursor: pointer; border-radius: 8px; overflow: hidden;">
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+            <i class="fas fa-play" style="color: #00ffaa; font-size: 24px; margin-left: 4px;"></i>
+          </div>
+        </div>
+        <div id="ceaVideoIframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;"></div>
       </div>
 
       <!-- Case Study Content -->
@@ -2832,11 +2857,15 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
         window.addEventListener('click', (event) => {
             if (event.target === caseStudyModal) {
                 caseStudyModal.style.display = 'none';
-                const iframe = document.getElementById('caseStudyVideo');
-                if (iframe) {
-                    const videoSrc = iframe.src;
-                    iframe.src = '';
-                    iframe.src = videoSrc;
+                const videoPlaceholder = document.querySelector('#caseStudyModal .video-placeholder');
+                const youtubePlayer = document.getElementById('youtubePlayer');
+                
+                if (videoPlaceholder && youtubePlayer) {
+                    // Show placeholder and hide iframe
+                    videoPlaceholder.style.display = 'flex';
+                    youtubePlayer.style.display = 'none';
+                    // Clear iframe src to stop video
+                    youtubePlayer.src = '';
                 }
             }
         });
@@ -3383,6 +3412,266 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
          });
        }
      });
+
+    // T-Cross video placeholder click handler
+    const tcrossVideoPlaceholder = document.getElementById('tcrossVideoPlaceholder');
+    if (tcrossVideoPlaceholder) {
+      tcrossVideoPlaceholder.addEventListener('click', function() {
+        const placeholderDiv = document.getElementById('tcrossVideoPlaceholder');
+        const videoIframe = document.getElementById('tcrossVideoIframe');
+        
+        if (placeholderDiv && videoIframe) {
+          // Hide placeholder and show iframe
+          placeholderDiv.style.display = 'none';
+          videoIframe.style.display = 'block';
+          
+          // Create YouTube iframe with autoplay
+          videoIframe.innerHTML = '<iframe width="100%" height="100%" src="https://www.youtube.com/embed/5InWksj7aNk?autoplay=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+        }
+      });
+    }
+
+    // T-Cross modal close handlers
+    const tcrossModal = document.getElementById('tcrossCaseStudyModal');
+    const tcrossCloseBtn = document.getElementById('closeTcrossCaseStudyModal');
+    
+    function resetTcrossVideo() {
+      const placeholderDiv = document.getElementById('tcrossVideoPlaceholder');
+      const videoIframe = document.getElementById('tcrossVideoIframe');
+      
+      if (placeholderDiv && videoIframe) {
+        // Stop video by removing iframe content
+        videoIframe.innerHTML = '';
+        videoIframe.style.display = 'none';
+        
+        // Show placeholder again
+        placeholderDiv.style.display = 'block';
+      }
+    }
+    
+    // Close button click handler
+    if (tcrossCloseBtn) {
+      tcrossCloseBtn.addEventListener('click', function() {
+        resetTcrossVideo();
+      });
+    }
+    
+    // Click outside modal to close
+    if (tcrossModal) {
+      tcrossModal.addEventListener('click', function(event) {
+        if (event.target === tcrossModal) {
+          resetTcrossVideo();
+        }
+      });
+    }
+
+    // Creta video placeholder click handler
+    const cretaVideoPlaceholder = document.getElementById('cretaVideoPlaceholder');
+    if (cretaVideoPlaceholder) {
+      cretaVideoPlaceholder.addEventListener('click', function() {
+        const placeholderDiv = document.getElementById('cretaVideoPlaceholder');
+        const videoIframe = document.getElementById('cretaVideoIframe');
+        
+        if (placeholderDiv && videoIframe) {
+          // Hide placeholder and show iframe
+          placeholderDiv.style.display = 'none';
+          videoIframe.style.display = 'block';
+          
+          // Create YouTube iframe with autoplay
+          videoIframe.innerHTML = '<iframe width="100%" height="100%" src="https://www.youtube.com/embed/O9XJVbup43M?autoplay=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+        }
+      });
+    }
+
+    // Creta modal close handlers
+    const cretaModal = document.getElementById('cretaCaseStudyModal');
+    const cretaCloseBtn = document.getElementById('closeCretaCaseStudyModal');
+    
+    function resetCretaVideo() {
+      const placeholderDiv = document.getElementById('cretaVideoPlaceholder');
+      const videoIframe = document.getElementById('cretaVideoIframe');
+      
+      if (placeholderDiv && videoIframe) {
+        // Stop video by removing iframe content
+        videoIframe.innerHTML = '';
+        videoIframe.style.display = 'none';
+        
+        // Show placeholder again
+        placeholderDiv.style.display = 'block';
+      }
+    }
+    
+    // Close button click handler
+    if (cretaCloseBtn) {
+      cretaCloseBtn.addEventListener('click', function() {
+        resetCretaVideo();
+      });
+    }
+    
+    // Click outside modal to close
+    if (cretaModal) {
+      cretaModal.addEventListener('click', function(event) {
+        if (event.target === cretaModal) {
+          resetCretaVideo();
+        }
+      });
+    }
+
+    // CEA video placeholder click handler
+    const ceaVideoPlaceholder = document.getElementById('ceaVideoPlaceholder');
+    if (ceaVideoPlaceholder) {
+      ceaVideoPlaceholder.addEventListener('click', function() {
+        const placeholderDiv = document.getElementById('ceaVideoPlaceholder');
+        const videoIframe = document.getElementById('ceaVideoIframe');
+        
+        if (placeholderDiv && videoIframe) {
+          // Hide placeholder and show iframe
+          placeholderDiv.style.display = 'none';
+          videoIframe.style.display = 'block';
+          
+          // Create YouTube iframe with autoplay
+          videoIframe.innerHTML = '<iframe width="100%" height="100%" src="https://www.youtube.com/embed/YA3WOyQboWA?autoplay=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+        }
+      });
+    }
+
+    // CEA modal close handlers
+    const ceaModal = document.getElementById('ceaCaseStudyModal');
+    const ceaCloseBtn = document.getElementById('closeCeaCaseStudyModal');
+    
+    function resetCeaVideo() {
+      const placeholderDiv = document.getElementById('ceaVideoPlaceholder');
+      const videoIframe = document.getElementById('ceaVideoIframe');
+      
+      if (placeholderDiv && videoIframe) {
+        // Stop video by removing iframe content
+        videoIframe.innerHTML = '';
+        videoIframe.style.display = 'none';
+        
+        // Show placeholder again
+        placeholderDiv.style.display = 'block';
+      }
+    }
+    
+    // Close button click handler
+    if (ceaCloseBtn) {
+      ceaCloseBtn.addEventListener('click', function() {
+        resetCeaVideo();
+      });
+    }
+    
+    // Click outside modal to close
+    if (ceaModal) {
+      ceaModal.addEventListener('click', function(event) {
+        if (event.target === ceaModal) {
+          resetCeaVideo();
+        }
+      });
+    }
+
+    // Globo video placeholder click handler
+    const globoVideoPlaceholder = document.getElementById('globoVideoPlaceholder');
+    if (globoVideoPlaceholder) {
+      globoVideoPlaceholder.addEventListener('click', function() {
+        const placeholderDiv = document.getElementById('globoVideoPlaceholder');
+        const videoIframe = document.getElementById('globoVideoIframe');
+        
+        if (placeholderDiv && videoIframe) {
+          // Hide placeholder and show iframe
+          placeholderDiv.style.display = 'none';
+          videoIframe.style.display = 'block';
+          
+          // Create YouTube iframe with autoplay
+          videoIframe.innerHTML = '<iframe width="100%" height="100%" src="https://www.youtube.com/embed/mJVcf-VkZSs?autoplay=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+        }
+      });
+    }
+
+    // Globo modal close handlers
+    const globoModal = document.getElementById('globoCaseStudyModal');
+    const globoCloseBtn = document.getElementById('closeGloboCaseStudyModal');
+    
+    function resetGloboVideo() {
+      const placeholderDiv = document.getElementById('globoVideoPlaceholder');
+      const videoIframe = document.getElementById('globoVideoIframe');
+      
+      if (placeholderDiv && videoIframe) {
+        // Stop video by removing iframe content
+        videoIframe.innerHTML = '';
+        videoIframe.style.display = 'none';
+        
+        // Show placeholder again
+        placeholderDiv.style.display = 'block';
+      }
+    }
+    
+    // Close button click handler
+    if (globoCloseBtn) {
+      globoCloseBtn.addEventListener('click', function() {
+        resetGloboVideo();
+      });
+    }
+    
+    // Click outside modal to close
+    if (globoModal) {
+      globoModal.addEventListener('click', function(event) {
+        if (event.target === globoModal) {
+          resetGloboVideo();
+        }
+      });
+    }
+
+    // Lupo video placeholder click handler
+    const lupoVideoPlaceholder = document.getElementById('lupoVideoPlaceholder');
+    if (lupoVideoPlaceholder) {
+      lupoVideoPlaceholder.addEventListener('click', function() {
+        const placeholderDiv = document.getElementById('lupoVideoPlaceholder');
+        const videoIframe = document.getElementById('lupoVideoIframe');
+        
+        if (placeholderDiv && videoIframe) {
+          // Hide placeholder and show iframe
+          placeholderDiv.style.display = 'none';
+          videoIframe.style.display = 'block';
+          
+          // Create YouTube iframe with autoplay
+          videoIframe.innerHTML = '<iframe width="100%" height="100%" src="https://www.youtube.com/embed/G6T20ZAvOgA?autoplay=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+        }
+      });
+    }
+
+    // Lupo modal close handlers
+    const lupoModal = document.getElementById('lupoCaseStudyModal');
+    const lupoCloseBtn = document.getElementById('closeLupoCaseStudyModal');
+    
+    function resetLupoVideo() {
+      const placeholderDiv = document.getElementById('lupoVideoPlaceholder');
+      const videoIframe = document.getElementById('lupoVideoIframe');
+      
+      if (placeholderDiv && videoIframe) {
+        // Stop video by removing iframe content
+        videoIframe.innerHTML = '';
+        videoIframe.style.display = 'none';
+        
+        // Show placeholder again
+        placeholderDiv.style.display = 'block';
+      }
+    }
+    
+    // Close button click handler
+    if (lupoCloseBtn) {
+      lupoCloseBtn.addEventListener('click', function() {
+        resetLupoVideo();
+      });
+    }
+    
+    // Click outside modal to close
+    if (lupoModal) {
+      lupoModal.addEventListener('click', function(event) {
+        if (event.target === lupoModal) {
+          resetLupoVideo();
+        }
+      });
+    }
    </script>
 <script>
 // Dynamic nav highlight on scroll
@@ -4192,5 +4481,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-</body>
+            </body>
 </html>
