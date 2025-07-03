@@ -544,14 +544,14 @@
                     <div class="relative rounded-xl overflow-hidden glow-box-primary">
                         <!-- YouTube video temporarily replaced with image for performance -->
                         <div class="relative">
-                            <img src="img/volume_disguise.webp" alt="On+Av Showreel Preview" class="w-full h-64 object-cover" width="600" height="400" loading="lazy">
-                            <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                            <img src="img/videos/hero_anime.webp" alt="On+Av Showreel Preview" class="w-full aspect-video object-cover" width="600" height="338" loading="lazy">
+                            <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center cursor-pointer" id="heroPlayButton">
                                 <div class="text-center">
                                     <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-4 mx-auto">
                                         <i class="fas fa-play text-dark text-xl"></i>
                                     </div>
-                                    <p class="text-white font-semibold">Showreel On+Av</p>
-                                    <p class="text-light-text text-sm">Temporarily optimized for performance</p>
+                                    <p class="text-white font-semibold">O que a Disguise faz</p>
+                                    <p class="text-light-text text-sm">Showreel dos clientes Disguise pelo mundo</p>
                                 </div>
                             </div>
                         </div>
@@ -560,7 +560,7 @@
                         <div class="flex items-center">
                             <img src="img/disguiseicon.webp" alt="Disguise Icon" class="w-8 h-8 object-contain mr-3" loading="lazy" />
                             <div>
-                                <p class="text-xs text-medium-text uppercase tracking-wider">Tecnologia Premiada</p>
+                                <p class="text-xs text-medium-text uppercase tracking-wider">powered by</p>
                                 <p class="text-sm font-bold text-light-text">Disguise Partner</p>
                             </div>
                         </div>
@@ -4478,8 +4478,58 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    
+    // Hero Video Modal
+    const heroPlayButton = document.getElementById('heroPlayButton');
+    const heroVideoModal = document.getElementById('heroVideoModal');
+    const heroVideo = document.getElementById('heroVideo');
+    const closeHeroVideo = document.getElementById('closeHeroVideo');
+    
+    if (heroPlayButton && heroVideoModal && heroVideo && closeHeroVideo) {
+        heroPlayButton.addEventListener('click', function() {
+            heroVideoModal.style.display = 'flex';
+            heroVideo.play();
+        });
+        
+        closeHeroVideo.addEventListener('click', function() {
+            heroVideoModal.style.display = 'none';
+            heroVideo.pause();
+            heroVideo.currentTime = 0;
+        });
+        
+        // Close modal when clicking outside
+        heroVideoModal.addEventListener('click', function(event) {
+            if (event.target === heroVideoModal) {
+                heroVideoModal.style.display = 'none';
+                heroVideo.pause();
+                heroVideo.currentTime = 0;
+            }
+        });
+        
+        // Close modal on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && heroVideoModal.style.display === 'flex') {
+                heroVideoModal.style.display = 'none';
+                heroVideo.pause();
+                heroVideo.currentTime = 0;
+            }
+        });
+    }
 });
 </script>
 
+    <!-- Hero Video Modal -->
+    <div id="heroVideoModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); z-index: 9999; justify-content: center; align-items: center;">
+        <div style="position: relative; width: 75%; height: 75%; max-width: 1200px; max-height: 675px;">
+            <video id="heroVideo" controls style="width: 100%; height: 100%; object-fit: contain;">
+                <source src="img/videos/disguise_showreel.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <button id="closeHeroVideo" style="position: absolute; top: -40px; right: -40px; background: rgba(255, 255, 255, 0.2); border: none; color: white; font-size: 24px; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+                ×
+            </button>
+        </div>
+    </div>
+    
             </body>
 </html>
