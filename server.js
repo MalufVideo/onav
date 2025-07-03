@@ -42,7 +42,16 @@ app.use(express.json());
 app.use(cors());
 
 // Serve static files from root directory
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname), {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    }
+    if (path.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    }
+  }
+}));
 
 // Serve static files from 'admin' directory under the /admin path
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
@@ -52,6 +61,15 @@ app.use('/led', express.static(path.join(__dirname, 'led')));
 
 // Serve static files from 'img' directory under the /img path
 app.use('/img', express.static(path.join(__dirname, 'img')));
+
+// Serve static files from 'css' directory under the /css path
+app.use('/css', express.static(path.join(__dirname, 'css')));
+
+// Serve static files from 'js' directory under the /js path
+app.use('/js', express.static(path.join(__dirname, 'js')));
+
+// Serve static files from 'tours' directory under the /tours path
+app.use('/tours', express.static(path.join(__dirname, 'tours')));
 
 // Route to serve the admin HTML page (old product admin)
 app.get('/admin', (req, res) => {
