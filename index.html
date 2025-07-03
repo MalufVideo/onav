@@ -319,6 +319,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
     
+    <!-- Font Display Fix for FontAwesome -->
+    <style>
+        @font-face {
+            font-family: 'Font Awesome 6 Free';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-regular-400.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Font Awesome 6 Free';
+            font-style: normal;
+            font-weight: 900;
+            font-display: swap;
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Font Awesome 6 Brands';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2') format('woff2');
+        }
+    </style>
+    
     <!-- Tailwind CSS - Deferred after page load -->
     <!-- Tailwind CSS - Load immediately for config -->
     <script src="https://cdn.tailwindcss.com" defer></script>
@@ -861,7 +886,7 @@
                             </a>
                             <a href="https://www.unrealengine.com/en-US/uses/film-television" target="_blank" rel="noopener noreferrer" class="bg-[#020b0b] p-4 rounded-lg flex flex-col items-center text-center tech-card border border-[#00a77d20] hover:border-[#00a77d60] transition-all duration-300" style="box-shadow: 0 0 15px rgba(0,167,125,0.1);">
                     
-                                <img src="img/unreal.webp" alt="Logo Unreal Engine" class="h-16 w-auto mb-3 object-contain" width="120" height="64" style="max-height: 65px;" loading="lazy">
+                                <img src="img/unreal.webp" alt="Logo Unreal Engine" class="h-16 w-auto mb-3 object-contain" width="53" height="64" style="max-height: 65px;" loading="lazy">
                       
                                 <p class="text-medium-text text-[10px]">Real-time Rendering</p>
                             </a>
@@ -879,7 +904,7 @@
                             </a>
                             <a href="https://www.lg-informationdisplay.com/industries/virtual-production" target="_blank" rel="noopener noreferrer" class="bg-[#020b0b] p-4 rounded-lg flex flex-col items-center text-center tech-card border border-[#00a77d20] hover:border-[#00a77d60] transition-all duration-300" style="box-shadow: 0 0 15px rgba(0,167,125,0.1);">
                    
-                                <img src="img/lg.webp" alt="Logo LG" class="h-10 w-auto mb-3 object-contain" style="max-height: 40px;" width="80" height="40" loading="lazy">
+                                <img src="img/lg.webp" alt="Logo LG" class="h-10 w-auto mb-3 object-contain" style="max-height: 40px;" width="82" height="40" loading="lazy">
                          
                                 <p class="text-medium-text text-[10px]">Painel de LED HDR 10-bit</p>
                             </a>
@@ -4231,10 +4256,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const imagesToLazyLoad = [
         // Technology partners
         'img[src*="disguise.webp"]',
-        'img[src*="unreal.webp"]', 
+        'img[src*="unreal_optimized.webp"]', 
         'img[src*="christie.webp"]',
         'img[src*="notch.webp"]',
-        'img[src*="lg.webp"]',
+        'img[src*="lg_optimized.webp"]',
         'img[src*="stype-logo-black.webp"]',
         // Case study images
         'img[src*="youtube.com"]',
