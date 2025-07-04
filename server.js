@@ -184,7 +184,7 @@ app.use('/tours', express.static(path.join(__dirname, 'tours')));
 // GET all products
 app.get('/api/products', async (req, res) => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('products')
       .select('*')
       .order('category', { ascending: true })
@@ -207,7 +207,7 @@ app.post('/api/products', async (req, res) => {
       return res.status(400).json({ error: 'Missing required fields: name, price, category, unit_type' });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('products')
       .insert([{ name, description, price, category, unit_type }])
       .select(); // Return the inserted row
@@ -230,7 +230,7 @@ app.put('/api/products/:id', async (req, res) => {
     console.log('Update data:', { name, description, price, category, unit_type });
 
     // First, check if the product exists
-    const { data: existingProduct, error: fetchError } = await supabase
+    const { data: existingProduct, error: fetchError } = await supabaseAdmin
       .from('products')
       .select('*')
       .eq('id', id)
@@ -258,7 +258,7 @@ app.put('/api/products/:id', async (req, res) => {
 
     console.log('Performing update with data:', updateData);
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('products')
       .update(updateData)
       .eq('id', id)
@@ -282,7 +282,7 @@ app.delete('/api/products/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('products')
       .delete()
       .eq('id', id);
@@ -478,7 +478,7 @@ app.get('/api/quote-history/:proposalId', async (req, res) => {
   try {
     const { proposalId } = req.params;
     
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('quote_history')
       .select('*')
       .eq('proposal_id', proposalId)
@@ -497,7 +497,7 @@ app.post('/api/quote-history', async (req, res) => {
   try {
     const historyEntry = req.body;
     
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('quote_history')
       .insert([historyEntry])
       .select();
@@ -523,7 +523,7 @@ app.put('/api/proposals/:id/apply-discount', async (req, res) => {
     } = req.body;
 
     // First, get the current proposal
-    const { data: currentProposal, error: fetchError } = await supabase
+    const { data: currentProposal, error: fetchError } = await supabaseAdmin
       .from('proposals')
       .select('*')
       .eq('id', id)
@@ -575,7 +575,7 @@ app.put('/api/proposals/:id/apply-discount', async (req, res) => {
       last_modified_by: changedBy
     };
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseAdmin
       .from('proposals')
       .update(updateData)
       .eq('id', id);
@@ -602,7 +602,7 @@ app.put('/api/proposals/:id/apply-discount', async (req, res) => {
       created_at: new Date().toISOString()
     };
 
-    const { error: historyError } = await supabase
+    const { error: historyError } = await supabaseAdmin
       .from('quote_history')
       .insert([historyEntry]);
 
@@ -675,7 +675,7 @@ app.get('/api/auth/profile', async (req, res) => {
       return res.status(401).json({ error: 'Invalid token' });
     }
 
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .select('*')
       .eq('id', user.id)
@@ -695,7 +695,7 @@ app.get('/api/auth/profile', async (req, res) => {
 // Get all users (admin only)
 app.get('/api/users', async (req, res) => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('user_profiles')
       .select('*')
       .order('created_at', { ascending: false });
@@ -795,7 +795,7 @@ app.post('/api/users', async (req, res) => {
     if (authError) throw authError;
 
     // Create user profile
-    const { data: profileData, error: profileError } = await supabase
+    const { data: profileData, error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .insert([{
         id: authData.user.id,
@@ -830,7 +830,7 @@ app.put('/api/users/:id', async (req, res) => {
     updateData.updated_at = new Date().toISOString();
 
     // Update user profile table
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('user_profiles')
       .update(updateData)
       .eq('id', id)
@@ -854,7 +854,7 @@ app.put('/api/users/:id', async (req, res) => {
         }
 
         // Update existing quotes with new phone number
-        const { error: quotesError } = await supabase
+        const { error: quotesError } = await supabaseAdmin
           .from('proposals')
           .update({ client_phone: phone })
           .eq('user_id', id);
@@ -893,7 +893,7 @@ app.delete('/api/users/:id', async (req, res) => {
     }
 
     // Get user profile to determine role
-    const { data: userProfile, error: profileError } = await supabase
+    const { data: userProfile, error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .select('role')
       .eq('id', user.id)
@@ -934,7 +934,7 @@ app.delete('/api/users/:id', async (req, res) => {
     const { id } = req.params;
 
     // Get user to delete for validation
-    const { data: userToDelete, error: fetchError } = await supabase
+    const { data: userToDelete, error: fetchError } = await supabaseAdmin
       .from('user_profiles')
       .select('email, role')
       .eq('id', id)
@@ -950,7 +950,7 @@ app.delete('/api/users/:id', async (req, res) => {
     }
 
     // Delete from user_profiles table first
-    const { error: profileDeleteError } = await supabase
+    const { error: profileDeleteError } = await supabaseAdmin
       .from('user_profiles')
       .delete()
       .eq('id', id);
@@ -999,7 +999,7 @@ app.post('/api/users/sync-phone-numbers', async (req, res) => {
     }
 
     // Get all user profiles with phone numbers
-    const { data: profiles, error: profilesError } = await supabase
+    const { data: profiles, error: profilesError } = await supabaseAdmin
       .from('user_profiles')
       .select('id, phone, email')
       .not('phone', 'is', null)
@@ -1025,7 +1025,7 @@ app.post('/api/users/sync-phone-numbers', async (req, res) => {
         }
 
         // Update existing quotes
-        const { error: quotesError } = await supabase
+        const { error: quotesError } = await supabaseAdmin
           .from('proposals')
           .update({ client_phone: profile.phone })
           .eq('user_id', profile.id);
@@ -1062,7 +1062,7 @@ app.post('/api/users/sync-phone-numbers', async (req, res) => {
 // Get all leads (with role-based filtering)
 app.get('/api/leads', async (req, res) => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('leads')
       .select('*')
       .order('created_at', { ascending: false });
@@ -1083,7 +1083,7 @@ app.get('/api/leads/search', async (req, res) => {
       return res.json([]);
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('leads')
       .select('*')
       .ilike('name', `%${q}%`)
@@ -1106,7 +1106,7 @@ app.post('/api/leads', async (req, res) => {
       return res.status(400).json({ error: 'Name is required' });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('leads')
       .insert([{ name, email, phone, company, created_by }])
       .select()
@@ -1133,7 +1133,7 @@ app.put('/api/leads/:id', async (req, res) => {
     if (company !== undefined) updateData.company = company;
     updateData.updated_at = new Date().toISOString();
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('leads')
       .update(updateData)
       .eq('id', id)
@@ -1164,7 +1164,7 @@ app.get('/api/proposals', async (req, res) => {
     }
 
     // Get user profile to determine role
-    const { data: userProfile, error: profileError } = await supabase
+    const { data: userProfile, error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .select('role')
       .eq('id', user.id)
@@ -1185,7 +1185,7 @@ app.get('/api/proposals', async (req, res) => {
       
       // Auto-create profile for known sales rep
       try {
-        const { error: createError } = await supabase
+        const { error: createError } = await supabaseAdmin
           .from('user_profiles')
           .insert([{
             id: user.id,
@@ -1498,7 +1498,7 @@ app.post('/api/check-user-by-email', async (req, res) => {
     }
 
     // Check if current user is admin or sales_rep
-    const { data: userProfile, error: profileError } = await supabase
+    const { data: userProfile, error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .select('role, email')
       .eq('id', user.id)
@@ -1521,7 +1521,7 @@ app.post('/api/check-user-by-email', async (req, res) => {
       
       // Auto-create profile for known sales rep
       try {
-        const { error: createError } = await supabase
+        const { error: createError } = await supabaseAdmin
           .from('user_profiles')
           .insert([{
             id: user.id,
@@ -1573,7 +1573,7 @@ app.post('/api/check-user-by-email', async (req, res) => {
     } catch (error) {
       // If admin functions don't work, check user_profiles table instead
       console.log('Admin listUsers failed, checking profiles table:', error.message);
-      const { data: profileUser } = await supabase
+      const { data: profileUser } = await supabaseAdmin
         .from('user_profiles')
         .select('id, email')
         .eq('email', email)
@@ -1586,7 +1586,7 @@ app.post('/api/check-user-by-email', async (req, res) => {
     
     if (existingUser) {
       // Check for profile data
-      const { data: profile } = await supabase
+      const { data: profile } = await supabaseAdmin
         .from('user_profiles')
         .select('*')
         .eq('id', existingUser.id)
@@ -1627,7 +1627,7 @@ app.post('/api/create-client-user', async (req, res) => {
     }
 
     // Check if current user is admin or sales_rep
-    const { data: userProfile, error: userProfileError } = await supabase
+    const { data: userProfile, error: userProfileError } = await supabaseAdmin
       .from('user_profiles')
       .select('role, email')
       .eq('id', user.id)
@@ -1746,7 +1746,7 @@ app.put('/api/update-user-profile', async (req, res) => {
     }
 
     // Check if current user is admin or sales_rep
-    const { data: userProfile, error: userProfileError } = await supabase
+    const { data: userProfile, error: userProfileError } = await supabaseAdmin
       .from('user_profiles')
       .select('role, email')
       .eq('id', user.id)
@@ -1824,7 +1824,7 @@ app.get('/api/debug/current-user', async (req, res) => {
     }
 
     // Get user profile
-    const { data: userProfile, error: debugProfileError } = await supabase
+    const { data: userProfile, error: debugProfileError } = await supabaseAdmin
       .from('user_profiles')
       .select('*')
       .eq('id', user.id)
@@ -1949,7 +1949,7 @@ app.post('/api/bootstrap-admin', async (req, res) => {
 app.get('/api/debug/table-structure', async (req, res) => {
   try {
     // Try to get table info by querying with all possible columns
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('user_profiles')
       .select('*')
       .limit(1);
@@ -1958,7 +1958,7 @@ app.get('/api/debug/table-structure', async (req, res) => {
       console.error('Error querying user_profiles:', error);
       
       // Try basic query to see what columns exist
-      const { data: basicData, error: basicError } = await supabase
+      const { data: basicData, error: basicError } = await supabaseAdmin
         .from('user_profiles')
         .select()
         .limit(1);
@@ -2180,7 +2180,7 @@ app.get('/api/quotes/public/:slug', async (req, res) => {
       console.log('Detected temporary slug format, looking up by ID:', id);
       
       // Try ID-based lookup for temporary slugs
-      const { data, error: idError } = await supabase
+      const { data, error: idError } = await supabaseAdmin
         .from('proposals')
         .select('*')
         .eq('id', id)
@@ -2191,7 +2191,7 @@ app.get('/api/quotes/public/:slug', async (req, res) => {
     } else {
       // Try regular slug-based lookup
       console.log('Using regular slug lookup');
-      const { data, error: slugError } = await supabase
+      const { data, error: slugError } = await supabaseAdmin
         .from('proposals')
         .select('*')
         .eq('quote_url_slug', slug)
@@ -2295,7 +2295,7 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
     
     if (slug.startsWith('quote-')) {
       const id = slug.replace('quote-', '');
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('proposals')
         .select('id, quote_approved, project_name, client_email')
         .eq('id', id)
@@ -2303,7 +2303,7 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
       existingQuote = data;
       fetchError = error;
     } else {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('proposals')
         .select('id, quote_approved, project_name, client_email')
         .eq('quote_url_slug', slug)
@@ -2322,7 +2322,7 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
 
     // Update quote with approval
     const approvedAt = new Date().toISOString();
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseAdmin
       .from('proposals')
       .update({
         quote_approved: true,
@@ -2375,7 +2375,7 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
     }
 
     // Get user profile to determine role
-    const { data: userProfile, error: profileError } = await supabase
+    const { data: userProfile, error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .select('role')
       .eq('id', user.id)
