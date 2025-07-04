@@ -557,9 +557,18 @@ class QuoteCartModal {
 
     async submitQuote() {
         console.log('[QuoteCartModal] Starting submitQuote...');
+        
+        // Prevent multiple simultaneous submissions
+        if (this.isSubmitting) {
+            console.log('[QuoteCartModal] Already submitting, ignoring duplicate call');
+            return;
+        }
+        this.isSubmitting = true;
+        
         if (!this.cartItems || this.cartItems.length === 0) {
             console.warn('[QuoteCartModal] submitQuote: Cart is empty.');
             alert('Seu carrinho está vazio. Adicione itens antes de requisitar uma proposta.');
+            this.isSubmitting = false;
             return;
         }
 
@@ -568,6 +577,10 @@ class QuoteCartModal {
             this.submitButton.disabled = true;
             this.submitButton.textContent = 'Enviando...'; // Provide feedback
         }
+        
+        // Generate unique submission token
+        const submissionToken = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        console.log('[QuoteCartModal] Submission token:', submissionToken);
 
         try {
             // --- Get User Info ---
