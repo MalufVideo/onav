@@ -43,6 +43,23 @@ async function sendProposalWebhook(proposalData) {
       led_teto_height: proposalData.led_teto_height,
       led_teto_modules: proposalData.led_teto_modules,
       led_teto_resolution: proposalData.led_teto_resolution,
+      led_teto_pixels_width: proposalData.led_teto_pixels_width,
+      led_teto_pixels_height: proposalData.led_teto_pixels_height,
+      led_teto_total_pixels: proposalData.led_teto_total_pixels,
+      
+      // Additional LED Principal data
+      led_principal_pixels_width: proposalData.led_principal_pixels_width,
+      led_principal_pixels_height: proposalData.led_principal_pixels_height,
+      led_principal_total_pixels: proposalData.led_principal_total_pixels,
+      led_principal_curvature: proposalData.led_principal_curvature,
+      
+      // Power and weight data
+      principal_power_max: proposalData.principal_power_max,
+      principal_power_avg: proposalData.principal_power_avg,
+      principal_weight: proposalData.principal_weight,
+      teto_power_max: proposalData.teto_power_max,
+      teto_power_avg: proposalData.teto_power_avg,
+      teto_weight: proposalData.teto_weight,
       
       // System Information
       proposal_id: proposalData.id,
@@ -60,11 +77,19 @@ async function sendProposalWebhook(proposalData) {
     const queryParams = new URLSearchParams();
     Object.keys(webhookPayload).forEach(key => {
       if (webhookPayload[key] !== null && webhookPayload[key] !== undefined) {
-        queryParams.append(key, webhookPayload[key]);
+        // Convert arrays to string format for URL params
+        const value = Array.isArray(webhookPayload[key]) 
+          ? JSON.stringify(webhookPayload[key]) 
+          : String(webhookPayload[key]);
+        queryParams.append(key, value);
       }
     });
     
     const webhookUrl = `https://n8n.avauto.fun/webhook-test/061d8866-fa53-435a-9a5f-ceafb3e2e639?${queryParams.toString()}`;
+    
+    console.log('Webhook URL being called:', webhookUrl);
+    console.log('Query parameters count:', queryParams.toString().split('&').length);
+    
     const response = await fetch(webhookUrl, {
       method: 'GET'
     });
