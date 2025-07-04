@@ -589,9 +589,9 @@
                     </div>
                     <div class="mt-12 flex items-center justify-center md:justify-start space-x-4">
                          <div class="flex -space-x-2">
-                             <div class="w-10 h-10 rounded-full border-2 border-dark bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-dark font-bold text-sm">C1</div>
-                             <div class="w-10 h-10 rounded-full border-2 border-dark bg-gradient-to-br from-secondary to-primary flex items-center justify-center text-dark font-bold text-sm">C2</div>
-                             <div class="w-10 h-10 rounded-full border-2 border-dark bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-dark font-bold text-sm">C3</div>
+                             <img src="img/rafael_sa.webp" alt="Foto de Rafael Sa" class="w-10 h-10 rounded-full border-2 border-primary object-cover bg-dark" loading="lazy" />
+<img src="img/face.webp" alt="Avatar genérico" class="w-10 h-10 rounded-full border-2 border-primary object-cover bg-dark" loading="lazy" />
+<img src="img/doridio.webp" alt="Foto de Doridio Silva" class="w-10 h-10 rounded-full border-2 border-primary object-cover bg-dark" loading="lazy" />
                          </div>
                          <div>
                              <p class="text-medium-text text-sm">Confiança de grandes players</p>
@@ -1410,9 +1410,9 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
             <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-light-text">Pronto para <span class="gradient-text">Elevar</span> Sua Produção?</h2>
             <p class="text-xl text-light-text mb-10">Nossa equipe de especialistas está pronta para entender suas necessidades e oferecer a melhor solução em tecnologia visual para seu projeto.</p>
             <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-                <a href="#contact" class="btn-primary font-bold py-4 px-10 rounded-md text-lg">
-                    Solicitar Orçamento
-                </a>
+                <a href="https://cal.com/onav.com.br/30min" class="btn-primary font-bold px-8 py-4 rounded-md text-lg" target="_blank" rel="noopener">
+    Fale com Especialistas
+</a>
                 <a href="https://wa.me/5511920550210?text=Olá%2C%20gostaria%20de%20discutir%20sobre%20meu%20projeto%20e%20descobrir%20como%20os%20serviços%20da%20On%2BAv%20podem%20me%20ajudar." target="_blank" class="btn-secondary font-bold py-4 px-10 rounded-md text-lg flex items-center justify-center">
                     <i class="fab fa-whatsapp mr-2"></i> (11) 92055-0210 </a>
             </div>
@@ -1432,8 +1432,10 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
                                 <i class="fas fa-map-marker-alt text-primary text-lg"></i>
                             </div>
                             <div>
-                                <h4 class="font-semibold mb-1 text-light-text">Escritório São Paulo</h4>
-                                <p class="text-medium-text text-sm">Rua Plácido Vieira, 43, Santo Amaro<br>São Paulo - SP, 04754-080</p>
+                                <h4 class="font-semibold mb-1 text-light-text">Escritório / Estúdio São Paulo</h4>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Rua+Pl%C3%A1cido+Vieira%2C+43%2C+Santo+Amaro%2C+S%C3%A3o+Paulo+-+SP%2C+04754-080" target="_blank" rel="noopener" class="text-medium-text text-sm hover:underline focus:outline-none">
+    Rua Plácido Vieira, 43, Santo Amaro<br>São Paulo - SP, 04754-080
+</a>
                             </div>
                         </div>
                         <div class="flex items-start">
@@ -1465,7 +1467,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
                         </div>
                     </div>
 
-                    <div>
+                    <div class="hidden">
                         <h4 class="font-semibold text-light-text mb-4">Siga-nos</h4>
                         <div class="flex space-x-4">
                             <a href="#" class="text-medium-text hover:text-primary text-xs transition duration-300" aria-label="Instagram">
@@ -2421,7 +2423,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
-        <div id="globoAgroVideoContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #000;">
+        <div id="globoAgroVideoContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('img/globo_agro_thumb.webp'); background-size: cover; background-position: center;">
           <!-- Custom play button overlay -->
           <div id="globoAgroPlayOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.4); cursor: pointer; z-index: 2;">
             <div style="width: 80px; height: 80px; border-radius: 50%; background-color: #00ffaa; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,255,170,0.5);">
@@ -3092,12 +3094,50 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
         if (closeAntarticaCaseStudyModalBtn) {
             closeAntarticaCaseStudyModalBtn.addEventListener('click', () => {
                 antarticaCaseStudyModal.style.display = 'none';
+                // Stop both Antártida videos
+                const antartidaClipVideo = document.getElementById('antartidaClipVideo');
+                const antartidaBrunoVideo = document.getElementById('antartidaBrunoVideo');
+                const antartidaClipPlayOverlay = document.getElementById('antartidaClipPlayOverlay');
+                const antartidaBrunoPlayOverlay = document.getElementById('antartidaBrunoPlayOverlay');
+                
+                if (antartidaClipVideo) {
+                    antartidaClipVideo.pause();
+                    antartidaClipVideo.currentTime = 0;
+                    antartidaClipVideo.style.display = 'none';
+                    if (antartidaClipPlayOverlay) antartidaClipPlayOverlay.style.display = 'flex';
+                }
+                
+                if (antartidaBrunoVideo) {
+                    antartidaBrunoVideo.pause();
+                    antartidaBrunoVideo.currentTime = 0;
+                    antartidaBrunoVideo.style.display = 'none';
+                    if (antartidaBrunoPlayOverlay) antartidaBrunoPlayOverlay.style.display = 'flex';
+                }
             });
         }
 
         window.addEventListener('click', (event) => {
             if (event.target === antarticaCaseStudyModal) {
                 antarticaCaseStudyModal.style.display = 'none';
+                // Stop both Antártida videos
+                const antartidaClipVideo = document.getElementById('antartidaClipVideo');
+                const antartidaBrunoVideo = document.getElementById('antartidaBrunoVideo');
+                const antartidaClipPlayOverlay = document.getElementById('antartidaClipPlayOverlay');
+                const antartidaBrunoPlayOverlay = document.getElementById('antartidaBrunoPlayOverlay');
+                
+                if (antartidaClipVideo) {
+                    antartidaClipVideo.pause();
+                    antartidaClipVideo.currentTime = 0;
+                    antartidaClipVideo.style.display = 'none';
+                    if (antartidaClipPlayOverlay) antartidaClipPlayOverlay.style.display = 'flex';
+                }
+                
+                if (antartidaBrunoVideo) {
+                    antartidaBrunoVideo.pause();
+                    antartidaBrunoVideo.currentTime = 0;
+                    antartidaBrunoVideo.style.display = 'none';
+                    if (antartidaBrunoPlayOverlay) antartidaBrunoPlayOverlay.style.display = 'flex';
+                }
             }
         });
         
@@ -3202,12 +3242,28 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
         if (closeNew1CaseStudyModalBtn) {
             closeNew1CaseStudyModalBtn.addEventListener('click', () => {
                 new1CaseStudyModal.style.display = 'none';
+                // Stop Globo Agro video
+                const globoAgroVideo = document.getElementById('globoAgroVideo');
+                const globoAgroPlayOverlay = document.getElementById('globoAgroPlayOverlay');
+                if (globoAgroVideo) {
+                    globoAgroVideo.pause();
+                    globoAgroVideo.currentTime = 0;
+                    if (globoAgroPlayOverlay) globoAgroPlayOverlay.style.display = 'flex';
+                }
             });
         }
 
         window.addEventListener('click', (event) => {
             if (event.target === new1CaseStudyModal) {
                 new1CaseStudyModal.style.display = 'none';
+                // Stop Globo Agro video
+                const globoAgroVideo = document.getElementById('globoAgroVideo');
+                const globoAgroPlayOverlay = document.getElementById('globoAgroPlayOverlay');
+                if (globoAgroVideo) {
+                    globoAgroVideo.pause();
+                    globoAgroVideo.currentTime = 0;
+                    if (globoAgroPlayOverlay) globoAgroPlayOverlay.style.display = 'flex';
+                }
             }
         });
         
@@ -3986,8 +4042,19 @@ window.addEventListener('DOMContentLoaded', onScrollNavHighlight);
         globoAgroTrigger.addEventListener('click', resetVideo);
     }
     
+    // Reset video when clicking outside modal
+    if (globoAgroModal) {
+        globoAgroModal.addEventListener('click', function(event) {
+            if (event.target === globoAgroModal) {
+                resetVideo();
+            }
+        });
+    }
+    
     // Initialize on page load
     
+})();
+
     // Tate McRae Modal Handler
     (function() {
         const tateCaseStudyModal = document.getElementById('tateCaseStudyModal');
