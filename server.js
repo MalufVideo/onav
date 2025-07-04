@@ -2154,12 +2154,38 @@ app.get('/api/quotes/public/:slug', async (req, res) => {
       return res.status(400).json({ error: 'Quote slug is required' });
     }
 
-    // Get quote by slug
-    const { data: quote, error } = await supabase
-      .from('proposals')
-      .select('*')
-      .eq('quote_url_slug', slug)
-      .single();
+    // Get quote by slug or ID (for temporary slugs)
+    let quote = null;
+    let error = null;
+    
+    console.log('Looking up quote with slug:', slug);
+    
+    // Check if this is a temporary slug format (quote-{id})
+    if (slug.startsWith('quote-')) {
+      const id = slug.replace('quote-', '');
+      console.log('Detected temporary slug format, looking up by ID:', id);
+      
+      // Try ID-based lookup for temporary slugs
+      const { data, error: idError } = await supabase
+        .from('proposals')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      quote = data;
+      error = idError;
+    } else {
+      // Try regular slug-based lookup
+      console.log('Using regular slug lookup');
+      const { data, error: slugError } = await supabase
+        .from('proposals')
+        .select('*')
+        .eq('quote_url_slug', slug)
+        .single();
+      
+      quote = data;
+      error = slugError;
+    }
 
     if (error) {
       console.error('Error fetching quote:', error);
@@ -2167,8 +2193,11 @@ app.get('/api/quotes/public/:slug', async (req, res) => {
     }
 
     if (!quote) {
+      console.log('No quote found for slug:', slug);
       return res.status(404).json({ error: 'Quote not found' });
     }
+    
+    console.log('Found quote:', quote.id, quote.project_name);
 
     // Parse services data - it can be stored in multiple places
     let parsedServices = [];
