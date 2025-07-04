@@ -4,16 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aluguel de Equipamentos AV | On + Av</title>
-    <!-- External CSS Files -->
-    <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/fontawesome-minimal.css" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="/css/fontawesome-minimal.css"></noscript>
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- External JS Files -->
-    <script src="/js/main.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         // Tailwind CSS configuration
         tailwind.config = {
@@ -48,7 +40,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400&display=swap');
 
-        /* Page-specific blob background */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #020202;
@@ -106,8 +97,10 @@
             background-color: rgba(0, 255, 157, 0.1);
             transform: translateY(-2px);
         }
-        
-        /* Page-specific equipment section styles */
+
+        nav.fixed { background-color: rgba(2, 2, 2, 0.8); }
+        footer { background-color: #050505; }
+
         .equipment-section {
             background: rgba(15, 15, 15, 0.6);
             backdrop-filter: blur(10px);
@@ -115,22 +108,22 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: border-color 0.3s ease;
         }
-        .equipment-section:hover {
+         .equipment-section:hover {
             border-color: #00ff9d;
-        }
+         }
 
-        /* Accordion styles */
+        /* Styles for Accordion */
         .equipment-details {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.5s ease-out, padding 0.5s ease-out;
             padding-top: 0;
-            padding-bottom: 0;
+             padding-bottom: 0;
         }
         .equipment-details.open {
-            max-height: 1500px;
+            max-height: 1500px; /* Increased max-height for potentially more content */
             padding-top: 1.5rem;
-            padding-bottom: 1.5rem;
+             padding-bottom: 1.5rem;
             transition: max-height 0.7s ease-in-out, padding 0.7s ease-in-out;
         }
         .equipment-item {
@@ -138,12 +131,12 @@
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 0.5rem;
         }
-        .accordion-icon {
+         .accordion-icon {
             transition: transform 0.3s ease-in-out;
-        }
-        .accordion-button.open .accordion-icon {
+         }
+         .accordion-button.open .accordion-icon {
             transform: rotate(180deg);
-        }
+         }
     </style>
 </head>
 <body class="antialiased">
@@ -151,7 +144,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
                 <div class="flex items-center">
-                    <a href="index.html" class="flex-shrink-0 flex items-center"> <img src="img/on+av_logo_v2.webp" alt="On + Av Logo" style="height:40px;" onerror="this.onerror=null; this.alt='On + Av'; this.src='https://placehold.co/120x40/020202/00ff9d?text=On%2BAv';">
+                    <a href="index.html" class="flex-shrink-0 flex items-center"> <img src="img/on+av_logo_v2.png" alt="On + Av Logo" style="height:40px;" onerror="this.onerror=null; this.alt='On + Av'; this.src='https://placehold.co/120x40/020202/00ff9d?text=On%2BAv';">
                     </a>
                 </div>
                 <div class="hidden md:block">
@@ -162,8 +155,7 @@
                         <a href="index.html#cases" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Cases</a>
                         <a href="index.html#about" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Quem Somos</a>
                         <a href="estudio.html" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Estúdio</a>
-                        <a href="#insights" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Insights</a>
-                        <a href="index.html#contact" class="btn-primary text-sm font-bold px-5 py-2 rounded-md transition-all duration-200">Contato</a>
+                        <a href="#insights" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Insights</a> <a href="index.html#contact" class="btn-primary text-sm font-bold px-5 py-2 rounded-md hover:bg-opacity-90 transition-all duration-200">Contato</a>
                     </div>
                 </div>
                 <div class="-mr-2 flex md:hidden">
@@ -657,7 +649,23 @@
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </form>
-                     <!-- Social media icons temporarily hidden -->
+                     <div class="mt-6">
+                         <h4 class="text-light-text font-semibold mb-2 uppercase tracking-wider text-sm">Siga-nos</h4>
+                         <div class="flex space-x-3">
+                              <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="Instagram">
+                                  <i class="fab fa-instagram text-base"></i>
+                              </a>
+                              <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="LinkedIn">
+                                  <i class="fab fa-linkedin-in text-base"></i>
+                              </a>
+                              <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="YouTube">
+                                  <i class="fab fa-youtube text-base"></i>
+                              </a>
+                               <a href="#" class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-medium-text hover:text-primary hover:border-primary transition duration-300" aria-label="Vimeo">
+                                  <i class="fab fa-vimeo-v text-base"></i>
+                              </a>
+                         </div>
+                       </div>
                 </div>
             </div>
             <div class="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
