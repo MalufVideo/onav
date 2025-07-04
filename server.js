@@ -2145,6 +2145,20 @@ app.get('/quote/:slug', (req, res) => {
   res.sendFile(path.join(__dirname, 'quote.html'));
 });
 
+// Debug endpoint to test slug parsing
+app.get('/api/debug/slug/:slug', async (req, res) => {
+  const { slug } = req.params;
+  const isTemporary = slug.startsWith('quote-');
+  const id = isTemporary ? slug.replace('quote-', '') : null;
+  
+  res.json({
+    originalSlug: slug,
+    isTemporary,
+    extractedId: id,
+    lookupMethod: isTemporary ? 'ID-based' : 'slug-based'
+  });
+});
+
 // Get public quote data by slug
 app.get('/api/quotes/public/:slug', async (req, res) => {
   try {
