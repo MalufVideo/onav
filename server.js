@@ -1315,6 +1315,9 @@ app.get('/api/proposals', async (req, res) => {
   }
 });
 
+// Track recent proposal submissions to prevent duplicates
+const recentSubmissions = new Map();
+
 // POST save proposal endpoint for dashboard quotes
 app.post('/api/save-proposal', async (req, res) => {
   try {
@@ -1322,6 +1325,41 @@ app.post('/api/save-proposal', async (req, res) => {
     if (!authHeader) {
       return res.status(401).json({ error: 'No authorization header' });
     }
+    
+    // Create a unique key for this submission to prevent duplicates
+    const submissionKey = `${req.body.user_id || 'unknown'}_${req.body.project_name || 'unknown'}_${Date.now()}`;
+    const shortKey = `${req.body.user_id || 'unknown'}_${req.body.project_name || 'unknown'}`;
+    
+    // Check if we received a similar submission recently (within 30 seconds)
+    const now = Date.now();
+    const recentSubmission = Array.from(recentSubmissions.entries()).find(([key, timestamp]) => 
+      key.startsWith(shortKey) && (now - timestamp) < 30000
+    );
+    
+    if (recentSubmission) {
+      console.log('Duplicate proposal submission detected, rejecting:', {
+        submissionKey,
+        recentKey: recentSubmission[0],
+        timeDiff: now - recentSubmission[1]
+      });
+      return res.status(409).json({ 
+        error: 'Duplicate submission detected',
+        message: 'A similar proposal was just submitted. Please wait before submitting again.'
+      });
+    }
+    
+    // Add this submission to tracking
+    recentSubmissions.set(submissionKey, now);
+    
+    // Clean up old entries (keep only last 100)
+    if (recentSubmissions.size > 100) {
+      const oldEntries = Array.from(recentSubmissions.entries())
+        .sort((a, b) => a[1] - b[1])
+        .slice(0, 50);
+      oldEntries.forEach(([key]) => recentSubmissions.delete(key));
+    }
+    
+    console.log('Processing new proposal submission:', submissionKey);
 
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
