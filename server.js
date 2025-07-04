@@ -2316,7 +2316,7 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
         quote_approval_ip: clientIP,
         status: 'approved'
       })
-      .eq('quote_url_slug', slug);
+      .eq('id', existingQuote.id);
 
     if (updateError) {
       console.error('Error updating quote approval:', updateError);
