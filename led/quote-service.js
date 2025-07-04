@@ -98,6 +98,26 @@ async function saveQuote(quoteData) {
     
     // console.log('Proposal saved successfully:', data);
     
+    // Send webhook to N8N/CRM with proposal data
+    if (data && data[0] && window.webhookService) {
+      try {
+        await window.webhookService.sendProposalWebhook(data[0]);
+      } catch (webhookError) {
+        console.warn('Webhook failed but proposal was saved:', webhookError);
+        // Don't fail the proposal creation if webhook fails
+      }
+    }
+    
+    // Send email notification based on rules: client gets email when self-submitting, sales rep gets email when creating for client
+    if (data && data[0] && window.webhookService) {
+      try {
+        await window.webhookService.sendProposalEmailNotification(data[0], currentUser?.id, userProfile?.role);
+      } catch (emailError) {
+        console.warn('Email notification failed but proposal was saved:', emailError);
+        // Don't fail the proposal creation if email fails
+      }
+    }
+    
     // Generate URL slug for the new proposal
     if (data && data[0] && data[0].id) {
       try {
@@ -238,7 +258,12 @@ async function getProposals(context = 'my-quotes') {
       
     if (error) throw error;
     
-    return { success: true, data };
+    // Remove duplicates that might occur when OR conditions overlap
+    const uniqueData = data.filter((item, index, self) => 
+      index === self.findIndex(t => t.id === item.id)
+    );
+    
+    return { success: true, data: uniqueData };
   } catch (error) {
     console.error('Error fetching proposals:', error.message);
     return { success: false, error: error.message };

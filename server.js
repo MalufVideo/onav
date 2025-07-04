@@ -1207,8 +1207,8 @@ app.get('/api/proposals', async (req, res) => {
 
     const context = req.query.context || 'my-quotes';
     
-    // For admin users in dashboard context, use service role client to bypass RLS
-    const clientToUse = (userRole === 'admin' && context === 'dashboard') ? supabaseAdmin : supabase;
+    // For admin users and sales reps in dashboard context, use service role client to bypass RLS
+    const clientToUse = (['admin', 'sales_rep'].includes(userRole) && context === 'dashboard') ? supabaseAdmin : supabase;
     console.log(`[DEBUG] Using ${clientToUse === supabaseAdmin ? 'ADMIN' : 'ANON'} client for query`);
     
     let query = clientToUse
@@ -1237,9 +1237,11 @@ app.get('/api/proposals', async (req, res) => {
         const clientIds = clientRels?.map(rel => rel.client_id) || [];
         
         if (clientIds.length > 0) {
-          // Show quotes created by sales rep OR by their clients
+          // Show quotes created by sales rep OR by their clients (but avoid duplicates)
           const userIdFilter = clientIds.map(id => `user_id.eq.${id}`).join(',');
-          query = query.or(`sales_rep_id.eq.${user.id},${userIdFilter}`);
+          // Use a more specific filter to prevent duplicates
+          const combinedFilter = `sales_rep_id.eq.${user.id},${userIdFilter}`;
+          query = query.or(combinedFilter);
         } else {
           // Fallback to only sales rep created quotes
           query = query.eq('sales_rep_id', user.id);
@@ -1276,9 +1278,11 @@ app.get('/api/proposals', async (req, res) => {
         const clientIds = clientRels?.map(rel => rel.client_id) || [];
         
         if (clientIds.length > 0) {
-          // Show quotes created by sales rep OR by their clients
+          // Show quotes created by sales rep OR by their clients (but avoid duplicates)
           const userIdFilter = clientIds.map(id => `user_id.eq.${id}`).join(',');
-          query = query.or(`sales_rep_id.eq.${user.id},${userIdFilter}`);
+          // Use a more specific filter to prevent duplicates
+          const combinedFilter = `sales_rep_id.eq.${user.id},${userIdFilter}`;
+          query = query.or(combinedFilter);
         } else {
           // Fallback to only sales rep created quotes
           query = query.eq('sales_rep_id', user.id);
@@ -1297,9 +1301,14 @@ app.get('/api/proposals', async (req, res) => {
     
     if (queryError) throw queryError;
     
-    console.log(`[/api/proposals] User: ${user.email} (${user.id}), Role: ${userRole}, Context: ${context}, Found ${data.length} quotes`);
+    // Remove duplicates that might occur when OR conditions overlap
+    const uniqueData = data.filter((item, index, self) => 
+      index === self.findIndex(t => t.id === item.id)
+    );
     
-    res.json(data);
+    console.log(`[/api/proposals] User: ${user.email} (${user.id}), Role: ${userRole}, Context: ${context}, Found ${uniqueData.length} unique quotes (${data.length} total)`);
+    
+    res.json(uniqueData);
   } catch (error) {
     console.error('Error fetching proposals:', error.message);
     res.status(500).json({ error: 'Failed to fetch proposals', details: error.message });
@@ -1505,6 +1514,22 @@ app.post('/api/save-proposal', async (req, res) => {
     if (error) {
       console.error('Database error details:', error);
       throw error;
+    }
+    
+    // Send webhook to N8N/CRM with proposal data
+    try {
+      await sendProposalWebhook(data);
+    } catch (webhookError) {
+      console.warn('Webhook failed but proposal was saved:', webhookError.message);
+      // Don't fail the proposal creation if webhook fails
+    }
+    
+    // Send email notification based on rules
+    try {
+      await sendProposalEmailNotification(data, user.id, userRole);
+    } catch (emailError) {
+      console.warn('Email notification failed but proposal was saved:', emailError.message);
+      // Don't fail the proposal creation if email fails
     }
     
     res.status(201).json({ 
@@ -2630,6 +2655,101 @@ io.on('connection', (socket) => {
     }
   });
 });
+
+// Webhook function to send proposal data to N8N/CRM
+async function sendProposalWebhook(proposalData) {
+  try {
+    const webhookPayload = {
+      // Client Information
+      client_name: proposalData.client_name,
+      client_email: proposalData.client_email, 
+      client_phone: proposalData.client_phone,
+      client_company: proposalData.client_company,
+      
+      // Sales Rep Information
+      sales_rep_name: proposalData.sales_rep_name,
+      sales_rep_id: proposalData.sales_rep_id,
+      
+      // Project Information
+      project_name: proposalData.project_name,
+      
+      // Shooting Dates
+      shooting_dates_start: proposalData.shooting_dates_start,
+      shooting_dates_end: proposalData.shooting_dates_end,
+      days_count: proposalData.days_count,
+      
+      // Quote/Pricing Information
+      total_price: proposalData.total_price,
+      daily_rate: proposalData.daily_rate,
+      selected_pod_type: proposalData.selected_pod_type,
+      selected_services: proposalData.selected_services,
+      
+      // LED Configuration Details  
+      led_principal_width: proposalData.led_principal_width,
+      led_principal_height: proposalData.led_principal_height,
+      led_principal_modules: proposalData.led_principal_modules,
+      led_principal_resolution: proposalData.led_principal_resolution,
+      
+      // System Information
+      proposal_id: proposalData.id,
+      created_at: proposalData.created_at,
+      status: proposalData.status,
+      
+      // Additional context
+      source: 'onav_led_calculator_server',
+      timestamp: new Date().toISOString()
+    };
+    
+    console.log('Sending proposal webhook to N8N from server:', proposalData.id);
+    
+    const response = await fetch('https://n8n.avauto.fun/webhook-test/061d8866-fa53-435a-9a5f-ceafb3e2e639', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(webhookPayload)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Webhook failed: ${response.status} ${response.statusText}`);
+    }
+    
+    console.log('Webhook sent successfully to N8N from server');
+    
+  } catch (error) {
+    console.error('Error sending webhook to N8N from server:', error);
+    throw error;
+  }
+}
+
+// Email notification function to send proposal emails using Supabase Edge Function
+async function sendProposalEmailNotification(proposalData, createdByUserId, currentUserRole) {
+  try {
+    console.log('Sending proposal email notification from server via Supabase Edge Function');
+    
+    // Create a server-side supabase client for calling Edge Functions
+    const supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // Call the Supabase Edge Function
+    const { data, error } = await supabaseClient.functions.invoke('send-quote-notification', {
+      body: {
+        proposalId: proposalData.id,
+        createdByUserId: createdByUserId,
+        currentUserRole: currentUserRole
+      }
+    });
+    
+    if (error) {
+      throw new Error(`Email notification failed: ${error.message}`);
+    }
+    
+    console.log('Email notification sent successfully from server:', data);
+    
+  } catch (error) {
+    console.error('Error sending email notification from server:', error);
+    throw error;
+  }
+}
 
 const PORT = process.env.PORT || 3000;
 
