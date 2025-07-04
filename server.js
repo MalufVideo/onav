@@ -2297,6 +2297,42 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
       return res.status(400).json({ error: 'Proposal ID is required' });
     }
 
+    // Check authorization
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: 'No authorization header' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    // Get user profile to determine role
+    const { data: userProfile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    // Special handling for master admin
+    let userRole = userProfile?.role;
+    
+    if (user.email === 'nelson.maluf@onprojecoes.com.br') {
+      userRole = 'admin';
+    }
+
+    // If no profile found but user exists, and it's a known sales rep email, grant sales_rep role
+    if (!userRole && user.email === 'nelson@avdesign.video') {
+      userRole = 'sales_rep';
+    }
+
+    if (!userRole || !['admin', 'sales_rep'].includes(userRole)) {
+      return res.status(403).json({ error: 'Unauthorized: Only admins and sales reps can generate quote URLs' });
+    }
+
     // Use admin client to bypass RLS
     const { data: proposal, error: fetchError } = await supabaseAdmin
       .from('proposals')

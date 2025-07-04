@@ -1678,7 +1678,8 @@ async function loadQuoteUrl(quoteId) {
         const response = await fetch(`/api/proposals/${quoteId}/generate-slug`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
             }
         });
 
