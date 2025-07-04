@@ -2276,11 +2276,27 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
     }
 
     // First, check if quote exists and is not already approved
-    const { data: existingQuote, error: fetchError } = await supabase
-      .from('proposals')
-      .select('id, quote_approved, project_name, client_email')
-      .eq('quote_url_slug', slug)
-      .single();
+    let existingQuote = null;
+    let fetchError = null;
+    
+    if (slug.startsWith('quote-')) {
+      const id = slug.replace('quote-', '');
+      const { data, error } = await supabase
+        .from('proposals')
+        .select('id, quote_approved, project_name, client_email')
+        .eq('id', id)
+        .single();
+      existingQuote = data;
+      fetchError = error;
+    } else {
+      const { data, error } = await supabase
+        .from('proposals')
+        .select('id, quote_approved, project_name, client_email')
+        .eq('quote_url_slug', slug)
+        .single();
+      existingQuote = data;
+      fetchError = error;
+    }
 
     if (fetchError || !existingQuote) {
       return res.status(404).json({ error: 'Quote not found' });
