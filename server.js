@@ -781,8 +781,8 @@ app.post('/api/users', async (req, res) => {
       return res.status(400).json({ error: 'Email, full name, and password are required' });
     }
 
-    // Create user in Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    // Create user in Supabase Auth (admin-created users are automatically confirmed)
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
@@ -802,7 +802,7 @@ app.post('/api/users', async (req, res) => {
         email,
         full_name,
         phone: phone || '',
-        role: role || 'end_user'
+        role: role || 'sales_rep'
       }])
       .select()
       .single();
