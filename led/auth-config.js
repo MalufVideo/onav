@@ -1,12 +1,19 @@
 // Supabase Configuration
-// This file contains the public API key (anon key) for Supabase authentication
+// This file loads the public API key (anon key) for Supabase authentication from environment
 
 // The anon key is safe to use in the browser with Row Level Security (RLS) enabled in Supabase
-// This is the key that starts with 'eyJ...'
+// Load from environment variable or fetch from server endpoint
 if (typeof window.SUPABASE_KEY === 'undefined') {
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1ODk4NzksImV4cCI6MjA1NTE2NTg3OX0.kAcBsHJnlr56fJ6qvXSLOWRiLTnQR7ilXUi_2Qzj4RE';
-  // Assign to window object if needed globally, though const usually suffices if script scope is correct
-  window.SUPABASE_KEY = SUPABASE_KEY;
+  // In production, this should be loaded from a server endpoint or build-time environment variable
+  // For now, we'll fetch it from the server
+  fetch('/api/config/supabase-key')
+    .then(response => response.json())
+    .then(data => {
+      window.SUPABASE_KEY = data.key;
+    })
+    .catch(error => {
+      console.error('Failed to load Supabase key:', error);
+    });
 } else {
   console.warn('[auth-config.js] SUPABASE_KEY already defined. Skipping re-declaration.');
 }

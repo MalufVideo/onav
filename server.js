@@ -307,6 +307,13 @@ app.get('/api/test', (req, res) => {
   });
 });
 
+// Config endpoint to serve Supabase anon key to frontend
+app.get('/api/config/supabase-key', (req, res) => {
+  res.json({ 
+    key: process.env.SUPABASE_ANON_KEY || supabaseAnonKey
+  });
+});
+
 // Debug endpoint to check quote data structure
 app.get('/api/debug/quote/:id', async (req, res) => {
   try {
@@ -2167,7 +2174,7 @@ app.post('/api/setup-database', async (req, res) => {
 
 // Import Resend
 const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY || 're_jMkwd7zt_FihowYjXxNzcDcek6RsfkNpp');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Handle contact form submissions
 app.post('/api/send-email', async (req, res) => {

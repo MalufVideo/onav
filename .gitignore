@@ -8,6 +8,9 @@ website.tar.gz
 # Ignore quotes folder
 quotes/
 
+# Ignore local configuration
+.roo/
+
 # Vercel
 .vercel
 
