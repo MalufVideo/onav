@@ -2735,7 +2735,7 @@ async function sendProposalWebhook(proposalData) {
       }
     });
     
-    const webhookUrl = `https://n8n.avauto.fun/webhook-test/061d8866-fa53-435a-9a5f-ceafb3e2e639?${queryParams.toString()}`;
+    const webhookUrl = `https://n8n.avauto.fun/webhook/061d8866-fa53-435a-9a5f-ceafb3e2e639?${queryParams.toString()}`;
     
     console.log('Server webhook URL being called:', webhookUrl);
     console.log('Server query parameters count:', queryParams.toString().split('&').length);
