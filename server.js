@@ -1220,9 +1220,30 @@ app.get('/api/proposals', async (req, res) => {
     
     if (context === 'my-quotes') {
       if (userRole === 'sales_rep') {
-        // Sales reps see quotes they created
-        console.log('[DEBUG] Sales rep - filtering by sales_rep_id');
-        query = query.eq('sales_rep_id', user.id);
+        // Sales reps see quotes they created AND quotes from their clients
+        console.log('[DEBUG] Sales rep - filtering by sales_rep_id OR client relationship');
+        
+        // Get client IDs for this sales rep
+        const { data: clientRels, error: clientError } = await supabaseAdmin
+          .from('client_sales_rep_relationships')
+          .select('client_id')
+          .eq('sales_rep_id', user.id)
+          .eq('is_active', true);
+        
+        if (clientError) {
+          console.error('Error fetching client relationships:', clientError);
+        }
+        
+        const clientIds = clientRels?.map(rel => rel.client_id) || [];
+        
+        if (clientIds.length > 0) {
+          // Show quotes created by sales rep OR by their clients
+          const userIdFilter = clientIds.map(id => `user_id.eq.${id}`).join(',');
+          query = query.or(`sales_rep_id.eq.${user.id},${userIdFilter}`);
+        } else {
+          // Fallback to only sales rep created quotes
+          query = query.eq('sales_rep_id', user.id);
+        }
       } else if (userRole === 'admin') {
         // Admins accessing my-quotes should see their own quotes only
         console.log('[DEBUG] Admin in my-quotes - filtering by user_id OR sales_rep_id');
@@ -1237,10 +1258,31 @@ app.get('/api/proposals', async (req, res) => {
       if (!['admin', 'sales_rep'].includes(userRole)) {
         return res.status(403).json({ error: 'Unauthorized: Only admins and sales reps can access dashboard view' });
       }
-      // Admins see all quotes, sales reps see quotes they created
+      // Admins see all quotes, sales reps see quotes they created AND client quotes
       if (userRole === 'sales_rep') {
-        console.log('[DEBUG] Sales rep in dashboard - filtering by sales_rep_id');
-        query = query.eq('sales_rep_id', user.id);
+        console.log('[DEBUG] Sales rep in dashboard - filtering by sales_rep_id OR client relationship');
+        
+        // Get client IDs for this sales rep
+        const { data: clientRels, error: clientError } = await supabaseAdmin
+          .from('client_sales_rep_relationships')
+          .select('client_id')
+          .eq('sales_rep_id', user.id)
+          .eq('is_active', true);
+        
+        if (clientError) {
+          console.error('Error fetching client relationships:', clientError);
+        }
+        
+        const clientIds = clientRels?.map(rel => rel.client_id) || [];
+        
+        if (clientIds.length > 0) {
+          // Show quotes created by sales rep OR by their clients
+          const userIdFilter = clientIds.map(id => `user_id.eq.${id}`).join(',');
+          query = query.or(`sales_rep_id.eq.${user.id},${userIdFilter}`);
+        } else {
+          // Fallback to only sales rep created quotes
+          query = query.eq('sales_rep_id', user.id);
+        }
       } else if (userRole === 'admin') {
         console.log('[DEBUG] ADMIN in dashboard - NO FILTER applied, should see ALL quotes');
       }

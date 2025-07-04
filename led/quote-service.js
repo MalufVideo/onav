@@ -164,8 +164,30 @@ async function getProposals(context = 'my-quotes') {
     // Apply filtering based on user role and context
     if (context === 'my-quotes') {
       if (userProfile?.role === 'sales_rep') {
-        // Sales reps see quotes they created
-        query = query.eq('sales_rep_id', currentUser.id);
+        // Sales reps see quotes they created AND quotes from their clients
+        console.log('[DEBUG] Sales rep in my-quotes - fetching client relationships');
+        
+        // Get client IDs for this sales rep
+        const { data: clientRels, error: clientError } = await supabase
+          .from('client_sales_rep_relationships')
+          .select('client_id')
+          .eq('sales_rep_id', currentUser.id)
+          .eq('is_active', true);
+        
+        if (clientError) {
+          console.error('Error fetching client relationships:', clientError);
+        }
+        
+        const clientIds = clientRels?.map(rel => rel.client_id) || [];
+        
+        if (clientIds.length > 0) {
+          // Show quotes created by sales rep OR by their clients
+          const userIdFilter = clientIds.map(id => `user_id.eq.${id}`).join(',');
+          query = query.or(`sales_rep_id.eq.${currentUser.id},${userIdFilter}`);
+        } else {
+          // Fallback to only sales rep created quotes
+          query = query.eq('sales_rep_id', currentUser.id);
+        }
       } else if (userProfile?.role === 'admin') {
         // Admins accessing my-quotes should see their own quotes only
         query = query.or(`user_id.eq.${currentUser.id},sales_rep_id.eq.${currentUser.id}`);
@@ -174,11 +196,38 @@ async function getProposals(context = 'my-quotes') {
         query = query.eq('user_id', currentUser.id);
       }
     } else if (context === 'dashboard') {
-      // Dashboard context - only admins should access this
-      if (userProfile?.role !== 'admin') {
-        throw new Error('Unauthorized: Only admins can access dashboard view');
+      // Dashboard context - only admins and sales reps should access this
+      if (!['admin', 'sales_rep'].includes(userProfile?.role)) {
+        throw new Error('Unauthorized: Only admins and sales reps can access dashboard view');
       }
-      // Admins see all quotes in dashboard
+      
+      if (userProfile?.role === 'sales_rep') {
+        // Sales reps see quotes they created AND quotes from their clients
+        console.log('[DEBUG] Sales rep in dashboard - fetching client relationships');
+        
+        // Get client IDs for this sales rep
+        const { data: clientRels, error: clientError } = await supabase
+          .from('client_sales_rep_relationships')
+          .select('client_id')
+          .eq('sales_rep_id', currentUser.id)
+          .eq('is_active', true);
+        
+        if (clientError) {
+          console.error('Error fetching client relationships:', clientError);
+        }
+        
+        const clientIds = clientRels?.map(rel => rel.client_id) || [];
+        
+        if (clientIds.length > 0) {
+          // Show quotes created by sales rep OR by their clients
+          const userIdFilter = clientIds.map(id => `user_id.eq.${id}`).join(',');
+          query = query.or(`sales_rep_id.eq.${currentUser.id},${userIdFilter}`);
+        } else {
+          // Fallback to only sales rep created quotes
+          query = query.eq('sales_rep_id', currentUser.id);
+        }
+      }
+      // Admins see all quotes in dashboard (no filter)
     } else {
       // Default: user sees only their own quotes
       query = query.eq('user_id', currentUser.id);
