@@ -2656,9 +2656,38 @@ io.on('connection', (socket) => {
   });
 });
 
+// Track sent webhooks to prevent duplicates
+const sentWebhooks = new Set();
+
 // Webhook function to send proposal data to N8N/CRM
 async function sendProposalWebhook(proposalData) {
   try {
+    // Create a unique key for this proposal
+    const webhookKey = `${proposalData.id || 'unknown'}_${Date.now()}`;
+    
+    // Check if we already sent this webhook recently (within 10 seconds)
+    const recentKey = `${proposalData.id || 'unknown'}`;
+    const now = Date.now();
+    const isRecent = Array.from(sentWebhooks).some(key => 
+      key.startsWith(recentKey) && (now - parseInt(key.split('_')[1])) < 10000
+    );
+    
+    if (isRecent) {
+      console.log('Skipping duplicate webhook for proposal:', proposalData.id);
+      return;
+    }
+    
+    // Add to sent webhooks
+    sentWebhooks.add(webhookKey);
+    
+    // Clean up old entries (keep only last 100)
+    if (sentWebhooks.size > 100) {
+      const oldestKeys = Array.from(sentWebhooks).slice(0, 50);
+      oldestKeys.forEach(key => sentWebhooks.delete(key));
+    }
+    
+    console.log('Sending webhook from SERVER for proposal:', proposalData.id);
+    
     const webhookPayload = {
       // Client Information
       client_name: proposalData.client_name,
@@ -2718,7 +2747,8 @@ async function sendProposalWebhook(proposalData) {
       
       // Additional context
       source: 'onav_led_calculator_server',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      webhook_call_id: `server_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     };
     
     console.log('Sending proposal webhook to N8N from server:', proposalData.id);
