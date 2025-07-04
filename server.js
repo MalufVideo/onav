@@ -2702,12 +2702,17 @@ async function sendProposalWebhook(proposalData) {
     
     console.log('Sending proposal webhook to N8N from server:', proposalData.id);
     
-    const response = await fetch('https://n8n.avauto.fun/webhook-test/061d8866-fa53-435a-9a5f-ceafb3e2e639', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(webhookPayload)
+    // Send to N8N webhook using GET with query parameters
+    const queryParams = new URLSearchParams();
+    Object.keys(webhookPayload).forEach(key => {
+      if (webhookPayload[key] !== null && webhookPayload[key] !== undefined) {
+        queryParams.append(key, webhookPayload[key]);
+      }
+    });
+    
+    const webhookUrl = `https://n8n.avauto.fun/webhook-test/061d8866-fa53-435a-9a5f-ceafb3e2e639?${queryParams.toString()}`;
+    const response = await fetch(webhookUrl, {
+      method: 'GET'
     });
     
     if (!response.ok) {
