@@ -1207,7 +1207,12 @@
                     
                     <!-- Main Video Player -->
                     <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 20px;">
-                      <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+                      <div id="manowarVideoPlaceholder1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('img/manowar1.webp'); background-size: cover; background-position: center; cursor: pointer; border-radius: 8px; overflow: hidden;">
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                          <i class="fas fa-play" style="color: #00ffaa; font-size: 24px; margin-left: 4px;"></i>
+                        </div>
+                      </div>
+                      <div id="manowarVideoIframe1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;"></div>
                     </div>
 
                     <!-- Case Study Content -->
@@ -1226,10 +1231,20 @@
                       <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Mais Vídeos</h4>
                       <div style="display: flex; gap: 15px; margin: 20px 0;">
                         <div style="flex: 1; position: relative; padding-bottom: 28.125%; height: 0; overflow: hidden;">
-                           <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+                           <div id="manowarVideoPlaceholder2" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('img/manowar2.webp'); background-size: cover; background-position: center; cursor: pointer; border-radius: 8px; overflow: hidden;">
+                             <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                               <i class="fas fa-play" style="color: #00ffaa; font-size: 18px; margin-left: 3px;"></i>
+                             </div>
+                           </div>
+                           <div id="manowarVideoIframe2" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;"></div>
                         </div>
                         <div style="flex: 1; position: relative; padding-bottom: 28.125%; height: 0; overflow: hidden;">
-                           <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+                           <div id="manowarVideoPlaceholder3" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('img/manowar3.webp'); background-size: cover; background-position: center; cursor: pointer; border-radius: 8px; overflow: hidden;">
+                             <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                               <i class="fas fa-play" style="color: #00ffaa; font-size: 18px; margin-left: 3px;"></i>
+                             </div>
+                           </div>
+                           <div id="manowarVideoIframe3" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;"></div>
                         </div>
                       </div>
                     </div>
@@ -1550,12 +1565,12 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
-        <div class="video-placeholder bg-gray-800 flex items-center justify-center cursor-pointer" style="background-image: url('img/paris.webp'); background-size: cover; background-position: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%;" onclick="playYouTubeVideo()">
-          <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center;">
-            <i class="fas fa-play text-primary text-4xl"></i>
+        <div id="globoVideoPlaceholder" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('img/paris.webp'); background-size: cover; background-position: center; cursor: pointer; border-radius: 8px; overflow: hidden;">
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+            <i class="fas fa-play" style="color: #00ffaa; font-size: 24px; margin-left: 4px;"></i>
           </div>
         </div>
-        <iframe id="youtubePlayer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;" frameborder="0" allowfullscreen></iframe>
+        <div id="globoVideoIframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;"></div>
       </div>
 
       <!-- Case Study Content -->
@@ -1694,7 +1709,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Main Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 20px; border-radius: 10px; background: #000;">
-        <div id="beloVideoContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #000;">
+        <div id="beloVideoContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('img/belo_thumb.webp'); background-size: cover; background-position: center;">
           <!-- Custom play button overlay -->
           <div id="beloPlayOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.4); cursor: pointer; z-index: 2;">
             <div style="width: 80px; height: 80px; border-radius: 50%; background-color: #00ffaa; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,255,170,0.5);">
@@ -1837,7 +1852,12 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Main Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 20px;">
-        <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+        <div id="gloobVideoPlaceholder" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('img/futeboleria.webp'); background-size: cover; background-position: center; cursor: pointer; border-radius: 8px; overflow: hidden;">
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+            <i class="fas fa-play" style="color: #00ffaa; font-size: 24px; margin-left: 4px;"></i>
+          </div>
+        </div>
+        <div id="gloobVideoIframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;"></div>
       </div>
 
       <!-- Case Study Content -->
@@ -2293,7 +2313,12 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       
       <!-- Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
-        <div class="video-placeholder bg-gray-800 flex items-center justify-center"><i class="fas fa-play text-primary text-4xl"></i></div>
+        <div id="pontofinalVideoPlaceholder" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('img/pontofinal.webp'); background-size: cover; background-position: center; cursor: pointer; border-radius: 8px; overflow: hidden;">
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+            <i class="fas fa-play" style="color: #00ffaa; font-size: 24px; margin-left: 4px;"></i>
+          </div>
+        </div>
+        <div id="pontofinalVideoIframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;"></div>
       </div>
 
       <!-- Case Study Content -->
@@ -2531,8 +2556,9 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
       <!-- Video Player -->
       <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
         <div id="new2CaseStudyVideoContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
-          <div id="sportingBetOverlay" style="position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index:2; cursor:pointer;">
-            <button id="sportingBetPlayBtn" style="background: #00ffaa; color: #121212; border: none; border-radius: 50%; width: 64px; height: 64px; font-size: 2rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 12px #00ffaa55;">
+          <div id="sportingBetOverlay" style="position: absolute; width: 100%; height: 100%; background-image: url('img/curvoo2.webp'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; z-index:2; cursor:pointer;">
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4);"></div>
+            <button id="sportingBetPlayBtn" style="background: #00ffaa; color: #121212; border: none; border-radius: 50%; width: 64px; height: 64px; font-size: 2rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 12px #00ffaa55; position: relative; z-index: 3;">
               ▶
             </button>
           </div>
@@ -2896,28 +2922,14 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
         if (closeCaseStudyModalBtn) {
             closeCaseStudyModalBtn.addEventListener('click', () => {
                 caseStudyModal.style.display = 'none';
-                const iframe = document.getElementById('caseStudyVideo');
-                if (iframe) {
-                    const videoSrc = iframe.src;
-                    iframe.src = ''; // Stop video by clearing src
-                    iframe.src = videoSrc; // Restore src to allow replay
-                }
+                if (window.resetGloboVideo) window.resetGloboVideo();
             });
         }
 
         window.addEventListener('click', (event) => {
             if (event.target === caseStudyModal) {
                 caseStudyModal.style.display = 'none';
-                const videoPlaceholder = document.querySelector('#caseStudyModal .video-placeholder');
-                const youtubePlayer = document.getElementById('youtubePlayer');
-                
-                if (videoPlaceholder && youtubePlayer) {
-                    // Show placeholder and hide iframe
-                    videoPlaceholder.style.display = 'flex';
-                    youtubePlayer.style.display = 'none';
-                    // Clear iframe src to stop video
-                    youtubePlayer.src = '';
-                }
+                if (window.resetGloboVideo) window.resetGloboVideo();
             }
         });
         
@@ -3140,24 +3152,14 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
         if (closePontofinalCaseStudyModalBtn) {
             closePontofinalCaseStudyModalBtn.addEventListener('click', () => {
                 pontofinalCaseStudyModal.style.display = 'none';
-                const iframe = document.getElementById('pontofinalCaseStudyVideo');
-                if (iframe) {
-                    const videoSrc = iframe.src;
-                    iframe.src = ''; // Stop video by clearing src
-                    iframe.src = videoSrc; // Restore src to allow replay
-                }
+                if (window.resetPontofinalVideo) window.resetPontofinalVideo();
             });
         }
 
         window.addEventListener('click', (event) => {
             if (event.target === pontofinalCaseStudyModal) {
                 pontofinalCaseStudyModal.style.display = 'none';
-                const iframe = document.getElementById('pontofinalCaseStudyVideo');
-                if (iframe) {
-                    const videoSrc = iframe.src;
-                    iframe.src = '';
-                    iframe.src = videoSrc;
-                }
+                if (window.resetPontofinalVideo) window.resetPontofinalVideo();
             }
         });
         
@@ -3270,24 +3272,14 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
         if (closeManowarCaseStudyModalBtn) {
             closeManowarCaseStudyModalBtn.addEventListener('click', () => {
                 manowarCaseStudyModal.style.display = 'none';
-                const iframe = document.getElementById('manowarCaseStudyVideo');
-                if (iframe) {
-                    const videoSrc = iframe.src;
-                    iframe.src = ''; // Stop video by clearing src
-                    iframe.src = videoSrc; // Restore src to allow replay
-                }
+                if (window.resetManowarVideos) window.resetManowarVideos();
             });
         }
 
         window.addEventListener('click', (event) => {
             if (event.target === manowarCaseStudyModal) {
                 manowarCaseStudyModal.style.display = 'none';
-                const iframe = document.getElementById('manowarCaseStudyVideo');
-                if (iframe) {
-                    const videoSrc = iframe.src;
-                    iframe.src = '';
-                    iframe.src = videoSrc;
-                }
+                if (window.resetManowarVideos) window.resetManowarVideos();
             }
         });
 
@@ -3625,6 +3617,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
     // Close button click handler
     if (ceaCloseBtn) {
       ceaCloseBtn.addEventListener('click', function() {
+        ceaModal.style.display = 'none';
         resetCeaVideo();
       });
     }
@@ -3633,6 +3626,7 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
     if (ceaModal) {
       ceaModal.addEventListener('click', function(event) {
         if (event.target === ceaModal) {
+          ceaModal.style.display = 'none';
           resetCeaVideo();
         }
       });
@@ -4121,11 +4115,8 @@ window.addEventListener('DOMContentLoaded', onScrollNavHighlight);
             futeboleriaModal.style.display = 'none';
             document.body.style.overflow = ''; // Re-enable scrolling
             
-            // Reset YouTube video by reloading iframe
-            if (futeboleriaVideo) {
-                const currentSrc = futeboleriaVideo.src;
-                futeboleriaVideo.src = currentSrc;
-            }
+            // Reset Gloob video
+            if (window.resetGloobVideo) window.resetGloobVideo();
         });
     }
     
@@ -4136,11 +4127,8 @@ window.addEventListener('DOMContentLoaded', onScrollNavHighlight);
                 futeboleriaModal.style.display = 'none';
                 document.body.style.overflow = ''; // Re-enable scrolling
                 
-                // Reset YouTube video by reloading iframe
-                if (futeboleriaVideo) {
-                    const currentSrc = futeboleriaVideo.src;
-                    futeboleriaVideo.src = currentSrc;
-                }
+                // Reset Gloob video
+                if (window.resetGloobVideo) window.resetGloobVideo();
             }
         });
     }
@@ -4690,6 +4678,154 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Start animation after page load
         setInterval(animateHero, 1000); // 1 second per frame
+    }
+    
+    // Manowar video handlers
+    const manowarVideoData = [
+        { videoId: 'jVAMWTCITVA', placeholderId: 'manowarVideoPlaceholder1', iframeId: 'manowarVideoIframe1' },
+        { videoId: 'tbhdN45U8Es', placeholderId: 'manowarVideoPlaceholder2', iframeId: 'manowarVideoIframe2' },
+        { videoId: 'lbbScd7kwTk', placeholderId: 'manowarVideoPlaceholder3', iframeId: 'manowarVideoIframe3' }
+    ];
+    
+    manowarVideoData.forEach(data => {
+        const placeholder = document.getElementById(data.placeholderId);
+        if (placeholder) {
+            placeholder.addEventListener('click', function() {
+                const placeholderDiv = document.getElementById(data.placeholderId);
+                const videoIframe = document.getElementById(data.iframeId);
+                
+                if (placeholderDiv && videoIframe) {
+                    // Hide placeholder and show iframe
+                    placeholderDiv.style.display = 'none';
+                    videoIframe.style.display = 'block';
+                    
+                    // Create YouTube iframe with autoplay
+                    videoIframe.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${data.videoId}?autoplay=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe>`;
+                }
+            });
+        }
+    });
+    
+    // Function to reset all Manowar videos
+    window.resetManowarVideos = function() {
+        const manowarVideoData = [
+            { placeholderId: 'manowarVideoPlaceholder1', iframeId: 'manowarVideoIframe1' },
+            { placeholderId: 'manowarVideoPlaceholder2', iframeId: 'manowarVideoIframe2' },
+            { placeholderId: 'manowarVideoPlaceholder3', iframeId: 'manowarVideoIframe3' }
+        ];
+        
+        manowarVideoData.forEach(data => {
+            const placeholderDiv = document.getElementById(data.placeholderId);
+            const videoIframe = document.getElementById(data.iframeId);
+            
+            if (placeholderDiv && videoIframe) {
+                // Stop video by removing iframe content
+                videoIframe.innerHTML = '';
+                videoIframe.style.display = 'none';
+                
+                // Show placeholder again
+                placeholderDiv.style.display = 'block';
+            }
+        });
+    }
+    
+    // Gloob video handler
+    const gloobVideoPlaceholder = document.getElementById('gloobVideoPlaceholder');
+    if (gloobVideoPlaceholder) {
+        gloobVideoPlaceholder.addEventListener('click', function() {
+            const placeholderDiv = document.getElementById('gloobVideoPlaceholder');
+            const videoIframe = document.getElementById('gloobVideoIframe');
+            
+            if (placeholderDiv && videoIframe) {
+                // Hide placeholder and show iframe
+                placeholderDiv.style.display = 'none';
+                videoIframe.style.display = 'block';
+                
+                // Create YouTube iframe with autoplay
+                videoIframe.innerHTML = '<iframe width="100%" height="100%" src="https://www.youtube.com/embed/NS7ivNPzvXg?autoplay=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe>';
+            }
+        });
+    }
+    
+    // Function to reset Gloob video
+    window.resetGloobVideo = function() {
+        const placeholderDiv = document.getElementById('gloobVideoPlaceholder');
+        const videoIframe = document.getElementById('gloobVideoIframe');
+        
+        if (placeholderDiv && videoIframe) {
+            // Stop video by removing iframe content
+            videoIframe.innerHTML = '';
+            videoIframe.style.display = 'none';
+            
+            // Show placeholder again
+            placeholderDiv.style.display = 'block';
+        }
+    }
+    
+    // Ponto Final video handler
+    const pontofinalVideoPlaceholder = document.getElementById('pontofinalVideoPlaceholder');
+    if (pontofinalVideoPlaceholder) {
+        pontofinalVideoPlaceholder.addEventListener('click', function() {
+            const placeholderDiv = document.getElementById('pontofinalVideoPlaceholder');
+            const videoIframe = document.getElementById('pontofinalVideoIframe');
+            
+            if (placeholderDiv && videoIframe) {
+                // Hide placeholder and show iframe
+                placeholderDiv.style.display = 'none';
+                videoIframe.style.display = 'block';
+                
+                // Create YouTube iframe with autoplay
+                videoIframe.innerHTML = '<iframe width="100%" height="100%" src="https://www.youtube.com/embed/U9NumXGdxv0?autoplay=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe>';
+            }
+        });
+    }
+    
+    // Function to reset Ponto Final video
+    window.resetPontofinalVideo = function() {
+        const placeholderDiv = document.getElementById('pontofinalVideoPlaceholder');
+        const videoIframe = document.getElementById('pontofinalVideoIframe');
+        
+        if (placeholderDiv && videoIframe) {
+            // Stop video by removing iframe content
+            videoIframe.innerHTML = '';
+            videoIframe.style.display = 'none';
+            
+            // Show placeholder again
+            placeholderDiv.style.display = 'block';
+        }
+    }
+    
+    // Globo Olympics video handler - updated to match other modals pattern
+    const globoVideoPlaceholder = document.getElementById('globoVideoPlaceholder');
+    if (globoVideoPlaceholder) {
+        globoVideoPlaceholder.addEventListener('click', function() {
+            const placeholderDiv = document.getElementById('globoVideoPlaceholder');
+            const videoIframe = document.getElementById('globoVideoIframe');
+            
+            if (placeholderDiv && videoIframe) {
+                // Hide placeholder and show iframe
+                placeholderDiv.style.display = 'none';
+                videoIframe.style.display = 'block';
+                
+                // Create YouTube iframe with autoplay
+                videoIframe.innerHTML = '<iframe width="100%" height="100%" src="https://www.youtube.com/embed/OzOQQSURvu4?autoplay=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;"></iframe>';
+            }
+        });
+    }
+    
+    // Function to reset Globo Olympics video
+    window.resetGloboVideo = function() {
+        const placeholderDiv = document.getElementById('globoVideoPlaceholder');
+        const videoIframe = document.getElementById('globoVideoIframe');
+        
+        if (placeholderDiv && videoIframe) {
+            // Stop video by removing iframe content
+            videoIframe.innerHTML = '';
+            videoIframe.style.display = 'none';
+            
+            // Show placeholder again
+            placeholderDiv.style.display = 'block';
+        }
     }
 });
 </script>
