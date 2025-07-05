@@ -2459,13 +2459,33 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
       return res.status(500).json({ error: 'Failed to approve quote' });
     }
 
+    // Get the complete quote data for the response
+    let completeQuote = null;
+    if (slug.startsWith('quote-')) {
+      const id = slug.replace('quote-', '');
+      const { data, error } = await supabaseAdmin
+        .from('proposals')
+        .select('*')
+        .eq('id', id)
+        .single();
+      completeQuote = data;
+    } else {
+      const { data, error } = await supabaseAdmin
+        .from('proposals')
+        .select('*')
+        .eq('quote_url_slug', slug)
+        .single();
+      completeQuote = data;
+    }
+
     // TODO: Send approval notification email to admin/sales team
     console.log(`Quote approved: ${existingQuote.project_name} by client at ${clientIP}`);
 
     res.json({ 
       success: true, 
       message: 'Quote approved successfully',
-      approvedAt: approvedAt
+      approvedAt: approvedAt,
+      quote: completeQuote
     });
 
   } catch (error) {
