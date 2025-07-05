@@ -25,32 +25,31 @@ async function initAuth() {
       // Use the global supabase object created by the UMD bundle
       if (typeof supabase === 'undefined' || supabase === null) {
         if (typeof window.supabaseClient !== 'undefined') {
-          supabase = window.supabaseClient.createClient(supabaseUrl, supabaseKey);
+          supabase = window.supabaseClient.createClient(supabaseUrl, supabaseKey, {
+            auth: {
+              persistSession: true,
+              autoRefreshToken: true,
+              detectSessionInUrl: true,
+              storage: window.localStorage
+            }
+          });
         } else if (typeof window.supabase !== 'undefined') {
-          supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+          supabase = window.supabase.createClient(supabaseUrl, supabaseKey, {
+            auth: {
+              persistSession: true,
+              autoRefreshToken: true,
+              detectSessionInUrl: true,
+              storage: window.localStorage
+            }
+          });
         } else {
           console.error('Could not find Supabase client library. Make sure it\'s properly loaded.');
           return;
         }
       }
       
-      // Handle email confirmation on page load
-      await handleEmailConfirmation();
-      
-      // Check for existing session
-      const { data, error } = await supabase.auth.getSession();
-      if (error) {
-        console.warn('Error getting session:', error);
-      } else if (data?.session?.user) {
-        currentUser = data.session.user;
-        console.log('Existing session found for:', currentUser.email);
-        notifyListeners();
-      } else {
-        console.log('No existing session found');
-      }
-      
-      // Set up auth state change listener
-      supabase.auth.onAuthStateChange((event, session) => {
+      // Set up auth state change listener FIRST (before checking session)
+      supabase.auth.onAuthStateChange(async (event, session) => {
         const previousUser = currentUser;
         currentUser = session?.user || null;
         
@@ -84,7 +83,58 @@ async function initAuth() {
             }, 500);
           }
         }
+        
+        // Handle token refresh
+        if (event === 'TOKEN_REFRESHED') {
+          console.log('Token refreshed successfully');
+        }
+        
+        // Handle session recovery
+        if (event === 'INITIAL_SESSION' && session?.user) {
+          console.log('Session recovered from storage:', session.user.email);
+        }
       });
+      
+      // Handle email confirmation on page load
+      await handleEmailConfirmation();
+      
+      // Force session recovery with retry mechanism
+      let sessionRecovered = false;
+      let attempts = 0;
+      const maxAttempts = 3;
+      
+      while (!sessionRecovered && attempts < maxAttempts) {
+        attempts++;
+        console.log(`Attempting to recover session (attempt ${attempts}/${maxAttempts})`);
+        
+        try {
+          const { data, error } = await supabase.auth.getSession();
+          
+          if (error) {
+            console.warn(`Session recovery attempt ${attempts} failed:`, error);
+            if (attempts === maxAttempts) {
+              console.log('No session could be recovered after all attempts');
+            }
+          } else if (data?.session?.user) {
+            currentUser = data.session.user;
+            console.log('Session successfully recovered for:', currentUser.email);
+            sessionRecovered = true;
+            notifyListeners();
+          } else {
+            console.log(`No session found on attempt ${attempts}`);
+            if (attempts === maxAttempts) {
+              console.log('No existing session found after all attempts');
+            }
+          }
+        } catch (sessionError) {
+          console.warn(`Session recovery attempt ${attempts} error:`, sessionError);
+        }
+        
+        // Wait a bit before retrying (except on last attempt)
+        if (!sessionRecovered && attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 200));
+        }
+      }
     } else {
       console.error('Supabase API key not found. Make sure auth-config.js is properly configured.');
     }
@@ -225,12 +275,29 @@ async function signOut() {
 
 // Get current user
 function getCurrentUser() {
+  // If no current user, try to recover from localStorage as backup
+  if (!currentUser && typeof window !== 'undefined') {
+    try {
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      if (storedSession) {
+        const sessionData = JSON.parse(storedSession);
+        if (sessionData?.user && sessionData?.expires_at && new Date(sessionData.expires_at * 1000) > new Date()) {
+          console.log('Found valid session in localStorage:', sessionData.user.email);
+          currentUser = sessionData.user;
+          notifyListeners();
+        }
+      }
+    } catch (error) {
+      console.warn('Error recovering session from localStorage:', error);
+    }
+  }
   return currentUser;
 }
 
 // Check if user is authenticated
 function isAuthenticated() {
-  return !!currentUser;
+  // Use getCurrentUser() which has fallback recovery logic
+  return !!getCurrentUser();
 }
 
 // Subscribe to auth state changes
@@ -460,6 +527,34 @@ function showErrorMessage(message) {
   }, 5000);
 }
 
+// Force session refresh
+async function refreshSession() {
+  if (!supabase) {
+    console.warn('Supabase client not initialized');
+    return false;
+  }
+  
+  try {
+    const { data, error } = await supabase.auth.refreshSession();
+    if (error) {
+      console.warn('Session refresh failed:', error);
+      return false;
+    }
+    
+    if (data?.session?.user) {
+      currentUser = data.session.user;
+      console.log('Session refreshed for:', currentUser.email);
+      notifyListeners();
+      return true;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('Error refreshing session:', error);
+    return false;
+  }
+}
+
 // Export auth functions
 window.auth = {
   initAuth,
@@ -475,5 +570,6 @@ window.auth = {
   redirectBasedOnRole,
   handleEmailConfirmation,
   showSuccessMessage,
-  showErrorMessage
+  showErrorMessage,
+  refreshSession
 };
