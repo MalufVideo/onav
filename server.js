@@ -41,6 +41,9 @@ app.use(express.json());
 // Enable CORS for all origins (adjust for production later if needed)
 app.use(cors());
 
+// Trust proxy for proper IP detection
+app.set('trust proxy', true);
+
 // Serve static files from root directory
 app.use(express.static(path.join(__dirname), {
   setHeaders: (res, path) => {
