@@ -2452,7 +2452,7 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
     const updateQuery = `
       UPDATE proposals 
       SET quote_approved = true, 
-          quote_approved_at = '${approvedAt}', 
+          quote_approved_at = NOW(), 
           quote_approval_ip = '${clientIP.replace(/'/g, "''")}', 
           status = 'approved'
       WHERE id = '${existingQuote.id}'
