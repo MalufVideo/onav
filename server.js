@@ -2447,6 +2447,8 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
 
     // Update quote with approval
     const approvedAt = new Date().toISOString();
+    console.log(`Attempting to approve quote ID: ${existingQuote.id}, IP: ${clientIP}`);
+    
     const { error: updateError } = await supabaseAdmin
       .from('proposals')
       .update({
@@ -2459,7 +2461,8 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
 
     if (updateError) {
       console.error('Error updating quote approval:', updateError);
-      return res.status(500).json({ error: 'Failed to approve quote' });
+      console.error('Update error details:', JSON.stringify(updateError, null, 2));
+      return res.status(500).json({ error: 'Failed to approve quote', details: updateError.message });
     }
 
     // Get the complete quote data for the response
