@@ -1,0 +1,176 @@
+{
+  "checkType": "availability",
+  "webhookUrl": "https://n8n.avauto.fun/webhook-test/eab92d5a-c6ee-4c74-9b52-e89997dd4205",
+  "requestTimestamp": "2025-07-05T23:35:17.798Z",
+  "quoteId": "4a2d379d-3e3d-4b77-887d-0772af1ae858",
+  "slug": "quote-4a2d379d-3e3d-4b77-887d-0772af1ae858",
+  "clientName": "Multicamhd",
+  "clientEmail": "multicamhd@gmail.com",
+  "projectName": "teste2",
+  "shootingDate": "2025-07-14",
+  "quoteData": {
+    "id": "4a2d379d-3e3d-4b77-887d-0772af1ae858",
+    "user_id": "ef32731a-54fc-48de-baf3-7bbec73040af",
+    "created_at": "2025-07-05T23:23:42.386734+00:00",
+    "updated_at": "2025-07-05T23:23:42.386734+00:00",
+    "status": "approved",
+    "project_name": "teste2",
+    "client_name": "Multicamhd",
+    "client_company": "multicamh",
+    "client_email": "multicamhd@gmail.com",
+    "client_phone": "19981454647",
+    "shooting_dates_start": "2025-07-14",
+    "shooting_dates_end": "2025-07-17",
+    "days_count": 4,
+    "led_configuration": {
+      "principal": {
+        "width": "20",
+        "height": "5",
+        "curvature": 5,
+        "modules": 400,
+        "resolution": "",
+        "pixels_width": 7680,
+        "pixels_height": 1920,
+        "total_pixels": 14745600,
+        "power_max": "69000",
+        "power_avg": "23000",
+        "weight": "3000"
+      },
+      "teto": {
+        "width": "8",
+        "height": "6",
+        "modules": 192,
+        "pixels_width": 3072,
+        "pixels_height": 2304,
+        "total_pixels": 7077888,
+        "power_max": "33120",
+        "power_avg": "11040",
+        "weight": "1440",
+        "resolution": ""
+      }
+    },
+    "production_type": {
+      "selected_pod_type": "2d",
+      "studio_size": null
+    },
+    "pricing": {
+      "daily_rate": "101140",
+      "discounted_daily_rate": null,
+      "total_price": "R$ 262.964,00",
+      "original_total_price": "404560",
+      "discount_percentage": "35",
+      "discount_amount": "141596.00",
+      "discount_reason": null,
+      "total_discount_percentage": "0.00",
+      "total_discount_amount": "0.00"
+    },
+    "equipment_pricing": {
+      "price_modules_principal": null,
+      "price_processors_principal": null,
+      "price_server": null,
+      "price_server_backup": false,
+      "price_disguise_modules_led": null,
+      "price_disguise_mx40_pro": null,
+      "price_disguise_vx4n": null,
+      "price_rxii": null,
+      "price_tracking": null,
+      "price_cinebot": null,
+      "price_trilho": null,
+      "price_komodo": null,
+      "total_price_estudios": null,
+      "total_price_2d": null,
+      "total_price_3d": null,
+      "total_price_rube_draco": null
+    },
+    "selected_services": [
+      {
+        "name": "Módulos LED (592 Unidades)",
+        "quantity": 592,
+        "unit_price": 85,
+        "daily_subtotal": 50320,
+        "total_subtotal": 201280
+      },
+      {
+        "name": "Processadores MX-40 Pro",
+        "quantity": 2,
+        "unit_price": 1890,
+        "daily_subtotal": 3780,
+        "total_subtotal": 15120
+      },
+      {
+        "name": "Disguise VX4n",
+        "quantity": 1,
+        "unit_price": 10000,
+        "daily_subtotal": 10000,
+        "total_subtotal": 40000
+      },
+      {
+        "name": "Disguise RXII",
+        "quantity": 3,
+        "unit_price": 7750,
+        "daily_subtotal": 23250,
+        "total_subtotal": 93000
+      },
+      {
+        "name": "Stype Tracking",
+        "quantity": 1,
+        "unit_price": 3890,
+        "daily_subtotal": 3890,
+        "total_subtotal": 15560
+      },
+      {
+        "name": "Equipe especializada Disguise",
+        "quantity": 1,
+        "unit_price": 9900,
+        "daily_subtotal": 9900,
+        "total_subtotal": 39600
+      }
+    ],
+    "approval_details": {
+      "quote_approved": true,
+      "quote_approved_at": "2025-07-05T23:35:17.798924+00:00",
+      "quote_approval_ip": "179.160.124.111",
+      "approved_by": "client"
+    },
+    "metadata": {
+      "discount_description": null,
+      "last_modified_at": "2025-07-05T23:23:42.386734",
+      "last_modified_by": null,
+      "sales_rep_id": null,
+      "sales_rep_name": null,
+      "lead_id": null,
+      "quote_url_slug": null,
+      "modified": "2025-07-05T23:35:17.798924"
+    }
+  },
+  "calculated_totals": {
+    "daily_equipment_total": 101140,
+    "total_before_discount": 404560,
+    "discount_amount": 141596,
+    "final_total": 262964,
+    "final_total_formatted": "R$ 262.964,00",
+    "total_days": 4,
+    "discount_percentage": 35
+  },
+  "studio_requirements": {
+    "led_total_modules": 592,
+    "led_total_pixels": 21823488,
+    "total_power_consumption": {
+      "max_watts": 102120,
+      "avg_watts": 34040
+    },
+    "total_weight_kg": 4440,
+    "space_requirements": {
+      "principal_area_sqm": 100,
+      "teto_area_sqm": 48,
+      "total_led_area_sqm": 148
+    }
+  },
+  "calendar_check": {
+    "requested_start_date": "2025-07-14",
+    "requested_end_date": "2025-07-17",
+    "duration_days": 4,
+    "check_type": "studio_availability",
+    "timezone": "America/Sao_Paulo"
+  }
+}
