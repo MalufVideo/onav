@@ -34,6 +34,9 @@ async function initAuth() {
         }
       }
       
+      // Handle email confirmation on page load
+      await handleEmailConfirmation();
+      
       // Check for existing session
       const { data } = await supabase.auth.getSession();
       if (data?.session) {
@@ -46,6 +49,16 @@ async function initAuth() {
         currentUser = session?.user || null;
         notifyListeners();
         console.log('Auth state changed:', event, currentUser);
+        
+        // Handle successful confirmation
+        if (event === 'SIGNED_IN' && session?.user) {
+          console.log('User confirmed and signed in automatically!');
+          showSuccessMessage('Email confirmado! Você está logado e pode usar o calculador.');
+          // Clear the URL hash to remove confirmation tokens
+          if (window.location.hash) {
+            window.history.replaceState(null, null, window.location.pathname);
+          }
+        }
       });
     } else {
       console.error('Supabase API key not found. Make sure auth-config.js is properly configured.');
@@ -89,6 +102,7 @@ async function signUp(email, password, userData = {}) {
       email,
       password,
       options: {
+        emailRedirectTo: 'https://onav.com.br/led/',
         data: {
           name: name || '',
           company: company || '',
@@ -302,6 +316,110 @@ async function redirectBasedOnRole() {
   }
 }
 
+// Handle email confirmation from URL hash
+async function handleEmailConfirmation() {
+  if (!supabase) return;
+  
+  try {
+    // Check for confirmation tokens in URL hash
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const access_token = hashParams.get('access_token');
+    const refresh_token = hashParams.get('refresh_token');
+    const type = hashParams.get('type');
+    
+    if (access_token && refresh_token && type) {
+      console.log('Email confirmation tokens found, processing...');
+      
+      // Set the session using the tokens from the URL
+      const { data, error } = await supabase.auth.setSession({
+        access_token,
+        refresh_token
+      });
+      
+      if (error) {
+        console.error('Error confirming email:', error);
+        showErrorMessage('Erro ao confirmar email. Tente novamente.');
+      } else if (data.user) {
+        console.log('Email confirmation successful!');
+        // The auth state change listener will handle the success message
+        return true;
+      }
+    }
+  } catch (error) {
+    console.error('Error handling email confirmation:', error);
+  }
+  
+  return false;
+}
+
+// Show success message
+function showSuccessMessage(message) {
+  // Create or update success message element
+  let messageEl = document.getElementById('auth-success-message');
+  if (!messageEl) {
+    messageEl = document.createElement('div');
+    messageEl.id = 'auth-success-message';
+    messageEl.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #10b981;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      z-index: 10000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      max-width: 300px;
+      font-family: Arial, sans-serif;
+    `;
+    document.body.appendChild(messageEl);
+  }
+  
+  messageEl.textContent = message;
+  messageEl.style.display = 'block';
+  
+  // Auto-hide after 5 seconds
+  setTimeout(() => {
+    if (messageEl) {
+      messageEl.style.display = 'none';
+    }
+  }, 5000);
+}
+
+// Show error message
+function showErrorMessage(message) {
+  // Create or update error message element
+  let messageEl = document.getElementById('auth-error-message');
+  if (!messageEl) {
+    messageEl = document.createElement('div');
+    messageEl.id = 'auth-error-message';
+    messageEl.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #ef4444;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      z-index: 10000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      max-width: 300px;
+      font-family: Arial, sans-serif;
+    `;
+    document.body.appendChild(messageEl);
+  }
+  
+  messageEl.textContent = message;
+  messageEl.style.display = 'block';
+  
+  // Auto-hide after 5 seconds
+  setTimeout(() => {
+    if (messageEl) {
+      messageEl.style.display = 'none';
+    }
+  }, 5000);
+}
+
 // Export auth functions
 window.auth = {
   initAuth,
@@ -314,5 +432,8 @@ window.auth = {
   getSupabaseClient,
   getUserProfile,
   hasRole,
-  redirectBasedOnRole
+  redirectBasedOnRole,
+  handleEmailConfirmation,
+  showSuccessMessage,
+  showErrorMessage
 };
