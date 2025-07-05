@@ -485,6 +485,67 @@
             return classMap[status] || 'bg-gray-100 text-gray-800';
         }
 
+        // Confetti animation
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.top = '-10px';
+                confetti.style.zIndex = '9999';
+                confetti.style.borderRadius = '50%';
+                confetti.style.pointerEvents = 'none';
+                
+                document.body.appendChild(confetti);
+                
+                // Animate confetti
+                confetti.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(${window.innerHeight + 100}px) rotate(720deg)`, opacity: 0 }
+                ], {
+                    duration: 3000 + Math.random() * 2000,
+                    easing: 'linear'
+                }).onfinish = () => {
+                    confetti.remove();
+                };
+            }
+        }
+
+        // Check calendar availability
+        async function checkCalendarAvailability(quoteData) {
+            try {
+                const webhookUrl = 'https://n8n.avauto.fun/webhook-test/eab92d5a-c6ee-4c74-9b52-e89997dd4205';
+                
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        quoteId: quoteData.id,
+                        slug: slug,
+                        shootingDate: quoteData.shooting_date,
+                        clientName: quoteData.client_name,
+                        clientEmail: quoteData.client_email,
+                        projectName: quoteData.project_name,
+                        checkType: 'availability'
+                    })
+                });
+
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('Error checking calendar availability:', error);
+                // Default to available if webhook fails
+                return { available: true };
+            }
+        }
+
         // Approve quote
         async function approveQuote() {
             const button = document.getElementById('approve-button');
@@ -505,8 +566,24 @@
                     throw new Error(data.error || 'Failed to approve quote');
                 }
 
-                // Show success state
-                showApprovedState(data.approvedAt);
+                // Trigger confetti animation
+                createConfetti();
+
+                // Check calendar availability
+                button.textContent = 'Verificando disponibilidade...';
+                const availabilityResult = await checkCalendarAvailability(data.quote);
+
+                if (availabilityResult.available) {
+                    // Redirect to thank you page
+                    setTimeout(() => {
+                        window.location.href = `/obrigado?quote=${slug}`;
+                    }, 2000);
+                } else {
+                    // Redirect to alternative dates page
+                    setTimeout(() => {
+                        window.location.href = `/escolher-data?quote=${slug}&alternatives=${encodeURIComponent(JSON.stringify(availabilityResult.alternatives || []))}`;
+                    }, 2000);
+                }
 
             } catch (error) {
                 console.error('Error approving quote:', error);

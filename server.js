@@ -2257,6 +2257,16 @@ app.get('/quote/:slug', (req, res) => {
   res.sendFile(path.join(__dirname, 'quote.html'));
 });
 
+// Serve thank you page
+app.get('/obrigado', (req, res) => {
+  res.sendFile(path.join(__dirname, 'obrigado.html'));
+});
+
+// Serve alternative date selection page
+app.get('/escolher-data', (req, res) => {
+  res.sendFile(path.join(__dirname, 'escolher-data.html'));
+});
+
 // Debug endpoint to test slug parsing
 app.get('/api/debug/slug/:slug', async (req, res) => {
   const { slug } = req.params;

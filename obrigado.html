@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obrigado - Proposta Aprovada | ONAV</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .success-animation {
+            animation: bounceIn 0.8s ease-out;
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .checkmark {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #4ade80;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(74, 222, 128, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center success-animation">
+        <div class="checkmark">
+            <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+        
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">Obrigado!</h1>
+        <p class="text-gray-600 mb-6">Sua proposta foi aprovada com sucesso!</p>
+        
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-green-800 font-medium">Data disponível confirmada</span>
+            </div>
+            <p class="text-green-700 text-sm mt-2">Nosso estúdio está livre na data solicitada. Em breve entraremos em contato com mais detalhes.</p>
+        </div>
+        
+        <div class="space-y-4">
+            <div class="text-sm text-gray-500">
+                <p><strong>Próximos passos:</strong></p>
+                <ul class="mt-2 space-y-1 text-left">
+                    <li>• Contato em até 24 horas</li>
+                    <li>• Confirmação de detalhes técnicos</li>
+                    <li>• Agendamento de briefing</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="mt-8 pt-6 border-t border-gray-200">
+            <a href="/" class="inline-flex items-center justify-center w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Voltar ao início
+            </a>
+        </div>
+        
+        <div class="mt-4 text-xs text-gray-400">
+            <p>Proposta ID: <span id="quote-id" class="font-mono"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Get quote ID from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const quoteSlug = urlParams.get('quote');
+        
+        if (quoteSlug) {
+            document.getElementById('quote-id').textContent = quoteSlug;
+        }
+        
+        // Add some sparkle animation
+        function createSparkles() {
+            const sparkles = ['✨', '⭐', '💫', '🌟'];
+            
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const sparkle = document.createElement('div');
+                    sparkle.textContent = sparkles[Math.floor(Math.random() * sparkles.length)];
+                    sparkle.style.position = 'fixed';
+                    sparkle.style.fontSize = '20px';
+                    sparkle.style.left = Math.random() * 100 + '%';
+                    sparkle.style.top = Math.random() * 100 + '%';
+                    sparkle.style.zIndex = '9999';
+                    sparkle.style.pointerEvents = 'none';
+                    
+                    document.body.appendChild(sparkle);
+                    
+                    sparkle.animate([
+                        { transform: 'translateY(0) scale(0)', opacity: 0 },
+                        { transform: 'translateY(-20px) scale(1)', opacity: 1 },
+                        { transform: 'translateY(-40px) scale(0)', opacity: 0 }
+                    ], {
+                        duration: 2000,
+                        easing: 'ease-out'
+                    }).onfinish = () => {
+                        sparkle.remove();
+                    };
+                }, i * 300);
+            }
+        }
+        
+        // Start sparkles animation when page loads
+        setTimeout(createSparkles, 1000);
+    </script>
+</body>
+</html>

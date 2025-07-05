@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escolher Nova Data | ONAV</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            min-height: 100vh;
+        }
+        .date-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .date-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .date-card.selected {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+        }
+        .warning-icon {
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="max-w-2xl w-full bg-white rounded-2xl shadow-2xl p-8">
+        <div class="text-center mb-8">
+            <div class="warning-icon text-6xl mb-4">⚠️</div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Data Não Disponível</h1>
+            <p class="text-gray-600 mb-6">A data solicitada já está ocupada. Por favor, escolha uma das opções disponíveis abaixo:</p>
+        </div>
+
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <span class="text-red-800 font-medium">Conflito de agendamento</span>
+            </div>
+            <p class="text-red-700 text-sm mt-2">
+                A data <span id="original-date" class="font-semibold"></span> já possui um evento agendado.
+            </p>
+        </div>
+
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Escolha uma nova data:</h2>
+            <div id="alternative-dates" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Alternative dates will be populated here -->
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <button id="confirm-date" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                Confirmar Nova Data
+            </button>
+            
+            <button id="contact-us" class="w-full bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors">
+                Entrar em Contato para Discutir Outras Opções
+            </button>
+        </div>
+        
+        <div class="mt-8 pt-6 border-t border-gray-200 text-center">
+            <p class="text-sm text-gray-500 mb-4">
+                <strong>Observação:</strong> Todas as datas mostradas estão disponíveis e serão reservadas assim que confirmadas.
+            </p>
+            <div class="text-xs text-gray-400">
+                <p>Proposta ID: <span id="quote-id" class="font-mono"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedDate = null;
+        let quoteSlug = null;
+        let alternatives = [];
+
+        // Parse URL parameters
+        function parseUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            quoteSlug = urlParams.get('quote');
+            const alternativesParam = urlParams.get('alternatives');
+            
+            if (quoteSlug) {
+                document.getElementById('quote-id').textContent = quoteSlug;
+            }
+            
+            if (alternativesParam) {
+                try {
+                    alternatives = JSON.parse(decodeURIComponent(alternativesParam));
+                } catch (e) {
+                    console.error('Error parsing alternatives:', e);
+                    alternatives = [];
+                }
+            }
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            return date.toLocaleDateString('pt-BR', options);
+        }
+
+        // Create date cards
+        function createDateCards() {
+            const container = document.getElementById('alternative-dates');
+            
+            if (alternatives.length === 0) {
+                // Default alternatives if none provided
+                const today = new Date();
+                alternatives = [
+                    { date: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], available: true },
+                    { date: new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], available: true },
+                    { date: new Date(today.getTime() + 21 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], available: true }
+                ];
+            }
+            
+            alternatives.forEach((alt, index) => {
+                const card = document.createElement('div');
+                card.className = 'date-card bg-white border-2 border-gray-200 rounded-lg p-4 text-center';
+                card.dataset.date = alt.date;
+                
+                card.innerHTML = `
+                    <div class="text-2xl mb-2">📅</div>
+                    <div class="font-semibold text-gray-800">${formatDate(alt.date)}</div>
+                    <div class="text-sm text-gray-500 mt-1">Disponível</div>
+                `;
+                
+                card.addEventListener('click', () => selectDate(alt.date, card));
+                container.appendChild(card);
+            });
+        }
+
+        // Select date
+        function selectDate(date, cardElement) {
+            // Remove selection from other cards
+            document.querySelectorAll('.date-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Select this card
+            cardElement.classList.add('selected');
+            selectedDate = date;
+            
+            // Enable confirm button
+            document.getElementById('confirm-date').disabled = false;
+        }
+
+        // Confirm new date
+        async function confirmNewDate() {
+            if (!selectedDate || !quoteSlug) return;
+            
+            const confirmBtn = document.getElementById('confirm-date');
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Confirmando...';
+            
+            try {
+                // Send webhook to update the date
+                const webhookUrl = 'https://n8n.avauto.fun/webhook-test/eab92d5a-c6ee-4c74-9b52-e89997dd4205';
+                
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        quoteSlug: quoteSlug,
+                        newDate: selectedDate,
+                        checkType: 'reschedule'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success !== false) {
+                    // Redirect to thank you page
+                    window.location.href = `/obrigado?quote=${quoteSlug}&rescheduled=true`;
+                } else {
+                    throw new Error('Failed to reschedule');
+                }
+                
+            } catch (error) {
+                console.error('Error confirming new date:', error);
+                alert('Erro ao confirmar nova data. Tente novamente.');
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Confirmar Nova Data';
+            }
+        }
+
+        // Contact us
+        function contactUs() {
+            window.location.href = `/contato?quote=${quoteSlug}&issue=date_conflict`;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            parseUrlParams();
+            createDateCards();
+            
+            // Add event listeners
+            document.getElementById('confirm-date').addEventListener('click', confirmNewDate);
+            document.getElementById('contact-us').addEventListener('click', contactUs);
+        });
+    </script>
+</body>
+</html>
