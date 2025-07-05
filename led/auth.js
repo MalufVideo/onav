@@ -25,116 +25,28 @@ async function initAuth() {
       // Use the global supabase object created by the UMD bundle
       if (typeof supabase === 'undefined' || supabase === null) {
         if (typeof window.supabaseClient !== 'undefined') {
-          supabase = window.supabaseClient.createClient(supabaseUrl, supabaseKey, {
-            auth: {
-              persistSession: true,
-              autoRefreshToken: true,
-              detectSessionInUrl: true,
-              storage: window.localStorage
-            }
-          });
+          supabase = window.supabaseClient.createClient(supabaseUrl, supabaseKey);
         } else if (typeof window.supabase !== 'undefined') {
-          supabase = window.supabase.createClient(supabaseUrl, supabaseKey, {
-            auth: {
-              persistSession: true,
-              autoRefreshToken: true,
-              detectSessionInUrl: true,
-              storage: window.localStorage
-            }
-          });
+          supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
         } else {
           console.error('Could not find Supabase client library. Make sure it\'s properly loaded.');
           return;
         }
       }
       
-      // Set up auth state change listener FIRST (before checking session)
-      supabase.auth.onAuthStateChange(async (event, session) => {
-        const previousUser = currentUser;
-        currentUser = session?.user || null;
-        
-        console.log('Auth state changed:', event, currentUser ? currentUser.email : 'null');
-        
-        // Only update UI if user actually changed
-        if (!previousUser && currentUser) {
-          console.log('User logged in:', currentUser.email);
-        } else if (previousUser && !currentUser) {
-          console.log('User logged out');
-        }
-        
+      // Check for existing session
+      const { data } = await supabase.auth.getSession();
+      if (data?.session) {
+        currentUser = data.session.user;
         notifyListeners();
-        
-        // Handle successful confirmation
-        if (event === 'SIGNED_IN' && session?.user) {
-          console.log('User confirmed and signed in automatically!');
-          
-          // Check if this is an email confirmation (has hash tokens)
-          const isEmailConfirmation = window.location.hash.includes('access_token');
-          
-          if (isEmailConfirmation) {
-            showSuccessMessage('Email confirmado! Você está logado e pode usar o calculador.');
-            // Clear the URL hash to remove confirmation tokens
-            window.history.replaceState(null, null, window.location.pathname);
-            // Don't trigger role-based redirect for email confirmations
-          } else {
-            // This is a regular login, allow role-based redirect
-            setTimeout(() => {
-              redirectBasedOnRole(true);
-            }, 500);
-          }
-        }
-        
-        // Handle token refresh
-        if (event === 'TOKEN_REFRESHED') {
-          console.log('Token refreshed successfully');
-        }
-        
-        // Handle session recovery
-        if (event === 'INITIAL_SESSION' && session?.user) {
-          console.log('Session recovered from storage:', session.user.email);
-        }
-      });
-      
-      // Handle email confirmation on page load
-      await handleEmailConfirmation();
-      
-      // Force session recovery with retry mechanism
-      let sessionRecovered = false;
-      let attempts = 0;
-      const maxAttempts = 3;
-      
-      while (!sessionRecovered && attempts < maxAttempts) {
-        attempts++;
-        console.log(`Attempting to recover session (attempt ${attempts}/${maxAttempts})`);
-        
-        try {
-          const { data, error } = await supabase.auth.getSession();
-          
-          if (error) {
-            console.warn(`Session recovery attempt ${attempts} failed:`, error);
-            if (attempts === maxAttempts) {
-              console.log('No session could be recovered after all attempts');
-            }
-          } else if (data?.session?.user) {
-            currentUser = data.session.user;
-            console.log('Session successfully recovered for:', currentUser.email);
-            sessionRecovered = true;
-            notifyListeners();
-          } else {
-            console.log(`No session found on attempt ${attempts}`);
-            if (attempts === maxAttempts) {
-              console.log('No existing session found after all attempts');
-            }
-          }
-        } catch (sessionError) {
-          console.warn(`Session recovery attempt ${attempts} error:`, sessionError);
-        }
-        
-        // Wait a bit before retrying (except on last attempt)
-        if (!sessionRecovered && attempts < maxAttempts) {
-          await new Promise(resolve => setTimeout(resolve, 200));
-        }
       }
+      
+      // Set up auth state change listener
+      supabase.auth.onAuthStateChange((event, session) => {
+        currentUser = session?.user || null;
+        notifyListeners();
+        console.log('Auth state changed:', event, currentUser);
+      });
     } else {
       console.error('Supabase API key not found. Make sure auth-config.js is properly configured.');
     }
@@ -177,7 +89,6 @@ async function signUp(email, password, userData = {}) {
       email,
       password,
       options: {
-        emailRedirectTo: 'https://onav.com.br/led/',
         data: {
           name: name || '',
           company: company || '',
@@ -246,9 +157,9 @@ async function signIn(email, password) {
         console.warn('Error updating last login:', updateError);
       }
       
-      // Auto-redirect based on role after successful login (only for direct login, not email confirmation)
+      // Auto-redirect based on role after successful login
       setTimeout(() => {
-        redirectBasedOnRole(false); // false = don't redirect if on same domain
+        redirectBasedOnRole();
       }, 1000); // Small delay to ensure auth state is updated
     }
     
@@ -275,29 +186,12 @@ async function signOut() {
 
 // Get current user
 function getCurrentUser() {
-  // If no current user, try to recover from localStorage as backup
-  if (!currentUser && typeof window !== 'undefined') {
-    try {
-      const storedSession = localStorage.getItem('supabase.auth.token');
-      if (storedSession) {
-        const sessionData = JSON.parse(storedSession);
-        if (sessionData?.user && sessionData?.expires_at && new Date(sessionData.expires_at * 1000) > new Date()) {
-          console.log('Found valid session in localStorage:', sessionData.user.email);
-          currentUser = sessionData.user;
-          notifyListeners();
-        }
-      }
-    } catch (error) {
-      console.warn('Error recovering session from localStorage:', error);
-    }
-  }
   return currentUser;
 }
 
 // Check if user is authenticated
 function isAuthenticated() {
-  // Use getCurrentUser() which has fallback recovery logic
-  return !!getCurrentUser();
+  return !!currentUser;
 }
 
 // Subscribe to auth state changes
@@ -382,7 +276,7 @@ async function hasRole(role) {
 }
 
 // Role-based redirect after login
-async function redirectBasedOnRole(forceRedirect = true) {
+async function redirectBasedOnRole() {
   if (!currentUser) return;
   
   try {
@@ -395,163 +289,16 @@ async function redirectBasedOnRole(forceRedirect = true) {
       'nelson@avdesign.video'
     ];
     
-    // Get current page to avoid unnecessary redirects
-    const currentPath = window.location.pathname;
-    const isOnLedCalculator = currentPath.includes('/led/') && 
-                             (currentPath.includes('index.html') || 
-                              currentPath.includes('my-quotes.html') || 
-                              currentPath.endsWith('/led/'));
-    
     if (masterAdminEmails.includes(currentUser.email) || userRole === 'admin' || userRole === 'sales_rep') {
-      // Only redirect admins if they're not already on a valid LED page and forceRedirect is true
-      if (forceRedirect && !currentPath.includes('/admin/')) {
-        window.location.href = '/admin/dashboard.html';
-      }
+      // Redirect to dashboard for admin/sales rep
+      window.location.href = '/admin/dashboard.html';
     } else {
-      // End users - stay where they are if they're already on LED pages
-      if (isOnLedCalculator) {
-        console.log('End user - staying on current LED page');
-      } else if (forceRedirect) {
-        // Only redirect if not already on LED pages
-        console.log('End user - redirecting to calculator');
-        window.location.href = '/led/index.html';
-      }
+      // Stay in calculator for end users/clients
+      console.log('End user - staying in calculator');
     }
   } catch (error) {
     console.error('Error checking user role for redirect:', error);
-    // Default to staying on current page on error
-  }
-}
-
-// Handle email confirmation from URL hash
-async function handleEmailConfirmation() {
-  if (!supabase) return;
-  
-  try {
-    // Check for confirmation tokens in URL hash
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const access_token = hashParams.get('access_token');
-    const refresh_token = hashParams.get('refresh_token');
-    const type = hashParams.get('type');
-    
-    if (access_token && refresh_token && type) {
-      console.log('Email confirmation tokens found, processing...');
-      
-      // Set the session using the tokens from the URL
-      const { data, error } = await supabase.auth.setSession({
-        access_token,
-        refresh_token
-      });
-      
-      if (error) {
-        console.error('Error confirming email:', error);
-        showErrorMessage('Erro ao confirmar email. Tente novamente.');
-      } else if (data.user) {
-        console.log('Email confirmation successful!');
-        // The auth state change listener will handle the success message
-        return true;
-      }
-    }
-  } catch (error) {
-    console.error('Error handling email confirmation:', error);
-  }
-  
-  return false;
-}
-
-// Show success message
-function showSuccessMessage(message) {
-  // Create or update success message element
-  let messageEl = document.getElementById('auth-success-message');
-  if (!messageEl) {
-    messageEl = document.createElement('div');
-    messageEl.id = 'auth-success-message';
-    messageEl.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background-color: #10b981;
-      color: white;
-      padding: 15px 20px;
-      border-radius: 8px;
-      z-index: 10000;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      max-width: 300px;
-      font-family: Arial, sans-serif;
-    `;
-    document.body.appendChild(messageEl);
-  }
-  
-  messageEl.textContent = message;
-  messageEl.style.display = 'block';
-  
-  // Auto-hide after 5 seconds
-  setTimeout(() => {
-    if (messageEl) {
-      messageEl.style.display = 'none';
-    }
-  }, 5000);
-}
-
-// Show error message
-function showErrorMessage(message) {
-  // Create or update error message element
-  let messageEl = document.getElementById('auth-error-message');
-  if (!messageEl) {
-    messageEl = document.createElement('div');
-    messageEl.id = 'auth-error-message';
-    messageEl.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background-color: #ef4444;
-      color: white;
-      padding: 15px 20px;
-      border-radius: 8px;
-      z-index: 10000;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      max-width: 300px;
-      font-family: Arial, sans-serif;
-    `;
-    document.body.appendChild(messageEl);
-  }
-  
-  messageEl.textContent = message;
-  messageEl.style.display = 'block';
-  
-  // Auto-hide after 5 seconds
-  setTimeout(() => {
-    if (messageEl) {
-      messageEl.style.display = 'none';
-    }
-  }, 5000);
-}
-
-// Force session refresh
-async function refreshSession() {
-  if (!supabase) {
-    console.warn('Supabase client not initialized');
-    return false;
-  }
-  
-  try {
-    const { data, error } = await supabase.auth.refreshSession();
-    if (error) {
-      console.warn('Session refresh failed:', error);
-      return false;
-    }
-    
-    if (data?.session?.user) {
-      currentUser = data.session.user;
-      console.log('Session refreshed for:', currentUser.email);
-      notifyListeners();
-      return true;
-    }
-    
-    return false;
-  } catch (error) {
-    console.error('Error refreshing session:', error);
-    return false;
+    // Default to calculator on error
   }
 }
 
@@ -567,9 +314,5 @@ window.auth = {
   getSupabaseClient,
   getUserProfile,
   hasRole,
-  redirectBasedOnRole,
-  handleEmailConfirmation,
-  showSuccessMessage,
-  showErrorMessage,
-  refreshSession
+  redirectBasedOnRole
 };
