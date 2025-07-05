@@ -507,10 +507,58 @@ async function showQuoteDetails(quote) {
       
       newApproveBtn.addEventListener('click', async (event) => {
           const proposalIdToApprove = event.target.dataset.proposalId;
-          alert(`Funcionalidade de aprovar proposta (${proposalIdToApprove}) ainda não implementada.`);
-          // TODO: Implement approval logic - call Supabase function or update status
-          // e.g., await window.quoteService.updateProposalStatus(proposalId, 'approved');
-          // Close modal and refresh list?
+          
+          // Disable button and show loading state
+          newApproveBtn.disabled = true;
+          newApproveBtn.textContent = 'Aprovando...';
+          
+          try {
+              // Call the quote approval API
+              const response = await fetch(`/api/quotes/approve/quote-${proposalIdToApprove}`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  }
+              });
+              
+              const data = await response.json();
+              
+              if (!response.ok) {
+                  throw new Error(data.error || 'Failed to approve quote');
+              }
+              
+              // Trigger confetti animation
+              createConfettiEffect();
+              
+              // Check calendar availability
+              newApproveBtn.textContent = 'Verificando disponibilidade...';
+              const availabilityResult = await checkCalendarAvailability(data.quote);
+              
+              // Close modal first
+              const modal = document.getElementById('quote-details-modal');
+              if (modal) {
+                  modal.style.display = 'none';
+                  document.body.style.overflow = '';
+              }
+              
+              if (availabilityResult.available) {
+                  // Redirect to thank you page
+                  setTimeout(() => {
+                      window.location.href = `/obrigado?quote=quote-${proposalIdToApprove}`;
+                  }, 2000);
+              } else {
+                  // Redirect to alternative dates page
+                  setTimeout(() => {
+                      window.location.href = `/escolher-data?quote=quote-${proposalIdToApprove}&alternatives=${encodeURIComponent(JSON.stringify(availabilityResult.alternatives || []))}`;
+                  }, 2000);
+              }
+              
+          } catch (error) {
+              console.error('Error approving quote:', error);
+              alert('Erro ao aprovar proposta. Tente novamente.');
+              newApproveBtn.disabled = false;
+              newApproveBtn.textContent = 'Aprovar Orçamento';
+          }
       });
   }
 }
