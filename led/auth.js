@@ -38,25 +38,50 @@ async function initAuth() {
       await handleEmailConfirmation();
       
       // Check for existing session
-      const { data } = await supabase.auth.getSession();
-      if (data?.session) {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        console.warn('Error getting session:', error);
+      } else if (data?.session?.user) {
         currentUser = data.session.user;
+        console.log('Existing session found for:', currentUser.email);
         notifyListeners();
+      } else {
+        console.log('No existing session found');
       }
       
       // Set up auth state change listener
       supabase.auth.onAuthStateChange((event, session) => {
+        const previousUser = currentUser;
         currentUser = session?.user || null;
+        
+        console.log('Auth state changed:', event, currentUser ? currentUser.email : 'null');
+        
+        // Only update UI if user actually changed
+        if (!previousUser && currentUser) {
+          console.log('User logged in:', currentUser.email);
+        } else if (previousUser && !currentUser) {
+          console.log('User logged out');
+        }
+        
         notifyListeners();
-        console.log('Auth state changed:', event, currentUser);
         
         // Handle successful confirmation
         if (event === 'SIGNED_IN' && session?.user) {
           console.log('User confirmed and signed in automatically!');
-          showSuccessMessage('Email confirmado! Você está logado e pode usar o calculador.');
-          // Clear the URL hash to remove confirmation tokens
-          if (window.location.hash) {
+          
+          // Check if this is an email confirmation (has hash tokens)
+          const isEmailConfirmation = window.location.hash.includes('access_token');
+          
+          if (isEmailConfirmation) {
+            showSuccessMessage('Email confirmado! Você está logado e pode usar o calculador.');
+            // Clear the URL hash to remove confirmation tokens
             window.history.replaceState(null, null, window.location.pathname);
+            // Don't trigger role-based redirect for email confirmations
+          } else {
+            // This is a regular login, allow role-based redirect
+            setTimeout(() => {
+              redirectBasedOnRole(true);
+            }, 500);
           }
         }
       });
@@ -171,9 +196,9 @@ async function signIn(email, password) {
         console.warn('Error updating last login:', updateError);
       }
       
-      // Auto-redirect based on role after successful login
+      // Auto-redirect based on role after successful login (only for direct login, not email confirmation)
       setTimeout(() => {
-        redirectBasedOnRole();
+        redirectBasedOnRole(false); // false = don't redirect if on same domain
       }, 1000); // Small delay to ensure auth state is updated
     }
     
@@ -290,7 +315,7 @@ async function hasRole(role) {
 }
 
 // Role-based redirect after login
-async function redirectBasedOnRole() {
+async function redirectBasedOnRole(forceRedirect = true) {
   if (!currentUser) return;
   
   try {
@@ -303,16 +328,31 @@ async function redirectBasedOnRole() {
       'nelson@avdesign.video'
     ];
     
+    // Get current page to avoid unnecessary redirects
+    const currentPath = window.location.pathname;
+    const isOnLedCalculator = currentPath.includes('/led/') && 
+                             (currentPath.includes('index.html') || 
+                              currentPath.includes('my-quotes.html') || 
+                              currentPath.endsWith('/led/'));
+    
     if (masterAdminEmails.includes(currentUser.email) || userRole === 'admin' || userRole === 'sales_rep') {
-      // Redirect to dashboard for admin/sales rep
-      window.location.href = '/admin/dashboard.html';
+      // Only redirect admins if they're not already on a valid LED page and forceRedirect is true
+      if (forceRedirect && !currentPath.includes('/admin/')) {
+        window.location.href = '/admin/dashboard.html';
+      }
     } else {
-      // Stay in calculator for end users/clients
-      console.log('End user - staying in calculator');
+      // End users - stay where they are if they're already on LED pages
+      if (isOnLedCalculator) {
+        console.log('End user - staying on current LED page');
+      } else if (forceRedirect) {
+        // Only redirect if not already on LED pages
+        console.log('End user - redirecting to calculator');
+        window.location.href = '/led/index.html';
+      }
     }
   } catch (error) {
     console.error('Error checking user role for redirect:', error);
-    // Default to calculator on error
+    // Default to staying on current page on error
   }
 }
 
