@@ -136,12 +136,13 @@
 
         // Format date for display
         function formatDate(dateString) {
-            const date = new Date(dateString);
+            const date = new Date(dateString + 'T00:00:00');
             const options = { 
                 weekday: 'long', 
                 year: 'numeric', 
                 month: 'long', 
-                day: 'numeric' 
+                day: 'numeric',
+                timeZone: 'America/Sao_Paulo'
             };
             return date.toLocaleDateString('pt-BR', options);
         }
@@ -355,15 +356,14 @@
             
             const confirmBtn = document.getElementById('confirm-date');
             confirmBtn.disabled = true;
-            confirmBtn.textContent = 'Confirmando...';
+            confirmBtn.textContent = 'Verificando disponibilidade...';
             
             try {
-                // Send webhook to update the date
+                // Send webhook to check availability and reschedule
                 const webhookUrl = 'https://n8n.avauto.fun/webhook/aa75ba5d-3766-45d6-a1dc-059b86bf3f05';
                 
                 const response = await fetch(webhookUrl, {
                     method: 'POST',
-                    mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -378,23 +378,61 @@
                     })
                 });
                 
-                // With no-cors mode, we can't read the response
-                // So we'll redirect to thank you page and let the backend handle the logic
-                setTimeout(() => {
+                const result = await response.json();
+                
+                // Handle different response formats
+                let success = false;
+                let errorMessage = 'Erro ao confirmar nova data';
+                
+                if (result === true || result.success === true) {
+                    success = true;
+                } else if (Array.isArray(result) && result.length > 0) {
+                    success = result[0].available === true;
+                    errorMessage = result[0].conflict_reason || 'Essa data também está ocupada, escolher uma outra data';
+                } else if (typeof result === 'object' && result.available === true) {
+                    success = true;
+                } else if (typeof result === 'object' && result.conflict_reason) {
+                    errorMessage = result.conflict_reason;
+                } else if (typeof result === 'object' && result.available === false) {
+                    errorMessage = 'Essa data também está ocupada, escolher uma outra data';
+                }
+                
+                if (success) {
+                    // Redirect to thank you page
                     window.location.href = `/obrigado.html?quote=${quoteSlug}&rescheduled=true`;
-                }, 1000);
+                } else {
+                    // Show error message and allow user to try again
+                    showOccupiedDateMessage(errorMessage);
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = 'Confirmar Nova Data';
+                    
+                    // Reset the date picker
+                    document.getElementById('new-date').value = '';
+                    document.getElementById('availability-status').classList.add('hidden');
+                    document.getElementById('date-range-display').classList.add('hidden');
+                    selectedDate = null;
+                }
                 
             } catch (error) {
                 console.error('Error confirming new date:', error);
                 
-                // Try form submission as fallback
-                try {
-                    await submitConfirmationViaForm();
-                    setTimeout(() => {
-                        window.location.href = `/obrigado.html?quote=${quoteSlug}&rescheduled=true`;
-                    }, 1000);
-                } catch (formError) {
-                    console.error('Form submission failed:', formError);
+                // If CORS error, try form submission
+                if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
+                    try {
+                        await submitConfirmationViaForm();
+                        confirmBtn.textContent = 'Aguardando resposta...';
+                        
+                        // Wait a bit longer for form submission to process
+                        setTimeout(() => {
+                            window.location.href = `/obrigado.html?quote=${quoteSlug}&rescheduled=true`;
+                        }, 3000);
+                    } catch (formError) {
+                        console.error('Form submission failed:', formError);
+                        alert('Erro ao confirmar nova data. Tente novamente.');
+                        confirmBtn.disabled = false;
+                        confirmBtn.textContent = 'Confirmar Nova Data';
+                    }
+                } else {
                     alert('Erro ao confirmar nova data. Tente novamente.');
                     confirmBtn.disabled = false;
                     confirmBtn.textContent = 'Confirmar Nova Data';
@@ -441,7 +479,7 @@
         function showDateRange(startDate) {
             if (!quoteData || !quoteData.shooting_days) return;
             
-            const start = new Date(startDate);
+            const start = new Date(startDate + 'T00:00:00');
             const shootingDays = parseInt(quoteData.shooting_days) || 1;
             const end = new Date(start);
             end.setDate(end.getDate() + shootingDays - 1);
