@@ -53,8 +53,8 @@ body {
 
 /* Button Styles */
 .btn-primary {
-    background: linear-gradient(135deg, #00ff9d 0%, #00cc7a 100%);
-    color: #000;
+    background: linear-gradient(90deg, #00ff9d, #0066ff);
+    color: #050505;
     padding: 12px 24px;
     border-radius: 6px;
     font-weight: 600;
@@ -64,14 +64,14 @@ body {
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #00cc7a 0%, #00ff9d 100%);
+    opacity: 0.9;
+    box-shadow: 0 5px 15px rgba(0, 255, 157, 0.3);
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 255, 157, 0.3);
 }
 
 .btn-secondary {
-    background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
-    color: #fff;
+    border: 2px solid #00ff9d;
+    color: #00ff9d;
     padding: 12px 24px;
     border-radius: 6px;
     font-weight: 600;
@@ -81,9 +81,8 @@ body {
 }
 
 .btn-secondary:hover {
-    background: linear-gradient(135deg, #0052cc 0%, #0066ff 100%);
+    background-color: rgba(0, 255, 157, 0.1);
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 102, 255, 0.3);
 }
 
 /* Text Gradients */

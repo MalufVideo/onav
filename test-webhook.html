@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Webhook - ONAV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .json-display {
+            background: #1e293b;
+            color: #e2e8f0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        .response-display {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .loading {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-4xl mx-auto px-4">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4">
+                <h1 class="text-2xl font-bold text-white">Teste de Webhook - n8n</h1>
+                <p class="text-blue-100 mt-1">Teste a integração com o sistema de calendário</p>
+            </div>
+            
+            <div class="p-6">
+                <!-- Webhook URL Configuration -->
+                <div class="mb-6">
+                    <label for="webhook-url" class="block text-sm font-medium text-gray-700 mb-2">
+                        URL do Webhook:
+                    </label>
+                    <input 
+                        type="url" 
+                        id="webhook-url" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="https://n8n.avauto.fun/webhook-test/eab92d5a-c6ee-4c74-9b52-e89997dd4205"
+                        placeholder="https://n8n.avauto.fun/webhook-test/..."
+                    >
+                </div>
+
+                <!-- Test Type Selection -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Tipo de Teste:
+                    </label>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <button 
+                            onclick="sendTestPayload('availability')" 
+                            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                            Verificar Disponibilidade
+                        </button>
+                        <button 
+                            onclick="sendTestPayload('reschedule')" 
+                            class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
+                            Reagendar Data
+                        </button>
+                        <button 
+                            onclick="sendTestPayload('approval')" 
+                            class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
+                            Aprovação de Proposta
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Custom Date Selection -->
+                <div class="mb-6">
+                    <label for="test-date" class="block text-sm font-medium text-gray-700 mb-2">
+                        Data para Teste:
+                    </label>
+                    <input 
+                        type="date" 
+                        id="test-date" 
+                        class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value="2025-07-14"
+                    >
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading-state" class="hidden mb-6">
+                    <div class="flex items-center justify-center py-8">
+                        <div class="loading w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mr-3"></div>
+                        <span class="text-gray-600">Enviando requisição...</span>
+                    </div>
+                </div>
+
+                <!-- Payload Display -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Payload Enviado:</h3>
+                    <div class="json-display p-4 rounded-md" id="payload-display">
+                        Selecione um tipo de teste acima para ver o payload...
+                    </div>
+                </div>
+
+                <!-- Response Display -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Resposta do Webhook:</h3>
+                    <div class="response-display p-4 rounded-md min-h-24" id="response-display">
+                        Aguardando resposta...
+                    </div>
+                </div>
+
+                <!-- Status Display -->
+                <div id="status-display" class="hidden">
+                    <div class="border-t pt-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-500">Status da Requisição:</span>
+                            <span id="status-code" class="px-2 py-1 rounded text-xs font-medium"></span>
+                        </div>
+                        <div class="mt-2">
+                            <span class="text-sm text-gray-500">Tempo de Resposta:</span>
+                            <span id="response-time" class="text-sm font-medium text-gray-700 ml-2"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample quote data for testing
+        const sampleQuoteData = {
+            "id": "4a2d379d-3e3d-4b77-887d-0772af1ae858",
+            "user_id": "ef32731a-54fc-48de-baf3-7bbec73040af",
+            "created_at": "2025-07-05T23:23:42.386734+00:00",
+            "updated_at": "2025-07-05T23:23:42.386734+00:00",
+            "status": "approved",
+            "project_name": "Teste de Webhook",
+            "client_name": "Cliente Teste",
+            "client_company": "Empresa Teste",
+            "client_email": "teste@exemplo.com",
+            "client_phone": "11999999999",
+            "shooting_dates_start": "2025-07-14",
+            "shooting_dates_end": "2025-07-17",
+            "days_count": 4,
+            "led_configuration": {
+                "principal": {
+                    "width": "20",
+                    "height": "5",
+                    "curvature": 5,
+                    "modules": 400,
+                    "resolution": "",
+                    "pixels_width": 7680,
+                    "pixels_height": 1920,
+                    "total_pixels": 14745600,
+                    "power_max": "69000",
+                    "power_avg": "23000",
+                    "weight": "3000"
+                },
+                "teto": {
+                    "width": "8",
+                    "height": "6",
+                    "modules": 192,
+                    "pixels_width": 3072,
+                    "pixels_height": 2304,
+                    "total_pixels": 7077888,
+                    "power_max": "33120",
+                    "power_avg": "11040",
+                    "weight": "1440",
+                    "resolution": ""
+                }
+            },
+            "production_type": {
+                "selected_pod_type": "2d",
+                "studio_size": null
+            },
+            "pricing": {
+                "daily_rate": "101140",
+                "discounted_daily_rate": null,
+                "total_price": "R$ 262.964,00",
+                "original_total_price": "404560",
+                "discount_percentage": "35",
+                "discount_amount": "141596.00",
+                "discount_reason": null
+            },
+            "selected_services": [
+                {
+                    "name": "Módulos LED (592 Unidades)",
+                    "quantity": 592,
+                    "unit_price": 85,
+                    "daily_subtotal": 50320,
+                    "total_subtotal": 201280
+                },
+                {
+                    "name": "Processadores MX-40 Pro",
+                    "quantity": 2,
+                    "unit_price": 1890,
+                    "daily_subtotal": 3780,
+                    "total_subtotal": 15120
+                },
+                {
+                    "name": "Disguise VX4n",
+                    "quantity": 1,
+                    "unit_price": 10000,
+                    "daily_subtotal": 10000,
+                    "total_subtotal": 40000
+                }
+            ],
+            "approval_details": {
+                "quote_approved": true,
+                "quote_approved_at": "2025-07-05T23:35:17.798924+00:00",
+                "quote_approval_ip": "179.160.124.111",
+                "approved_by": "client"
+            }
+        };
+
+        // Create test payload based on type
+        function createTestPayload(testType) {
+            const selectedDate = document.getElementById('test-date').value;
+            const basePayload = {
+                checkType: testType,
+                webhookUrl: document.getElementById('webhook-url').value,
+                requestTimestamp: new Date().toISOString(),
+                quoteId: sampleQuoteData.id,
+                slug: `quote-${sampleQuoteData.id}`,
+                clientName: sampleQuoteData.client_name,
+                clientEmail: sampleQuoteData.client_email,
+                projectName: sampleQuoteData.project_name,
+                shootingDate: selectedDate,
+                quoteData: sampleQuoteData,
+                calculated_totals: {
+                    daily_equipment_total: 101140,
+                    total_before_discount: 404560,
+                    discount_amount: 141596,
+                    final_total: 262964,
+                    final_total_formatted: "R$ 262.964,00",
+                    total_days: 4,
+                    discount_percentage: 35
+                },
+                studio_requirements: {
+                    led_total_modules: 592,
+                    led_total_pixels: 21823488,
+                    total_power_consumption: {
+                        max_watts: 102120,
+                        avg_watts: 34040
+                    },
+                    total_weight_kg: 4440,
+                    space_requirements: {
+                        principal_area_sqm: 100,
+                        teto_area_sqm: 48,
+                        total_led_area_sqm: 148
+                    }
+                },
+                calendar_check: {
+                    requested_start_date: selectedDate,
+                    requested_end_date: selectedDate,
+                    duration_days: 1,
+                    check_type: "studio_availability",
+                    timezone: "America/Sao_Paulo"
+                }
+            };
+
+            // Add specific fields based on test type
+            if (testType === 'reschedule') {
+                basePayload.newDate = selectedDate;
+                basePayload.originalShootingDate = sampleQuoteData.shooting_dates_start;
+                basePayload.requestType = 'reschedule';
+            } else if (testType === 'availability') {
+                basePayload.requestType = 'date_check';
+            } else if (testType === 'approval') {
+                basePayload.requestType = 'quote_approval';
+            }
+
+            return basePayload;
+        }
+
+        // Send test payload
+        async function sendTestPayload(testType) {
+            const webhookUrl = document.getElementById('webhook-url').value;
+            
+            if (!webhookUrl) {
+                alert('Por favor, insira uma URL de webhook válida.');
+                return;
+            }
+
+            const payload = createTestPayload(testType);
+            
+            // Display payload
+            document.getElementById('payload-display').textContent = JSON.stringify(payload, null, 2);
+            
+            // Show loading state
+            document.getElementById('loading-state').classList.remove('hidden');
+            document.getElementById('response-display').textContent = 'Enviando requisição...';
+            document.getElementById('status-display').classList.add('hidden');
+            
+            const startTime = Date.now();
+            
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+                
+                let responseData;
+                const contentType = response.headers.get('content-type');
+                
+                if (contentType && contentType.includes('application/json')) {
+                    responseData = await response.json();
+                } else {
+                    responseData = await response.text();
+                }
+                
+                // Display response
+                document.getElementById('response-display').textContent = 
+                    typeof responseData === 'string' ? responseData : JSON.stringify(responseData, null, 2);
+                
+                // Update status
+                const statusCode = document.getElementById('status-code');
+                statusCode.textContent = `${response.status} ${response.statusText}`;
+                statusCode.className = `px-2 py-1 rounded text-xs font-medium ${
+                    response.ok ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }`;
+                
+                document.getElementById('response-time').textContent = `${responseTime}ms`;
+                document.getElementById('status-display').classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('Erro ao enviar webhook:', error);
+                document.getElementById('response-display').textContent = `Erro: ${error.message}`;
+                
+                const statusCode = document.getElementById('status-code');
+                statusCode.textContent = 'Erro de Rede';
+                statusCode.className = 'px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800';
+                
+                document.getElementById('response-time').textContent = 'N/A';
+                document.getElementById('status-display').classList.remove('hidden');
+            } finally {
+                // Hide loading state
+                document.getElementById('loading-state').classList.add('hidden');
+            }
+        }
+
+        // Set minimum date to today
+        document.addEventListener('DOMContentLoaded', () => {
+            const dateInput = document.getElementById('test-date');
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.min = today;
+        });
+    </script>
+</body>
+</html>

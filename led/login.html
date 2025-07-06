@@ -201,6 +201,68 @@
       100% { transform: translate(-50%, -50%) rotate(360deg); }
     }
   </style>
+  <!-- Light theme overrides -->
+  <style>
+    /* On+Av Light Theme Styling (blue-purple gradient + white card) */
+    body {
+      background: linear-gradient(135deg, #6a8dff 0%, #9b5bff 100%);
+      color: #333333;
+    }
+
+    .login-container {
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    h1 {
+      color: #222222;
+      text-shadow: none;
+    }
+
+    label {
+      color: #555555;
+    }
+
+    input {
+      background: #f7f9ff;
+      color: #333333;
+      border: 1px solid #ccd4ff;
+    }
+
+    input::placeholder {
+      color: #888888;
+    }
+
+    input:focus {
+      border-color: #6a8dff;
+      box-shadow: 0 0 0 2px rgba(106, 141, 255, 0.2);
+      background: #ffffff;
+    }
+
+    .form-submit {
+      background: linear-gradient(135deg, #0066ff 0%, #004de6 100%);
+      color: #ffffff;
+    }
+
+    .form-submit:hover {
+      background: linear-gradient(135deg, #3384ff 0%, #0060ff 100%);
+      box-shadow: 0 4px 20px rgba(0, 102, 255, 0.3);
+    }
+
+    .toggle-form {
+      color: #666666;
+    }
+
+    .toggle-form a {
+      color: #0066ff;
+    }
+
+    .toggle-form a:hover {
+      color: #3384ff;
+    }
+  </style>
 </head>
 <body>
   <div class="login-container">
