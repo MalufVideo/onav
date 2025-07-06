@@ -674,8 +674,8 @@
                 return result;
             } catch (error) {
                 console.error('Error checking calendar availability:', error);
-                // Default to available if webhook fails
-                return { available: true };
+                // Default to unavailable if webhook fails for safety
+                return { available: false };
             }
         }
 
@@ -710,19 +710,28 @@
                 console.log('Webhook response:', availabilityResult);
                 console.log('Response type:', typeof availabilityResult);
                 console.log('Is array:', Array.isArray(availabilityResult));
+                console.log('Response as JSON string:', JSON.stringify(availabilityResult));
+                if (typeof availabilityResult === 'object' && availabilityResult !== null) {
+                    console.log('Object keys:', Object.keys(availabilityResult));
+                    console.log('availabilityResult.available:', availabilityResult.available);
+                }
 
                 // Handle different response formats: boolean, object, or array
                 let isAvailable = false;
                 
                 if (availabilityResult === true) {
                     isAvailable = true;
+                } else if (availabilityResult === false) {
+                    isAvailable = false;
                 } else if (Array.isArray(availabilityResult) && availabilityResult.length > 0) {
                     // Handle array format: [{"available": false}]
                     isAvailable = availabilityResult[0].available === true;
-                } else if (typeof availabilityResult === 'object' && availabilityResult.available === true) {
+                } else if (typeof availabilityResult === 'object' && availabilityResult !== null) {
                     // Handle object format: {"available": true}
-                    isAvailable = true;
+                    isAvailable = availabilityResult.available === true;
                 }
+                
+                console.log('Final isAvailable result:', isAvailable);
                 
                 if (isAvailable) {
                     // Redirect to thank you page
