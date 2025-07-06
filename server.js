@@ -2902,6 +2902,58 @@ async function sendProposalEmailNotification(proposalData, createdByUserId, curr
   }
 }
 
+// --- Webhook Proxy Endpoint ---
+// Proxy endpoint to handle webhook calls and bypass CORS
+app.post('/api/webhook-proxy', async (req, res) => {
+  try {
+    const { targetUrl, payload } = req.body;
+    
+    if (!targetUrl || !payload) {
+      return res.status(400).json({ error: 'Missing targetUrl or payload' });
+    }
+    
+    console.log('Proxying webhook to:', targetUrl);
+    console.log('Payload:', JSON.stringify(payload, null, 2));
+    
+    // Import fetch dynamically for Node.js compatibility
+    const fetch = (await import('node-fetch')).default;
+    
+    const response = await fetch(targetUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'ONAV-Webhook-Proxy/1.0'
+      },
+      body: JSON.stringify(payload)
+    });
+    
+    const responseText = await response.text();
+    console.log('Webhook response status:', response.status);
+    console.log('Webhook response:', responseText);
+    
+    // Try to parse as JSON, fallback to text
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+    } catch (e) {
+      responseData = responseText;
+    }
+    
+    res.status(response.status).json({
+      success: response.ok,
+      status: response.status,
+      data: responseData
+    });
+    
+  } catch (error) {
+    console.error('Webhook proxy error:', error);
+    res.status(500).json({ 
+      error: 'Webhook proxy failed', 
+      details: error.message 
+    });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 
 // For local development
