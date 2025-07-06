@@ -368,56 +368,92 @@
                 const endDate = new Date(startDate);
                 endDate.setDate(endDate.getDate() + shootingDays - 1);
                 
-                const response = await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
+                const payload = {
+                    checkType: 'reschedule',
+                    webhookUrl: webhookUrl,
+                    requestTimestamp: new Date().toISOString(),
+                    quoteId: quoteData.id,
+                    slug: quoteSlug,
+                    clientName: quoteData.client_name,
+                    clientEmail: quoteData.client_email,
+                    projectName: quoteData.project_name,
+                    shootingDate: selectedDate,
+                    quoteData: quoteData,
+                    calculated_totals: {
+                        daily_equipment_total: quoteData.pricing?.daily_rate || 0,
+                        total_before_discount: quoteData.pricing?.original_total_price || 0,
+                        discount_amount: quoteData.pricing?.discount_amount || 0,
+                        final_total: parseInt(quoteData.pricing?.total_price?.replace(/[^\d]/g, '') || '0'),
+                        final_total_formatted: quoteData.pricing?.total_price || 'R$ 0,00',
+                        total_days: shootingDays,
+                        discount_percentage: quoteData.pricing?.discount_percentage || 0
                     },
-                    body: JSON.stringify({
-                        checkType: 'reschedule',
-                        webhookUrl: webhookUrl,
-                        requestTimestamp: new Date().toISOString(),
-                        quoteId: quoteData.id,
-                        slug: quoteSlug,
-                        clientName: quoteData.client_name,
-                        clientEmail: quoteData.client_email,
-                        projectName: quoteData.project_name,
-                        shootingDate: selectedDate,
-                        quoteData: quoteData,
-                        calculated_totals: {
-                            daily_equipment_total: quoteData.pricing?.daily_rate || 0,
-                            total_before_discount: quoteData.pricing?.original_total_price || 0,
-                            discount_amount: quoteData.pricing?.discount_amount || 0,
-                            final_total: parseInt(quoteData.pricing?.total_price?.replace(/[^\d]/g, '') || '0'),
-                            final_total_formatted: quoteData.pricing?.total_price || 'R$ 0,00',
-                            total_days: shootingDays,
-                            discount_percentage: quoteData.pricing?.discount_percentage || 0
+                    studio_requirements: {
+                        led_total_modules: quoteData.selected_services?.find(s => s.name?.includes('Módulos LED'))?.quantity || 0,
+                        led_total_pixels: (quoteData.led_configuration?.principal?.total_pixels || 0) + (quoteData.led_configuration?.teto?.total_pixels || 0),
+                        total_power_consumption: {
+                            max_watts: parseInt(quoteData.led_configuration?.principal?.power_max || '0') + parseInt(quoteData.led_configuration?.teto?.power_max || '0'),
+                            avg_watts: parseInt(quoteData.led_configuration?.principal?.power_avg || '0') + parseInt(quoteData.led_configuration?.teto?.power_avg || '0')
                         },
-                        studio_requirements: {
-                            led_total_modules: quoteData.selected_services?.find(s => s.name?.includes('Módulos LED'))?.quantity || 0,
-                            led_total_pixels: (quoteData.led_configuration?.principal?.total_pixels || 0) + (quoteData.led_configuration?.teto?.total_pixels || 0),
-                            total_power_consumption: {
-                                max_watts: parseInt(quoteData.led_configuration?.principal?.power_max || '0') + parseInt(quoteData.led_configuration?.teto?.power_max || '0'),
-                                avg_watts: parseInt(quoteData.led_configuration?.principal?.power_avg || '0') + parseInt(quoteData.led_configuration?.teto?.power_avg || '0')
-                            },
-                            total_weight_kg: parseInt(quoteData.led_configuration?.principal?.weight || '0') + parseInt(quoteData.led_configuration?.teto?.weight || '0'),
-                            space_requirements: {
-                                principal_area_sqm: (quoteData.led_configuration?.principal?.width || 0) * (quoteData.led_configuration?.principal?.height || 0),
-                                teto_area_sqm: (quoteData.led_configuration?.teto?.width || 0) * (quoteData.led_configuration?.teto?.height || 0),
-                                total_led_area_sqm: ((quoteData.led_configuration?.principal?.width || 0) * (quoteData.led_configuration?.principal?.height || 0)) + ((quoteData.led_configuration?.teto?.width || 0) * (quoteData.led_configuration?.teto?.height || 0))
-                            }
-                        },
-                        calendar_check: {
-                            requested_start_date: selectedDate,
-                            requested_end_date: endDate.toISOString().split('T')[0],
-                            duration_days: shootingDays,
-                            check_type: 'studio_availability',
-                            timezone: 'America/Sao_Paulo'
+                        total_weight_kg: parseInt(quoteData.led_configuration?.principal?.weight || '0') + parseInt(quoteData.led_configuration?.teto?.weight || '0'),
+                        space_requirements: {
+                            principal_area_sqm: (quoteData.led_configuration?.principal?.width || 0) * (quoteData.led_configuration?.principal?.height || 0),
+                            teto_area_sqm: (quoteData.led_configuration?.teto?.width || 0) * (quoteData.led_configuration?.teto?.height || 0),
+                            total_led_area_sqm: ((quoteData.led_configuration?.principal?.width || 0) * (quoteData.led_configuration?.principal?.height || 0)) + ((quoteData.led_configuration?.teto?.width || 0) * (quoteData.led_configuration?.teto?.height || 0))
                         }
-                    })
+                    },
+                    calendar_check: {
+                        requested_start_date: selectedDate,
+                        requested_end_date: endDate.toISOString().split('T')[0],
+                        duration_days: shootingDays,
+                        check_type: 'studio_availability',
+                        timezone: 'America/Sao_Paulo'
+                    }
+                };
+                
+                console.log('Sending payload to webhook:', payload);
+                console.log('Payload size:', JSON.stringify(payload).length);
+                
+                // Try using XMLHttpRequest for better reliability
+                const result = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', webhookUrl, true);
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+                    xhr.setRequestHeader('Accept', 'application/json');
+                    
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === XMLHttpRequest.DONE) {
+                            console.log('XHR Status:', xhr.status);
+                            console.log('XHR Response:', xhr.responseText);
+                            
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                try {
+                                    const result = JSON.parse(xhr.responseText);
+                                    resolve(result);
+                                } catch (e) {
+                                    console.error('Failed to parse JSON response:', e);
+                                    resolve({ success: true }); // Default to success if can't parse
+                                }
+                            } else {
+                                reject(new Error(`XHR failed with status ${xhr.status}: ${xhr.responseText}`));
+                            }
+                        }
+                    };
+                    
+                    xhr.onerror = function() {
+                        console.error('XHR error occurred');
+                        reject(new Error('Network error'));
+                    };
+                    
+                    try {
+                        xhr.send(JSON.stringify(payload));
+                    } catch (e) {
+                        console.error('Failed to send XHR:', e);
+                        reject(e);
+                    }
                 });
                 
-                const result = await response.json();
+                console.log('Webhook response result:', result);
                 
                 // Handle different response formats
                 let success = false;
