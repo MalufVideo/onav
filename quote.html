@@ -705,8 +705,26 @@
                 // Check calendar availability
                 button.textContent = 'Verificando disponibilidade...';
                 const availabilityResult = await checkCalendarAvailability(data.quote);
+                
+                // Debug: Log the webhook response
+                console.log('Webhook response:', availabilityResult);
+                console.log('Response type:', typeof availabilityResult);
+                console.log('Is array:', Array.isArray(availabilityResult));
 
-                if (availabilityResult === true || (typeof availabilityResult === 'object' && availabilityResult.available === true)) {
+                // Handle different response formats: boolean, object, or array
+                let isAvailable = false;
+                
+                if (availabilityResult === true) {
+                    isAvailable = true;
+                } else if (Array.isArray(availabilityResult) && availabilityResult.length > 0) {
+                    // Handle array format: [{"available": false}]
+                    isAvailable = availabilityResult[0].available === true;
+                } else if (typeof availabilityResult === 'object' && availabilityResult.available === true) {
+                    // Handle object format: {"available": true}
+                    isAvailable = true;
+                }
+                
+                if (isAvailable) {
                     // Redirect to thank you page
                     setTimeout(() => {
                         window.location.href = `/obrigado?quote=${slug}`;

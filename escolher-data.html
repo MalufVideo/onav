@@ -182,11 +182,31 @@
                 
                 const result = await response.json();
                 
-                // Handle boolean response from production webhook
-                if (result === true || (typeof result === 'object' && result.available === true)) {
+                // Debug: Log the webhook response
+                console.log('Date picker webhook response:', result);
+                console.log('Response type:', typeof result);
+                console.log('Is array:', Array.isArray(result));
+                
+                // Handle different response formats: boolean, object, or array
+                let isAvailable = false;
+                let conflictReason = 'Data não disponível';
+                
+                if (result === true) {
+                    isAvailable = true;
+                } else if (Array.isArray(result) && result.length > 0) {
+                    // Handle array format: [{"available": false}]
+                    isAvailable = result[0].available === true;
+                    conflictReason = result[0].conflict_reason || 'Data não disponível';
+                } else if (typeof result === 'object' && result.available === true) {
+                    // Handle object format: {"available": true}
+                    isAvailable = true;
+                } else if (typeof result === 'object' && result.conflict_reason) {
+                    conflictReason = result.conflict_reason;
+                }
+                
+                if (isAvailable) {
                     showAvailableState(selectedDateValue);
                 } else {
-                    const conflictReason = typeof result === 'object' ? result.conflict_reason : 'Data não disponível';
                     showUnavailableState(selectedDateValue, conflictReason);
                 }
                 
