@@ -340,10 +340,8 @@
                 
                 if (response.ok) {
                     quoteData = data.quote;
-                    // Show the original requested date
-                    if (quoteData.shooting_dates_start) {
-                        document.getElementById('original-date').textContent = formatDate(quoteData.shooting_dates_start);
-                    }
+                    // The original-date element was removed, no need to set it
+                    console.log('Quote data loaded successfully:', quoteData);
                 }
             } catch (error) {
                 console.error('Error loading quote data:', error);
@@ -491,23 +489,18 @@
             } catch (error) {
                 console.error('Error confirming new date:', error);
                 
-                // If CORS error, try form submission
-                if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
-                    try {
-                        await submitConfirmationViaForm();
-                        confirmBtn.textContent = 'Aguardando resposta...';
-                        
-                        // Wait a bit longer for form submission to process
-                        setTimeout(() => {
-                            window.location.href = `/obrigado.html?quote=${quoteSlug}&rescheduled=true`;
-                        }, 3000);
-                    } catch (formError) {
-                        console.error('Form submission failed:', formError);
-                        alert('Erro ao confirmar nova data. Tente novamente.');
-                        confirmBtn.disabled = false;
-                        confirmBtn.textContent = 'Confirmar Nova Data';
-                    }
-                } else {
+                // Always try form submission as fallback for CORS issues
+                console.log('Falling back to form submission...');
+                try {
+                    await submitConfirmationViaForm();
+                    confirmBtn.textContent = 'Enviando dados...';
+                    
+                    // Wait for form submission to process and redirect
+                    setTimeout(() => {
+                        window.location.href = `/obrigado.html?quote=${quoteSlug}&rescheduled=true`;
+                    }, 2000);
+                } catch (formError) {
+                    console.error('Form submission also failed:', formError);
                     alert('Erro ao confirmar nova data. Tente novamente.');
                     confirmBtn.disabled = false;
                     confirmBtn.textContent = 'Confirmar Nova Data';
@@ -517,10 +510,9 @@
         
         // Submit confirmation via hidden form
         async function submitConfirmationViaForm() {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = 'https://n8n.avauto.fun/webhook/aa75ba5d-3766-45d6-a1dc-059b86bf3f05';
-            form.style.display = 'none';
+            if (!quoteData) {
+                throw new Error('Quote data not loaded');
+            }
             
             // Calculate date range for new selection
             const startDate = new Date(selectedDate + 'T00:00:00');
@@ -528,7 +520,8 @@
             const endDate = new Date(startDate);
             endDate.setDate(endDate.getDate() + shootingDays - 1);
             
-            const data = {
+            // Create a full payload matching the expected format
+            const payload = {
                 checkType: 'reschedule',
                 webhookUrl: 'https://n8n.avauto.fun/webhook/aa75ba5d-3766-45d6-a1dc-059b86bf3f05',
                 requestTimestamp: new Date().toISOString(),
@@ -538,25 +531,64 @@
                 clientEmail: quoteData.client_email,
                 projectName: quoteData.project_name,
                 shootingDate: selectedDate,
-                quoteData: JSON.stringify(quoteData),
-                'calendar_check[requested_start_date]': selectedDate,
-                'calendar_check[requested_end_date]': endDate.toISOString().split('T')[0],
-                'calendar_check[duration_days]': shootingDays,
-                'calendar_check[check_type]': 'studio_availability',
-                'calendar_check[timezone]': 'America/Sao_Paulo'
+                quoteData: quoteData,
+                calculated_totals: {
+                    daily_equipment_total: quoteData.pricing?.daily_rate || 0,
+                    total_before_discount: quoteData.pricing?.original_total_price || 0,
+                    discount_amount: quoteData.pricing?.discount_amount || 0,
+                    final_total: parseInt(quoteData.pricing?.total_price?.replace(/[^\d]/g, '') || '0'),
+                    final_total_formatted: quoteData.pricing?.total_price || 'R$ 0,00',
+                    total_days: shootingDays,
+                    discount_percentage: quoteData.pricing?.discount_percentage || 0
+                },
+                studio_requirements: {
+                    led_total_modules: quoteData.selected_services?.find(s => s.name?.includes('Módulos LED'))?.quantity || 0,
+                    led_total_pixels: (quoteData.led_configuration?.principal?.total_pixels || 0) + (quoteData.led_configuration?.teto?.total_pixels || 0),
+                    total_power_consumption: {
+                        max_watts: parseInt(quoteData.led_configuration?.principal?.power_max || '0') + parseInt(quoteData.led_configuration?.teto?.power_max || '0'),
+                        avg_watts: parseInt(quoteData.led_configuration?.principal?.power_avg || '0') + parseInt(quoteData.led_configuration?.teto?.power_avg || '0')
+                    },
+                    total_weight_kg: parseInt(quoteData.led_configuration?.principal?.weight || '0') + parseInt(quoteData.led_configuration?.teto?.weight || '0'),
+                    space_requirements: {
+                        principal_area_sqm: (quoteData.led_configuration?.principal?.width || 0) * (quoteData.led_configuration?.principal?.height || 0),
+                        teto_area_sqm: (quoteData.led_configuration?.teto?.width || 0) * (quoteData.led_configuration?.teto?.height || 0),
+                        total_led_area_sqm: ((quoteData.led_configuration?.principal?.width || 0) * (quoteData.led_configuration?.principal?.height || 0)) + ((quoteData.led_configuration?.teto?.width || 0) * (quoteData.led_configuration?.teto?.height || 0))
+                    }
+                },
+                calendar_check: {
+                    requested_start_date: selectedDate,
+                    requested_end_date: endDate.toISOString().split('T')[0],
+                    duration_days: shootingDays,
+                    check_type: 'studio_availability',
+                    timezone: 'America/Sao_Paulo'
+                }
             };
             
-            for (const [key, value] of Object.entries(data)) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = value;
-                form.appendChild(input);
-            }
+            console.log('Form submission payload:', payload);
+            
+            // Create form with JSON payload
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'https://n8n.avauto.fun/webhook/aa75ba5d-3766-45d6-a1dc-059b86bf3f05';
+            form.style.display = 'none';
+            form.enctype = 'application/json';
+            
+            // Add payload as a single JSON field
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'payload';
+            input.value = JSON.stringify(payload);
+            form.appendChild(input);
             
             document.body.appendChild(form);
             form.submit();
-            document.body.removeChild(form);
+            
+            // Don't remove form immediately to allow submission
+            setTimeout(() => {
+                if (document.body.contains(form)) {
+                    document.body.removeChild(form);
+                }
+            }, 1000);
         }
 
         // Contact us
