@@ -159,7 +159,7 @@
             showLoadingState();
             
             try {
-                const webhookUrl = 'https://n8n.avauto.fun/webhook-test/eab92d5a-c6ee-4c74-9b52-e89997dd4205';
+                const webhookUrl = 'https://n8n.avauto.fun/webhook/eab92d5a-c6ee-4c74-9b52-e89997dd4205';
                 
                 const response = await fetch(webhookUrl, {
                     method: 'POST',
@@ -182,10 +182,12 @@
                 
                 const result = await response.json();
                 
-                if (result.available) {
+                // Handle boolean response from production webhook
+                if (result === true || (typeof result === 'object' && result.available === true)) {
                     showAvailableState(selectedDateValue);
                 } else {
-                    showUnavailableState(selectedDateValue, result.conflict_reason);
+                    const conflictReason = typeof result === 'object' ? result.conflict_reason : 'Data não disponível';
+                    showUnavailableState(selectedDateValue, conflictReason);
                 }
                 
             } catch (error) {
@@ -281,7 +283,7 @@
             
             try {
                 // Send webhook to update the date
-                const webhookUrl = 'https://n8n.avauto.fun/webhook-test/eab92d5a-c6ee-4c74-9b52-e89997dd4205';
+                const webhookUrl = 'https://n8n.avauto.fun/webhook/eab92d5a-c6ee-4c74-9b52-e89997dd4205';
                 
                 const response = await fetch(webhookUrl, {
                     method: 'POST',

@@ -520,7 +520,7 @@
         // Check calendar availability
         async function checkCalendarAvailability(quoteData) {
             try {
-                const webhookUrl = 'https://n8n.avauto.fun/webhook-test/eab92d5a-c6ee-4c74-9b52-e89997dd4205';
+                const webhookUrl = 'https://n8n.avauto.fun/webhook/eab92d5a-c6ee-4c74-9b52-e89997dd4205';
                 
                 // Calculate comprehensive data
                 const originalPrice = parseFloat(quoteData.original_total_price) || 0;
@@ -706,7 +706,7 @@
                 button.textContent = 'Verificando disponibilidade...';
                 const availabilityResult = await checkCalendarAvailability(data.quote);
 
-                if (availabilityResult.available) {
+                if (availabilityResult === true || (typeof availabilityResult === 'object' && availabilityResult.available === true)) {
                     // Redirect to thank you page
                     setTimeout(() => {
                         window.location.href = `/obrigado?quote=${slug}`;
@@ -714,7 +714,7 @@
                 } else {
                     // Redirect to alternative dates page
                     setTimeout(() => {
-                        window.location.href = `/escolher-data?quote=${slug}&alternatives=${encodeURIComponent(JSON.stringify(availabilityResult.alternatives || []))}`;
+                        window.location.href = `https://www.onav.com.br/escolher-data?quote=${slug}`;
                     }, 2000);
                 }
 
