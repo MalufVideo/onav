@@ -2270,6 +2270,11 @@ app.get('/escolher-data', (req, res) => {
   res.sendFile(path.join(__dirname, 'escolher-data.html'));
 });
 
+// Serve test webhook page
+app.get('/test-webhook', (req, res) => {
+  res.sendFile(path.join(__dirname, 'test-webhook-local.html'));
+});
+
 // Debug endpoint to test slug parsing
 app.get('/api/debug/slug/:slug', async (req, res) => {
   const { slug } = req.params;
