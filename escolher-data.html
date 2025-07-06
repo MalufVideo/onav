@@ -70,6 +70,17 @@
                     onchange="checkDateAvailability()"
                 >
                 
+                <!-- Date Range Display -->
+                <div id="date-range-display" class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg hidden">
+                    <div class="flex items-center mb-2">
+                        <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span class="text-blue-800 font-medium">Período de filmagem:</span>
+                    </div>
+                    <p id="date-range-text" class="text-blue-700 text-sm"></p>
+                </div>
+                
                 <!-- Availability Status -->
                 <div id="availability-status" class="mt-4 p-3 rounded-lg hidden">
                     <div id="availability-message" class="flex items-center">
@@ -159,7 +170,7 @@
             showLoadingState();
             
             try {
-                const webhookUrl = 'https://n8n.avauto.fun/webhook/eab92d5a-c6ee-4c74-9b52-e89997dd4205';
+                const webhookUrl = 'https://n8n.avauto.fun/webhook/aa75ba5d-3766-45d6-a1dc-059b86bf3f05';
                 
                 const response = await fetch(webhookUrl, {
                     method: 'POST',
@@ -171,6 +182,7 @@
                         quoteSlug: quoteSlug,
                         quoteId: quoteData.id,
                         shootingDate: selectedDateValue,
+                        shootingDays: quoteData.shooting_days || 1,
                         clientName: quoteData.client_name,
                         clientEmail: quoteData.client_email,
                         projectName: quoteData.project_name,
@@ -208,6 +220,8 @@
                     showAvailableState(selectedDateValue);
                 } else {
                     showUnavailableState(selectedDateValue, conflictReason);
+                    // Show error message about occupied date
+                    showOccupiedDateMessage();
                 }
                 
             } catch (error) {
@@ -238,6 +252,9 @@
             statusDiv.classList.remove('hidden');
             document.getElementById('confirm-date').disabled = false;
             selectedDate = date;
+            
+            // Show date range
+            showDateRange(date);
         }
 
         // Show unavailable state
@@ -255,6 +272,9 @@
             statusDiv.classList.remove('hidden');
             document.getElementById('confirm-date').disabled = true;
             selectedDate = null;
+            
+            // Hide date range
+            document.getElementById('date-range-display').classList.add('hidden');
         }
 
         // Show error state
@@ -303,7 +323,7 @@
             
             try {
                 // Send webhook to update the date
-                const webhookUrl = 'https://n8n.avauto.fun/webhook/eab92d5a-c6ee-4c74-9b52-e89997dd4205';
+                const webhookUrl = 'https://n8n.avauto.fun/webhook/aa75ba5d-3766-45d6-a1dc-059b86bf3f05';
                 
                 const response = await fetch(webhookUrl, {
                     method: 'POST',
@@ -313,17 +333,39 @@
                     body: JSON.stringify({
                         quoteSlug: quoteSlug,
                         newDate: selectedDate,
-                        checkType: 'reschedule'
+                        shootingDays: quoteData.shooting_days || 1,
+                        checkType: 'reschedule',
+                        clientName: quoteData.client_name,
+                        clientEmail: quoteData.client_email,
+                        projectName: quoteData.project_name
                     })
                 });
                 
                 const result = await response.json();
                 
-                if (result.success !== false) {
+                // Handle different response formats
+                let success = false;
+                let errorMessage = 'Erro ao confirmar nova data';
+                
+                if (result === true || result.success === true) {
+                    success = true;
+                } else if (Array.isArray(result) && result.length > 0) {
+                    success = result[0].available === true;
+                    errorMessage = result[0].conflict_reason || 'Essa data também está ocupada, escolher uma outra data';
+                } else if (typeof result === 'object' && result.available === true) {
+                    success = true;
+                } else if (typeof result === 'object' && result.conflict_reason) {
+                    errorMessage = result.conflict_reason;
+                }
+                
+                if (success) {
                     // Redirect to thank you page
-                    window.location.href = `/obrigado?quote=${quoteSlug}&rescheduled=true`;
+                    window.location.href = `/obrigado.html?quote=${quoteSlug}&rescheduled=true`;
                 } else {
-                    throw new Error('Failed to reschedule');
+                    // Show error message and allow user to try again
+                    showOccupiedDateMessage(errorMessage);
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = 'Confirmar Nova Data';
                 }
                 
             } catch (error) {
@@ -339,6 +381,54 @@
             window.location.href = `/contato?quote=${quoteSlug}&issue=date_conflict`;
         }
 
+        // Show date range based on shooting days
+        function showDateRange(startDate) {
+            if (!quoteData || !quoteData.shooting_days) return;
+            
+            const start = new Date(startDate);
+            const shootingDays = parseInt(quoteData.shooting_days) || 1;
+            const end = new Date(start);
+            end.setDate(end.getDate() + shootingDays - 1);
+            
+            const rangeDiv = document.getElementById('date-range-display');
+            const rangeText = document.getElementById('date-range-text');
+            
+            if (shootingDays === 1) {
+                rangeText.textContent = `Data de filmagem: ${formatDate(startDate)}`;
+            } else {
+                rangeText.textContent = `De ${formatDate(startDate)} até ${formatDate(end.toISOString().split('T')[0])} (${shootingDays} dias)`;
+            }
+            
+            rangeDiv.classList.remove('hidden');
+        }
+        
+        // Show occupied date message
+        function showOccupiedDateMessage(customMessage) {
+            const message = customMessage || 'Essa data também está ocupada, escolher uma outra data';
+            
+            // Create or update error message
+            let errorDiv = document.getElementById('occupied-date-error');
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.id = 'occupied-date-error';
+                errorDiv.className = 'mt-4 p-4 bg-red-50 border border-red-200 rounded-lg';
+                
+                const conflictDiv = document.querySelector('.bg-red-50.border-red-200');
+                if (conflictDiv && conflictDiv.parentNode) {
+                    conflictDiv.parentNode.insertBefore(errorDiv, conflictDiv.nextSibling);
+                }
+            }
+            
+            errorDiv.innerHTML = `
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                    <span class="text-red-800 font-medium">${message}</span>
+                </div>
+            `;
+        }
+        
         // Initialize page
         document.addEventListener('DOMContentLoaded', async () => {
             parseUrlParams();
