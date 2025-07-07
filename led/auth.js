@@ -15,12 +15,12 @@ async function initAuth() {
     // Load the Supabase JavaScript library
     await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js');
     
-    // Load the configuration
-    await loadScript('./auth-config.js');
+    // Wait for config to load
+    await waitForConfig();
     
     // Initialize client with API key from config
-    if (typeof SUPABASE_KEY !== 'undefined') {
-      supabaseKey = SUPABASE_KEY;
+    if (typeof window.SUPABASE_KEY !== 'undefined') {
+      supabaseKey = window.SUPABASE_KEY;
       
       // Use the global supabase object created by the UMD bundle
       if (typeof supabase === 'undefined' || supabase === null) {
@@ -34,18 +34,25 @@ async function initAuth() {
         }
       }
       
-      // Check for existing session
-      const { data } = await supabase.auth.getSession();
-      if (data?.session) {
-        currentUser = data.session.user;
-        notifyListeners();
-      }
+      // Check for existing session with retry logic
+      await restoreSession();
       
       // Set up auth state change listener
-      supabase.auth.onAuthStateChange((event, session) => {
+      supabase.auth.onAuthStateChange(async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email || 'no user');
         currentUser = session?.user || null;
+        
+        // Store session info in localStorage for persistence
+        if (session?.user) {
+          localStorage.setItem('supabase_user_session', JSON.stringify({
+            user: session.user,
+            timestamp: Date.now()
+          }));
+        } else {
+          localStorage.removeItem('supabase_user_session');
+        }
+        
         notifyListeners();
-        console.log('Auth state changed:', event, currentUser);
       });
     } else {
       console.error('Supabase API key not found. Make sure auth-config.js is properly configured.');
@@ -53,6 +60,105 @@ async function initAuth() {
   } catch (error) {
     console.error('Error initializing authentication:', error);
   }
+}
+
+// Wait for configuration to be loaded
+async function waitForConfig() {
+  return new Promise((resolve, reject) => {
+    let attempts = 0;
+    const maxAttempts = 40; // Increased max attempts
+    
+    const checkConfig = () => {
+      if (typeof window.SUPABASE_KEY !== 'undefined') {
+        console.log('[auth.js] Configuration loaded successfully');
+        resolve();
+        return;
+      }
+      
+      attempts++;
+      if (attempts >= maxAttempts) {
+        reject(new Error('Configuration could not be loaded after maximum attempts'));
+        return;
+      }
+      
+      setTimeout(checkConfig, 250);
+    };
+    
+    // Listen for config ready event
+    const onConfigReady = () => {
+      window.removeEventListener('supabaseConfigReady', onConfigReady);
+      resolve();
+    };
+    
+    window.addEventListener('supabaseConfigReady', onConfigReady);
+    
+    // Start checking immediately
+    checkConfig();
+  });
+}
+
+// Restore session with retry logic
+async function restoreSession() {
+  let attempts = 0;
+  const maxAttempts = 3;
+  
+  while (attempts < maxAttempts) {
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.warn(`Session restore attempt ${attempts + 1} failed:`, error.message);
+        attempts++;
+        await new Promise(resolve => setTimeout(resolve, 500));
+        continue;
+      }
+      
+      if (data?.session?.user) {
+        currentUser = data.session.user;
+        console.log('Session restored successfully for:', currentUser.email);
+        notifyListeners();
+        return;
+      } else {
+        // Try to restore from localStorage as fallback
+        const storedSession = localStorage.getItem('supabase_user_session');
+        if (storedSession) {
+          try {
+            const parsed = JSON.parse(storedSession);
+            // Check if session is not too old (24 hours)
+            if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
+              console.log('Attempting to restore session from localStorage');
+              // Try to refresh the session
+              const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+              if (refreshData?.session?.user && !refreshError) {
+                currentUser = refreshData.session.user;
+                console.log('Session refreshed successfully for:', currentUser.email);
+                notifyListeners();
+                return;
+              }
+            }
+          } catch (e) {
+            console.warn('Could not parse stored session:', e);
+          }
+          localStorage.removeItem('supabase_user_session');
+        }
+        
+        console.log('No valid session found');
+        currentUser = null;
+        notifyListeners();
+        return;
+      }
+    } catch (error) {
+      console.warn(`Session restore attempt ${attempts + 1} failed:`, error.message);
+      attempts++;
+      if (attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+  }
+  
+  console.warn('All session restore attempts failed, user will need to log in again');
+  currentUser = null;
+  notifyListeners();
 }
 
 // Helper function to load scripts

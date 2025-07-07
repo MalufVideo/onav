@@ -387,20 +387,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to update pod visibility based on auth state
     const updatePodVisibility = (user) => {
+        console.log('[pricing-pods.js] updatePodVisibility called with user:', user?.email || 'null');
+        
         if (pricingPod) {
             if (user) {
                 console.log('[pricing-pods.js] User authenticated, showing pricing pod.');
                 pricingPod.style.display = ''; // Show the pod
+                
                 // Ensure calculation runs when pod becomes visible
-                // Check if controller and calculateTotal exist before calling
-                if (controller && typeof controller.calculateTotal === 'function') {
-                    controller.calculateTotal(controller.currentMode, 'Initialization');
-                } else {
-                    console.error('[pricing-pods.js] Controller or calculateTotal method not found for visibility update.');
-                }
+                setTimeout(() => {
+                    if (controller && typeof controller.calculateTotal === 'function') {
+                        controller.calculateTotal(controller.currentMode, 'User Authenticated');
+                    } else {
+                        console.error('[pricing-pods.js] Controller or calculateTotal method not found for visibility update.');
+                    }
+                }, 100);
             } else {
                 console.log('[pricing-pods.js] User not authenticated, hiding pricing pod.');
                 pricingPod.style.display = 'none'; // Hide the pod
+            }
+        } else {
+            console.error('[pricing-pods.js] Pricing pod element not found!');
+        }
+    };
+
+    // Function to check current auth state and update visibility
+    const checkAuthStateAndUpdate = () => {
+        if (window.auth && typeof window.auth.isAuthenticated === 'function') {
+            const isAuth = window.auth.isAuthenticated();
+            const currentUser = window.auth.getCurrentUser();
+            console.log('[pricing-pods.js] Current auth state - isAuthenticated:', isAuth, 'user:', currentUser?.email || 'null');
+            updatePodVisibility(currentUser);
+        } else {
+            console.log('[pricing-pods.js] Auth not available yet, hiding pod by default');
+            if (pricingPod) {
+                pricingPod.style.display = 'none';
             }
         }
     };
@@ -408,15 +429,39 @@ document.addEventListener('DOMContentLoaded', () => {
     // Wait for auth to be initialized and then set up listener
     const waitForAuthAndListen = () => {
         if (window.auth && typeof window.auth.onAuthStateChange === 'function') {
-            console.log('[pricing-pods.js] Auth found, setting up listener.');
+            console.log('[pricing-pods.js] Auth found, setting up listener and checking initial state.');
+            
+            // Set up listener for future changes
             window.auth.onAuthStateChange(updatePodVisibility);
+            
+            // Check current state immediately
+            checkAuthStateAndUpdate();
+            
         } else {
             console.log('[pricing-pods.js] Waiting for auth...');
             setTimeout(waitForAuthAndListen, 500); // Check again shortly
         }
     };
 
-    waitForAuthAndListen(); // Start checking for auth
+    // Start checking for auth immediately
+    waitForAuthAndListen();
+    
+    // Also check periodically in case auth state changes without triggering the listener
+    const periodicAuthCheck = setInterval(() => {
+        if (window.auth && typeof window.auth.isAuthenticated === 'function') {
+            const currentAuthState = window.auth.isAuthenticated();
+            const podVisible = pricingPod && pricingPod.style.display !== 'none';
+            
+            // If auth state and pod visibility don't match, update
+            if (currentAuthState !== podVisible) {
+                console.log('[pricing-pods.js] Auth state mismatch detected, correcting...');
+                checkAuthStateAndUpdate();
+            }
+            
+            // Clear interval after auth system is working
+            clearInterval(periodicAuthCheck);
+        }
+    }, 2000);
 
 });
 // Ensure updateDisguisePod is globally accessible if called from led-wall.js

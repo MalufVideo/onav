@@ -410,5 +410,58 @@
       <!-- Quotes will be loaded here -->
     </div>
   </div>
+
+  <!-- Initialize authentication -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('[my-quotes.html] DOM loaded, initializing authentication...');
+      
+      // Check if auth module is available
+      const waitForAuth = () => {
+        return new Promise((resolve) => {
+          let attempts = 0;
+          const maxAttempts = 20;
+          
+          const checkAuth = () => {
+            if (window.auth) {
+              console.log('[my-quotes.html] Auth module found');
+              resolve();
+            } else {
+              attempts++;
+              if (attempts >= maxAttempts) {
+                console.error('[my-quotes.html] Auth module not found after maximum attempts');
+                resolve(); // Resolve anyway to prevent hanging
+                return;
+              }
+              console.log(`[my-quotes.html] Waiting for auth to be available... (${attempts}/${maxAttempts})`);
+              setTimeout(checkAuth, 500);
+            }
+          };
+          checkAuth();
+        });
+      };
+
+      // Initialize authentication
+      waitForAuth()
+        .then(async () => {
+          if (window.auth) {
+            console.log('[my-quotes.html] Initializing auth...');
+            await window.auth.initAuth();
+            console.log('[my-quotes.html] Auth initialized');
+          }
+          
+          // Initialize authentication UI
+          if (window.authUI) {
+            window.authUI.initAuthUI();
+            console.log('[my-quotes.html] Authentication UI initialized');
+          } else {
+            console.error('[my-quotes.html] Auth UI module not available');
+          }
+        })
+        .catch(error => {
+          console.error('[my-quotes.html] Failed to initialize authentication:', error);
+        });
+    });
+  </script>
 </body>
 </html>

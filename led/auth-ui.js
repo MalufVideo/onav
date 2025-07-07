@@ -549,7 +549,10 @@ function initAuthUI() {
 
 // Export auth UI functions
 window.authUI = {
-  initAuthUI
+  initAuthUI,
+  openModal,
+  closeAllModals,
+  updateAuthUI
 };
 
 // Helper functions
