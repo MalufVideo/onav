@@ -1,24 +1,86 @@
 // My Quotes Page JavaScript
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Wait for authentication to initialize
-  if (typeof window.auth !== 'undefined' && typeof window.auth.initAuth === 'function') {
-    await window.auth.initAuth();
-    setupQuotesUI();
+  console.log('[my-quotes.js] DOM loaded, waiting for authentication...');
+  
+  // Wait for authentication to be fully ready
+  await waitForAuthenticationReady();
+  
+  // Set up authentication state listener
+  if (window.auth && typeof window.auth.onAuthStateChange === 'function') {
+    window.auth.onAuthStateChange((user) => {
+      console.log('[my-quotes.js] Auth state changed:', user?.email || 'null');
+      setupQuotesUI();
+    });
   } else {
-    // console.error('Auth module not found');
+    // Fallback to immediate setup if listener not available
+    setupQuotesUI();
   }
 });
+
+/**
+ * Wait for authentication to be fully initialized and ready
+ */
+async function waitForAuthenticationReady() {
+  return new Promise((resolve) => {
+    let attempts = 0;
+    const maxAttempts = 40; // Increased max attempts
+    
+    const checkAuth = async () => {
+      attempts++;
+      
+      // Check if auth module is available
+      if (typeof window.auth === 'undefined') {
+        if (attempts >= maxAttempts) {
+          console.error('[my-quotes.js] Auth module not available after maximum attempts');
+          resolve();
+          return;
+        }
+        console.log(`[my-quotes.js] Waiting for auth module... (${attempts}/${maxAttempts})`);
+        setTimeout(checkAuth, 250);
+        return;
+      }
+      
+      // Initialize auth if not already done
+      if (typeof window.auth.initAuth === 'function') {
+        try {
+          await window.auth.initAuth();
+          console.log('[my-quotes.js] Auth initialized successfully');
+        } catch (error) {
+          console.error('[my-quotes.js] Error initializing auth:', error);
+        }
+      }
+      
+      // Wait a bit more to ensure session is fully restored
+      setTimeout(() => {
+        console.log('[my-quotes.js] Authentication ready');
+        resolve();
+      }, 500);
+    };
+    
+    checkAuth();
+  });
+}
 
 /**
  * Set up the quotes UI and load quotes
  */
 async function setupQuotesUI() {
+  console.log('[my-quotes.js] Setting up quotes UI...');
+  
   // Check if user is authenticated
-  if (!window.auth.isAuthenticated()) {
+  const isAuthenticated = window.auth && window.auth.isAuthenticated();
+  const currentUser = window.auth && window.auth.getCurrentUser();
+  
+  console.log('[my-quotes.js] Auth check - isAuthenticated:', isAuthenticated, 'user:', currentUser?.email || 'null');
+  
+  if (!isAuthenticated) {
+    console.log('[my-quotes.js] User not authenticated, showing login prompt');
     showLoginPrompt();
     return;
   }
+  
+  console.log('[my-quotes.js] User authenticated, loading quotes...');
   
   // Ensure the modal structure exists ONCE on page load
   setupQuoteDetailsModal(); 
@@ -524,11 +586,20 @@ async function showQuoteDetails(quote) {
               const data = await response.json();
               
               if (!response.ok) {
+                  if (response.status === 400 && data.error === 'Quote has already been approved') {
+                      // Handle already approved case gracefully
+                      createConfetti();
+                      alert('Este orçamento já foi aprovado! Redirecionando...');
+                      setTimeout(() => {
+                          window.location.href = `/obrigado?quote=quote-${proposalIdToApprove}`;
+                      }, 2000);
+                      return;
+                  }
                   throw new Error(data.error || 'Failed to approve quote');
               }
               
               // Trigger confetti animation
-              createConfettiEffect();
+              createConfetti();
               
               // Check calendar availability
               newApproveBtn.textContent = 'Verificando disponibilidade...';
@@ -651,4 +722,200 @@ function showLoginPrompt() {
       <a href="login.html" class="login-button">Fazer Login</a>
     </div>
   `;
+}
+
+/**
+ * Create confetti animation effect
+ */
+function createConfetti() {
+  const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd'];
+  
+  for (let i = 0; i < 50; i++) {
+    const confetti = document.createElement('div');
+    confetti.style.position = 'fixed';
+    confetti.style.width = '10px';
+    confetti.style.height = '10px';
+    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    confetti.style.left = Math.random() * 100 + '%';
+    confetti.style.top = '-10px';
+    confetti.style.zIndex = '9999';
+    confetti.style.borderRadius = '50%';
+    confetti.style.pointerEvents = 'none';
+    
+    document.body.appendChild(confetti);
+    
+    // Animate confetti
+    confetti.animate([
+      { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+      { transform: `translateY(${window.innerHeight + 100}px) rotate(720deg)`, opacity: 0 }
+    ], {
+      duration: 3000 + Math.random() * 2000,
+      easing: 'linear'
+    }).onfinish = () => {
+      confetti.remove();
+    };
+  }
+}
+
+/**
+ * Check calendar availability
+ */
+async function checkCalendarAvailability(quoteData) {
+    try {
+        const webhookUrl = 'https://n8n.avauto.fun/webhook/eab92d5a-c6ee-4c74-9b52-e89997dd4205';
+        
+        // Calculate comprehensive data
+        const originalPrice = parseFloat(quoteData.original_total_price) || 0;
+        const discountAmount = parseFloat(quoteData.discount_amount) || 0;
+        const finalPrice = originalPrice - discountAmount;
+        
+        // Calculate equipment totals
+        let dailyEquipmentTotal = 0;
+        let servicesWithCalculations = [];
+        
+        if (quoteData.selected_services && Array.isArray(quoteData.selected_services)) {
+            servicesWithCalculations = quoteData.selected_services.map(service => {
+                const quantity = service.quantity || 0;
+                const unitPrice = service.unit_price || 0;
+                const dailySubtotal = quantity * unitPrice;
+                const totalSubtotal = dailySubtotal * (quoteData.days_count || 1);
+                dailyEquipmentTotal += dailySubtotal;
+                
+                return {
+                    ...service,
+                    daily_subtotal: dailySubtotal,
+                    total_subtotal: totalSubtotal
+                };
+            });
+        }
+        
+        // Calculate LED totals
+        const ledTotalModules = (quoteData.led_principal_modules || 0) + (quoteData.led_teto_modules || 0);
+        const ledTotalPixels = (quoteData.led_principal_total_pixels || 0) + (quoteData.led_teto_total_pixels || 0);
+        const totalPowerMax = (parseInt(quoteData.principal_power_max) || 0) + (parseInt(quoteData.teto_power_max) || 0);
+        const totalPowerAvg = (parseInt(quoteData.principal_power_avg) || 0) + (parseInt(quoteData.teto_power_avg) || 0);
+        const totalWeight = (parseInt(quoteData.principal_weight) || 0) + (parseInt(quoteData.teto_weight) || 0);
+        
+        // Calculate areas
+        const principalArea = (parseFloat(quoteData.led_principal_width) || 0) * (parseFloat(quoteData.led_principal_height) || 0);
+        const tetoArea = (parseFloat(quoteData.led_teto_width) || 0) * (parseFloat(quoteData.led_teto_height) || 0);
+        
+        const comprehensivePayload = {
+            checkType: 'availability',
+            webhookUrl: webhookUrl,
+            requestTimestamp: new Date().toISOString(),
+            quoteId: quoteData.id,
+            clientName: quoteData.client_name,
+            clientEmail: quoteData.client_email,
+            projectName: quoteData.project_name,
+            shootingDate: quoteData.shooting_dates_start || quoteData.shooting_date,
+            quoteData: {
+                id: quoteData.id,
+                user_id: quoteData.user_id,
+                created_at: quoteData.created_at,
+                updated_at: quoteData.updated_at,
+                status: quoteData.status,
+                project_name: quoteData.project_name,
+                client_name: quoteData.client_name,
+                client_company: quoteData.client_company,
+                client_email: quoteData.client_email,
+                client_phone: quoteData.client_phone,
+                shooting_dates_start: quoteData.shooting_dates_start,
+                shooting_dates_end: quoteData.shooting_dates_end,
+                days_count: quoteData.days_count,
+                led_configuration: {
+                    principal: {
+                        width: quoteData.led_principal_width,
+                        height: quoteData.led_principal_height,
+                        curvature: quoteData.led_principal_curvature,
+                        modules: quoteData.led_principal_modules,
+                        resolution: quoteData.led_principal_resolution,
+                        pixels_width: quoteData.led_principal_pixels_width,
+                        pixels_height: quoteData.led_principal_pixels_height,
+                        total_pixels: quoteData.led_principal_total_pixels,
+                        power_max: quoteData.principal_power_max,
+                        power_avg: quoteData.principal_power_avg,
+                        weight: quoteData.principal_weight
+                    },
+                    teto: {
+                        width: quoteData.led_teto_width,
+                        height: quoteData.led_teto_height,
+                        modules: quoteData.led_teto_modules,
+                        pixels_width: quoteData.led_teto_pixels_width,
+                        pixels_height: quoteData.led_teto_pixels_height,
+                        total_pixels: quoteData.led_teto_total_pixels,
+                        power_max: quoteData.teto_power_max,
+                        power_avg: quoteData.teto_power_avg,
+                        weight: quoteData.teto_weight,
+                        resolution: quoteData.led_teto_resolution
+                    }
+                },
+                production_type: {
+                    selected_pod_type: quoteData.selected_pod_type,
+                    studio_size: quoteData.selected_studio_size
+                },
+                pricing: {
+                    daily_rate: quoteData.daily_rate,
+                    discounted_daily_rate: quoteData.discounted_daily_rate,
+                    total_price: quoteData.total_price,
+                    original_total_price: quoteData.original_total_price,
+                    discount_percentage: quoteData.discount_percentage,
+                    discount_amount: quoteData.discount_amount,
+                    discount_reason: quoteData.discount_reason
+                },
+                selected_services: servicesWithCalculations,
+                approval_details: {
+                    quote_approved: quoteData.quote_approved,
+                    quote_approved_at: quoteData.quote_approved_at,
+                    quote_approval_ip: quoteData.quote_approval_ip,
+                    approved_by: 'client'
+                }
+            },
+            calculated_totals: {
+                daily_equipment_total: dailyEquipmentTotal,
+                total_before_discount: originalPrice,
+                discount_amount: discountAmount,
+                final_total: finalPrice,
+                final_total_formatted: quoteData.total_price,
+                total_days: quoteData.days_count || 1,
+                discount_percentage: parseFloat(quoteData.discount_percentage) || 0
+            },
+            studio_requirements: {
+                led_total_modules: ledTotalModules,
+                led_total_pixels: ledTotalPixels,
+                total_power_consumption: {
+                    max_watts: totalPowerMax,
+                    avg_watts: totalPowerAvg
+                },
+                total_weight_kg: totalWeight,
+                space_requirements: {
+                    principal_area_sqm: principalArea,
+                    teto_area_sqm: tetoArea,
+                    total_led_area_sqm: principalArea + tetoArea
+                }
+            },
+            calendar_check: {
+                requested_start_date: quoteData.shooting_dates_start,
+                requested_end_date: quoteData.shooting_dates_end,
+                duration_days: quoteData.days_count || 1,
+                check_type: 'studio_availability',
+                timezone: 'America/Sao_Paulo'
+            }
+        };
+        
+        const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(comprehensivePayload)
+        });
+
+        const result = await response.json();
+        return result;
+    } catch (error) {
+        console.error('Error checking calendar availability:', error);
+        // Default to unavailable if webhook fails for safety
+        return { available: false };
+    }
 }
