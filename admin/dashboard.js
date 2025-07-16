@@ -2591,9 +2591,9 @@ async function loadUsersPage() {
             console.log('Session available for auth API:', !!sessionData?.session?.access_token);
             
             if (!sessionData?.session?.access_token) {
-                console.warn('No session token available for auth API call');
-                return;
-            }
+                console.warn('No session token available for auth API call, showing only users with profiles');
+                // Continue with just the users from profiles table
+            } else {
             
             const response = await fetch('/api/users/auth-data', {
                 method: 'GET',

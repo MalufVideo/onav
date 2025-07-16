@@ -109,11 +109,7 @@
         const userName = document.getElementById('user-name');
         if (userName && clientInfo.name) {
             // Display the client's name with a prefix to indicate it's for the client
-            let displayName = `Cliente: ${clientInfo.name}`;
-            // Limit the display name length
-            if (displayName.length > 20) {
-                displayName = `Cliente: ${clientInfo.name.substring(0, 12)}...`;
-            }
+            const displayName = `Cliente: ${clientInfo.name}`;
             userName.textContent = displayName;
             console.log('[Dashboard Integration] Updated user display name to:', displayName);
         }

@@ -1085,7 +1085,7 @@
             <!-- Ver Mais Casos Button -->
             <div class="mt-10 text-center">
                 <button id="toggle-more-cases" class="btn-primary font-bold py-3 px-8 rounded-md">
-                    Ver Mais Casos <i class="fas fa-chevron-down ml-2"></i>
+                    Ver Mais Casos <i class="fas fa-chevron-down ml-2" id="toggle-icon"></i>
                 </button>
             </div>
 
@@ -4946,6 +4946,25 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show placeholder again
             placeholderDiv.style.display = 'block';
         }
+    }
+    
+    // Toggle hidden case studies
+    const toggleButton = document.getElementById('toggle-more-cases');
+    const hiddenCaseStudies = document.getElementById('hidden-case-studies');
+    
+    if (toggleButton && hiddenCaseStudies) {
+        toggleButton.addEventListener('click', function() {
+            // Toggle visibility
+            if (hiddenCaseStudies.classList.contains('hidden')) {
+                hiddenCaseStudies.classList.remove('hidden');
+                toggleButton.innerHTML = 'Ver Menos Casos <i class="fas fa-chevron-up ml-2"></i>';
+            } else {
+                hiddenCaseStudies.classList.add('hidden');
+                toggleButton.innerHTML = 'Ver Mais Casos <i class="fas fa-chevron-down ml-2"></i>';
+                // Scroll back to the toggle button for better UX
+                toggleButton.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
     }
 });
 </script>

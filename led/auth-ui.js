@@ -305,10 +305,6 @@ async function updateAuthUI() {
       }
     }
     
-    // Limit the display name length
-    if (displayName && displayName.length > 15) {
-      displayName = displayName.substring(0, 12) + '...';
-    }
     userName.textContent = displayName;
   } else {
     // User is logged out
@@ -385,6 +381,11 @@ function addAuthStyles() {
   text-align: center;
   width: 100%;
   margin-bottom: 5px;
+  white-space: normal;
+  word-wrap: break-word;
+  line-height: 1.2;
+  max-height: 2.4em;
+  overflow: hidden;
 }
 
 /* --- NEW/MODIFIED MODAL STYLES START HERE --- */
