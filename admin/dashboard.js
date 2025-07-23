@@ -2640,6 +2640,7 @@ async function loadUsersPage() {
                 const errorText = await response.text();
                 console.warn('Could not fetch auth data from server:', response.status, errorText);
             }
+            }
         } catch (authError) {
             console.warn('Error fetching auth data:', authError);
         }
