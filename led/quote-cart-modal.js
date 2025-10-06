@@ -220,6 +220,7 @@ class QuoteCartModal {
         }
 
         console.log("[getSelectedItemsFromPods] Final items prepared for cart rendering:", items);
+
         // This function now returns the items directly.
         // The updateCart function will call this and then fetch details/render.
         return items;
@@ -290,6 +291,7 @@ class QuoteCartModal {
         }
         this.cartItemsContainer.innerHTML = ''; // Clear previous items
         let dailyTotalPrice = 0;
+        let studioDailyTotal = 0;
         let numberOfDays = 1; // Default
 
         // --- Date Range Calculation ---
@@ -466,6 +468,30 @@ class QuoteCartModal {
             this.cartItemsContainer.appendChild(itemElement);
         });
 
+        // --- Add Estúdio Item if available ---
+        const studioProductName = 'Estúdio';
+        const studioItems = this.cartItems.filter(item => item.name && item.name.toLowerCase().includes('estúdio'));
+        let studioDisplayRows = 0;
+
+        studioItems.forEach(studioItem => {
+            const quantity = Math.max(1, studioItem.quantity || 1);
+            const unitPrice = studioItem.price || this.productPrices[studioProductName] || 0;
+            const subtotal = unitPrice * quantity;
+
+            const itemElement = document.createElement('div');
+            itemElement.classList.add('cart-item');
+            itemElement.innerHTML = `
+                <span class="cart-item-name">${studioItem.name}</span>
+                <span class="cart-item-qty">${quantity}</span>
+                <span class="cart-item-price">${formatCurrency(unitPrice)}</span>
+                <span class="cart-item-subtotal">${formatCurrency(subtotal)}</span>
+            `;
+            this.cartItemsContainer.appendChild(itemElement);
+
+            studioDailyTotal += subtotal;
+            studioDisplayRows += 1;
+        });
+
         // --- Add Equipe Especializada Disguise ---
         const equipeName = 'Equipe especializada Disguise';
         const equipeSupabaseName = 'Equipe Técnica Diária'; // Name used in your products table
@@ -490,15 +516,32 @@ class QuoteCartModal {
         }
         // --- End Equipe Especializada Disguise ---
 
+        console.log(`[renderCart Debug] Studio Daily Total (before studio discount): ${formatCurrency(studioDailyTotal)}`);
+
+        // Apply Estúdio specific discount if applicable
+        let studioFinalPrice = studioDailyTotal * numberOfDays;
+        let studioDiscountInfo = null;
+
+        if (studioDailyTotal > 0 && window.DiscountCalculator && typeof window.DiscountCalculator.applyStudioDiscount === 'function') {
+            studioDiscountInfo = window.DiscountCalculator.applyStudioDiscount(studioDailyTotal, numberOfDays);
+            studioFinalPrice = studioDiscountInfo.finalPrice;
+            console.log('[renderCart] Applied Estúdio discount:', studioDiscountInfo);
+        }
+
         console.log(`[renderCart Debug] Calculated Daily Total Price (before discount): ${formatCurrency(dailyTotalPrice)}`);
 
         // --- Apply Progressive Discount Based on Days ---
         let finalTotalPrice;
         let discountInfo = null;
         
+        let combinedDailyTotal = dailyTotalPrice;
+        if (studioDailyTotal > 0) {
+            combinedDailyTotal = dailyTotalPrice + (studioFinalPrice / numberOfDays);
+        }
+
         if (window.DiscountCalculator && numberOfDays > 0) {
             // Apply discount calculation
-            discountInfo = window.DiscountCalculator.applyDayBasedDiscount(dailyTotalPrice, numberOfDays);
+            discountInfo = window.DiscountCalculator.applyDayBasedDiscount(combinedDailyTotal, numberOfDays);
             finalTotalPrice = discountInfo.finalPrice;
             
             console.log(`[renderCart Debug] Discount applied:`, discountInfo);
@@ -525,7 +568,7 @@ class QuoteCartModal {
             }
         } else {
             // Fallback to original calculation if discount calculator not available
-            finalTotalPrice = dailyTotalPrice * numberOfDays;
+            finalTotalPrice = combinedDailyTotal * numberOfDays;
             this.totalPriceElement.textContent = `${formatCurrency(finalTotalPrice)} (${numberOfDays} dia${numberOfDays > 1 ? 's' : ''})`;
             console.warn('[renderCart] Discount calculator not available, using original pricing');
         }
