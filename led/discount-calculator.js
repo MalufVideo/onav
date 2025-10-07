@@ -119,70 +119,10 @@ function applyDayBasedDiscount(fullPrice, days) {
     };
 }
 
-/**
- * Apply Estúdio-specific discount rules based on number of days
- * Day 1: 0% discount (100% price)
- * Day 2: 33% discount (67% price)
- * Day 3+: 20% discount (80% price per additional day)
- * @param {number} fullPrice - Original daily price for the Estúdio
- * @param {number} days - Number of days selected
- * @returns {Object} Discount calculation result similar to applyDayBasedDiscount
- */
-function applyStudioDiscount(fullPrice, days) {
-    const dailyPrice = Number(fullPrice) || 0;
-    const rentalDays = Math.max(1, parseInt(days, 10) || 1);
-
-    if (dailyPrice <= 0) {
-        const totalPrice = dailyPrice * rentalDays;
-        return {
-            originalDailyPrice: dailyPrice,
-            discountPercentage: 0,
-            discountAmount: 0,
-            discountedDailyPrice: rentalDays > 0 ? totalPrice / rentalDays : 0,
-            days: rentalDays,
-            finalPrice: totalPrice,
-            hasDiscount: false
-        };
-    }
-
-    let total = 0;
-
-    // Day 1: full price
-    total += dailyPrice;
-
-    if (rentalDays >= 2) {
-        // Day 2: 33% discount, pay 67%
-        total += dailyPrice * 0.67;
-    }
-
-    if (rentalDays > 2) {
-        const additionalDays = rentalDays - 2;
-        // Days 3+: 20% discount, pay 80%
-        total += additionalDays * dailyPrice * 0.80;
-    }
-
-    const originalTotal = dailyPrice * rentalDays;
-    const discountAmount = originalTotal - total;
-    const discountPercentage = originalTotal > 0 ? ((discountAmount / originalTotal) * 100) : 0;
-    const discountedDailyPrice = total / rentalDays;
-
-    return {
-        originalDailyPrice: dailyPrice,
-        discountPercentage: Math.round(discountPercentage * 10) / 10,
-        discountAmount: Math.round(discountAmount * 100) / 100,
-        discountedDailyPrice: Math.round(discountedDailyPrice * 100) / 100,
-        days: rentalDays,
-        finalPrice: Math.round(total * 100) / 100,
-        hasDiscount: discountAmount > 0
-    };
-}
-
 // Export functions for use in other modules
 window.DiscountCalculator = {
     calculateDiscountPercentage,
     applyDayBasedDiscount,
-    getDiscountDisplayInfo,
-    applyStudioDiscount,
     DISCOUNT_TABLE
 };
 

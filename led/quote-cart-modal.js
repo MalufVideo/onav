@@ -532,49 +532,33 @@ class QuoteCartModal {
         }
         // --- End Equipe Especializada Disguise ---
 
-        console.log(`[renderCart Debug] Studio Daily Total (before studio discount): ${formatCurrency(studioDailyTotal)}`);
+        console.log(`[renderCart Debug] Studio Daily Total: ${formatCurrency(studioDailyTotal)}`);
+        console.log(`[renderCart Debug] Equipment Daily Total: ${formatCurrency(dailyTotalPrice)}`);
 
-        // Apply Estúdio specific discount if applicable (total across all days)
-        let studioFinalPrice = studioDailyTotal * numberOfDays;
-        let studioDiscountInfo = null;
+        // Calculate combined daily total (equipment + studio)
+        const combinedDailyTotal = dailyTotalPrice + studioDailyTotal;
+        const originalTotalPrice = combinedDailyTotal * numberOfDays;
 
-        if (studioDailyTotal > 0 && window.DiscountCalculator && typeof window.DiscountCalculator.applyStudioDiscount === 'function') {
-            studioDiscountInfo = window.DiscountCalculator.applyStudioDiscount(studioDailyTotal, numberOfDays);
-            studioFinalPrice = studioDiscountInfo.finalPrice;
-            console.log('[renderCart] Applied Estúdio discount:', studioDiscountInfo);
-        }
+        console.log(`[renderCart Debug] Combined Daily Total: ${formatCurrency(combinedDailyTotal)}`);
+        console.log(`[renderCart Debug] Number of Days: ${numberOfDays}`);
+        console.log(`[renderCart Debug] Original Total Price (before discount): ${formatCurrency(originalTotalPrice)}`);
 
-        console.log(`[renderCart Debug] Equipment Daily Total (before discount): ${formatCurrency(dailyTotalPrice)}`);
+        // Apply progressive discount to the combined total
+        let finalTotalPrice = originalTotalPrice;
+        let discountInfo = null;
 
-        // Apply progressive discount ONLY to equipment (not Estúdio)
-        let equipmentDiscountInfo = null;
-        let equipmentFinalPrice = dailyTotalPrice * numberOfDays;
-
-        if (window.DiscountCalculator && numberOfDays > 0 && dailyTotalPrice > 0) {
-            equipmentDiscountInfo = window.DiscountCalculator.applyDayBasedDiscount(dailyTotalPrice, numberOfDays);
-            equipmentFinalPrice = equipmentDiscountInfo.finalPrice;
-            console.log('[renderCart] Progressive discount applied to equipment only:', equipmentDiscountInfo);
+        if (window.DiscountCalculator && numberOfDays > 0 && combinedDailyTotal > 0) {
+            discountInfo = window.DiscountCalculator.applyDayBasedDiscount(combinedDailyTotal, numberOfDays);
+            finalTotalPrice = discountInfo.finalPrice;
+            console.log('[renderCart] Progressive discount applied:', discountInfo);
+            console.log(`[renderCart Debug] Discount Percentage: ${discountInfo.discountPercentage}%`);
+            console.log(`[renderCart Debug] Final Price After Discount: ${formatCurrency(finalTotalPrice)}`);
         } else {
-            console.warn('[renderCart] Discount calculator not available or no equipment, using original pricing');
+            console.warn('[renderCart] Discount calculator not available or no items, using original pricing');
         }
 
-        // Calculate totals
-        const originalEquipmentTotal = dailyTotalPrice * numberOfDays;
-        const originalStudioTotal = studioDailyTotal * numberOfDays;
-        const originalTotalPrice = originalEquipmentTotal + originalStudioTotal;
-        const finalTotalPrice = equipmentFinalPrice + studioFinalPrice;
-
-        // Build discount label
-        if (equipmentDiscountInfo || studioDiscountInfo) {
-            const labels = [];
-            if (equipmentDiscountInfo?.hasDiscount) {
-                labels.push(`${equipmentDiscountInfo.discountPercentage}% desconto progressivo`);
-            }
-            if (studioDiscountInfo?.hasDiscount) {
-                labels.push('Estúdio: regra 100/33/20');
-            }
-            const badges = labels.join(' | ');
-
+        // Display the total with or without discount
+        if (discountInfo && discountInfo.hasDiscount) {
             this.totalPriceElement.innerHTML = `
                 <div>
                     <span style="text-decoration: line-through; color: #999; font-size: 0.9em;">
@@ -585,7 +569,7 @@ class QuoteCartModal {
                         ${formatCurrency(finalTotalPrice)}
                     </span>
                     <span style="color: #27ae60; font-size: 0.9em; display: block;">
-                        ${badges} - ${numberOfDays} dia${numberOfDays > 1 ? 's' : ''}
+                        ${discountInfo.discountPercentage}% desconto progressivo - ${numberOfDays} dia${numberOfDays > 1 ? 's' : ''}
                     </span>
                 </div>
             `;
@@ -593,7 +577,7 @@ class QuoteCartModal {
             this.totalPriceElement.textContent = `${formatCurrency(finalTotalPrice)} (${numberOfDays} dia${numberOfDays > 1 ? 's' : ''})`;
         }
 
-        console.log(`[renderCart] Render complete. Equipment: ${formatCurrency(equipmentFinalPrice)}, Studio: ${formatCurrency(studioFinalPrice)}, Final Total: ${formatCurrency(finalTotalPrice)}`);
+        console.log(`[renderCart] Render complete. Original: ${formatCurrency(originalTotalPrice)}, Final: ${formatCurrency(finalTotalPrice)}`);
     }
 
     show() {
