@@ -221,6 +221,22 @@ class QuoteCartModal {
 
         console.log("[getSelectedItemsFromPods] Final items prepared for cart rendering:", items);
 
+        // Add Estúdio entry based on Supabase prices
+        const studioEntry = Object.entries(this.productPrices || {}).find(([name]) => name.toLowerCase().includes('estúdio de 436'));
+        const studioName = studioEntry ? studioEntry[0] : 'Estúdio de 436 metros quadrados - 31,63 x 13,80m (Estudios SP)';
+        const studioPrice = studioEntry ? Number(studioEntry[1]) : 6000;
+
+        if (studioPrice > 0) {
+            items.push({
+                id: 'estudio_estudios_sp',
+                name: studioName,
+                quantity: 1,
+                price: studioPrice
+            });
+        } else {
+            console.warn('[getSelectedItemsFromPods] Estúdio price not available. Item will not be added.');
+        }
+
         // This function now returns the items directly.
         // The updateCart function will call this and then fetch details/render.
         return items;
@@ -551,7 +567,7 @@ class QuoteCartModal {
                 this.totalPriceElement.innerHTML = `
                     <div>
                         <span style="text-decoration: line-through; color: #999; font-size: 0.9em;">
-                            ${formatCurrency(dailyTotalPrice * numberOfDays)}
+                            ${formatCurrency(combinedDailyTotal * numberOfDays)}
                         </span>
                         <br>
                         <span style="color: #e74c3c; font-weight: bold;">
@@ -573,7 +589,7 @@ class QuoteCartModal {
             console.warn('[renderCart] Discount calculator not available, using original pricing');
         }
 
-        console.log(`[renderCart] Render complete. Daily Total: ${formatCurrency(dailyTotalPrice)}, Days: ${numberOfDays}, Final Total: ${formatCurrency(finalTotalPrice)}`);
+        console.log(`[renderCart] Render complete. Daily Total (without Estúdio): ${formatCurrency(dailyTotalPrice)}, Combined Daily Total: ${formatCurrency(combinedDailyTotal)}, Days: ${numberOfDays}, Final Total: ${formatCurrency(finalTotalPrice)}`);
     }
 
     show() {
