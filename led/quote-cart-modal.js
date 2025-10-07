@@ -222,8 +222,8 @@ class QuoteCartModal {
         console.log("[getSelectedItemsFromPods] Final items prepared for cart rendering:", items);
 
         // Add Estúdio entry based on Supabase prices
-        const studioEntry = Object.entries(this.productPrices || {}).find(([name]) => name.toLowerCase().includes('estúdio de 436'));
-        const studioName = studioEntry ? studioEntry[0] : 'Estúdio de 436 metros quadrados - 31,63 x 13,80m (Estudios SP)';
+        const studioEntry = Object.entries(this.productPrices || {}).find(([name]) => name.toLowerCase().includes('estúdio'));
+        const studioName = studioEntry ? studioEntry[0] : 'Estúdio 31,63 x 13,80m';
         const studioPrice = studioEntry ? Number(studioEntry[1]) : 6000;
 
         if (studioPrice > 0) {
