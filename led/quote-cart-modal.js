@@ -465,23 +465,24 @@ class QuoteCartModal {
                 console.log(`[renderCart Debug] Item: ${itemName} | Unit Price: ${formatCurrency(unitPrice)} | Qty: ${quantity} | Subtotal: ${formatCurrency(itemSubtotal)}`);
 
             } else {
-                // Item not found in cartItems, render with quantity 0
-                console.log(`[renderCart Debug] Item not found in cartItems: ${expectedName}. Rendering with Qty 0.`);
-                // unitPrice is already fetched from productPrices or is 0
+                // Item not found in cartItems, skip rendering (don't show items with 0 quantity)
+                console.log(`[renderCart Debug] Item not found in cartItems: ${expectedName}. Skipping (zero quantity).`);
                 quantity = 0;
                 itemSubtotal = 0;
             }
 
-            // Render the item row
-            const itemElement = document.createElement('div');
-            itemElement.classList.add('cart-item');
-            itemElement.innerHTML = `
-                <span class="cart-item-name">${itemName}</span>
-                <span class="cart-item-qty">${quantity}</span>
-                <span class="cart-item-price">${formatCurrency(unitPrice)}</span>
-                <span class="cart-item-subtotal">${formatCurrency(itemSubtotal)}</span>
-            `;
-            this.cartItemsContainer.appendChild(itemElement);
+            // Only render the item row if quantity > 0
+            if (quantity > 0) {
+                const itemElement = document.createElement('div');
+                itemElement.classList.add('cart-item');
+                itemElement.innerHTML = `
+                    <span class="cart-item-name">${itemName}</span>
+                    <span class="cart-item-qty">${quantity}</span>
+                    <span class="cart-item-price">${formatCurrency(unitPrice)}</span>
+                    <span class="cart-item-subtotal">${formatCurrency(itemSubtotal)}</span>
+                `;
+                this.cartItemsContainer.appendChild(itemElement);
+            }
         });
 
         // --- Add Estúdio Item if available ---
