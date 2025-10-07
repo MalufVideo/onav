@@ -534,7 +534,7 @@ class QuoteCartModal {
 
         console.log(`[renderCart Debug] Studio Daily Total (before studio discount): ${formatCurrency(studioDailyTotal)}`);
 
-        // Apply Estúdio specific discount if applicable
+        // Apply Estúdio specific discount if applicable (total across all days)
         let studioFinalPrice = studioDailyTotal * numberOfDays;
         let studioDiscountInfo = null;
 
@@ -544,52 +544,54 @@ class QuoteCartModal {
             console.log('[renderCart] Applied Estúdio discount:', studioDiscountInfo);
         }
 
-        console.log(`[renderCart Debug] Calculated Daily Total Price (before discount): ${formatCurrency(dailyTotalPrice)}`);
+        console.log(`[renderCart Debug] Equipment Daily Total (before discount): ${formatCurrency(dailyTotalPrice)}`);
 
-        // --- Apply Progressive Discount Based on Days ---
-        let finalTotalPrice;
-        let discountInfo = null;
-        
-        let combinedDailyTotal = dailyTotalPrice;
-        if (studioDailyTotal > 0) {
-            combinedDailyTotal = dailyTotalPrice + (studioFinalPrice / numberOfDays);
-        }
+        const originalDailyTotal = dailyTotalPrice + studioDailyTotal;
+        const originalTotalPrice = originalDailyTotal * numberOfDays;
+
+        let baselineDiscountInfo = null;
+        let baselineFinalPrice = originalTotalPrice;
 
         if (window.DiscountCalculator && numberOfDays > 0) {
-            // Apply discount calculation
-            discountInfo = window.DiscountCalculator.applyDayBasedDiscount(combinedDailyTotal, numberOfDays);
-            finalTotalPrice = discountInfo.finalPrice;
-            
-            console.log(`[renderCart Debug] Discount applied:`, discountInfo);
-            
-            // Update total price display with discount information
-            if (discountInfo.discountPercentage > 0) {
-                this.totalPriceElement.innerHTML = `
-                    <div>
-                        <span style="text-decoration: line-through; color: #999; font-size: 0.9em;">
-                            ${formatCurrency(combinedDailyTotal * numberOfDays)}
-                        </span>
-                        <br>
-                        <span style="color: #e74c3c; font-weight: bold;">
-                            ${formatCurrency(finalTotalPrice)} 
-                        </span>
-                        <span style="color: #27ae60; font-size: 0.9em;">
-                            (${discountInfo.discountPercentage}% desconto - ${numberOfDays} dia${numberOfDays > 1 ? 's' : ''})
-                        </span>
-                    </div>
-                `;
-            } else {
-                // No discount for 1 day
-                this.totalPriceElement.textContent = `${formatCurrency(finalTotalPrice)} (${numberOfDays} dia${numberOfDays > 1 ? 's' : ''})`;
-            }
+            baselineDiscountInfo = window.DiscountCalculator.applyDayBasedDiscount(originalDailyTotal, numberOfDays);
+            baselineFinalPrice = baselineDiscountInfo.finalPrice;
+            console.log('[renderCart] Progressive discount (baseline all items):', baselineDiscountInfo);
         } else {
-            // Fallback to original calculation if discount calculator not available
-            finalTotalPrice = combinedDailyTotal * numberOfDays;
-            this.totalPriceElement.textContent = `${formatCurrency(finalTotalPrice)} (${numberOfDays} dia${numberOfDays > 1 ? 's' : ''})`;
-            console.warn('[renderCart] Discount calculator not available, using original pricing');
+            console.warn('[renderCart] Discount calculator not available for baseline calculation, using original pricing');
         }
 
-        console.log(`[renderCart] Render complete. Daily Total (without Estúdio): ${formatCurrency(dailyTotalPrice)}, Combined Daily Total: ${formatCurrency(combinedDailyTotal)}, Days: ${numberOfDays}, Final Total: ${formatCurrency(finalTotalPrice)}`);
+        let baselineStudioFinal = studioDailyTotal * numberOfDays;
+        if (studioDailyTotal > 0 && window.DiscountCalculator && numberOfDays > 0) {
+            const baselineStudioDiscountInfo = window.DiscountCalculator.applyDayBasedDiscount(studioDailyTotal, numberOfDays);
+            baselineStudioFinal = baselineStudioDiscountInfo.finalPrice;
+            console.log('[renderCart] Baseline progressive discount for Estúdio (for adjustment):', baselineStudioDiscountInfo);
+        }
+
+        const finalTotalPrice = baselineFinalPrice - baselineStudioFinal + studioFinalPrice;
+
+        if (baselineDiscountInfo) {
+            const discountLabel = `${baselineDiscountInfo.discountPercentage}% desconto progressivo`;
+            const extraLabel = studioDiscountInfo?.hasDiscount ? 'Estúdio: regra 100/33/20 aplicada' : '';
+            const badges = [discountLabel, extraLabel].filter(Boolean).join(' | ');
+            this.totalPriceElement.innerHTML = `
+                <div>
+                    <span style="text-decoration: line-through; color: #999; font-size: 0.9em;">
+                        ${formatCurrency(originalTotalPrice)}
+                    </span>
+                    <br>
+                    <span style="color: #e74c3c; font-weight: bold;">
+                        ${formatCurrency(finalTotalPrice)}
+                    </span>
+                    <span style="color: #27ae60; font-size: 0.9em; display: block;">
+                        ${badges} - ${numberOfDays} dia${numberOfDays > 1 ? 's' : ''}
+                    </span>
+                </div>
+            `;
+        } else {
+            this.totalPriceElement.textContent = `${formatCurrency(finalTotalPrice)} (${numberOfDays} dia${numberOfDays > 1 ? 's' : ''})`;
+        }
+
+        console.log(`[renderCart] Render complete. Original Total: ${formatCurrency(originalTotalPrice)}, Final Total Adjusted: ${formatCurrency(finalTotalPrice)}`);
     }
 
     show() {
