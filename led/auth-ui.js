@@ -379,7 +379,7 @@ function addAuthStyles() {
 }
 
 #user-name {
-  color: #333;
+  color: #fff;
   font-weight: bold;
   flex-grow: 1;
   text-align: center;
