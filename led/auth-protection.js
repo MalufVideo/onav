@@ -73,18 +73,21 @@ async function protectRoute(destination = '/led/login.html') {
   
   console.log('[auth-protection.js] Route check - needsAuth:', needsAuth, 'isGuestOnly:', isGuestOnly);
   
-  // Redirect logic
-  if (needsAuth && !isAuthenticated) {
-    console.log('[auth-protection.js] Protected route accessed without authentication, redirecting to login');
-    // Protect authenticated routes from unauthenticated users
-    redirectToLoginWithRedirect(currentPath);
-  } else if (isGuestOnly && isAuthenticated) {
-    console.log('[auth-protection.js] Guest-only route accessed by authenticated user, redirecting to calculator');
-    // Protect guest-only routes from authenticated users
-    window.location.href = '/led/index.html';
-  } else {
-    console.log('[auth-protection.js] Route protection passed, user can access this page');
-  }
+  // Redirect logic - DISABLED FOR GUEST ACCESS
+  // if (needsAuth && !isAuthenticated) {
+  //   console.log('[auth-protection.js] Protected route accessed without authentication, redirecting to login');
+  //   // Protect authenticated routes from unauthenticated users
+  //   redirectToLoginWithRedirect(currentPath);
+  // } else if (isGuestOnly && isAuthenticated) {
+  //   console.log('[auth-protection.js] Guest-only route accessed by authenticated user, redirecting to calculator');
+  //   // Protect guest-only routes from authenticated users
+  //   window.location.href = '/led/index.html';
+  // } else {
+  //   console.log('[auth-protection.js] Route protection passed, user can access this page');
+  // }
+
+  // Allow all users (authenticated and guests) to access calculator
+  console.log('[auth-protection.js] Guest access enabled - allowing access to all users');
 }
 
 /**

@@ -357,9 +357,35 @@ async function getEquipeTecnicaPrice() {
  */
 async function getProductPrices() {
   try {
-    const supabase = window.auth?.getSupabaseClient();
+    // Try to get existing Supabase client first
+    let supabase = window.auth?.getSupabaseClient();
+
+    // If not available (guest user), create a public client
     if (!supabase) {
-      throw new Error('Supabase client not available');
+      console.log('[quote-service] Creating public Supabase client for product prices');
+
+      // Wait for both Supabase library and key to be loaded
+      let attempts = 0;
+      const maxAttempts = 50; // 5 seconds max wait (50 * 100ms)
+
+      while ((!window.supabase || !window.SUPABASE_KEY) && attempts < maxAttempts) {
+        console.log(`[quote-service] Waiting for Supabase... attempt ${attempts + 1}/${maxAttempts}`);
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+
+      if (!window.supabase) {
+        throw new Error('Supabase library not loaded');
+      }
+
+      if (!window.SUPABASE_KEY) {
+        throw new Error('Supabase key not loaded');
+      }
+
+      // Create public client with anon key
+      const supabaseUrl = window.APP_CONFIG.current.supabaseUrl;
+      supabase = window.supabase.createClient(supabaseUrl, window.SUPABASE_KEY);
+      console.log('[quote-service] Public Supabase client created successfully');
     }
 
     const { data, error } = await supabase
@@ -368,15 +394,19 @@ async function getProductPrices() {
 
     if (error) throw error;
 
+    if (!data || data.length === 0) {
+      throw new Error('No products found in database');
+    }
+
     const prices = data.reduce((acc, product) => {
-      acc[product.name] = product.price;
+      acc[product.name] = parseFloat(product.price); // Parse to number
       return acc;
     }, {});
 
-    // console.log('Fetched product prices:', prices); 
+    console.log('[quote-service] Fetched product prices:', prices);
     return { success: true, data: prices };
   } catch (error) {
-    console.error('Error fetching product prices:', error.message);
+    console.error('[quote-service] Error fetching product prices:', error.message);
     return { success: false, error: error.message, data: {} };
   }
 }

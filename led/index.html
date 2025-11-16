@@ -50,7 +50,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-top: 10px;
+      margin-top: 0px;
       margin-bottom: 20px;
     }
     #sidebar-logo {
@@ -59,13 +59,18 @@
       height: auto;
       display: block;
     }
+
+    #card-disguise-selector {
+      padding-top: 16px;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
   <!-- Left Sidebar: Controls -->
   <div id="controls">
     <a href="/" id="sidebar-logo-link">
-      <img src="../img/on+av_logo_v3.png" alt="ON+AV Logo" id="sidebar-logo">
+      <img src="/img/resized_logo.png" alt="ON+AV Logo" id="sidebar-logo">
     </a>
     <!-- Pod 1: LED Principal -->
     <div class="control-card" id="card-led-principal">
@@ -101,6 +106,43 @@
       <p><strong>Módulos LED Teto:</strong> <span id="teto-module-count">192</span></p>
     </div>
 
+    <div class="control-card" id="powered-by-disguise" style="display:flex; align-items:center; justify-content: center; gap:10px; margin-top:10px;">
+      <p style="margin:0; font-size: 12px;"><strong>Powered by:</strong></p>
+      <img src="../img/logo_disguise.svg" alt="Disguise Logo" style="height:30px; width: auto;">
+    </div>
+    <!-- Rube Draco Control Card Removed -->
+    <!-- Estudios Control Card Removed -->
+  </div>
+
+  <!-- Center 3D Viewer -->
+  <div id="canvas-container">
+    <!-- Bottom LED detail pods -->
+    <div id="bottom-info-bar">
+      <details class="bottom-info-pod" id="info-principal">
+        <summary>Detalhes LED Principal</summary>
+        <div class="bottom-info-content">
+          <p><strong>Resolução:</strong> <span id="resolution">3840 x 960 pixels</span></p>
+          <p><strong>Processadores:</strong> <span id="processors">4 unidades</span></p>
+          <p><strong>Potência Máxima:</strong> <span id="power-max">40</span> W</p>
+          <p><strong>Potência Média:</strong> <span id="power-avg">20</span> W</p>
+          <p><strong>Peso Total:</strong> <span id="total-weight">800</span> kg</p>
+        </div>
+      </details>
+
+      <details class="bottom-info-pod" id="info-teto">
+        <summary>Detalhes LED Teto</summary>
+        <div class="bottom-info-content">
+          <p><strong>Resolução:</strong> <span id="teto-resolution">1536 x 1152 pixels</span></p>
+          <p><strong>Potência Máxima:</strong> <span id="teto-power-max">19.2</span> W</p>
+          <p><strong>Potência Média:</strong> <span id="teto-power-avg">9.6</span> W</p>
+          <p><strong>Peso Total:</strong> <span id="teto-total-weight">384</span> kg</p>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- Right Sidebar: Pricing Pod and CTA -->
+  <div id="info-sidebar">
     <!-- Pod 3: Disguise Mode Selector -->
     <div class="control-card" id="card-disguise-selector">
         <h2>Produção Virtual em:</h2>
@@ -116,68 +158,26 @@
         </div>
         <!-- Add any specific Disguise controls here if needed in the future -->
     </div>
-    <div class="control-card" id="powered-by-disguise" style="display:flex; align-items:center; gap:10px; margin-top:10px;">
-      <p style="margin:0; font-size: 12px;"><strong>Powered by:</strong></p>
-      <img src="../img/logo_disguise_inverted.png" alt="Disguise Logo" style="height:30px;" />
-    </div>
-    <!-- Rube Draco Control Card Removed -->
-    <!-- Estudios Control Card Removed -->
-  </div>
-
-  <!-- Center 3D Viewer -->
-  <div id="canvas-container">
-    <!-- Pricing Pods Container -->
-    <div class="pricing-pods">
-      <!-- Unified Pod: VP 3D / 2D -->
-      <div class="control-card pricing-pod active" id="card-custo-3d">
-         <!-- Title will be dynamic -->
-         <h2><strong id="main-pod-title">VP 3D</strong>: <span id="total-price">Calculating...</span></h2>
-
-         <!-- Item 1: LED Modules (Always Visible) -->
-         <p style="display: flex; align-items: center;">Módulos LED: <span id="modules-price" style="margin-left: 4px;" data-price="23680">23.680</span></p>
-
-         <!-- Item 2: MX-40 Pro (Always Visible) -->
-         <p>MX-40 Pro: <span id="processors-price" data-price="4000">4.000</span></p>
-
-         <!-- Item 3: Disguise VX4n (Always Visible, Backup Button) -->
-         <p style="display: flex; align-items: center;">Disguise VX4n: <span id="server-price" style="margin-left: 4px;" data-price="10000">10.000</span> <button class="backup-btn" id="backup-btn">adicionar backup ativo</button></p>
-
-         <!-- Item 4: Disguise RXII (Visible in 3D Mode Only) -->
-         <div class="control-group" id="rxii-group">
-             <label for="rxii-units"> Disguise RXII: <span id="rxii-units-value">3</span> = <span id="rxii-price" data-unit-price="7500">22.500</span></label>
-             <input type="range" id="rxii-units" min="1" max="5" step="1" value="3">
-         </div>
-
-         <!-- Item 5: Stype Tracking (Visible in 3D Mode Only) -->
-         <p id="tracking-item">Stype Tracking: <span id="tracking-price" data-price="5000">5.000</span></p>
+    <div id="sidebar-pricing" class="control-card">
+      <h2><span id="main-pod-title">3D ou 2.5D</span></h2>
+      <p>Painel de LED: <span id="modules-price" data-price="23680">...</span></p>
+      <p>Processadora: <span id="processors-price" data-price="4000">...</span></p>
+      <p>Disguise VX: <span id="server-price" data-price="10000">...</span> <button class="backup-btn" id="backup-btn">+backup</button></p>
+      <div class="control-group" id="rxii-group">
+        <label for="rxii-units">Disguise RX: <span id="rxii-units-value">3</span> = <span id="rxii-price" data-unit-price="7500">...</span></label>
+        <input type="range" id="rxii-units" min="1" max="5" step="1" value="3">
       </div>
-
-    </div>
-  </div>
-
-  <!-- Right Sidebar: Detailed LED Info -->
-  <div id="info-sidebar">
-    <div class="info-pod" id="info-principal">
-      <h2>Detalhes LED Principal</h2>
-      <p><strong>Resolução:</strong> <span id="resolution">3840 x 960 pixels</span></p>
-      <p><strong>Processadores:</strong> <span id="processors">4 unidades</span></p>
-      <p><strong>Potência Máxima:</strong> <span id="power-max">40</span> W</p>
-      <p><strong>Potência Média:</strong> <span id="power-avg">20</span> W</p>
-      <p><strong>Peso Total:</strong> <span id="total-weight">800</span> kg</p>
-    </div>
-
-    <div class="info-pod" id="info-teto">
-      <h2>Detalhes LED Teto</h2>
-      <p><strong>Resolução:</strong> <span id="teto-resolution">1536 x 1152 pixels</span></p>
-      <p><strong>Potência Máxima:</strong> <span id="teto-power-max">19.2</span> W</p>
-      <p><strong>Potência Média:</strong> <span id="teto-power-avg">9.6</span> W</p>
-      <p><strong>Peso Total:</strong> <span id="teto-total-weight">384</span> kg</p>
+      <p id="tracking-item">Camera Tracking: <span id="tracking-price" data-price="5000">...</span></p>
+      <p>Estúdio: <span id="studio-price" data-price="6000">...</span></p>
+      <p>Equipe Profissional: <span id="team-price" data-price="0">...</span></p>
+      <p id="total-line"><strong>Investimento Total:</strong> <span id="subtotal-price">...</span></p>
     </div>
 
     <div class="info-pod">
       <button id="proposta-btn" class="form-submit">Gerar Proposta</button>
     </div>
   </div>
+
 
   <!-- New Quote Cart Modal -->
   <div id="quote-cart-modal" class="modal-overlay" style="display: none;">

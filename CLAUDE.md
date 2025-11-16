@@ -20,7 +20,7 @@ Runs Express server on port 3000 with Supabase integration, Socket.IO, and stati
 
 ### Technology Stack
 - **Frontend**: Vanilla HTML/CSS/JS with Tailwind CSS
-- **Backend**: Node.js Express server (3000 lines in `server.js`)
+- **Backend**: Node.js Express server (~3000 lines in `server.js`)
 - **Real-time**: Socket.IO for AI chat functionality
 - **Database**: Supabase PostgreSQL
 - **Authentication**: Supabase Auth with custom wrapper
@@ -37,15 +37,28 @@ A complex quotation system for LED wall rentals with multiple pricing modes:
 **Authentication Flow** (`/led/auth.js`, `auth-config.js`, `auth-protection.js`):
 - Custom Supabase Auth wrapper with session persistence
 - Role-based access (admin/sales_rep vs. clients)
-- Auto-redirects unauthenticated users to `/led/login.html`
+- **Guest Access Mode**: Authentication is DISABLED for calculator access (commented out in `auth-protection.js`)
+  - Guests can use calculator and view pricing without login
+  - Authentication only required when submitting quote ("Gerar Proposta" button)
+  - Guest submission flow: collects email/phone/name → creates guest account → sends magic login link
+  - Guest account creation via `/api/register-guest` endpoint
+- `quote-service.js` creates public Supabase client for guest users to fetch product prices
 - Profile management integrated with proposals table
 
-**Pricing Engine** (`/led/pricing-pods.js`):
+**Pricing Engine** (`/led/pricing-pods.js`, `/led/led-wall.js`, `/led/discount-calculator.js`):
+- **CRITICAL**: `pricing-pods.js` is the SINGLE SOURCE OF TRUTH for pricing display and calculations
+- `led-wall.js` handles 3D visualization and LED wall geometry calculations only
 - Dynamic pricing for 2D vs 3D LED configurations
-- Calculates costs for: LED modules, Disguise processors/servers, RXII tracking units, Rube Draco camera systems
-- Studio size pricing categories
-- Multi-day rental rates with discount support
-- Known bug fix in `inject-fix.js` for Rube Draco display issues
+- Calculates costs for: LED modules, Disguise processors/servers, RXII tracking units, Stype tracking
+- Studio size pricing categories ("Estúdio de 436", etc.) - automatically added to cart
+- Multi-day rental rates with progressive discount system (1 day = 0%, 2 days = 25%, up to 720 days = 96%)
+- Discount calculator (`discount-calculator.js`) applies tiered discounts based on rental duration, interpolates between defined tiers
+- **Pricing Data Flow**:
+  1. `led-wall.js` calculates LED geometry → dispatches `ledWallDataCalculated` event
+  2. `pricing-pods.js` listens to event → fetches prices from Supabase `products` table
+  3. `pricing-pods.js` performs all price calculations and DOM updates
+  4. All price display elements (`#rxii-price`, `#tracking-price`, `#total-price`, etc.) controlled exclusively by `pricing-pods.js`
+- **Known Issue**: DO NOT add duplicate event handlers or price updates in `led-wall.js` - causes display conflicts
 
 **Quote Management**:
 - `quote-service.js`: Saves proposals to Supabase `proposals` table
@@ -98,6 +111,7 @@ Express server with 50+ API endpoints organized by domain:
 - `GET /api/auth/profile` - Current user profile
 - `POST /api/check-user-by-email` - Email lookup
 - `POST /api/create-client-user` - Client registration
+- `POST /api/register-guest` - **Public endpoint** for guest user registration (no auth required)
 - `PUT /api/update-user-profile` - Profile updates
 
 **Leads API**:
@@ -124,7 +138,16 @@ Express server with 50+ API endpoints organized by domain:
 
 **Main Tables**:
 - `proposals` - Complete quote data (LED specs, pricing, client info, shooting dates)
-- `products` - Equipment catalog
+- `products` - Equipment catalog with daily rental prices
+  - **CRITICAL**: Product names must match exactly in code (case-sensitive):
+    - `LED Module` - Per module daily rate
+    - `MX-40 Pro Processor` - Disguise processor daily rate
+    - `Disguise VX4n (Base)` - Base server daily rate
+    - `Disguise VX4n (Backup)` - Backup server daily rate
+    - `Disguise RXII Unit` - Per RXII unit daily rate
+    - `Stype Tracking` - Tracking system daily rate
+    - `Estúdio` - Studio rental (e.g., "Estúdio de 436")
+    - `Equipe Técnica Diária` - Technical crew daily rate
 - `quote_history` - Audit trail for quote changes (discounts, status updates)
 - `leads` - CRM lead management
 - `profiles` - Extended user profiles (linked to `auth.users`)
@@ -163,6 +186,32 @@ SUPABASE_SERVICE_ROLE_KEY=[service_key]  # Required for user management
 - Optimized media: `/img/` (mostly WebP format), raw assets in `/img/raw/`
 - Portuguese language (Brazilian market)
 
+### Critical Architectural Patterns
+
+**Event-Driven Communication**:
+- `led-wall.js` dispatches `ledWallDataCalculated` event when geometry changes
+- `pricing-pods.js` listens and recalculates prices
+- `quote-cart-modal.js` dispatches `updateProposalSummary` for cart updates
+- Always use custom events for cross-module communication
+
+**Price Data Management**:
+- All prices stored in Supabase `products` table (not hardcoded)
+- `quote-service.js` provides `getProductPrices()` function
+- Creates public Supabase client for guest users (no auth required)
+- Implements retry logic waiting for Supabase library to load (up to 5 seconds)
+- Price format: Use `formatPrice()` helper for Brazilian Real formatting (R$ X.XXX,XX)
+
+**DOM Element Ownership**:
+- Each module owns specific DOM elements - DO NOT create duplicate handlers
+- `pricing-pods.js` owns: `#rxii-price`, `#tracking-price`, `#total-price`, `#modules-price`, `#processors-price`, `#server-price`, `#studio-price`, `#team-price`
+- `led-wall.js` owns: LED 3D visualization canvas and geometry inputs only
+- Violating ownership causes race conditions and display bugs
+
+**Supabase Client Patterns**:
+- Authenticated users: Use `window.auth.getSupabaseClient()`
+- Guest users: Create public client with `window.supabase.createClient(supabaseUrl, window.SUPABASE_KEY)`
+- Admin operations: Use `supabaseAdmin` with service role key (server-side only)
+
 ### Important Notes
 
 **Authentication**:
@@ -170,10 +219,19 @@ SUPABASE_SERVICE_ROLE_KEY=[service_key]  # Required for user management
 - Without it, user management will fail (warning in console)
 - Two Supabase clients: `supabase` (anon) and `supabaseAdmin` (service role)
 
+**Recent Changes** (see git history for details):
+- Progressive discount system now applies to all equipment items
+- Estúdio pricing automatically added to cart on page load
+- Zero-quantity items hidden from shopping cart display
+- WhatsApp contact integration in hero section
+
 **Known Issues**:
-- Rube Draco pricing display bug (fixed in `inject-fix.js`)
 - Some UTF-8 encoding issues in legacy README files
 - Quote service handles missing database columns gracefully
+
+**Fixed Issues**:
+- ~~RXII and Tracking prices showing 0 on slider interaction~~ - Fixed by disabling duplicate event handlers in `led-wall.js`
+- Rube Draco pricing display bug (fixed in `inject-fix.js`)
 
 **File Organization**:
 - `/led/unused_files_backup/` - Deprecated/backup files (DO NOT USE)
@@ -186,3 +244,48 @@ SUPABASE_SERVICE_ROLE_KEY=[service_key]  # Required for user management
 - Clients can view their own quotes at `/led/my-quotes.html`
 - Admins see all quotes in dashboard
 - Lead capture integrated with quote system
+
+### Debugging and Troubleshooting
+
+**Common Issues**:
+
+1. **Prices showing as 0 or "Calculating..."**:
+   - Check browser console for `[quote-service]` logs showing Supabase client creation
+   - Verify `products` table has entries with exact product names (see Database Schema section)
+   - Check `[pricing-pods.js]` logs for "Prices fetched successfully" message
+   - Ensure `window.SUPABASE_KEY` is loaded (check for `supabaseConfigReady` event)
+
+2. **"Product prices not loaded yet" warning**:
+   - Normal on first load - retry logic handles this automatically
+   - If persists, check network tab for failed Supabase requests
+   - Verify Supabase RLS policies allow public SELECT on `products` table
+
+3. **Display elements not updating**:
+   - Check for duplicate event handlers in browser DevTools Event Listeners
+   - Verify only `pricing-pods.js` is updating price display elements
+   - Look for JavaScript errors in console interrupting calculation flow
+
+4. **Authentication issues for guests**:
+   - Verify `auth-protection.js` has redirect logic commented out
+   - Check `/api/register-guest` endpoint is accessible without auth
+   - Ensure Supabase anon key has permissions to create users
+
+5. **Total price incorrect**:
+   - Enable console logging in `pricing-pods.js` `calculateTotal()` method
+   - Verify all items are included in calculation (LED, processors, server, RXII, tracking, studio, team)
+   - Check if discount is being applied correctly via `discount-calculator.js`
+
+**Useful Console Commands**:
+```javascript
+// Check if prices are loaded
+window.pricingPodsController?.productPrices
+
+// Get current Supabase client
+window.auth?.getSupabaseClient()
+
+// Check authentication state
+window.auth?.isAuthenticated()
+
+// Manually trigger price recalculation
+document.dispatchEvent(new CustomEvent('ledWallDataCalculated', { detail: { totalModules: 100, moduleUnitPrice: 55 }}))
+```

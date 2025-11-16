@@ -3,14 +3,17 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Pricing Pods Script Loaded - Single Pod Logic');
 
-    // --- Main Pricing Pod Elements (#card-custo-3d) ---
-    const pricingPod = document.getElementById('card-custo-3d');
+    // --- Main Pricing Pod Elements (#sidebar-pricing) ---
+    const pricingPod = document.getElementById('sidebar-pricing');
     const podTitleSpan = document.getElementById('main-pod-title');
     const totalPriceSpan = document.getElementById('total-price');
 
-    // Initially hide the pricing pod
+    // Initially show the pricing pod (guest access enabled)
+    // Pod will be populated once prices are loaded
     if (pricingPod) {
-        pricingPod.style.display = 'none';
+        pricingPod.style.display = ''; // Show by default
+    } else {
+        console.error('[pricing-pods.js] Pricing pod element #sidebar-pricing not found!');
     }
 
     // Always Visible Items
@@ -54,14 +57,14 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn('[formatPrice] Input value is not a number:', value);
             return 'N/A'; // Or handle appropriately
         }
-        return numericValue.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        return 'R$ ' + numericValue.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     }
 
     // --- Core Logic ---
 
     class PricingPodsController {
         constructor() {
-            this.pricingPodElement = document.getElementById('card-custo-3d');
+            this.pricingPodElement = document.getElementById('sidebar-pricing');
             this.modeSelectorButtons = document.querySelectorAll('.selector-btn[data-mode]');
             this.currentMode = '3d'; // Default mode - Ensure this matches the HTML 'active' class
             this.productPrices = {}; // Store fetched prices here
@@ -77,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.processorUnitPrice = 0;
 
             if (!this.pricingPodElement) {
-                console.error('[PricingPodsController] Pricing pod element #card-custo-3d not found!');
+                console.error('[PricingPodsController] Pricing pod element #sidebar-pricing not found!');
                 return;
             }
 
@@ -108,42 +111,36 @@ document.addEventListener('DOMContentLoaded', () => {
         async fetchProductPrices() {
             console.log('[fetchProductPrices] Fetching prices from Supabase...');
             try {
-                const supabase = window.auth?.getSupabaseClient();
-                if (!supabase) {
-                    throw new Error('Supabase client not available');
+                // Use the quote-service which handles Supabase client initialization
+                if (!window.quoteService || typeof window.quoteService.getProductPrices !== 'function') {
+                    throw new Error('Quote service not available');
                 }
 
-                const { data, error } = await supabase
-                    .from('product_prices') // Assuming table name is 'product_prices'
-                    .select('item_name, price');
+                const result = await window.quoteService.getProductPrices();
 
-                if (error) throw error;
-
-                if (data) {
-                    this.productPrices = data.reduce((acc, item) => {
-                        acc[item.item_name] = item.price;
-                        return acc;
-                    }, {});
+                if (result.success && result.data) {
+                    this.productPrices = result.data;
                     console.log('[fetchProductPrices] Prices fetched successfully:', this.productPrices);
-                    this.pricesReady = true; // Set flag
-                    this.triggerInitialCalculationCheck('Prices Ready'); // Check if ready
+                    this.pricesReady = true;
+                    this.triggerInitialCalculationCheck('Prices Ready');
                 } else {
-                    console.warn('[fetchProductPrices] No price data returned from Supabase.');
-                    this.pricesReady = true; // Still ready, even if empty/error, to allow calc attempt
-                    this.triggerInitialCalculationCheck('Prices Ready (No Data)'); // Check if ready
+                    throw new Error(result.error || 'No price data returned');
                 }
             } catch (error) {
                 console.error('[fetchProductPrices] Error fetching prices:', error);
-                // Handle error appropriately, maybe set default prices or show an error message
-                this.productPrices = { // Fallback basic prices (consider removing if error handling is robust)
+                // Use fallback prices with correct database values
+                this.productPrices = {
                     'LED Module': 85,
                     'MX-40 Pro Processor': 1890,
                     'Disguise VX4n (Base)': 10000,
-                    'Disguise RXII Unit': 7750, // Price per unit
-                    'Stype Tracking': 3890
+                    'Disguise RXII Unit': 7750,
+                    'Stype Tracking': 3890,
+                    'Estúdio': 6000,
+                    'Equipe Técnica Diária': 9900
                 };
-                this.pricesReady = true; // Set flag even on error (using fallback)
-                this.triggerInitialCalculationCheck('Prices Ready (Error/Fallback)'); // Check if ready
+                console.log('[fetchProductPrices] Using fallback prices');
+                this.pricesReady = true;
+                this.triggerInitialCalculationCheck('Prices Ready (Fallback)');
             }
         }
 
@@ -157,9 +154,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const initialPodTitleSpan = this.pricingPodElement.querySelector('#main-pod-title');
             if (initialPodTitleSpan) {
                 if (this.currentMode === '3d') {
-                    initialPodTitleSpan.textContent = 'Virtual Production 3D ou 2.5D';
+                    initialPodTitleSpan.textContent = '3D ou 2.5D';
                 } else if (this.currentMode === '2d') {
-                    initialPodTitleSpan.textContent = 'Virtual Production 2D ou Car Plate';
+                    initialPodTitleSpan.textContent = '2D ou Car Plate';
                 } else {
                     initialPodTitleSpan.textContent = 'Custo Estimado'; // Default fallback
                 }
@@ -187,9 +184,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const podTitleSpan = this.pricingPodElement.querySelector('#main-pod-title');
                 if (podTitleSpan) {
                     if (newMode === '3d') {
-                        podTitleSpan.textContent = 'Virtual Production 3D ou 2.5D';
+                        podTitleSpan.textContent = '3D ou 2.5D';
                     } else if (newMode === '2d') {
-                        podTitleSpan.textContent = 'Virtual Production 2D ou Car Plate';
+                        podTitleSpan.textContent = '2D ou Car Plate';
                     } else {
                         podTitleSpan.textContent = 'Custo Estimado'; // Default fallback
                     }
@@ -218,15 +215,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const rxiiValueSpan = this.pricingPodElement.querySelector('#rxii-units-value'); // Get span
             if (rxiiSlider && rxiiValueSpan) { // Check both exist
                 rxiiSlider.addEventListener('input', () => {
-                    console.log('[PricingPodsController] RXII slider changed.');
                     const currentUnits = rxiiSlider.value; // Get current value
+                    console.log('[PricingPodsController] RXII slider changed to:', currentUnits);
                     rxiiValueSpan.textContent = currentUnits; // Explicitly update span *here*
                     if (this.currentMode === '3d') {
                         this.calculateTotal(this.currentMode, 'RXII Slider Change'); // Pass trigger info
-                    } else {
-                         // Update only the unit count display if in 2D mode (calculation doesn't happen)
-                         if (rxiiUnitsValueSpan) rxiiUnitsValueSpan.textContent = rxiiUnitsInput.value;
                     }
+                    // Removed buggy 2D mode code that referenced undefined variables
                 });
             }
 
@@ -287,20 +282,33 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemsForCart = [];
 
             // --- Get Unit Prices from fetched data ---
+            // Check if prices are loaded
+            if (!this.productPrices || Object.keys(this.productPrices).length === 0) {
+                console.warn('[calculateTotal] Product prices not loaded yet, skipping calculation');
+                return;
+            }
+
             const modulePrice = this.productPrices['LED Module'] || 0;
             const processorPrice = this.productPrices['MX-40 Pro Processor'] || 0;
             const vx4nBasePrice = this.productPrices['Disguise VX4n (Base)'] || 0;
             const rxiiUnitPrice = this.productPrices['Disguise RXII Unit'] || 0; // Per unit price
             const trackingPrice = this.productPrices['Stype Tracking'] || 0;
 
+            // Log warning if any critical prices are 0
+            if (mode === '3d' && (rxiiUnitPrice === 0 || trackingPrice === 0)) {
+                console.warn('[calculateTotal] Missing 3D prices - RXII:', rxiiUnitPrice, 'Tracking:', trackingPrice);
+            }
+
             // --- Core Items (Always present) ---
             // 1. LED Modules (Use dynamic data received from led-wall.js)
             const modulesTotalCost = this.totalModules * modulePrice;
             total += modulesTotalCost;
+            console.log(`[calculateTotal] LED Modules: ${this.totalModules} × ${modulePrice} = ${modulesTotalCost}`);
             itemsForCart.push({ id: 'led_modules', name: `Módulos LED (${this.totalModules} Unidades)`, quantity: this.totalModules, price: modulePrice }); // Store unit price
             const modulesPriceSpan = pod.querySelector('#modules-price');
             if (modulesPriceSpan) {
                 modulesPriceSpan.textContent = formatPrice(modulesTotalCost);
+                console.log(`[calculateTotal] Set modules-price to: ${formatPrice(modulesTotalCost)}`);
                 modulesPriceSpan.dataset.price = modulesTotalCost; // Update data attribute too
             }
 
@@ -325,48 +333,85 @@ document.addEventListener('DOMContentLoaded', () => {
             itemsForCart.push({ id: 'disguise_vx4n', name: serverName, quantity: isBackupServerActive ? 2 : 1, price: vx4nBasePrice });
             if (serverPriceElement) serverPriceElement.textContent = formatPrice(serverCost);
 
+            // Declare 3D mode elements before conditional logic
+            const rxiiGroup = pod.querySelector('#rxii-group');
+            const trackingItem = pod.querySelector('#tracking-item');
+
             // --- 3D Mode Specific Items ---
             if (mode === '3d') {
                 // 4. Disguise RXII (Read slider value, use fetched unit price)
-                const rxiiGroup = pod.querySelector('#rxii-group');
                 const rxiiUnitsInput = pod.querySelector('#rxii-units'); // The slider
                 const rxiiUnitsValueSpan = pod.querySelector('#rxii-units-value'); // The display span
                 const rxiiPriceElement = pod.querySelector('#rxii-price'); // The price display span
-                // const rxiiUnitPrice = parseFloat(rxiiPriceElement?.dataset.unitPrice || '0'); // Now fetched
                 const rxiiUnits = parseInt(rxiiUnitsInput?.value || '1'); // Read slider value HERE
 
-                console.log(`[calculateTotal] Trigger: ${trigger} - Read rxiiUnits slider value: ${rxiiUnits}`);
+                console.log(`[calculateTotal] Trigger: ${trigger} - RXII Units: ${rxiiUnits}, Unit Price: ${rxiiUnitPrice}`);
 
                 const rxiiTotalCost = rxiiUnits * rxiiUnitPrice;
                 total += rxiiTotalCost;
                 // For cart: use unit price and quantity
                 itemsForCart.push({ id: 'disguise_rxii', name: 'Disguise RXII', quantity: rxiiUnits, price: rxiiUnitPrice });
                 if(rxiiUnitsValueSpan) rxiiUnitsValueSpan.textContent = rxiiUnits;
-                if(rxiiPriceElement) rxiiPriceElement.textContent = formatPrice(rxiiTotalCost);
+                if(rxiiPriceElement) {
+                    console.log(`[calculateTotal] Setting RXII price display to: ${formatPrice(rxiiTotalCost)} (${rxiiTotalCost})`);
+                    rxiiPriceElement.textContent = formatPrice(rxiiTotalCost);
+                } else {
+                    console.warn('[calculateTotal] RXII price element not found!');
+                }
 
                 // Show RXII Group
                 if (rxiiGroup) rxiiGroup.style.display = '';
 
                 // 5. Stype Tracking (Use fetched price)
-                const trackingItem = pod.querySelector('#tracking-item');
                 const trackingPriceElement = pod.querySelector('#tracking-price');
-                // const trackingCost = parseFloat(trackingPriceElement?.dataset.price || '0'); // Now fetched
                 const trackingCost = trackingPrice;
                 total += trackingCost;
                 itemsForCart.push({ id: 'stype_tracking', name: 'Stype Tracking', quantity: 1, price: trackingCost });
-                 // Update display
-                if(trackingPriceElement) trackingPriceElement.textContent = formatPrice(trackingCost);
+                // Update display
+                if(trackingPriceElement) {
+                    console.log(`[calculateTotal] Setting Tracking price display to: ${formatPrice(trackingCost)} (${trackingCost})`);
+                    trackingPriceElement.textContent = formatPrice(trackingCost);
+                } else {
+                    console.warn('[calculateTotal] Tracking price element not found!');
+                }
 
                 // Show Tracking Item
-                 if (trackingItem) trackingItem.style.display = '';
+                if (trackingItem) trackingItem.style.display = '';
             } else { // 2D Mode
-                 // Hide RXII Group
-                 if (rxiiGroup) rxiiGroup.style.display = 'none';
-                 // Hide Tracking Item
-                 if (trackingItem) trackingItem.style.display = 'none';
+                // Hide RXII Group
+                if (rxiiGroup) rxiiGroup.style.display = 'none';
+                // Hide Tracking Item
+                if (trackingItem) trackingItem.style.display = 'none';
             }
 
-            // Update the main total price display
+            // --- Additional Items (Always Visible) ---
+            // 6. Estúdio (Use fetched price from Supabase)
+            const studioPriceElement = pod.querySelector('#studio-price');
+            const studioPrice = this.productPrices['Estúdio'] || 6000;
+            total += studioPrice;
+            itemsForCart.push({ id: 'estudio', name: 'Estúdio', quantity: 1, price: studioPrice });
+            if (studioPriceElement) {
+                studioPriceElement.textContent = formatPrice(studioPrice);
+                studioPriceElement.dataset.price = studioPrice;
+            }
+
+            // 7. Equipe Profissional (Use fetched price from Supabase)
+            const teamPriceElement = pod.querySelector('#team-price');
+            const teamPrice = this.productPrices['Equipe Técnica Diária'] || 0;
+            total += teamPrice;
+            itemsForCart.push({ id: 'equipe_tecnica', name: 'Equipe Profissional', quantity: 1, price: teamPrice });
+            if (teamPriceElement) {
+                teamPriceElement.textContent = formatPrice(teamPrice);
+                teamPriceElement.dataset.price = teamPrice;
+            }
+
+            // Update the subtotal display
+            const subtotalPriceSpan = pod.querySelector('#subtotal-price');
+            if (subtotalPriceSpan) {
+                subtotalPriceSpan.textContent = formatPrice(total);
+            }
+
+            // Update the main total price display (same as subtotal for now)
             const mainTotalPriceSpan = pod.querySelector('#total-price');
             if (mainTotalPriceSpan) {
                 mainTotalPriceSpan.textContent = formatPrice(total);
@@ -386,43 +431,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const controller = new PricingPodsController(); // Re-add const for reference
 
     // Function to update pod visibility based on auth state
+    // UPDATED: Always show pricing pod for guest users
     const updatePodVisibility = (user) => {
-        console.log('[pricing-pods.js] updatePodVisibility called with user:', user?.email || 'null');
-        
+        console.log('[pricing-pods.js] updatePodVisibility called with user:', user?.email || 'guest');
+
         if (pricingPod) {
-            if (user) {
-                console.log('[pricing-pods.js] User authenticated, showing pricing pod.');
-                pricingPod.style.display = ''; // Show the pod
-                
-                // Ensure calculation runs when pod becomes visible
-                setTimeout(() => {
-                    if (controller && typeof controller.calculateTotal === 'function') {
-                        controller.calculateTotal(controller.currentMode, 'User Authenticated');
-                    } else {
-                        console.error('[pricing-pods.js] Controller or calculateTotal method not found for visibility update.');
-                    }
-                }, 100);
-            } else {
-                console.log('[pricing-pods.js] User not authenticated, hiding pricing pod.');
-                pricingPod.style.display = 'none'; // Hide the pod
-            }
+            // Always show the pricing pod (guest access enabled)
+            console.log('[pricing-pods.js] Showing pricing pod (guest access enabled)');
+            pricingPod.style.display = ''; // Show the pod
+
+            // Ensure calculation runs when pod becomes visible
+            setTimeout(() => {
+                if (controller && typeof controller.calculateTotal === 'function') {
+                    controller.calculateTotal(controller.currentMode, user ? 'User Authenticated' : 'Guest Access');
+                } else {
+                    console.error('[pricing-pods.js] Controller or calculateTotal method not found for visibility update.');
+                }
+            }, 100);
         } else {
             console.error('[pricing-pods.js] Pricing pod element not found!');
         }
     };
 
     // Function to check current auth state and update visibility
+    // UPDATED: Show pod even if auth is not available (guest access)
     const checkAuthStateAndUpdate = () => {
         if (window.auth && typeof window.auth.isAuthenticated === 'function') {
             const isAuth = window.auth.isAuthenticated();
             const currentUser = window.auth.getCurrentUser();
-            console.log('[pricing-pods.js] Current auth state - isAuthenticated:', isAuth, 'user:', currentUser?.email || 'null');
+            console.log('[pricing-pods.js] Current auth state - isAuthenticated:', isAuth, 'user:', currentUser?.email || 'guest');
             updatePodVisibility(currentUser);
         } else {
-            console.log('[pricing-pods.js] Auth not available yet, hiding pod by default');
-            if (pricingPod) {
-                pricingPod.style.display = 'none';
-            }
+            console.log('[pricing-pods.js] Auth not available yet, showing pod for guest access');
+            // Show pod even without auth (guest access enabled)
+            updatePodVisibility(null); // Pass null to indicate guest user
         }
     };
 
@@ -447,17 +489,15 @@ document.addEventListener('DOMContentLoaded', () => {
     waitForAuthAndListen();
     
     // Also check periodically in case auth state changes without triggering the listener
+    // UPDATED: Pod should always be visible now (guest access enabled)
     const periodicAuthCheck = setInterval(() => {
         if (window.auth && typeof window.auth.isAuthenticated === 'function') {
-            const currentAuthState = window.auth.isAuthenticated();
-            const podVisible = pricingPod && pricingPod.style.display !== 'none';
-            
-            // If auth state and pod visibility don't match, update
-            if (currentAuthState !== podVisible) {
-                console.log('[pricing-pods.js] Auth state mismatch detected, correcting...');
+            // Just ensure pod is visible, regardless of auth state
+            if (pricingPod && pricingPod.style.display === 'none') {
+                console.log('[pricing-pods.js] Pod hidden detected, showing for guest access...');
                 checkAuthStateAndUpdate();
             }
-            
+
             // Clear interval after auth system is working
             clearInterval(periodicAuthCheck);
         }

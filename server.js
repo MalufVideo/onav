@@ -1726,6 +1726,165 @@ app.post('/api/check-user-by-email', async (req, res) => {
   }
 });
 
+// Public guest user registration (no auth required)
+app.post('/api/register-guest', async (req, res) => {
+  try {
+    const { email, phone, full_name, sendEmail } = req.body;
+
+    if (!email || !phone || !full_name) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email, phone, and full_name are required'
+      });
+    }
+
+    // Generate a random password for the user
+    const randomPassword = Math.random().toString(36).slice(-12) + Math.random().toString(36).slice(-12);
+
+    // Create user in Supabase Auth
+    let newUser = null;
+    try {
+      const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
+        email: email,
+        password: randomPassword,
+        email_confirm: true,
+        user_metadata: {
+          full_name: full_name,
+          phone: phone
+        }
+      });
+
+      if (createError) {
+        // Check if user already exists
+        if (createError.message && createError.message.includes('already registered')) {
+          return res.status(400).json({
+            success: false,
+            error: 'User already exists with this email'
+          });
+        }
+        throw createError;
+      }
+      newUser = userData;
+      console.log('[register-guest] User created in auth:', newUser.user.id);
+    } catch (error) {
+      console.error('[register-guest] Error creating user in auth:', error);
+      if (!supabaseServiceKey) {
+        return res.status(500).json({
+          success: false,
+          error: 'Cannot create users: Service role key not configured',
+          message: 'Please contact administrator to enable user registration',
+          details: error.message
+        });
+      }
+      throw error;
+    }
+
+    // Create profile in user_profiles table
+    const profileData = {
+      id: newUser.user.id,
+      email: email,
+      full_name: full_name,
+      phone: phone,
+      role: 'end_user',
+      is_active: true
+    };
+
+    const { data: profile, error: insertProfileError } = await supabaseAdmin
+      .from('user_profiles')
+      .insert(profileData)
+      .select()
+      .single();
+
+    if (insertProfileError) {
+      console.error('[register-guest] Error creating profile:', insertProfileError);
+      // Try to clean up the created user if profile creation fails
+      try {
+        await supabaseAdmin.auth.admin.deleteUser(newUser.user.id);
+      } catch (cleanupError) {
+        console.error('[register-guest] Failed to cleanup user:', cleanupError);
+      }
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to create user profile',
+        details: insertProfileError.message
+      });
+    }
+
+    console.log('[register-guest] Profile created:', profile.id);
+
+    // Send magic link email if requested
+    if (sendEmail) {
+      try {
+        const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+          type: 'magiclink',
+          email: email,
+          options: {
+            redirectTo: `${process.env.BASE_URL || 'http://localhost:3000'}/led/my-quotes.html`
+          }
+        });
+
+        if (linkError) {
+          console.error('[register-guest] Error generating magic link:', linkError);
+        } else {
+          console.log('[register-guest] Magic link generated:', linkData);
+
+          // Send email with magic link using Resend
+          try {
+            const resendResponse = await fetch('https://api.resend.com/emails', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                from: 'ONAV <noreply@onav.com.br>',
+                to: [email],
+                subject: 'Acesse sua proposta - ONAV',
+                html: `
+                  <h2>Bem-vindo à ONAV!</h2>
+                  <p>Olá ${full_name},</p>
+                  <p>Sua conta foi criada com sucesso. Clique no link abaixo para acessar suas propostas:</p>
+                  <p><a href="${linkData.properties.action_link}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Acessar Minhas Propostas</a></p>
+                  <p>Ou copie e cole este link no seu navegador:</p>
+                  <p>${linkData.properties.action_link}</p>
+                  <br>
+                  <p>Atenciosamente,<br>Equipe ONAV</p>
+                `
+              })
+            });
+
+            if (!resendResponse.ok) {
+              const resendError = await resendResponse.text();
+              console.error('[register-guest] Error sending email via Resend:', resendError);
+            } else {
+              const resendData = await resendResponse.json();
+              console.log('[register-guest] Email sent successfully:', resendData);
+            }
+          } catch (emailError) {
+            console.error('[register-guest] Error sending email:', emailError);
+          }
+        }
+      } catch (linkGenerationError) {
+        console.error('[register-guest] Error in link generation process:', linkGenerationError);
+      }
+    }
+
+    res.status(201).json({
+      success: true,
+      userId: newUser.user.id,
+      message: 'User created successfully'
+    });
+
+  } catch (error) {
+    console.error('[register-guest] Error creating guest user:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create guest user',
+      details: error.message
+    });
+  }
+});
+
 // Create new user (for dashboard client creation)
 app.post('/api/create-client-user', async (req, res) => {
   try {

@@ -19,7 +19,9 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      background: linear-gradient(135deg, rgba(2, 2, 2, 0.95) 0%, rgba(0, 0, 0, 1) 100%);
+      background: radial-gradient(circle at 20% 20%, rgba(249, 115, 22, 0.18), transparent 45%),
+        radial-gradient(circle at 80% 0%, rgba(251, 191, 36, 0.22), transparent 40%),
+        linear-gradient(135deg, #01040c 0%, #0b1222 100%);
       background-attachment: fixed;
     }
     
@@ -27,27 +29,27 @@
       width: 100%;
       max-width: 420px;
       padding: 40px;
-      background: rgba(2, 2, 2, 0.8);
-      border: 1px solid rgba(0, 255, 157, 0.2);
+      background: rgba(9, 15, 30, 0.9);
+      border: 1px solid rgba(249, 115, 22, 0.35);
       border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
     
     .login-container:hover {
-      border-color: rgba(0, 255, 157, 0.4);
-      box-shadow: 0 12px 40px rgba(0, 255, 157, 0.1);
+      border-color: rgba(251, 191, 36, 0.6);
+      box-shadow: 0 25px 60px rgba(249, 115, 22, 0.25);
       transition: all 0.3s ease;
     }
     
     h1 {
       text-align: center;
       margin: 0 0 30px 0;
-      color: #ffffff;
+      color: #f8fafc;
       font-size: 1.8rem;
       font-weight: 600;
-      text-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+      text-shadow: 0 0 20px rgba(249, 115, 22, 0.35);
     }
     
     .form-group {
@@ -65,7 +67,7 @@
     input {
       width: 100%;
       padding: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 8px;
       font-size: 16px;
       background: rgba(255, 255, 255, 0.05);
@@ -77,8 +79,8 @@
     
     input:focus {
       outline: none;
-      border-color: rgba(0, 255, 157, 0.5);
-      box-shadow: 0 0 0 2px rgba(0, 255, 157, 0.1);
+      border-color: rgba(251, 191, 36, 0.5);
+      box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
       background: rgba(255, 255, 255, 0.08);
     }
     
@@ -89,22 +91,22 @@
     .form-submit {
       width: 100%;
       padding: 14px;
-      background: linear-gradient(135deg, rgba(0, 255, 157, 0.8) 0%, rgba(0, 167, 125, 0.9) 100%);
-      color: #000000;
+      background: linear-gradient(120deg, #f97316 0%, #fbbf24 100%);
+      color: #0f172a;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
       margin-top: 10px;
-      transition: all 0.3s ease;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      box-shadow: 0 12px 30px rgba(249, 115, 22, 0.35);
     }
     
     .form-submit:hover {
-      background: linear-gradient(135deg, rgba(0, 255, 157, 1) 0%, rgba(0, 167, 125, 1) 100%);
-      box-shadow: 0 4px 20px rgba(0, 255, 157, 0.4);
+      box-shadow: 0 18px 40px rgba(249, 115, 22, 0.45);
       transform: translateY(-2px);
     }
     
@@ -126,19 +128,19 @@
     }
     
     .toggle-form {
-      color: #a0a0a0;
+      color: #cdd6f6;
     }
     
     .toggle-form a {
-      color: rgba(0, 255, 157, 0.9);
+      color: rgba(249, 115, 22, 0.85);
       text-decoration: none;
       font-weight: 500;
       transition: color 0.3s ease;
     }
     
     .toggle-form a:hover {
-      color: rgba(0, 255, 157, 1);
-      text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);
+      color: rgba(251, 191, 36, 1);
+      text-shadow: 0 0 12px rgba(249, 115, 22, 0.45);
     }
     
     .auth-error {
@@ -153,12 +155,12 @@
     }
     
     .auth-success {
-      color: rgba(0, 255, 157, 1);
+      color: rgba(251, 191, 36, 1);
       font-size: 14px;
       margin-bottom: 15px;
       padding: 10px;
-      background: rgba(0, 255, 157, 0.1);
-      border: 1px solid rgba(0, 255, 157, 0.2);
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(249, 115, 22, 0.2);
       border-radius: 6px;
       backdrop-filter: blur(5px);
     }
@@ -205,19 +207,19 @@
   <style>
     /* On+Av Light Theme Styling (blue-purple gradient + white card) */
     body {
-      background: linear-gradient(135deg, #6a8dff 0%, #9b5bff 100%);
+      background: linear-gradient(135deg, #fde68a 0%, #f97316 100%);
       color: #333333;
     }
 
     .login-container {
       background: #ffffff;
-      border: 1px solid #e0e0e0;
+      border: 1px solid rgba(249, 115, 22, 0.25);
       border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 15px 40px rgba(249, 115, 22, 0.15);
     }
 
     h1 {
-      color: #222222;
+      color: #1f2937;
       text-shadow: none;
     }
 
@@ -227,40 +229,36 @@
 
     input {
       background: #f7f9ff;
-      color: #333333;
-      border: 1px solid #ccd4ff;
-    }
-
-    input::placeholder {
-      color: #888888;
+      color: #111111;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: rgba(0, 0, 0, 0.02);
     }
 
     input:focus {
-      border-color: #6a8dff;
-      box-shadow: 0 0 0 2px rgba(106, 141, 255, 0.2);
+      border-color: rgba(249, 115, 22, 0.5);
+      box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.25);
       background: #ffffff;
     }
 
     .form-submit {
-      background: linear-gradient(135deg, #0066ff 0%, #004de6 100%);
-      color: #ffffff;
+      background: linear-gradient(120deg, #f97316 0%, #fbbf24 100%);
+      color: #0f172a;
+      text-transform: none;
+      letter-spacing: normal;
     }
 
     .form-submit:hover {
-      background: linear-gradient(135deg, #3384ff 0%, #0060ff 100%);
-      box-shadow: 0 4px 20px rgba(0, 102, 255, 0.3);
-    }
-
-    .toggle-form {
-      color: #666666;
+      background: linear-gradient(120deg, #fb923c 0%, #fcd34d 100%);
+      box-shadow: 0 6px 22px rgba(249, 115, 22, 0.35);
     }
 
     .toggle-form a {
-      color: #0066ff;
+      color: #dd6b20;
     }
 
     .toggle-form a:hover {
-      color: #3384ff;
+      color: #f97316;
+      text-shadow: none;
     }
   </style>
 </head>

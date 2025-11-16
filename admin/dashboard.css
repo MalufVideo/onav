@@ -6,27 +6,31 @@
 }
 
 :root {
-    --primary-color: #4CAF50;
-    --secondary-color: #2196F3;
-    --danger-color: #f44336;
-    --warning-color: #ff9800;
-    --success-color: #4CAF50;
-    --dark-bg: #1a1a1a;
-    --sidebar-bg: #2c2c2c;
-    --card-bg: #ffffff;
-    --text-primary: #333333;
-    --text-secondary: #666666;
-    --border-color: #e0e0e0;
-    --hover-bg: #f5f5f5;
-    --shadow: 0 2px 4px rgba(0,0,0,0.1);
-    --shadow-lg: 0 4px 12px rgba(0,0,0,0.15);
+    --bg-gradient-start: #01040c;
+    --bg-gradient-end: #0b1222;
+    --panel-bg: rgba(7, 12, 24, 0.9);
+    --card-bg: rgba(13, 20, 36, 0.92);
+    --card-border: rgba(248, 250, 252, 0.08);
+    --panel-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
+    --accent-color: #fbbf24;
+    --accent-strong: #f97316;
+    --text-primary: #f8fafc;
+    --text-secondary: #cdd6f6;
+    --danger-color: #f87171;
+    --warning-color: #facc15;
+    --success-color: #34d399;
+    --hover-bg: rgba(248, 250, 252, 0.08);
 }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background-color: #f8f9fa;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(249, 115, 22, 0.18), transparent 55%),
+        radial-gradient(circle at 80% 0%, rgba(251, 191, 36, 0.15), transparent 45%),
+        linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
     color: var(--text-primary);
     line-height: 1.6;
+    min-height: 100vh;
 }
 
 /* Sidebar Styles */
@@ -36,11 +40,14 @@ body {
     top: 0;
     width: 260px;
     height: 100vh;
-    background-color: var(--sidebar-bg);
-    color: white;
+    background: var(--panel-bg);
+    color: var(--text-primary);
     transition: width 0.3s ease;
     z-index: 1000;
     overflow-y: auto;
+    border-right: 1px solid var(--card-border);
+    box-shadow: var(--panel-shadow);
+    backdrop-filter: blur(18px);
 }
 
 .sidebar.collapsed {
@@ -52,7 +59,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid var(--card-border);
 }
 
 .sidebar .logo {
@@ -66,12 +73,13 @@ body {
 }
 
 .sidebar-toggle {
-    background: none;
-    border: none;
-    color: white;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
     font-size: 20px;
     cursor: pointer;
     padding: 5px;
+    border-radius: 8px;
 }
 
 .sidebar-menu {
@@ -87,20 +95,21 @@ body {
     display: flex;
     align-items: center;
     padding: 12px 20px;
-    color: rgba(255,255,255,0.8);
+    color: var(--text-secondary);
     text-decoration: none;
     transition: all 0.3s;
     position: relative;
 }
 
 .menu-item a:hover {
-    background-color: rgba(255,255,255,0.1);
-    color: white;
+    background-color: var(--hover-bg);
+    color: var(--text-primary);
 }
 
 .menu-item.active a {
-    background-color: var(--primary-color);
-    color: white;
+    background: linear-gradient(120deg, var(--accent-strong), var(--accent-color));
+    color: #0f172a;
+    box-shadow: 0 10px 25px rgba(249, 115, 22, 0.35);
 }
 
 .menu-item i {
@@ -120,12 +129,13 @@ body {
 }
 
 .badge {
-    background-color: var(--danger-color);
-    color: white;
+    background: rgba(248, 113, 113, 0.2);
+    color: var(--danger-color);
     font-size: 12px;
     padding: 2px 6px;
     border-radius: 10px;
     margin-left: auto;
+    border: 1px solid rgba(248, 113, 113, 0.35);
 }
 
 .sidebar-footer {
@@ -133,7 +143,7 @@ body {
     bottom: 0;
     width: 100%;
     padding: 20px;
-    border-top: 1px solid rgba(255,255,255,0.1);
+    border-top: 1px solid var(--card-border);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -146,16 +156,17 @@ body {
 }
 
 .logout-btn {
-    background: none;
-    border: none;
-    color: rgba(255,255,255,0.8);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
     font-size: 18px;
     cursor: pointer;
-    padding: 5px;
+    padding: 8px;
+    border-radius: 50%;
 }
 
 .logout-btn:hover {
-    color: white;
+    background: rgba(255, 255, 255, 0.12);
 }
 
 /* Main Content */
@@ -171,15 +182,17 @@ body {
 
 /* Top Bar */
 .top-bar {
-    background-color: white;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     padding: 20px 30px;
-    box-shadow: var(--shadow);
+    box-shadow: var(--panel-shadow);
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: sticky;
     top: 0;
     z-index: 100;
+    backdrop-filter: blur(18px);
 }
 
 .top-bar h1 {
@@ -195,8 +208,9 @@ body {
 
 .notification-btn,
 .refresh-btn {
-    background: none;
-    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
     padding: 8px 12px;
     border-radius: 8px;
     cursor: pointer;
@@ -214,15 +228,19 @@ body {
     top: -5px;
     right: -5px;
     background-color: var(--danger-color);
-    color: white;
+    color: #0f172a;
     font-size: 11px;
     padding: 2px 5px;
     border-radius: 10px;
+    box-shadow: 0 6px 14px rgba(248, 113, 113, 0.45);
 }
 
 /* Page Content */
 .page-content {
     padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
 }
 
 /* Cards */
@@ -234,16 +252,18 @@ body {
 }
 
 .stat-card {
-    background: white;
+    background: var(--card-bg);
     padding: 25px;
-    border-radius: 12px;
-    box-shadow: var(--shadow);
+    border-radius: 16px;
+    border: 1px solid var(--card-border);
+    box-shadow: var(--panel-shadow);
     transition: transform 0.3s, box-shadow 0.3s;
+    backdrop-filter: blur(16px);
 }
 
 .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+    box-shadow: 0 25px 35px rgba(0, 0, 0, 0.45);
 }
 
 .stat-card-header {
@@ -261,7 +281,7 @@ body {
 
 .stat-card-icon {
     font-size: 24px;
-    opacity: 0.3;
+    color: var(--accent-color);
 }
 
 .stat-card-value {
@@ -276,6 +296,7 @@ body {
     display: flex;
     align-items: center;
     gap: 5px;
+    color: var(--text-secondary);
 }
 
 .stat-card-change.positive {
@@ -288,15 +309,16 @@ body {
 
 /* Tables */
 .data-table {
-    background: white;
-    border-radius: 12px;
-    box-shadow: var(--shadow);
+    background: var(--card-bg);
+    border-radius: 16px;
+    border: 1px solid var(--card-border);
+    box-shadow: var(--panel-shadow);
     overflow: hidden;
 }
 
 .table-header {
     padding: 20px;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--card-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -318,9 +340,20 @@ body {
 
 .search-box input {
     padding: 8px 12px 8px 35px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
     width: 250px;
+    background: rgba(15, 23, 42, 0.8);
+    color: var(--text-primary);
+}
+
+.search-box input::placeholder {
+    color: var(--text-secondary);
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: var(--accent-color);
 }
 
 .search-box i {
@@ -337,7 +370,7 @@ table {
 }
 
 thead {
-    background-color: #f8f9fa;
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 th {
@@ -345,14 +378,14 @@ th {
     text-align: left;
     font-weight: 600;
     color: var(--text-secondary);
-    font-size: 14px;
+    font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 td {
     padding: 15px;
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 tbody tr:hover {
@@ -369,64 +402,73 @@ tbody tr:hover {
 }
 
 .status-badge.pending {
-    background-color: #fff3cd;
-    color: #856404;
+    background-color: rgba(250, 204, 21, 0.15);
+    color: var(--warning-color);
+    border: 1px solid rgba(250, 204, 21, 0.35);
 }
 
 .status-badge.approved {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: rgba(52, 211, 153, 0.18);
+    color: var(--success-color);
+    border: 1px solid rgba(52, 211, 153, 0.35);
 }
 
 .status-badge.rejected {
-    background-color: #f8d7da;
-    color: #721c24;
+    background-color: rgba(248, 113, 113, 0.15);
+    color: var(--danger-color);
+    border: 1px solid rgba(248, 113, 113, 0.35);
 }
 
 .status-badge.new {
-    background-color: #cce5ff;
-    color: #004085;
+    background-color: rgba(96, 165, 250, 0.18);
+    color: #93c5fd;
+    border: 1px solid rgba(96, 165, 250, 0.35);
 }
 
 /* Buttons */
 .btn {
-    padding: 8px 16px;
+    padding: 10px 18px;
     border: none;
-    border-radius: 8px;
+    border-radius: 999px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    letter-spacing: 0.3px;
 }
 
 .btn-primary {
-    background-color: var(--primary-color);
-    color: white;
+    background: linear-gradient(120deg, var(--accent-strong), var(--accent-color));
+    color: #0f172a;
+    box-shadow: 0 18px 40px rgba(249, 115, 22, 0.4);
 }
 
 .btn-primary:hover {
-    background-color: #45a049;
+    transform: translateY(-1px);
+    box-shadow: 0 25px 45px rgba(249, 115, 22, 0.45);
 }
 
 .btn-secondary {
-    background-color: #e0e0e0;
+    background: rgba(255, 255, 255, 0.08);
     color: var(--text-primary);
+    border: 1px solid var(--card-border);
 }
 
 .btn-secondary:hover {
-    background-color: #d0d0d0;
+    background: rgba(255, 255, 255, 0.16);
 }
 
 .btn-danger {
-    background-color: var(--danger-color);
-    color: white;
+    background: rgba(248, 113, 113, 0.18);
+    color: var(--danger-color);
+    border: 1px solid rgba(248, 113, 113, 0.4);
 }
 
 .btn-danger:hover {
-    background-color: #d32f2f;
+    background: rgba(248, 113, 113, 0.28);
 }
 
 .btn-sm {
@@ -451,10 +493,11 @@ tbody tr:hover {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(1, 4, 12, 0.85);
     z-index: 2000;
     align-items: center;
     justify-content: center;
+    backdrop-filter: blur(4px);
 }
 
 .modal.active {
@@ -462,14 +505,16 @@ tbody tr:hover {
 }
 
 .modal-content {
-    background: white;
-    border-radius: 12px;
+    background: var(--card-bg);
+    border-radius: 20px;
     width: 90%;
     max-width: 600px;
     max-height: 90vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    border: 1px solid var(--card-border);
+    box-shadow: var(--panel-shadow);
 }
 
 .modal-content.large {
@@ -478,7 +523,7 @@ tbody tr:hover {
 
 .modal-header {
     padding: 20px;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--card-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -490,16 +535,17 @@ tbody tr:hover {
 }
 
 .modal-close {
-    background: none;
-    border: none;
-    font-size: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    font-size: 18px;
     cursor: pointer;
-    color: var(--text-secondary);
-    padding: 5px;
+    color: var(--text-primary);
+    padding: 6px;
+    border-radius: 8px;
 }
 
 .modal-close:hover {
-    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.12);
 }
 
 .modal-body {
@@ -517,25 +563,33 @@ tbody tr:hover {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: var(--text-primary);
+    color: var(--text-secondary);
 }
 
 .form-group input,
 .form-group textarea,
 .form-group select {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
     font-size: 14px;
     transition: border-color 0.3s;
+    background: rgba(15, 23, 42, 0.85);
+    color: var(--text-primary);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: var(--text-secondary);
 }
 
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
     outline: none;
-    border-color: var(--primary-color);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.15);
 }
 
 .form-help {
@@ -561,10 +615,12 @@ tbody tr:hover {
     align-items: center;
     gap: 8px;
     cursor: pointer;
+    color: var(--text-secondary);
 }
 
 .checkbox-label input[type="checkbox"] {
     width: auto;
+    accent-color: var(--accent-color);
 }
 
 /* Notification Panel */
@@ -574,10 +630,12 @@ tbody tr:hover {
     top: 0;
     width: 400px;
     height: 100vh;
-    background: white;
-    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    background: var(--panel-bg);
+    box-shadow: -2px 0 25px rgba(0, 0, 0, 0.45);
     transition: right 0.3s;
     z-index: 1500;
+    border-left: 1px solid var(--card-border);
+    backdrop-filter: blur(18px);
 }
 
 .notification-panel.active {
@@ -586,18 +644,20 @@ tbody tr:hover {
 
 .notification-header {
     padding: 20px;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--card-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .close-panel {
-    background: none;
-    border: none;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
     font-size: 20px;
     cursor: pointer;
-    color: var(--text-secondary);
+    color: var(--text-primary);
+    padding: 5px 10px;
+    border-radius: 8px;
 }
 
 .notification-list {
@@ -608,19 +668,21 @@ tbody tr:hover {
 
 .notification-item {
     padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    background-color: #f8f9fa;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    background-color: rgba(255, 255, 255, 0.04);
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.2s;
+    border: 1px solid transparent;
 }
 
 .notification-item:hover {
-    background-color: #e9ecef;
+    background-color: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
 }
 
 .notification-item.unread {
-    background-color: #e3f2fd;
+    border-color: rgba(251, 191, 36, 0.35);
 }
 
 .notification-time {
@@ -635,13 +697,14 @@ tbody tr:hover {
     bottom: -100px;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--dark-bg);
-    color: white;
+    background: var(--panel-bg);
+    color: var(--text-primary);
     padding: 15px 25px;
-    border-radius: 8px;
-    box-shadow: var(--shadow-lg);
+    border-radius: 12px;
+    box-shadow: var(--panel-shadow);
     transition: bottom 0.3s;
     z-index: 3000;
+    border: 1px solid var(--card-border);
 }
 
 .toast.show {
@@ -663,10 +726,12 @@ tbody tr:hover {
 }
 
 .chart-card {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: var(--shadow);
+    background: var(--card-bg);
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid var(--card-border);
+    box-shadow: var(--panel-shadow);
+    backdrop-filter: blur(16px);
 }
 
 .chart-card h3 {
@@ -677,10 +742,12 @@ tbody tr:hover {
 
 /* Calendar Styles */
 .calendar-container {
-    background: white;
-    border-radius: 12px;
-    box-shadow: var(--shadow);
-    padding: 20px;
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--panel-shadow);
+    padding: 24px;
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(16px);
 }
 
 .calendar-header {
@@ -698,12 +765,13 @@ tbody tr:hover {
 
 .calendar-day {
     aspect-ratio: 1;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
     padding: 8px;
     position: relative;
     cursor: pointer;
     transition: all 0.3s;
+    background: rgba(255, 255, 255, 0.02);
 }
 
 .calendar-day:hover {
@@ -711,7 +779,8 @@ tbody tr:hover {
 }
 
 .calendar-day.has-event {
-    border-color: var(--primary-color);
+    border-color: var(--accent-color);
+    box-shadow: 0 12px 24px rgba(251, 191, 36, 0.15);
 }
 
 .calendar-day-number {
@@ -721,8 +790,8 @@ tbody tr:hover {
 
 .calendar-event {
     font-size: 11px;
-    background-color: var(--primary-color);
-    color: white;
+    background: linear-gradient(120deg, var(--accent-strong), var(--accent-color));
+    color: #0f172a;
     padding: 2px 5px;
     border-radius: 4px;
     margin-bottom: 2px;
@@ -736,28 +805,28 @@ tbody tr:hover {
     .sidebar {
         width: 70px;
     }
-    
+
     .sidebar:not(.collapsed) {
         width: 100%;
     }
-    
+
     .main-content {
         margin-left: 70px;
     }
-    
+
     .stats-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .charts-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .table-actions {
         flex-direction: column;
         width: 100%;
     }
-    
+
     .search-box input {
         width: 100%;
     }

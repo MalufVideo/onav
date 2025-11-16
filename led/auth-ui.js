@@ -339,30 +339,34 @@ function addAuthStyles() {
 }
 
 .auth-button { /* This is for sidebar buttons, not modal submit */
-  padding: 8px 12px;
+  padding: 8px 14px;
   border: none;
-  border-radius: 6px;
-  background-color: #4CAF50; /* Existing green */
-  color: white;
-  font-weight: 500;
+  border-radius: 999px;
+  background-image: linear-gradient(120deg, #f97316, #fbbf24);
+  color: #0f172a;
+  font-weight: 600;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.2s;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   text-decoration: none;
   display: inline-block;
   text-align: center;
+  box-shadow: 0 10px 20px rgba(249, 115, 22, 0.3);
 }
 
 .auth-button:hover {
-  background-color: #45a049;
+  transform: translateY(-1px);
+  box-shadow: 0 14px 26px rgba(249, 115, 22, 0.35);
 }
 
 .logout-btn {
-  background-color: #f44336;
+  background-image: linear-gradient(120deg, #f87171, #ef4444);
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(239, 68, 68, 0.25);
 }
 
 .logout-btn:hover {
-  background-color: #d32f2f;
+  box-shadow: 0 14px 26px rgba(239, 68, 68, 0.35);
 }
 
 .user-profile {

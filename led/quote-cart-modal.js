@@ -631,9 +631,18 @@ class QuoteCartModal {
         console.log('[QuoteCartModal] Submission token:', submissionToken);
 
         try {
-            // --- Get User Info ---
-            if (!supabase || !supabase.auth || typeof supabase.auth.getSession !== 'function') { 
-                alert('Você precisa estar logado para requisitar uma proposta.');
+            // --- Get User Info (Handle Guest or Authenticated Users) ---
+            let userId = null;
+            let userEmail = '';
+            let clientName = '';
+            let clientCompany = '';
+            let clientPhone = '';
+            let isGuestUser = false;
+            let guestUserCreated = false;
+
+            if (!supabase || !supabase.auth || typeof supabase.auth.getSession !== 'function') {
+                console.error('[submitQuote] Supabase auth not available');
+                alert('Erro: Sistema de autenticação não disponível.');
                 if (this.submitButton) {
                     this.submitButton.disabled = false;
                     this.submitButton.textContent = 'Requisitar Proposta';
@@ -641,35 +650,120 @@ class QuoteCartModal {
                 return;
             }
 
-            // Check session first
+            // Check if user is authenticated
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-            if (sessionError) {
-                throw new Error(`Erro ao obter sessão: ${sessionError.message}`);
+
+            if (session && session.user) {
+                // Authenticated user - use existing session
+                const user = session.user;
+                userId = user.id;
+                userEmail = user.email || '';
+                clientName = user.user_metadata?.full_name;
+                if (!clientName || clientName === 'Nome não disponível') {
+                    const emailName = userEmail.split('@')[0] || '';
+                    clientName = emailName
+                        .replace(/[._]/g, ' ')
+                        .replace(/\b\w/g, l => l.toUpperCase());
+                }
+                clientCompany = user.user_metadata?.company || '';
+                clientPhone = user.user_metadata?.phone || '';
+                console.log('[submitQuote] Using authenticated user:', userEmail);
+            } else {
+                // Guest user - collect email/phone info
+                isGuestUser = true;
+                console.log('[submitQuote] Guest user detected - collecting contact info');
+
+                // Prompt for email and phone
+                const guestEmail = prompt('Para receber sua proposta, por favor insira seu email:');
+                if (!guestEmail || !guestEmail.includes('@')) {
+                    alert('Email válido é necessário para receber a proposta.');
+                    if (this.submitButton) {
+                        this.submitButton.disabled = false;
+                        this.submitButton.textContent = 'Requisitar Proposta';
+                    }
+                    this.isSubmitting = false;
+                    return;
+                }
+
+                const guestPhone = prompt('Por favor insira seu telefone (com DDD):');
+                if (!guestPhone || guestPhone.length < 10) {
+                    alert('Telefone válido é necessário para contato.');
+                    if (this.submitButton) {
+                        this.submitButton.disabled = false;
+                        this.submitButton.textContent = 'Requisitar Proposta';
+                    }
+                    this.isSubmitting = false;
+                    return;
+                }
+
+                const guestName = prompt('Por favor insira seu nome:');
+                if (!guestName || guestName.trim().length < 2) {
+                    alert('Nome é necessário.');
+                    if (this.submitButton) {
+                        this.submitButton.disabled = false;
+                        this.submitButton.textContent = 'Requisitar Proposta';
+                    }
+                    this.isSubmitting = false;
+                    return;
+                }
+
+                userEmail = guestEmail.trim().toLowerCase();
+                clientPhone = guestPhone.trim();
+                clientName = guestName.trim();
+
+                // Check if user already exists
+                try {
+                    const checkResponse = await fetch('/api/check-user-by-email', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: userEmail })
+                    });
+
+                    const checkResult = await checkResponse.json();
+
+                    if (checkResult.exists) {
+                        // User exists - use their ID
+                        userId = checkResult.userId;
+                        console.log('[submitQuote] Found existing user:', userId);
+                    } else {
+                        // Create new guest user account using public endpoint
+                        console.log('[submitQuote] Creating new guest user account...');
+                        const createResponse = await fetch('/api/register-guest', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                email: userEmail,
+                                phone: clientPhone,
+                                full_name: clientName,
+                                sendEmail: true // Send login link
+                            })
+                        });
+
+                        const createResult = await createResponse.json();
+
+                        if (createResult.success) {
+                            userId = createResult.userId;
+                            guestUserCreated = true;
+                            console.log('[submitQuote] Guest user created successfully:', userId);
+                        } else {
+                            throw new Error(createResult.error || 'Erro ao criar conta de usuário');
+                        }
+                    }
+                } catch (error) {
+                    console.error('[submitQuote] Error handling guest user:', error);
+                    alert('Erro ao processar seu cadastro. Por favor, tente novamente.');
+                    if (this.submitButton) {
+                        this.submitButton.disabled = false;
+                        this.submitButton.textContent = 'Requisitar Proposta';
+                    }
+                    this.isSubmitting = false;
+                    return;
+                }
             }
-            if (!session || !session.user) {
-                throw new Error('Sessão de usuário não encontrada. Por favor, faça login novamente.');
-            }
-            
-            const user = session.user;
-            const userId = user?.id;
+
             if (!userId) {
-                throw new Error('Não foi possível obter o ID do usuário.');
+                throw new Error('Não foi possível identificar ou criar usuário.');
             }
-            
-            // Get user metadata - provide fallbacks
-            const userEmail = user?.email || '';
-            // Try to get name from metadata, or extract from email if not available
-            let clientName = user?.user_metadata?.full_name;
-            if (!clientName || clientName === 'Nome não disponível') {
-                // Extract name from email (part before @)
-                const emailName = userEmail.split('@')[0] || '';
-                // Convert to title case and replace dots/underscores with spaces
-                clientName = emailName
-                    .replace(/[._]/g, ' ')
-                    .replace(/\b\w/g, l => l.toUpperCase());
-            }
-            const clientCompany = user?.user_metadata?.company || '';
-            const clientPhone = user?.user_metadata?.phone || '';
 
             // Store email for later use in confirmation modal
             this.currentUserEmail = userEmail;
@@ -938,7 +1032,7 @@ class QuoteCartModal {
             // --- Success Handling ---
             console.log('[QuoteCartModal] Resetting cart and showing confirmation...');
             this.hide();
-            this.showConfirmationModal(projectName);
+            this.showConfirmationModal(projectName, isGuestUser, guestUserCreated);
             console.log('[QuoteCartModal] Successfully called showConfirmationModal.');
 
         } catch (error) {
@@ -953,7 +1047,8 @@ class QuoteCartModal {
              alert('Ocorreu um erro inesperado ao processar sua requisição. Verifique o console para detalhes.');
 
         } finally {
-            // Re-enable submit button regardless of success or failure
+            // Re-enable submit button and reset submission flag
+            this.isSubmitting = false;
             if (this.submitButton) {
                 this.submitButton.disabled = false;
                 this.submitButton.textContent = 'Requisitar Proposta';
@@ -963,23 +1058,22 @@ class QuoteCartModal {
     
     // ... (other methods like showCalEmbed, etc.) ...
 
-    showConfirmationModal(projectName) {
+    showConfirmationModal(projectName, isGuestUser = false, guestUserCreated = false) {
         console.log('[QuoteCartModal] Entering showConfirmationModal...');
         const confirmationModal = document.getElementById('confirmation-modal');
         const confirmationHeader = document.getElementById('confirmation-header');
         const confirmationBody = document.getElementById('confirmation-body');
         const confirmationFooter = document.getElementById('confirmation-footer');
         const confirmationCloseBtn = document.getElementById('confirmation-close-btn');
-        const viewMyProposalsBtn = document.getElementById('view-my-proposals-btn');
 
         // Get user name for personalized message
         const currentUser = window.auth?.getCurrentUser();
         let userName = 'Cliente'; // Default fallback
-        
+
         if (currentUser) {
             // Try user metadata first
             userName = currentUser.user_metadata?.full_name;
-            
+
             // If not available, extract from email
             if (!userName) {
                 const emailName = currentUser.email?.split('@')[0] || '';
@@ -989,23 +1083,54 @@ class QuoteCartModal {
             }
         }
 
-        // Update modal content as per requirements
+        // Update modal content based on user type
         if (confirmationHeader) {
             confirmationHeader.innerHTML = `<h2>Obrigado!</h2>`;
         }
+
         if (confirmationBody) {
-            confirmationBody.innerHTML = `
-                <p>Obrigado <strong>${userName}</strong>. Sua estimativa do projeto <strong>${projectName}</strong> foi enviada e você já recebeu no seu email.</p>
-                <br>
-                <p><strong>${userName}</strong>, saiba que a <strong>ONAV</strong> tem um desconto extra para esse projeto. Clique em "Falar com Especialista" e agende uma conversa sobre seu projeto e converta a estimativa em proposta oficial com desconto.</p>
-            `;
+            if (isGuestUser && guestUserCreated) {
+                // New guest user - inform about login link
+                confirmationBody.innerHTML = `
+                    <p>Obrigado <strong>${userName}</strong>! Sua estimativa do projeto <strong>${projectName}</strong> foi enviada.</p>
+                    <br>
+                    <p>✉️ <strong>Enviamos um link de acesso para seu email</strong> onde você pode visualizar sua proposta a qualquer momento.</p>
+                    <br>
+                    <p>Saiba que a <strong>ONAV</strong> tem um desconto extra para esse projeto. Clique em "Falar com Especialista" e agende uma conversa sobre seu projeto e converta a estimativa em proposta oficial com desconto.</p>
+                `;
+            } else if (isGuestUser && !guestUserCreated) {
+                // Existing user submitting as guest
+                confirmationBody.innerHTML = `
+                    <p>Obrigado <strong>${userName}</strong>. Sua estimativa do projeto <strong>${projectName}</strong> foi enviada e você já recebeu no seu email.</p>
+                    <br>
+                    <p><strong>${userName}</strong>, saiba que a <strong>ONAV</strong> tem um desconto extra para esse projeto. Clique em "Falar com Especialista" e agende uma conversa sobre seu projeto e converta a estimativa em proposta oficial com desconto.</p>
+                `;
+            } else {
+                // Authenticated user - standard message
+                confirmationBody.innerHTML = `
+                    <p>Obrigado <strong>${userName}</strong>. Sua estimativa do projeto <strong>${projectName}</strong> foi enviada e você já recebeu no seu email.</p>
+                    <br>
+                    <p><strong>${userName}</strong>, saiba que a <strong>ONAV</strong> tem um desconto extra para esse projeto. Clique em "Falar com Especialista" e agende uma conversa sobre seu projeto e converta a estimativa em proposta oficial com desconto.</p>
+                `;
+            }
         }
+
         if (confirmationFooter) {
-            confirmationFooter.innerHTML = `
-                <button id="view-my-proposals-btn" class="form-submit">Minhas Propostas</button>
-                <button id="talk-to-specialist-btn" class="form-submit" style="margin-left:10px;">Falar com Especialista</button>
-            `;
+            if (isGuestUser) {
+                // Guest users - show only "Falar com Especialista" button
+                confirmationFooter.innerHTML = `
+                    <button id="talk-to-specialist-btn" class="form-submit">Falar com Especialista</button>
+                    <button id="close-modal-btn" class="form-submit" style="margin-left:10px; background-color: #6c757d;">Fechar</button>
+                `;
+            } else {
+                // Authenticated users - show both buttons
+                confirmationFooter.innerHTML = `
+                    <button id="view-my-proposals-btn" class="form-submit">Minhas Propostas</button>
+                    <button id="talk-to-specialist-btn" class="form-submit" style="margin-left:10px;">Falar com Especialista</button>
+                `;
+            }
         }
+
         // Hide the close button if present
         if (confirmationCloseBtn) confirmationCloseBtn.style.display = 'none';
 
@@ -1018,6 +1143,8 @@ class QuoteCartModal {
         setTimeout(() => {
             const myProposalsBtn = document.getElementById('view-my-proposals-btn');
             const talkBtn = document.getElementById('talk-to-specialist-btn');
+            const closeBtn = document.getElementById('close-modal-btn');
+
             if (myProposalsBtn) {
                 myProposalsBtn.onclick = () => {
                     window.location.href = '/led/my-quotes.html';
@@ -1026,8 +1153,14 @@ class QuoteCartModal {
             }
             if (talkBtn) {
                 talkBtn.onclick = () => {
-                    // Open Cal.com in new tab
-                    window.open('https://cal.com/onav.com.br/30min?overlayCalendar=true', '_blank');
+                    // Open WhatsApp or Cal.com
+                    window.open('https://wa.me/5511981234567?text=Olá! Gostaria de conversar sobre minha proposta.', '_blank');
+                };
+            }
+            if (closeBtn) {
+                closeBtn.onclick = () => {
+                    if (confirmationModal) confirmationModal.style.display = 'none';
+                    window.location.reload(); // Reload to reset calculator
                 };
             }
         }, 0);
