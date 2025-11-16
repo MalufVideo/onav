@@ -11,7 +11,7 @@ function createAuthUI() {
       <button id="login-button" class="auth-button">Entrar</button>
       <button id="register-button" class="auth-button">Cadastrar</button>
       <div id="user-profile" class="user-profile" style="display: none;">
-        <span id="user-name" style="margin-right: 10px; font-weight: bold;"></span>
+        <span id="user-name" style="margin-right: 10px; font-weight: bold; color: #fff;"></span>
         <a href="my-quotes.html" class="auth-button" id="my-quotes-button" style="margin-right: 10px;">Minhas Propostas</a>
         <button id="logout-button" class="auth-button logout-btn">Sair</button>
       </div>
