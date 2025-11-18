@@ -2441,7 +2441,13 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
         
         <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Desafio Criativo</h4>
         <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Além de fornecer a tecnologia e o estúdio, fomos responsáveis por conceber e produzir todo o ambiente 3D do filme. A diretora chegou com referências e imagens estáticas do tipo de deserto que imaginava, e nosso desafio foi transformar esse moodboard em um cenário virtual crível e cinematográfico. Criamos o deserto em Unreal Engine, montanhas e atmosfera até chegar exatamente ao visual desejado. Um dos trechos mais complexos envolvia um carro em alta velocidade cruzando o deserto, exigindo que o render node sustentasse o movimento rápido sem perda de qualidade.</p>
-        
+        <div style="margin: 1.5rem 0;">
+          <video controls style="width: 100%; border-radius: 12px; border: 1px solid #333; box-shadow: 0 4px 12px rgba(0,0,0,0.4);">
+            <source src="/img/avon_ana_castela_v2.mp4" type="video/mp4">
+            Seu navegador não suporta a tag de vídeo.
+          </video>
+          <p style="font-size: 0.8em; line-height: 1.5; color: #bbbbbb; margin-top: 0.5rem;">Sequência completa utilizada no volume LED mostrando o carro em alta velocidade pelo deserto.</p>
+        </div>
         <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Nossa Solução</h4>
         <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Nossa entrega foi um pacote completo de produção virtual. Utilizamos nosso estúdio de última geração em São Paulo, equipado com um volume LED HDR de 16 x 5 metros, pitch 2.6 mm, operando com sinal RGB 4:4:4 sem compressão em tempo real. O conteúdo 3D rodou em um servidor <strong>Disguise RXII</strong>, garantindo performance e fidelidade de cor, enquanto o sistema de rastreamento <strong>Stype Red Spy</strong> assegurou o parallax perfeito entre câmera, cenário e movimento da artista, dando à direção liberdade total para explorar ângulos, composições e variações de luz.</p>
         
@@ -3400,22 +3406,44 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
         const closeAvonCaseStudyModalBtn = document.getElementById('closeAvonCaseStudyModal');
         const avonCaseStudyTrigger = document.querySelector('.case-study-trigger-avon');
 
+        const avonInlineVideo = document.getElementById('avonCaseStudyInlineVideo');
+        const avonInlineVideoSource = document.getElementById('avonCaseStudyInlineVideoSource');
+
+        function loadAvonInlineVideo() {
+            if (avonInlineVideo && avonInlineVideoSource && !avonInlineVideoSource.src) {
+                avonInlineVideoSource.src = avonInlineVideoSource.getAttribute('data-src');
+                avonInlineVideo.load();
+            }
+        }
+
+        function resetAvonInlineVideo() {
+            if (avonInlineVideo && avonInlineVideoSource) {
+                avonInlineVideo.pause();
+                avonInlineVideo.currentTime = 0;
+                avonInlineVideoSource.src = '';
+                avonInlineVideo.load();
+            }
+        }
+
         if (avonCaseStudyTrigger) {
             avonCaseStudyTrigger.style.cursor = 'pointer'; // Indicate it's clickable
             avonCaseStudyTrigger.addEventListener('click', () => {
                 avonCaseStudyModal.style.display = 'flex'; // Use flex to center content
+                loadAvonInlineVideo();
             });
         }
 
         if (closeAvonCaseStudyModalBtn) {
             closeAvonCaseStudyModalBtn.addEventListener('click', () => {
                 avonCaseStudyModal.style.display = 'none';
+                resetAvonInlineVideo();
             });
         }
 
         window.addEventListener('click', (event) => {
             if (event.target === avonCaseStudyModal) {
                 avonCaseStudyModal.style.display = 'none';
+                resetAvonInlineVideo();
             }
         });
         
