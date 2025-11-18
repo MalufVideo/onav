@@ -1166,6 +1166,7 @@ input[type="range"]::-moz-range-thumb {
   text-align: right;
   font-size: 1.1em;
   font-weight: bold;
+  color: #000; /* Ensure total text is black for readability */
 }
 
 .cart-total-days {
