@@ -20,7 +20,8 @@
       "mcp__playwright__browser_snapshot",
       "mcp__playwright__browser_take_screenshot",
       "mcp__playwright__browser_evaluate",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "mcp__supabase__list_edge_functions"
     ],
     "deny": [],
     "ask": []

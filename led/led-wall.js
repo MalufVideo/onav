@@ -335,7 +335,7 @@ class LEDWallCalculator {
     event.preventDefault();
 
     // Normalize wheel delta across browsers
-    const delta = Math.sign(event.deltaY) * Math.min(Math.abs(event.deltaY) / 100, 1);
+    const delta = Math.sign(event.deltaY) * Math.min(Math.abs(event.deltaY) / 1000, 1);
     this.zoom(delta * this.cameraControls.zoomSpeed);
   }
 
@@ -591,10 +591,10 @@ class LEDWallCalculator {
     const processorPriceTotal = processorsNeeded * processorDailyPrice;
 
     // Dispatch event with necessary data for pricing pods
-    // IMPORTANT: Send only principal modules for pricing display (not including ceiling)
+    // UPDATED: Send combined total (principal + teto) as requested
     const eventData = {
         detail: {
-            totalModules: principalModules, // Only principal wall modules, not combined
+            totalModules: totalModulesCombined, // Use combined total
             moduleUnitPrice: moduleDailyPrice,
             processorsNeeded: processorsNeeded, // Pass other relevant data if needed
             processorUnitPrice: processorDailyPrice,
