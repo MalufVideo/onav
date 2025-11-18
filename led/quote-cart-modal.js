@@ -160,10 +160,10 @@ class QuoteCartModal {
     async getSelectedItemsFromPods() {
         console.log("[getSelectedItemsFromPods] Starting - Single Pod Logic");
         const items = [];
-        const pricingPod = document.getElementById('card-custo-3d'); // Target the single unified pod
+        const pricingPod = document.getElementById('sidebar-pricing'); // Corrected ID to match the actual pricing pod
 
         if (pricingPod) {
-            console.log("[getSelectedItemsFromPods] Found pricing pod #card-custo-3d");
+            console.log("[getSelectedItemsFromPods] Found pricing pod #sidebar-pricing");
             try {
                 const podItemsData = pricingPod.dataset.items;
                 if (podItemsData) {
@@ -186,14 +186,14 @@ class QuoteCartModal {
                         }
                     });
                 } else {
-                    console.log("[getSelectedItemsFromPods] data-items attribute is empty or missing on #card-custo-3d.");
+                    console.log("[getSelectedItemsFromPods] data-items attribute is empty or missing on #sidebar-pricing.");
                 }
             } catch (e) {
-                console.error("[getSelectedItemsFromPods] Error parsing data-items from #card-custo-3d:", e);
+                console.error("[getSelectedItemsFromPods] Error parsing data-items from #sidebar-pricing:", e);
                 console.error("[getSelectedItemsFromPods] Raw data-items:", pricingPod.dataset.items);
             }
         } else {
-            console.log("[getSelectedItemsFromPods] Pricing pod #card-custo-3d not found.");
+            console.log("[getSelectedItemsFromPods] Pricing pod #sidebar-pricing not found.");
         }
 
         // --- Add LED Configuration Info (Keep this part) ---
@@ -379,165 +379,66 @@ class QuoteCartModal {
             this.cartItemsContainer.appendChild(infoElement);
         });
 
-        // Render expected 3D items, using data from cartItems if available
-        expected3DItems.forEach(expectedName => {
-            const item = this.cartItems.find(cartItem => cartItem.name && cartItem.name.startsWith(expectedName));
+        // Detect current mode from the pricing pod or mode selector
+        const activeButton = document.querySelector('#card-disguise-selector .selector-btn.active');
+        const currentMode = activeButton?.dataset.mode || '3d';
+        console.log(`[renderCart] Detected mode: ${currentMode}`);
 
-            let quantity = 0;
-            // Map expectedName to Supabase product name
-            const productNameMap = {
-                "Módulos LED": "LED Module",
-                "Processadores MX-40 Pro": "MX-40 Pro Processor",
-                "Disguise VX4n": "Disguise VX4n (Base)",
-                "Disguise RXII": "Disguise RXII Unit",
-                "Stype Tracking": "Stype Tracking"
-            };
-            let supabaseProductName = productNameMap[expectedName] || expectedName;
-            let unitPrice = this.productPrices[supabaseProductName] || 0;
-            let itemName = expectedName;
-            let itemSubtotal = 0;
-
-            if (item) {
-                itemName = item.name; // Use the full name from the item if found
-                // Apply specific quantity logic based on the base name
-                switch (expectedName) {
-                    case 'Módulos LED':
-                        const match = itemName.match(/\((\d+)\s*Unidades\)/);
-                        if (match && match[1]) {
-                            quantity = parseInt(match[1], 10);
-                        } else {
-                            console.warn(`[renderCart] Could not parse quantity from LED module name: ${itemName}. Using item.quantity: ${item.quantity}`);
-                            quantity = item.quantity || 0; // Fallback
-                        }
-                        break;
-
-                    case 'Processadores MX-40 Pro':
-                        const processorsInput = document.getElementById('processors');
-                        if (processorsInput) {
-                            // Try .value (for <input>), fallback to .textContent (for <span> or <p>)
-                            let raw = processorsInput.value !== undefined ? processorsInput.value : processorsInput.textContent;
-                            quantity = parseInt(raw, 10) || 0;
-                        } else {
-                            // Fallback: try XPath if element not found
-                            try {
-                                const xpathResult = document.evaluate('/html/body/div[3]/div[2]/p[2]/span', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-                                const spanNode = xpathResult.singleNodeValue;
-                                if (spanNode) {
-                                    quantity = parseInt(spanNode.textContent, 10) || 0;
-                                } else {
-                                    quantity = 0;
-                                }
-                            } catch (e) {
-                                quantity = 0;
-                            }
-                        }
-                        break;
-
-                    case 'Disguise VX4n':
-                        // If the item name includes "+ Backup", set quantity to 2, else 1
-                        if (itemName.includes('+ Backup')) {
-                            quantity = 2;
-                        } else {
-                            quantity = 1;
-                        }
-                        break;
-
-                    case 'Disguise RXII':
-                    case 'Stype Tracking':
-                        quantity = item.quantity || 0; // Use provided quantity
-                        break;
-
-                    default:
-                        // Should not happen with predefined list, but as a fallback
-                        quantity = item.quantity || 0;
-                        break;
-                }
-
-                // Ensure quantity is a non-negative number
-                quantity = Math.max(0, quantity);
-
-                // Calculate subtotal only if item was found and has quantity > 0
-                if (quantity > 0) {
-                    itemSubtotal = unitPrice * quantity;
-                    dailyTotalPrice += itemSubtotal;
-                }
-
-                console.log(`[renderCart Debug] Item: ${itemName} | Unit Price: ${formatCurrency(unitPrice)} | Qty: ${quantity} | Subtotal: ${formatCurrency(itemSubtotal)}`);
-
-            } else {
-                // Item not found in cartItems, skip rendering (don't show items with 0 quantity)
-                console.log(`[renderCart Debug] Item not found in cartItems: ${expectedName}. Skipping (zero quantity).`);
-                quantity = 0;
-                itemSubtotal = 0;
+        // Filter items based on mode - only show RXII and Tracking in 3D mode
+        const itemsToRender = this.cartItems.filter(item => {
+            // Always show LED modules, processors, VX4n, studio, and team
+            if (item.id === 'led_modules' || item.id === 'processors' ||
+                item.id === 'disguise_vx4n' || item.id === 'estudio' ||
+                item.id === 'equipe_tecnica') {
+                return true;
             }
-
-            // Only render the item row if quantity > 0
-            if (quantity > 0) {
-                const itemElement = document.createElement('div');
-                itemElement.classList.add('cart-item');
-                itemElement.innerHTML = `
-                    <span class="cart-item-name">${itemName}</span>
-                    <span class="cart-item-qty">${quantity}</span>
-                    <span class="cart-item-price">${formatCurrency(unitPrice)}</span>
-                    <span class="cart-item-subtotal">${formatCurrency(itemSubtotal)}</span>
-                `;
-                this.cartItemsContainer.appendChild(itemElement);
+            // Only show RXII and tracking in 3D mode
+            if ((item.id === 'disguise_rxii' || item.id === 'stype_tracking') && currentMode === '3d') {
+                return true;
             }
+            // Filter out RXII and tracking in 2D mode
+            if ((item.id === 'disguise_rxii' || item.id === 'stype_tracking') && currentMode === '2d') {
+                return false;
+            }
+            // Include other items
+            return true;
         });
 
-        // --- Add Estúdio Item if available ---
-        const studioProductName = 'Estúdio';
-        const studioItems = this.cartItems.filter(item => item.name && item.name.toLowerCase().includes('estúdio'));
-        let studioDisplayRows = 0;
+        console.log(`[renderCart] Items to render (${itemsToRender.length}):`, itemsToRender.map(i => i.name));
 
-        studioItems.forEach(studioItem => {
-            const quantity = Math.max(1, studioItem.quantity || 1);
-            const unitPrice = studioItem.price || this.productPrices[studioProductName] || 0;
-            const subtotal = unitPrice * quantity;
+        // Render items from cartItems array
+        itemsToRender.forEach(item => {
+            const quantity = item.quantity || 0;
+            const unitPrice = item.price || 0;
+            const itemSubtotal = quantity * unitPrice;
 
+            // Skip items with 0 quantity
+            if (quantity === 0) {
+                console.log(`[renderCart] Skipping item with 0 quantity: ${item.name}`);
+                return;
+            }
+
+            // Add to daily total
+            dailyTotalPrice += itemSubtotal;
+
+            console.log(`[renderCart Debug] Item: ${item.name} | Unit Price: ${formatCurrency(unitPrice)} | Qty: ${quantity} | Subtotal: ${formatCurrency(itemSubtotal)}`);
+
+            // Render the item row
             const itemElement = document.createElement('div');
             itemElement.classList.add('cart-item');
             itemElement.innerHTML = `
-                <span class="cart-item-name">${studioItem.name}</span>
+                <span class="cart-item-name">${item.name}</span>
                 <span class="cart-item-qty">${quantity}</span>
                 <span class="cart-item-price">${formatCurrency(unitPrice)}</span>
-                <span class="cart-item-subtotal">${formatCurrency(subtotal)}</span>
+                <span class="cart-item-subtotal">${formatCurrency(itemSubtotal)}</span>
             `;
             this.cartItemsContainer.appendChild(itemElement);
-
-            studioDailyTotal += subtotal;
-            studioDisplayRows += 1;
         });
 
-        // --- Add Equipe Especializada Disguise ---
-        const equipeName = 'Equipe especializada Disguise';
-        const equipeSupabaseName = 'Equipe Técnica Diária'; // Name used in your products table
-        const equipeUnitPrice = this.productPrices[equipeSupabaseName] || 0;
-        const equipeQuantity = 1; // Fixed quantity
-        const equipeSubtotal = equipeQuantity * equipeUnitPrice;
-
-        if (equipeUnitPrice > 0) { // Only render if price is found
-            const equipeElement = document.createElement('div');
-            equipeElement.classList.add('cart-item');
-            equipeElement.innerHTML = `
-                <span class="cart-item-name">${equipeName}</span>
-                <span class="cart-item-qty">${equipeQuantity}</span>
-                <span class="cart-item-price">${formatCurrency(equipeUnitPrice)}</span>
-                <span class="cart-item-subtotal">${formatCurrency(equipeSubtotal)}</span>
-            `;
-            this.cartItemsContainer.appendChild(equipeElement);
-            dailyTotalPrice += equipeSubtotal; // Add to the daily total
-            console.log(`[renderCart] Added ${equipeName}, Price: ${equipeUnitPrice}, Subtotal: ${equipeSubtotal}`);
-        } else {
-            console.warn(`[renderCart] Price for '${equipeSupabaseName}' not found. Item not added.`);
-        }
-        // --- End Equipe Especializada Disguise ---
-
-        console.log(`[renderCart Debug] Studio Daily Total: ${formatCurrency(studioDailyTotal)}`);
         console.log(`[renderCart Debug] Equipment Daily Total: ${formatCurrency(dailyTotalPrice)}`);
 
-        // Calculate combined daily total (equipment + studio)
-        const combinedDailyTotal = dailyTotalPrice + studioDailyTotal;
+        // Calculate combined daily total (all items already in dailyTotalPrice)
+        const combinedDailyTotal = dailyTotalPrice;
         const originalTotalPrice = combinedDailyTotal * numberOfDays;
 
         console.log(`[renderCart Debug] Combined Daily Total: ${formatCurrency(combinedDailyTotal)}`);
