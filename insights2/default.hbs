@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    {{! Document Settings }}
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    
+    {{! Page Meta }}
+    <title>{{meta_title}}</title>
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    {{! Brand meta }}
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    <link rel="canonical" href="{{url absolute="true"}}" />
+    
+    {{! SEO and Social Meta }}
+    <meta property="og:site_name" content="{{@site.title}}" />
+    <meta property="og:type" content="{{#is "post"}}article{{else}}website{{/is}}" />
+    <meta property="og:title" content="{{meta_title}}" />
+    <meta property="og:description" content="{{#if excerpt}}{{excerpt}}{{else}}{{@site.description}}{{/if}}" />
+    <meta property="og:url" content="{{url absolute="true"}}" />
+    <meta property="og:image" content="{{#if feature_image}}{{img_url feature_image}}{{else}}{{asset "img/og-default.webp"}}{{/if}}" />
+    <meta property="og:locale" content="pt_BR" />
+    
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{meta_title}}" />
+    <meta name="twitter:description" content="{{#if excerpt}}{{excerpt}}{{else}}{{@site.description}}{{/if}}" />
+    <meta name="twitter:url" content="{{url absolute="true"}}" />
+    <meta name="twitter:image" content="{{#if feature_image}}{{img_url feature_image}}{{else}}{{asset "img/og-default.webp"}}{{/if}}" />
+    
+    {{#is "post"}}
+        <meta property="article:published_time" content="{{date published_at format="YYYY-MM-DD"}}T{{date published_at format="HH:mm:ss"}}Z" />
+        <meta property="article:modified_time" content="{{date updated_at format="YYYY-MM-DD"}}T{{date updated_at format="HH:mm:ss"}}Z" />
+        {{#if primary_tag}}
+            <meta property="article:tag" content="{{primary_tag.name}}" />
+        {{/if}}
+        {{#if primary_author}}
+            <meta property="article:author" content="{{primary_author.name}}" />
+        {{/if}}
+    {{/is}}
+    
+    {{! Favicon }}
+    <link rel="icon" type="image/x-icon" href="{{asset "favicon.ico"}}" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{asset "apple-touch-icon.png"}}" />
+    <link rel="icon" type="image/png" sizes="32x32" href="{{asset "favicon-32x32.png"}}" />
+    <link rel="icon" type="image/png" sizes="16x16" href="{{asset "favicon-16x16.png"}}" />
+    
+    {{! Fonts }}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    {{! Tailwind CSS }}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00ff9d',
+                        secondary: '#0066ff',
+                        purpleish: '#9370DB',
+                        dark: '#0a0a0a',
+                        darker: '#020202',
+                        'light-text': '#e0e0e0',
+                        'medium-text': '#a0a0a0'
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    {{! Font Awesome }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    {{! Custom Styles }}
+    <link rel="stylesheet" type="text/css" href="{{asset "css/main.css"}}" />
+    <link rel="stylesheet" type="text/css" href="{{asset "css/main-simple.css"}}" />
+    
+    {{! Ghost outputs important scripts and data with this tag }}
+    {{ghost_head}}
+    
+    {{! Additional styles for critical components }}
+    <style>
+        body {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #020202;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .text-primary { color: #00ff9d; }
+        .text-light-text { color: #e0e0e0; }
+        .text-medium-text { color: #a0a0a0; }
+        .gradient-text {
+            background: linear-gradient(90deg, #00ff9d, #0066ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Critical navigation CSS from original website */
+        .btn-primary {
+            background: linear-gradient(90deg, #00ff9d, #0066ff);
+            color: #050505;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+            box-shadow: 0 5px 15px rgba(0, 255, 157, 0.3);
+            transform: translateY(-2px);
+        }
+        .hidden { display: none; }
+        
+        /* Responsive navigation fixes */
+        @media (min-width: 768px) {
+            .hidden.md\:block {
+                display: block !important;
+            }
+        }
+        @media (max-width: 767px) {
+            .hidden.md\:block {
+                display: none !important;
+            }
+        }
+    </style>
+    
+    {{! JSON-LD Structured Data }}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "{{@site.title}}",
+        "url": "{{@site.url}}",
+        "description": "{{@site.description}}",
+        "inLanguage": "pt-BR",
+        "publisher": {
+            "@type": "Organization",
+            "name": "On + Av",
+            "url": "https://onav.com.br",
+            "logo": "https://onav.com.br/img/on+av_logo_v2.webp"
+        }
+    }
+    </script>
+</head>
+
+<body class="{{body_class}} font-inter">
+    {{! Navigation - EXACT copy from original website }}
+    <nav class="fixed w-full bg-opacity-90 backdrop-blur-md z-50 border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center">
+                    <a href="https://onav.com.br" class="flex-shrink-0 flex items-center">
+                        <img src="{{asset "img/on+av_logo_v2.webp"}}" alt="On + Av Logo" style="height:40px;">
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-6 lg:space-x-8">
+                        <a href="https://onav.com.br#services" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Serviços</a>
+                        <a href="https://onav.com.br#industries" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Indústrias</a>
+                        <a href="https://onav.com.br#expertise" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Expertise</a>
+                        <a href="https://onav.com.br#cases" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Cases</a>
+                        <a href="https://onav.com.br#about" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Quem Somos</a>
+                        <a href="https://onav.com.br/estudio.html" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Estúdio</a>
+                        <a href="{{@site.url}}" class="text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Insights</a>
+                        <a href="https://onav.com.br#contact" class="btn-primary text-sm font-bold px-5 py-2 rounded-md hover:bg-opacity-90 transition-all duration-200">Contato</a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Abrir menu principal</span>
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="hidden md:hidden bg-darker border-t border-gray-800" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="https://onav.com.br#services" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Serviços</a>
+                <a href="https://onav.com.br#industries" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Indústrias</a>
+                <a href="https://onav.com.br#expertise" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Expertise</a>
+                <a href="https://onav.com.br#cases" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Cases</a>
+                <a href="https://onav.com.br#about" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Quem Somos</a>
+                <a href="https://onav.com.br/estudio.html" class="text-light-text hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Estúdio</a>
+                <a href="{{@site.url}}" class="text-primary block px-3 py-2 rounded-md text-base font-medium">Insights</a>
+                <a href="https://onav.com.br#contact" class="btn-primary text-base font-bold block px-3 py-2 rounded-md text-center mt-2">Contato</a>
+            </div>
+        </div>
+    </nav>
+
+    {{! Main content area }}
+    {{{body}}}
+
+    {{! Footer }}
+    <footer class="bg-dark py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <a href="https://onav.com.br" class="flex items-center mb-4">
+                        <span class="text-xl font-bold gradient-text">On + Av</span>
+                    </a>
+                    <p class="text-medium-text text-sm">
+                        A principal referência em tecnologia Disguise no Brasil, oferecendo soluções completas para produções visuais de alto nível.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-light-text font-semibold mb-4 uppercase tracking-wider text-sm">Serviços</h4>
+                    <ul class="space-y-2">
+                        <li><a href="https://onav.com.br#services" class="text-medium-text hover:text-primary transition duration-300 text-sm">Aluguel de Equipamentos</a></li>
+                        <li><a href="https://onav.com.br#services" class="text-medium-text hover:text-primary transition duration-300 text-sm">Produção Virtual (xR)</a></li>
+                        <li><a href="https://onav.com.br#industries" class="text-medium-text hover:text-primary transition duration-300 text-sm">Projeção Mapeada</a></li>
+                        <li><a href="https://onav.com.br#services" class="text-medium-text hover:text-primary transition duration-300 text-sm">Consultoria e Suporte</a></li>
+                        <li><a href="https://onav.com.br#services" class="text-medium-text hover:text-primary transition duration-300 text-sm">Treinamentos</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-light-text font-semibold mb-4 uppercase tracking-wider text-sm">Links Rápidos</h4>
+                    <ul class="space-y-2">
+                        <li><a href="https://onav.com.br#about" class="text-medium-text hover:text-primary transition duration-300 text-sm">Quem Somos</a></li>
+                        <li><a href="https://onav.com.br#industries" class="text-medium-text hover:text-primary transition duration-300 text-sm">Indústrias</a></li>
+                        <li><a href="https://onav.com.br#cases" class="text-medium-text hover:text-primary transition duration-300 text-sm">Cases</a></li>
+                        <li><a href="https://onav.com.br#expertise" class="text-medium-text hover:text-primary transition duration-300 text-sm">Expertise</a></li>
+                        <li><a href="{{@site.url}}" class="text-medium-text hover:text-primary transition duration-300 text-sm">Insights</a></li>
+                        <li><a href="https://onav.com.br#contact" class="text-medium-text hover:text-primary transition duration-300 text-sm">Contato</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-light-text font-semibold mb-4 uppercase tracking-wider text-sm">Contato</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-start">
+                            <i class="fas fa-envelope text-primary text-sm mt-1 mr-3"></i>
+                            <div>
+                                <h5 class="font-semibold mb-1 text-light-text text-sm">E-mail</h5>
+                                <p class="text-medium-text text-sm hover:text-primary transition">
+                                    <a href="mailto:nelson@onav.com.br">nelson@onav.com.br</a>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fab fa-whatsapp text-primary text-sm mt-1 mr-3"></i>
+                            <div>
+                                <h5 class="font-semibold mb-1 text-light-text text-sm">WhatsApp</h5>
+                                <p class="text-medium-text text-sm hover:text-primary transition">
+                                    <a href="https://wa.me/5511920550210" target="_blank">+55 11 92055-0210</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-center md:text-left mb-4 md:mb-0">
+                        <p class="text-medium-text text-sm">
+                            © {{date format="YYYY"}} On + Av. Todos os direitos reservados.
+                        </p>
+                    </div>
+                    <div class="flex space-x-6">
+                        <a href="https://onav.com.br" class="text-medium-text hover:text-primary text-sm transition duration-300">Site Principal</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    {{! JavaScript }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuButton = document.querySelector('.mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+            
+            // Close mobile menu when a link is clicked
+            if (mobileMenu) {
+                const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+                if (mobileMenuLinks.length > 0) {
+                    mobileMenuLinks.forEach(function(link) {
+                        link.addEventListener('click', function() {
+                            mobileMenu.classList.add('hidden');
+                        });
+                    });
+                }
+            }
+        });
+    </script>
+
+    {{! Ghost outputs important script and data at the bottom of the page }}
+    {{ghost_foot}}
+</body>
+</html>

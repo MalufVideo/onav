@@ -1,0 +1,91 @@
+{{!< default}}
+
+<main id="site-main" style="background-color: #020202; color: #e0e0e0; min-height: 100vh; padding: 2rem;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+        
+        {{! Debug Info }}
+        <div style="background: #333; padding: 1rem; margin: 2rem 0; border-radius: 8px;">
+            <h2 style="color: #00ff9d; margin: 0 0 1rem 0;">🔧 Debug Info</h2>
+            <p style="margin: 0.5rem 0;">Site Title: {{@site.title}}</p>
+            <p style="margin: 0.5rem 0;">Site URL: {{@site.url}}</p>
+            <p style="margin: 0.5rem 0;">Posts Count: {{pagination.total}}</p>
+            <p style="margin: 0.5rem 0;">Ghost Version: {{@site.version}}</p>
+        </div>
+
+        {{! Hero Section }}
+        <header style="text-align: center; margin: 3rem 0;">
+            <h1 style="font-size: 3rem; margin-bottom: 1rem; color: #00ff9d;">
+                On+Av Insights
+            </h1>
+            <p style="font-size: 1.2rem; color: #a0a0a0; max-width: 600px; margin: 0 auto;">
+                Conteúdo especializado sobre produção virtual e tecnologia audiovisual
+            </p>
+        </header>
+
+        {{! Posts Section }}
+        <section style="margin: 3rem 0;">
+            <h2 style="color: #e0e0e0; margin-bottom: 2rem;">Posts Recentes</h2>
+            
+            {{#if posts}}
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                    {{#foreach posts}}
+                        <article style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);">
+                            {{#if feature_image}}
+                                <img src="{{img_url feature_image size="m"}}" alt="{{title}}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 1rem;">
+                            {{/if}}
+                            
+                            <h3 style="margin: 0 0 0.5rem 0; color: #e0e0e0;">
+                                <a href="{{url}}" style="color: inherit; text-decoration: none;">{{title}}</a>
+                            </h3>
+                            
+                            {{#if excerpt}}
+                                <p style="color: #a0a0a0; margin: 0 0 1rem 0; font-size: 0.9rem;">{{excerpt}}</p>
+                            {{/if}}
+                            
+                            <div style="font-size: 0.8rem; color: #666;">
+                                {{#if primary_author}}
+                                    Por {{primary_author.name}} • 
+                                {{/if}}
+                                {{date format="DD MMM YYYY"}}
+                            </div>
+                        </article>
+                    {{/foreach}}
+                </div>
+            {{else}}
+                <div style="text-align: center; padding: 3rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                    <h3 style="color: #e0e0e0; margin-bottom: 1rem;">Nenhum post encontrado</h3>
+                    <p style="color: #a0a0a0;">Adicione alguns posts no Ghost Admin para começar.</p>
+                </div>
+            {{/if}}
+        </section>
+
+        {{! Newsletter Section }}
+        <section style="background: rgba(0, 255, 157, 0.1); padding: 2rem; border-radius: 8px; text-align: center; margin: 3rem 0;">
+            <h2 style="color: #00ff9d; margin-bottom: 1rem;">Receba nossas atualizações</h2>
+            <p style="color: #e0e0e0; margin-bottom: 1.5rem;">Fique por dentro das últimas novidades em produção virtual</p>
+            
+            <form data-members-form="subscribe" style="display: flex; gap: 1rem; max-width: 400px; margin: 0 auto; flex-wrap: wrap;">
+                <input 
+                    type="email" 
+                    data-members-email 
+                    placeholder="Seu email" 
+                    required 
+                    style="flex: 1; padding: 0.75rem; border-radius: 4px; border: 1px solid #555; background: #333; color: #e0e0e0; min-width: 200px;"
+                >
+                <button 
+                    type="submit" 
+                    style="padding: 0.75rem 1.5rem; background: #00ff9d; color: #020202; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;"
+                >
+                    Inscrever
+                </button>
+            </form>
+        </section>
+
+        {{! Footer Info }}
+        <footer style="text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #333;">
+            <p style="color: #666; margin: 0;">
+                <a href="https://onav.com.br" style="color: #00ff9d; text-decoration: none;">← Voltar ao site principal</a>
+            </p>
+        </footer>
+    </div>
+</main>

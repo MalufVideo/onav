@@ -1,0 +1,123 @@
+{{!< default}}
+
+{{! The main content area }}
+<main id="site-main" class="site-main">
+    {{! Hero section for the blog }}
+    <section class="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden" style="background: radial-gradient(circle at 50% 50%, rgba(0, 255, 157, 0.05) 0%, rgba(2, 2, 2, 0) 60%);">
+        <div class="absolute inset-0 w-full h-full pointer-events-none z-0">
+            <div class="w-full h-full" style="background: radial-gradient(circle at 10% 20%, rgba(0, 255, 157, 0.15) 0%, transparent 50%), radial-gradient(circle at 85% 80%, rgba(0, 102, 255, 0.12) 0%, transparent 45%);"></div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+                    <span class="text-primary">Insights</span> sobre <span class="gradient-text">Produção Virtual</span>
+                </h1>
+                <p class="text-xl text-light-text mb-10 max-w-3xl mx-auto">
+                    Conteúdo especializado sobre tecnologia Disguise, painéis LED, produção virtual e as últimas tendências do mercado audiovisual.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    {{! Posts loop }}
+    <section id="posts" class="py-20 bg-transparent">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {{#if posts}}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {{#foreach posts}}
+                        <article class="glass-card rounded-xl overflow-hidden hover:transform hover:scale-105 transition-all duration-300">
+                            {{#if feature_image}}
+                                <a href="{{url}}" class="block">
+                                    <div class="relative h-48 overflow-hidden">
+                                        <img src="{{img_url feature_image size="m"}}" alt="{{title}}" class="w-full h-full object-cover" loading="lazy">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
+                                    </div>
+                                </a>
+                            {{/if}}
+                            
+                            <div class="p-6">
+                                {{#if primary_tag}}
+                                    <span class="text-primary text-sm font-semibold uppercase tracking-wider">{{primary_tag.name}}</span>
+                                {{/if}}
+                                
+                                <h2 class="text-xl md:text-2xl font-bold mt-2 mb-3 text-light-text">
+                                    <a href="{{url}}" class="hover:text-primary transition-colors duration-200">{{title}}</a>
+                                </h2>
+                                
+                                {{#if excerpt}}
+                                    <p class="text-medium-text text-sm mb-4 line-clamp-3">{{excerpt}}</p>
+                                {{/if}}
+                                
+                                <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-700">
+                                    <div class="flex items-center text-xs text-medium-text">
+                                        {{#if primary_author}}
+                                            {{#if primary_author.profile_image}}
+                                                <img src="{{img_url primary_author.profile_image size="xs"}}" alt="{{primary_author.name}}" class="w-6 h-6 rounded-full mr-2">
+                                            {{/if}}
+                                            <span>{{primary_author.name}}</span>
+                                        {{/if}}
+                                    </div>
+                                    <time class="text-xs text-medium-text" datetime="{{date format="YYYY-MM-DD"}}">
+                                        {{date format="DD MMM YYYY"}}
+                                    </time>
+                                </div>
+                            </div>
+                        </article>
+                    {{/foreach}}
+                </div>
+
+                {{! Pagination }}
+                {{pagination}}
+                
+            {{else}}
+                {{! No posts }}
+                <div class="text-center py-20">
+                    <div class="glass-card rounded-xl p-12 max-w-md mx-auto">
+                        <i class="fas fa-newspaper text-primary text-5xl mb-6"></i>
+                        <h2 class="text-2xl font-bold mb-4 text-light-text">Em breve</h2>
+                        <p class="text-medium-text">Estamos preparando conteúdo exclusivo sobre produção virtual e tecnologia audiovisual.</p>
+                    </div>
+                </div>
+            {{/if}}
+        </div>
+    </section>
+
+    {{! Newsletter signup section }}
+    <section class="py-20 bg-dark">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="glass-card rounded-xl p-8 border border-primary glow-box-primary">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    Não perca nenhum <span class="gradient-text">Insight</span>
+                </h2>
+                <p class="text-xl text-light-text mb-8">
+                    Receba conteúdo exclusivo sobre as últimas tendências em produção virtual e tecnologia audiovisual.
+                </p>
+                
+                {{! Ghost newsletter signup form }}
+                <form data-members-form="subscribe" class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                    <input 
+                        type="email" 
+                        data-members-email 
+                        placeholder="Seu melhor email" 
+                        required 
+                        class="flex-1 px-4 py-3 rounded-lg bg-darker border border-gray-700 text-light-text focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+                    >
+                    <button 
+                        type="submit" 
+                        class="btn-primary px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-all duration-200"
+                    >
+                        Inscrever-se
+                    </button>
+                </form>
+                
+                <div data-members-success class="hidden mt-4 p-4 bg-green-900 bg-opacity-50 rounded-lg border border-green-500">
+                    <p class="text-green-200">✓ Inscrição realizada com sucesso! Verifique seu email.</p>
+                </div>
+                
+                <div data-members-error class="hidden mt-4 p-4 bg-red-900 bg-opacity-50 rounded-lg border border-red-500">
+                    <p class="text-red-200">Erro ao processar inscrição. Tente novamente.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
