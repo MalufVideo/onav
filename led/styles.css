@@ -1109,6 +1109,7 @@ input[type="range"]::-moz-range-thumb {
   border-bottom: 1px solid #f0f0f0;
   font-size: 14px;
   align-items: center; /* Vertically align items */
+  color: #000; /* Ensure text is black for readability */
 }
 
 .cart-item:last-child {
