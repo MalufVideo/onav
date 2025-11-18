@@ -25,10 +25,10 @@ async function waitForAuthenticationReady() {
   return new Promise((resolve) => {
     let attempts = 0;
     const maxAttempts = 40; // Increased max attempts
-    
+
     const checkAuth = async () => {
       attempts++;
-      
+
       // Check if auth module is available
       if (typeof window.auth === 'undefined') {
         if (attempts >= maxAttempts) {
@@ -40,7 +40,7 @@ async function waitForAuthenticationReady() {
         setTimeout(checkAuth, 250);
         return;
       }
-      
+
       // Initialize auth if not already done
       if (typeof window.auth.initAuth === 'function') {
         try {
@@ -50,14 +50,31 @@ async function waitForAuthenticationReady() {
           console.error('[my-quotes.js] Error initializing auth:', error);
         }
       }
-      
-      // Wait a bit more to ensure session is fully restored
-      setTimeout(() => {
-        console.log('[my-quotes.js] Authentication ready');
-        resolve();
-      }, 500);
+
+      // Wait for session restoration to complete by checking if user is set or max attempts reached
+      let sessionAttempts = 0;
+      const maxSessionAttempts = 10; // 10 attempts * 300ms = 3 seconds max wait
+
+      const checkSession = () => {
+        sessionAttempts++;
+        const isAuth = window.auth.isAuthenticated();
+        const currentUser = window.auth.getCurrentUser();
+
+        console.log(`[my-quotes.js] Session check ${sessionAttempts}/${maxSessionAttempts} - isAuth: ${isAuth}, user: ${currentUser?.email || 'null'}`);
+
+        // If authenticated or max attempts reached, resolve
+        if (isAuth || sessionAttempts >= maxSessionAttempts) {
+          console.log('[my-quotes.js] Authentication ready');
+          resolve();
+        } else {
+          // Keep checking
+          setTimeout(checkSession, 300);
+        }
+      };
+
+      checkSession();
     };
-    
+
     checkAuth();
   });
 }
@@ -648,12 +665,13 @@ function setupQuoteDetailsModal() {
         modal.style.top = '0';
         modal.style.width = '100%';
         modal.style.height = '100%';
-        modal.style.overflow = 'hidden'; 
-        modal.style.backgroundColor = 'rgba(0,0,0,0.6)'; 
-        modal.style.justifyContent = 'center'; 
-        modal.style.alignItems = 'center'; 
-        modal.style.padding = '20px'; 
+        modal.style.overflow = 'hidden';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.6)';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        modal.style.padding = '20px';
         modal.style.boxSizing = 'border-box';
+        modal.style.display = 'none'; // Hide modal by default
 
         // Create the content container *inside* the modal overlay
         const contentDiv = document.createElement('div');
