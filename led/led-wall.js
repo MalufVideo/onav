@@ -581,11 +581,11 @@ class LEDWallCalculator {
 
     // --- Price Calculations using fetched prices ---
     const totalModulesCombined = principalModules + tetoModules;
-    const moduleDailyPrice = this.getPrice('LED Module', 55); // Default 55
-    const processorDailyPrice = this.getPrice('MX-40 Pro Processor', 4000); // Default 4000
-    const serverBaseDailyPrice = this.getPrice('Disguise VX4n (Base)', 30000); // Default 30000
-    const rxiiUnitDailyPrice = this.getPrice('Disguise RXII Unit', 7500); // Default 7500
-    const trackingDailyPrice = this.getPrice('Stype Tracking', 5000); // Default 5000
+    const moduleDailyPrice = this.getPrice('LED Module', 0); 
+    const processorDailyPrice = this.getPrice('MX-40 Pro Processor', 0);
+    const serverBaseDailyPrice = this.getPrice('Disguise VX4n (Base)', 0);
+    const rxiiUnitDailyPrice = this.getPrice('Disguise RXII Unit', 0);
+    const trackingDailyPrice = this.getPrice('Stype Tracking', 0);
 
     const modulePriceTotal = totalModulesCombined * moduleDailyPrice;
     const processorPriceTotal = processorsNeeded * processorDailyPrice;

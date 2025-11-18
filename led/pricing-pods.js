@@ -291,6 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const modulePrice = this.productPrices['LED Module'] || 0;
             const processorPrice = this.productPrices['MX-40 Pro Processor'] || 0;
             const vx4nBasePrice = this.productPrices['Disguise VX4n (Base)'] || 0;
+            const vx4nBackupPrice = this.productPrices['Disguise VX4n (Backup)'] || vx4nBasePrice || 0;
             const rxiiUnitPrice = this.productPrices['Disguise RXII Unit'] || 0; // Per unit price
             const trackingPrice = this.productPrices['Stype Tracking'] || 0;
 
@@ -325,12 +326,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const serverBackupBtn = pod.querySelector('#backup-btn'); // Get the button to read its state
             // Read backup state directly from the controller's property
             const isBackupServerActive = this.isBackupActive;
-            const serverCost = isBackupServerActive ? (vx4nBasePrice * 2) : vx4nBasePrice;
+            const serverCost = isBackupServerActive ? (vx4nBasePrice + vx4nBackupPrice) : vx4nBasePrice;
             total += serverCost;
-            // Cart item name reflects backup status
-            const serverName = isBackupServerActive ? 'Disguise VX4n (Principal + Backup)' : 'Disguise VX4n';
-            // For the cart, store the base unit price and quantity (1 or 2)
-            itemsForCart.push({ id: 'disguise_vx4n', name: serverName, quantity: isBackupServerActive ? 2 : 1, price: vx4nBasePrice });
+            
+            // Add Base Unit
+            itemsForCart.push({ id: 'disguise_vx4n', name: 'Disguise VX4n (Base)', quantity: 1, price: vx4nBasePrice });
+            
+            // Add Backup Unit if active
+            if (isBackupServerActive) {
+                itemsForCart.push({ id: 'disguise_vx4n_backup', name: 'Disguise VX4n (Backup)', quantity: 1, price: vx4nBackupPrice });
+            }
+
             if (serverPriceElement) serverPriceElement.textContent = formatPrice(serverCost);
 
             // Declare 3D mode elements before conditional logic
@@ -397,7 +403,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 7. Equipe Profissional (Use fetched price from Supabase)
             const teamPriceElement = pod.querySelector('#team-price');
-            const teamPrice = this.productPrices['Equipe Técnica Diária'] || 0;
+            // Try exact match from DB then fallback
+            const teamPrice = this.productPrices['Equipe Técnica da Diária'] || this.productPrices['Equipe Técnica Diária'] || 0;
             total += teamPrice;
             itemsForCart.push({ id: 'equipe_tecnica', name: 'Equipe Profissional', quantity: 1, price: teamPrice });
             if (teamPriceElement) {

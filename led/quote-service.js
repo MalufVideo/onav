@@ -320,7 +320,7 @@ async function getEquipeTecnicaPrice() {
     const { data, error } = await supabase
       .from('prices')
       .select('*')
-      .eq('name', 'Equipe Técnica Diária')
+      .eq('name', 'Equipe Técnica da Diária')
       .single();
       
     if (error) throw error;
