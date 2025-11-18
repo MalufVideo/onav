@@ -221,21 +221,8 @@ class QuoteCartModal {
 
         console.log("[getSelectedItemsFromPods] Final items prepared for cart rendering:", items);
 
-        // Add Estúdio entry based on Supabase prices
-        const studioEntry = Object.entries(this.productPrices || {}).find(([name]) => name.toLowerCase().includes('estúdio'));
-        const studioName = studioEntry ? studioEntry[0] : 'Estúdio 31,63 x 13,80m';
-        const studioPrice = studioEntry ? Number(studioEntry[1]) : 6000;
-
-        if (studioPrice > 0) {
-            items.push({
-                id: 'estudio_estudios_sp',
-                name: studioName,
-                quantity: 1,
-                price: studioPrice
-            });
-        } else {
-            console.warn('[getSelectedItemsFromPods] Estúdio price not available. Item will not be added.');
-        }
+        // Note: Estúdio is already added by pricing-pods.js in the data-items attribute
+        // No need to add it here again to avoid duplication
 
         // This function now returns the items directly.
         // The updateCart function will call this and then fetch details/render.
