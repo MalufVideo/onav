@@ -1009,6 +1009,43 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass-card rounded-xl overflow-hidden case-study-trigger-avon">
+                    <div class="relative">
+                        <img src="/img/avon_thumb2.webp" alt="Avon Ana Castela" class="w-full h-48 object-cover" loading="lazy">
+                        <div class="absolute bottom-0 left-0 bg-primary text-dark px-3 py-1 text-[10px] font-bold uppercase tracking-wider">Publicidade</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-1 text-light-text">Avon Ana Castela</h3>
+                        <p class="text-medium-text text-xs">Produção com tecnologia de ponta para campanha publicitária.</p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-xl overflow-hidden case-study-trigger-bradesco">
+                    <div class="relative">
+                        <img src="/img/bradeco_thumb2.webp" alt="Bradesco Seguros" class="w-full h-48 object-cover" loading="lazy">
+                        <div class="absolute bottom-0 left-0 bg-primary text-dark px-3 py-1 text-[10px] font-bold uppercase tracking-wider">Publicidade</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-1 text-light-text">Bradesco Seguros</h3>
+                        <p class="text-medium-text text-xs">Projeto de produção virtual para campanha institucional.</p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-xl overflow-hidden case-study-trigger-globoagro">
+                    <div class="relative">
+                        <img src="/img/agro_2025_thumb.webp" alt="Globo Agro 2025" class="w-full h-48 object-cover" loading="lazy">
+                        <div class="absolute bottom-0 left-0 bg-primary text-dark px-3 py-1 text-[10px] font-bold uppercase tracking-wider">Publicidade</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold mb-1 text-light-text">Globo Agro 2025</h3>
+                        <p class="text-medium-text text-xs">Cobertura técnica com tecnologia Disguise para programação agrícola.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                  <div class="glass-card rounded-xl overflow-hidden case-study-trigger-creta">
                     <div class="relative">
                         <img src="https://img.youtube.com/vi/O9XJVbup43M/maxresdefault.jpg" alt="Video Thumbnail" class="w-full h-48 object-cover" loading="lazy">
@@ -1048,7 +1085,7 @@
                  <!-- Card 1: Encontro C&A -->
                  <div class="glass-card rounded-xl overflow-hidden case-study-trigger-cea">
                     <div class="relative">
-                        <img src="https://img.youtube.com/vi/YA3WOyQboWA/maxresdefault.jpg" alt="Encontro C&A" class="w-full h-48 object-cover" loading="lazy">
+                        <img src="/img/cea_thumb.webp" alt="Encontro C&A" class="w-full h-48 object-cover" loading="lazy">
                         <div class="absolute bottom-0 left-0 bg-primary text-dark px-3 py-1 text-[10px] font-bold uppercase tracking-wider">Publicidade</div>
                     </div>
                     <div class="p-4">
@@ -2329,6 +2366,167 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
     </div>
   </div>
 
+  <!-- Bradesco Seguros Modal Structure -->
+  <div id="bradescoCaseStudyModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center;">
+    <div style="background-color: #1f1f1f; color: #e0e0e0; margin: auto; padding: 20px; border-radius: 20px; width: 90%; max-width: 900px; position: relative; top: 20px; border: 2px solid #00ffaa; box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 8px #00aaff, 0 0 12px #aa00ff;">
+      <span id="closeBradescoCaseStudyModal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 20px;">&times;</span>
+      <h3 class="text-xl font-bold mb-2 text-light-text" style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.5rem; color: #f0f0f0;">Bradesco Seguros</h3>
+      
+      <!-- Video Player -->
+      <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
+        <div id="bradescoVideoPlaceholder" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('/img/bradeco_thumb2.webp'); background-size: cover; background-position: center; cursor: pointer; border-radius: 8px; overflow: hidden;">
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+            <i class="fas fa-play" style="color: #00ffaa; font-size: 24px; margin-left: 4px;"></i>
+          </div>
+        </div>
+        <div id="bradescoVideoIframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;"></div>
+      </div>
+
+      <!-- Case Study Content -->
+      <div id="bradescoCaseStudyContent">
+        <p class="text-medium-text text-sm mb-4" style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">Campanha institucional do Bradesco Seguros utilizando tecnologia de produção virtual de última geração.</p>
+        
+        <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Virtual Production</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">LED Volume</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Disguise</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Institutional Campaign</span>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Visão Geral</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">A campanha de <strong>Bradesco Seguros</strong> é mais um caso clássico em que a <strong>produção virtual</strong> realmente brilhou. Foi um enorme prazer trabalhar em parceria com a equipe da <strong>Boiler</strong>, que chegou com o desafio de, em um único dia de filmagem, filmar em três cenários diferentes em três painéis distintos.</p>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-top: 0.75rem;">Para isso, a produção virtual se mostrou a ferramenta ideal. Colocamos em jogo todo o nosso ecossistema de tecnologia: estúdio, painéis de LED, servidores <strong>Disguise</strong> e também nosso time de serviços criativos. Mais uma vez, atuamos de ponta a ponta – do ambiente técnico ao desenvolvimento visual – para viabilizar um filme complexo dentro de uma janela de tempo bastante enxuta.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Desafio Técnico</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">O grande desafio deste projeto era o tempo: tínhamos um dia de set para filmar cenários muito diferentes entre si. Logo na primeira cena, precisávamos de um campo de flores, algo que em locação exigiria um enorme esforço de montagem, ambientação e desmontagem. Nossa solução foi dividir o projeto em três configurações distintas de LED: um campo de flores no volume LED, com luz vindo de todos os lados; uma cena de slow motion com pétalas em alta velocidade no nosso painel preparado para high speed; e, por fim, uma sala completamente vermelha criada em <strong>Unreal Engine</strong>, alinhada às cores da marca.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Nossa Solução</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Para o Bradesco Seguros, atuamos como um verdadeiro <strong>one-stop shop</strong>. Em um único lugar, o cliente teve acesso ao estúdio, à tecnologia, à equipe técnica especializada e aos serviços criativos para construir os ambientes virtuais. Operamos com painéis LED de alta definição integrados a servidores <strong>Disguise</strong> para playback em tempo real, desenvolvemos os cenários em <strong>Unreal Engine</strong> com base nas referências trazidas pela direção e, no caso do campo de flores, utilizamos <strong>IA generativa</strong> para criar os backgrounds de forma eficiente, mantendo a qualidade visual exigida pelo filme.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Resultados</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">O resultado final é um filme visualmente sofisticado, que traduz com sensibilidade a mensagem da marca. A atriz <strong>Bella Campos</strong>, que veio diretamente de um set de novela no Rio de Janeiro para filmar em São Paulo, encontrou um ambiente de trabalho ágil, organizado e criativo. A produtora e a direção trabalharam com tranquilidade, sabendo que tinham flexibilidade para ajustes em tempo real, e nós tivemos a satisfação de ver mais um projeto em que tecnologia, arte e performance caminham juntos. No fim, este case reforça como a produção virtual é uma aliada poderosa para campanhas que exigem múltiplos cenários, pouco tempo e alto padrão estético – tudo dentro de um único estúdio.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Avon Ana Castela Modal Structure -->
+  <div id="avonCaseStudyModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center;">
+    <div style="background-color: #1f1f1f; color: #e0e0e0; margin: auto; padding: 20px; border-radius: 20px; width: 90%; max-width: 900px; position: relative; top: 20px; border: 2px solid #00ffaa; box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 8px #00aaff, 0 0 12px #aa00ff;">
+      <span id="closeAvonCaseStudyModal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 20px;">&times;</span>
+      <h3 class="text-xl font-bold mb-2 text-light-text" style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.5rem; color: #f0f0f0;">Avon Ana Castela</h3>
+      
+      <!-- Video Player -->
+      <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
+        <div id="avonVideoPlaceholder" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('/img/avon_thumb2.webp'); background-size: cover; background-position: center; cursor: pointer; border-radius: 8px; overflow: hidden;">
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+            <i class="fas fa-play" style="color: #00ffaa; font-size: 24px; margin-left: 4px;"></i>
+          </div>
+        </div>
+        <div id="avonVideoIframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;"></div>
+      </div>
+
+      <!-- Case Study Content -->
+      <div id="avonCaseStudyContent">
+        <p class="text-medium-text text-sm mb-4" style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">Campanha publicitária da Avon com Ana Castela utilizando tecnologia de produção virtual de ponta.</p>
+        
+        <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Virtual Production</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">LED Volume</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Disguise</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Beauty Campaign</span>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Visão Geral</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">A campanha da <strong>Avon com Ana Castela</strong> foi mais um projeto em parceria com a <strong>Rube</strong> que mostra, na prática, a força da produção virtual. A proposta criativa pedia a artista em um cenário de deserto norte-americano, com montanhas e horizontes amplos. Em vez de viajar para fora do país, trouxemos o deserto para dentro de um estúdio em São Paulo, utilizando nosso volume de LED, servidores <strong>Disguise</strong>, conteúdo em <strong>Unreal Engine</strong> e tracking de câmera <strong>Stype</strong> para recriar, em tempo real, as paisagens de Utah/Texas.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Desafio Criativo</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Além de fornecer a tecnologia e o estúdio, fomos responsáveis por conceber e produzir todo o ambiente 3D do filme. A diretora chegou com referências e imagens estáticas do tipo de deserto que imaginava, e nosso desafio foi transformar esse moodboard em um cenário virtual crível e cinematográfico. Criamos o deserto em Unreal Engine, montanhas e atmosfera até chegar exatamente ao visual desejado. Um dos trechos mais complexos envolvia um carro em alta velocidade cruzando o deserto, exigindo que o render node sustentasse o movimento rápido sem perda de qualidade.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Nossa Solução</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Nossa entrega foi um pacote completo de produção virtual. Utilizamos nosso estúdio de última geração em São Paulo, equipado com um volume LED HDR de 16 x 5 metros, pitch 2.6 mm, operando com sinal RGB 4:4:4 sem compressão em tempo real. O conteúdo 3D rodou em um servidor <strong>Disguise RXII</strong>, garantindo performance e fidelidade de cor, enquanto o sistema de rastreamento <strong>Stype Red Spy</strong> assegurou o parallax perfeito entre câmera, cenário e movimento da artista, dando à direção liberdade total para explorar ângulos, composições e variações de luz.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Resultados</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">O resultado visual foi impecável e superou as expectativas de todos. Ana Castela se sentiu à vontade em um cenário que respondia como um ambiente real, a Avon aprovou o filme com entusiasmo e a produtora trabalhou com segurança, sabendo que tinha um sistema flexível para ajustes em tempo real. Para nós, o maior retorno foi ver um set colaborativo e criativo, onde tecnologia e storytelling caminharam juntos. Com essa campanha, reforçamos nosso compromisso em entregar excelência técnica e criativa, mostrando como a produção virtual transforma ideias ambiciosas em imagens concretas sem sair do estúdio.</p>
+
+        <h4 style="color: #f0f0f0; font-size: 1.1rem; margin-top: 1.75rem; margin-bottom: 0.75rem;">Bastidores e vídeos de apoio</h4>
+        <p style="font-size: 0.85em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">Confira abaixo dois vídeos complementares que mostram mais detalhes da produção virtual e dos bastidores da campanha com Ana Castela.</p>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 1.5rem;">
+          <div style="flex: 1 1 260px; min-width: 0;">
+            <p style="font-size: 0.8em; line-height: 1.4; color: #cccccc; margin-bottom: 0.5rem;">Produção virtual – visão geral do set</p>
+            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; border: 1px solid #333; background-color: #000;">
+              <video controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px;">
+                <source src="/img/videos/avon_producao_virtual.mp4" type="video/mp4">
+                Seu navegador não suporta a tag de vídeo.
+              </video>
+            </div>
+          </div>
+
+          <div style="flex: 1 1 260px; min-width: 0;">
+            <p style="font-size: 0.8em; line-height: 1.4; color: #cccccc; margin-bottom: 0.5rem;">Ana Castela – bastidores da produção virtual</p>
+            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; border: 1px solid #333; background-color: #000;">
+              <video controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px;">
+                <source src="/img/videos/ana_castela_virtual_production.mp4" type="video/mp4">
+                Seu navegador não suporta a tag de vídeo.
+              </video>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Globo Agro 2025 Modal Structure -->
+  <div id="globoAgroCaseStudyModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center;">
+    <div style="background-color: #1f1f1f; color: #e0e0e0; margin: auto; padding: 20px; border-radius: 20px; width: 90%; max-width: 900px; position: relative; top: 20px; border: 2px solid #00ffaa; box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 8px #00aaff, 0 0 12px #aa00ff;">
+      <span id="closeGloboAgroCaseStudyModal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 20px;">&times;</span>
+      <h3 class="text-xl font-bold mb-2 text-light-text" style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.5rem; color: #f0f0f0;">Globo Agro 2025</h3>
+      
+      <!-- Video Player -->
+      <div style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
+        <div id="globoAgroVideoPlaceholder" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('/img/agro_2025_thumb.webp'); background-size: cover; background-position: center; cursor: pointer; border-radius: 8px; overflow: hidden;">
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+            <i class="fas fa-play" style="color: #00ffaa; font-size: 24px; margin-left: 4px;"></i>
+          </div>
+        </div>
+        <div id="globoAgroVideoContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;">
+          <video id="globoAgroVideo" width="100%" height="100%" controls style="border-radius: 8px;">
+            <source src="/img/videos/globo_agro_2025.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+
+      <!-- Case Study Content -->
+      <div id="globoAgroCaseStudyContent">
+        <p class="text-medium-text text-sm mb-4" style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">Série de filmes para o Globo Agro 2025 produzida em parceria com a Rube e a produtora Piloto, utilizando produção virtual para levar múltiplas regiões do Brasil para dentro do estúdio.</p>
+        
+        <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Broadcast</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">LED Walls</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Disguise</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">TV Production</span>
+        </div>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Visão Geral</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">A campanha <strong>Globo Agro 2025</strong> foi mais um projeto realizado em parceria com a <strong>Rube</strong> e a produtora <strong>Piloto</strong>, uma série de filmes veiculados em rede nacional. É um case perfeito de como a <strong>produção virtual</strong> transforma logística complexa em um fluxo de trabalho eficiente.</p>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-top: 0.75rem;">Cada filme da série aborda uma cultura agrícola diferente, localizada em regiões distintas do Brasil. Em um modelo tradicional de produção, isso significaria semanas de viagem pelo país, com altos custos de deslocamento, equipe e infraestrutura. Com a produção virtual, conseguimos trazer todas essas locações para dentro do estúdio e, em dois ou três dias de gravação, filmar múltiplos cenários representando diferentes partes do Brasil com consistência visual e liberdade criativa.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Desafio Técnico</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Do ponto de vista técnico, o principal desafio era atender a uma demanda muito específica da direção: <strong>controle total sobre cada elemento da cena 3D</strong>. Para isso, estruturamos o projeto de forma a expor parâmetros em tempo real dentro do set.</p>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-top: 0.75rem;">Em cada ambiente, o diretor podia ajustar posição e intensidade das luzes, posição de elementos de cena, horário do dia e até a velocidade de movimentos sutis, como o giro de um ventilador na parede. Grande parte dos filmes foi feita com <strong>Unreal Engine</strong> integrado a <strong>camera tracking</strong> e servidores <strong>Disguise</strong>, permitindo cenas 3D em tempo real. Em outros trechos, utilizamos plates 2D combinados com recursos de <strong>IA</strong>, sempre mantendo o controle fino sobre o resultado final.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Nossa Solução</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">A solução foi desenhar um fluxo de produção em que o estúdio funcionasse como um “hub” de todas as locações do projeto. Mesmo não tendo criado a arte original de todos os cenários, fomos responsáveis por configurar, programar e parametrizar as cenas para que o diretor tivesse autonomia total durante as filmagens.</p>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-top: 0.75rem;">Integramos os conteúdos a um pipeline de <strong>Unreal Engine + Disguise + tracking de câmera</strong>, expondo controles de cor, luz, posição de elementos e atmosfera diretamente no set. Ajustes que, em locação real, exigiriam horas ou dias, puderam ser feitos em minutos, ao vivo, com o cliente e a direção acompanhando em monitor.</p>
+        
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Resultados</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">O resultado visual da campanha é impressionante: em muitos momentos, é difícil dizer onde termina o real e onde começa o virtual. Os cenários que representam diferentes regiões do Brasil mantêm coerência estética e narrativa, ao mesmo tempo em que preservam a identidade de cada cultura retratada.</p>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-top: 0.75rem;">Do ponto de vista de produção, o ganho é evidente: em vez de semanas na estrada, concentramos tudo em poucos dias de estúdio, com maior controle, segurança e previsibilidade. Os painéis de LED, o tracking de câmera e toda a infraestrutura de produção virtual responderam com precisão, permitindo planos complexos sem comprometer o cronograma. Este projeto se consolidou como um dos nossos melhores cases de produção virtual aplicada ao agronegócio e broadcast, mostrando na prática como é possível economizar tempo e recursos sem abrir mão de qualidade e ambição visual.</p>
+      </div>
+    </div>
+  </div>
+
   <!-- DVD Filipe Ret Modal Structure -->
   <div id="filipeCaseStudyModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center;">
     <div style="background-color: #1f1f1f; color: #e0e0e0; margin: auto; padding: 20px; border-radius: 20px; width: 90%; max-width: 900px; position: relative; top: 20px; border: 2px solid #00ffaa; box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 8px #00aaff, 0 0 12px #aa00ff;">
@@ -3173,6 +3371,78 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
             }
         });
         
+        // Bradesco Seguros Modal Elements
+        const bradescoCaseStudyModal = document.getElementById('bradescoCaseStudyModal');
+        const closeBradescoCaseStudyModalBtn = document.getElementById('closeBradescoCaseStudyModal');
+        const bradescoCaseStudyTrigger = document.querySelector('.case-study-trigger-bradesco');
+
+        if (bradescoCaseStudyTrigger) {
+            bradescoCaseStudyTrigger.style.cursor = 'pointer'; // Indicate it's clickable
+            bradescoCaseStudyTrigger.addEventListener('click', () => {
+                bradescoCaseStudyModal.style.display = 'flex'; // Use flex to center content
+            });
+        }
+
+        if (closeBradescoCaseStudyModalBtn) {
+            closeBradescoCaseStudyModalBtn.addEventListener('click', () => {
+                bradescoCaseStudyModal.style.display = 'none';
+            });
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target === bradescoCaseStudyModal) {
+                bradescoCaseStudyModal.style.display = 'none';
+            }
+        });
+        
+        // Avon Ana Castela Modal Elements
+        const avonCaseStudyModal = document.getElementById('avonCaseStudyModal');
+        const closeAvonCaseStudyModalBtn = document.getElementById('closeAvonCaseStudyModal');
+        const avonCaseStudyTrigger = document.querySelector('.case-study-trigger-avon');
+
+        if (avonCaseStudyTrigger) {
+            avonCaseStudyTrigger.style.cursor = 'pointer'; // Indicate it's clickable
+            avonCaseStudyTrigger.addEventListener('click', () => {
+                avonCaseStudyModal.style.display = 'flex'; // Use flex to center content
+            });
+        }
+
+        if (closeAvonCaseStudyModalBtn) {
+            closeAvonCaseStudyModalBtn.addEventListener('click', () => {
+                avonCaseStudyModal.style.display = 'none';
+            });
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target === avonCaseStudyModal) {
+                avonCaseStudyModal.style.display = 'none';
+            }
+        });
+        
+        // Globo Agro 2025 Modal Elements
+        const globoAgroCaseStudyModal = document.getElementById('globoAgroCaseStudyModal');
+        const closeGloboAgroCaseStudyModalBtn = document.getElementById('closeGloboAgroCaseStudyModal');
+        const globoAgroCaseStudyTrigger = document.querySelector('.case-study-trigger-globoagro');
+
+        if (globoAgroCaseStudyTrigger) {
+            globoAgroCaseStudyTrigger.style.cursor = 'pointer'; // Indicate it's clickable
+            globoAgroCaseStudyTrigger.addEventListener('click', () => {
+                globoAgroCaseStudyModal.style.display = 'flex'; // Use flex to center content
+            });
+        }
+
+        if (closeGloboAgroCaseStudyModalBtn) {
+            closeGloboAgroCaseStudyModalBtn.addEventListener('click', () => {
+                globoAgroCaseStudyModal.style.display = 'none';
+            });
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target === globoAgroCaseStudyModal) {
+                globoAgroCaseStudyModal.style.display = 'none';
+            }
+        });
+        
         // Antartica Modal Elements
         const antarticaCaseStudyModal = document.getElementById('antarticaCaseStudyModal');
         const closeAntarticaCaseStudyModalBtn = document.getElementById('closeAntarticaCaseStudyModal');
@@ -3840,6 +4110,171 @@ Ter esse nível de entrega, especialmente em um projeto tão complexo e exigente
         if (event.target === ceaModal) {
           ceaModal.style.display = 'none';
           resetCeaVideo();
+        }
+      });
+    }
+
+    // Bradesco video placeholder click handler
+    const bradescoVideoPlaceholder = document.getElementById('bradescoVideoPlaceholder');
+    if (bradescoVideoPlaceholder) {
+      bradescoVideoPlaceholder.addEventListener('click', function() {
+        const placeholderDiv = document.getElementById('bradescoVideoPlaceholder');
+        const videoIframe = document.getElementById('bradescoVideoIframe');
+        
+        if (placeholderDiv && videoIframe) {
+          // Hide placeholder and show iframe
+          placeholderDiv.style.display = 'none';
+          videoIframe.style.display = 'block';
+          
+          // Create YouTube iframe with autoplay
+          videoIframe.innerHTML = '<iframe width="100%" height="100%" src="https://www.youtube.com/embed/1A9PslUFGWE?autoplay=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+        }
+      });
+    }
+
+    // Bradesco modal close handlers
+    const bradescoModal = document.getElementById('bradescoCaseStudyModal');
+    const bradescoCloseBtn = document.getElementById('closeBradescoCaseStudyModal');
+    
+    function resetBradescoVideo() {
+      const placeholderDiv = document.getElementById('bradescoVideoPlaceholder');
+      const videoIframe = document.getElementById('bradescoVideoIframe');
+      
+      if (placeholderDiv && videoIframe) {
+        // Stop video by removing iframe content
+        videoIframe.innerHTML = '';
+        videoIframe.style.display = 'none';
+        
+        // Show placeholder again
+        placeholderDiv.style.display = 'block';
+      }
+    }
+    
+    // Close button click handler
+    if (bradescoCloseBtn) {
+      bradescoCloseBtn.addEventListener('click', function() {
+        bradescoModal.style.display = 'none';
+        resetBradescoVideo();
+      });
+    }
+    
+    // Click outside modal to close
+    if (bradescoModal) {
+      bradescoModal.addEventListener('click', function(event) {
+        if (event.target === bradescoModal) {
+          bradescoModal.style.display = 'none';
+          resetBradescoVideo();
+        }
+      });
+    }
+
+    // Avon video placeholder click handler
+    const avonVideoPlaceholder = document.getElementById('avonVideoPlaceholder');
+    if (avonVideoPlaceholder) {
+      avonVideoPlaceholder.addEventListener('click', function() {
+        const placeholderDiv = document.getElementById('avonVideoPlaceholder');
+        const videoIframe = document.getElementById('avonVideoIframe');
+        
+        if (placeholderDiv && videoIframe) {
+          // Hide placeholder and show iframe
+          placeholderDiv.style.display = 'none';
+          videoIframe.style.display = 'block';
+          
+          // Create YouTube iframe with autoplay
+          videoIframe.innerHTML = '<iframe width="100%" height="100%" src="https://www.youtube.com/embed/2JM1C4Paovg?autoplay=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+        }
+      });
+    }
+
+    // Avon modal close handlers
+    const avonModal = document.getElementById('avonCaseStudyModal');
+    const avonCloseBtn = document.getElementById('closeAvonCaseStudyModal');
+    
+    function resetAvonVideo() {
+      const placeholderDiv = document.getElementById('avonVideoPlaceholder');
+      const videoIframe = document.getElementById('avonVideoIframe');
+      
+      if (placeholderDiv && videoIframe) {
+        // Stop video by removing iframe content
+        videoIframe.innerHTML = '';
+        videoIframe.style.display = 'none';
+        
+        // Show placeholder again
+        placeholderDiv.style.display = 'block';
+      }
+    }
+    
+    // Close button click handler
+    if (avonCloseBtn) {
+      avonCloseBtn.addEventListener('click', function() {
+        avonModal.style.display = 'none';
+        resetAvonVideo();
+      });
+    }
+    
+    // Click outside modal to close
+    if (avonModal) {
+      avonModal.addEventListener('click', function(event) {
+        if (event.target === avonModal) {
+          avonModal.style.display = 'none';
+          resetAvonVideo();
+        }
+      });
+    }
+
+    // Globo Agro 2025 video placeholder click handler
+    const globoAgroVideoPlaceholder = document.getElementById('globoAgroVideoPlaceholder');
+    if (globoAgroVideoPlaceholder) {
+      globoAgroVideoPlaceholder.addEventListener('click', function() {
+        const placeholderDiv = document.getElementById('globoAgroVideoPlaceholder');
+        const videoContainer = document.getElementById('globoAgroVideoContainer');
+        const video = document.getElementById('globoAgroVideo');
+        
+        if (placeholderDiv && videoContainer && video) {
+          // Hide placeholder and show video
+          placeholderDiv.style.display = 'none';
+          videoContainer.style.display = 'block';
+          
+          // Play video
+          video.play();
+        }
+      });
+    }
+
+    // Globo Agro modal close handlers
+    const globoAgroModal = document.getElementById('globoAgroCaseStudyModal');
+    const globoAgroCloseBtn = document.getElementById('closeGloboAgroCaseStudyModal');
+    
+    function resetGloboAgroVideo() {
+      const placeholderDiv = document.getElementById('globoAgroVideoPlaceholder');
+      const videoContainer = document.getElementById('globoAgroVideoContainer');
+      const video = document.getElementById('globoAgroVideo');
+      
+      if (placeholderDiv && videoContainer && video) {
+        // Stop video
+        video.pause();
+        video.currentTime = 0;
+        videoContainer.style.display = 'none';
+        
+        // Show placeholder again
+        placeholderDiv.style.display = 'block';
+      }
+    }
+    
+    // Close button click handler
+    if (globoAgroCloseBtn) {
+      globoAgroCloseBtn.addEventListener('click', function() {
+        globoAgroModal.style.display = 'none';
+        resetGloboAgroVideo();
+      });
+    }
+    
+    // Click outside modal to close
+    if (globoAgroModal) {
+      globoAgroModal.addEventListener('click', function(event) {
+        if (event.target === globoAgroModal) {
+          globoAgroModal.style.display = 'none';
+          resetGloboAgroVideo();
         }
       });
     }
