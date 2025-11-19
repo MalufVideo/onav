@@ -769,7 +769,7 @@
     </div>
   </nav>
 
-  <section class="relative pt-32 pb-20 md:pt-40 md:pb-32 hero-gradient-overlay overflow-hidden">
+  <section class="relative pt-24 pb-20 md:pt-32 md:pb-32 hero-gradient-overlay overflow-hidden">
     <!-- Hero Image with Left-to-Right Opacity Gradient -->
     <div class="absolute inset-0 w-full h-full pointer-events-none z-0">
       <img src="img/hero_background.webp" alt="Volume Disguise" class="w-full h-full object-cover" width="1920"
@@ -786,7 +786,7 @@
         <div class="text-center md:text-left z-10">
           <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6"
             style="background: linear-gradient(135deg, #fff, #00ff9d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; padding-bottom: 1.5rem;">
-            A plataforma completa para produzir com Disguise, LED e projeção
+            A plataforma completa para produzir com Disguise,<br>LED e projeção
           </h1>
 
           <p class="text-xl text-light-text mb-10 max-w-2xl mx-auto md:mx-0">
@@ -798,7 +798,35 @@
               Simular Orçamento
             </button>
           </div>
-          <div class="mt-12 flex items-center justify-center md:justify-start space-x-4">
+        </div>
+        <div class="relative z-10">
+          <div class="relative rounded-xl overflow-hidden glow-box-primary">
+            <!-- YouTube video temporarily replaced with image for performance -->
+            <div class="relative">
+              <img id="heroAnimationImg" src="img/animation/still_03.webp" alt="On+Av Showreel Preview"
+                class="w-full aspect-video object-cover" width="600" height="338" loading="lazy">
+              <div
+                class="absolute inset-0 bg-black bg-opacity-30 flex flex-col items-center cursor-pointer text-center" style="justify-content: flex-start; padding-top: 25%;"
+                id="heroPlayButton">
+                <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-4">
+                  <i class="fas fa-play text-dark text-xl"></i>
+                </div>
+                <p class="text-white font-semibold">O que a Disguise faz</p>
+                <p class="text-light-text text-sm">Showreel dos clientes Disguise pelo mundo</p>
+              </div>
+            </div>
+          </div>
+          <div
+            class="absolute -bottom-6 -left-6 bg-dark p-3 md:p-4 rounded-lg border border-gray-800 shadow-lg hidden md:block z-20 glass-card">
+            <div class="flex items-center">
+              <img src="img/disguiseicon.webp" alt="Disguise Icon" class="w-8 h-8 object-contain mr-3" loading="lazy" />
+              <div>
+                <p class="text-xs text-medium-text uppercase tracking-wider">powered by</p>
+                <p class="text-sm font-bold text-light-text">Disguise Partner</p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-12 flex items-center justify-end space-x-4 hidden">
             <div class="flex -space-x-2">
               <img src="img/rafael_sa.webp" alt="Foto de Rafael Sa"
                 class="w-10 h-10 rounded-full border-2 border-primary object-cover bg-dark" loading="lazy" />
@@ -816,34 +844,6 @@
                 <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
                 <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
                 <span class="text-light-text text-sm ml-1">5.0 Avaliação Média</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="relative z-10">
-          <div class="relative rounded-xl overflow-hidden glow-box-primary">
-            <!-- YouTube video temporarily replaced with image for performance -->
-            <div class="relative">
-              <img id="heroAnimationImg" src="img/animation/still_03.webp" alt="On+Av Showreel Preview"
-                class="w-full aspect-video object-cover" width="600" height="338" loading="lazy">
-              <div
-                class="absolute inset-0 bg-black bg-opacity-30 flex flex-col items-center justify-center cursor-pointer text-center"
-                id="heroPlayButton">
-                <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-4">
-                  <i class="fas fa-play text-dark text-xl"></i>
-                </div>
-                <p class="text-white font-semibold">O que a Disguise faz</p>
-                <p class="text-light-text text-sm">Showreel dos clientes Disguise pelo mundo</p>
-              </div>
-            </div>
-          </div>
-          <div
-            class="absolute -bottom-6 -left-6 bg-dark p-3 md:p-4 rounded-lg border border-gray-800 shadow-lg hidden md:block z-20 glass-card">
-            <div class="flex items-center">
-              <img src="img/disguiseicon.webp" alt="Disguise Icon" class="w-8 h-8 object-contain mr-3" loading="lazy" />
-              <div>
-                <p class="text-xs text-medium-text uppercase tracking-wider">powered by</p>
-                <p class="text-sm font-bold text-light-text">Disguise Partner</p>
               </div>
             </div>
           </div>
