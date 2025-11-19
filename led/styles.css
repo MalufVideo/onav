@@ -551,7 +551,7 @@ p {
 h2 {
   margin: 0 0 10px 0;
   font-size: 1.2em;
-  color: #000;
+  color: var(--text-primary);
   border-bottom: 2px solid rgba(148, 163, 184, 0.2);
   padding-bottom: 5px;
 }
@@ -1262,4 +1262,8 @@ input[type="range"]::-moz-range-thumb {
 
 #info-sidebar .info-pod#info-principal {
   margin-top: 24px; /* Add margin above the 'Detalhes LED Principal' pod */
+}
+
+#main-pod-title {
+  color: white;
 }

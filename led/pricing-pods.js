@@ -128,19 +128,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (error) {
                 console.error('[fetchProductPrices] Error fetching prices:', error);
-                // Use fallback prices with correct database values
-                this.productPrices = {
-                    'LED Module': 85,
-                    'MX-40 Pro Processor': 1890,
-                    'Disguise VX4n (Base)': 10000,
-                    'Disguise RXII Unit': 7750,
-                    'Stype Tracking': 3890,
-                    'Estúdio': 6000,
-                    'Equipe Técnica Diária': 9900
-                };
-                console.log('[fetchProductPrices] Using fallback prices');
-                this.pricesReady = true;
-                this.triggerInitialCalculationCheck('Prices Ready (Fallback)');
+                // Do NOT use hardcoded fallbacks as per user requirement. 
+                // Prices must come from the database.
+                this.productPrices = {}; 
+                console.error('[fetchProductPrices] Failed to load prices. Pricing calculations will be incorrect.');
+                
+                // Optionally show a user-facing error
+                if(window.showToast) window.showToast('Erro ao carregar tabela de preços. Por favor, recarregue a página.', 'error');
+                
+                this.pricesReady = false; // Keep false so we don't trigger calculations with bad data
             }
         }
 
