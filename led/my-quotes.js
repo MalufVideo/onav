@@ -525,20 +525,20 @@ async function showQuoteDetails(quote) {
             <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 1.2rem; color: #856404;"><i class="fas fa-tag"></i> Desconto Aplicado</h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
               <div>
-                <strong>Preço Original:</strong><br>
+                <strong style="color: #000;">Preço Original:</strong><br>
                 <span style="font-size: 1.1rem; text-decoration: line-through; color: #6c757d;">${formatCurrency(quote.original_total_price || quote.total_price)}</span>
               </div>
               <div>
-                <strong>Desconto:</strong><br>
+                <strong style="color: #000;">Desconto:</strong><br>
                 <span style="font-size: 1.1rem; color: #dc3545;">${quote.discount_percentage.toFixed(1)}% (${formatCurrency((parseFloat(quote.original_total_price) * quote.discount_percentage) / 100)})</span>
               </div>
               <div>
-                <strong>Preço Final:</strong><br>
+                <strong style="color: #000;">Preço Final:</strong><br>
                 <span style="font-size: 1.1rem; color: #28a745; font-weight: bold;">${totalPrice}</span>
               </div>
             </div>
             <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ffeaa7;">
-              <strong>Motivo do Desconto:</strong><br>
+              <strong style="color: #000;">Motivo do Desconto:</strong><br>
               <span style="color: #856404;">Desconto progressivo por ${daysCount} dias de locação</span>
             </div>
           </div>
