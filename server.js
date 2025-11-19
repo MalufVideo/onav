@@ -187,7 +187,8 @@ app.use('/tours', express.static(path.join(__dirname, 'tours')));
 // GET all products
 app.get('/api/products', async (req, res) => {
   try {
-    const { data, error } = await supabaseAdmin
+    // Use regular supabase client (anon key) since products table has public read access
+    const { data, error } = await supabase
       .from('products')
       .select('*')
       .order('category', { ascending: true })
