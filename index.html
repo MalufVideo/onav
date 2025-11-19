@@ -455,6 +455,69 @@
         /* 60px - lg:text-5xl */
       }
     }
+
+    /* WhatsApp Floating Bubble */
+    .whatsapp-bubble {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+      cursor: pointer;
+      z-index: 1000;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      opacity: 0;
+      animation: fadeInBubble 1s ease-in-out 0.5s forwards, pulseBubble 2s ease-in-out 1.5s infinite;
+    }
+
+    .whatsapp-bubble:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+    }
+
+    .whatsapp-bubble i {
+      color: white;
+      font-size: 30px;
+    }
+
+    @keyframes fadeInBubble {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulseBubble {
+      0%, 100% {
+        box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+      }
+      50% {
+        box-shadow: 0 4px 20px rgba(37, 211, 102, 0.8), 0 0 0 10px rgba(37, 211, 102, 0.1);
+      }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .whatsapp-bubble {
+        width: 56px;
+        height: 56px;
+        bottom: 20px;
+        right: 20px;
+      }
+      .whatsapp-bubble i {
+        font-size: 26px;
+      }
+    }
   </style>
 
   <!-- Font Awesome - Load with media swap for performance -->
@@ -541,6 +604,15 @@
 </head>
 
 <body class="antialiased">
+
+  <!-- WhatsApp Floating Bubble -->
+  <a href="https://wa.me/5511920550210?text=Olá%2C%20gostaria%20de%20falar%20com%20um%20especialista"
+     class="whatsapp-bubble"
+     target="_blank"
+     rel="noopener noreferrer"
+     aria-label="Fale conosco no WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
 
   <!-- Google Tag Manager (noscript) -->
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TJR6PHP8" height="0" width="0"
