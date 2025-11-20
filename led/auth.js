@@ -12,16 +12,22 @@ let authListeners = [];
 // Initialize authentication
 async function initAuth() {
   try {
-    // Load the Supabase JavaScript library
-    await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js');
-    
+    // Supabase library is now loaded statically in HTML, no need for dynamic loading
+    // Just verify it's available
+    if (typeof window.supabase === 'undefined') {
+      console.error('Supabase library not loaded. Make sure the script tag is in index.html');
+      return;
+    }
+
+    console.log('[auth.js] Supabase library detected');
+
     // Wait for config to load
     await waitForConfig();
-    
+
     // Initialize client with API key from config
     if (typeof window.SUPABASE_KEY !== 'undefined') {
       supabaseKey = window.SUPABASE_KEY;
-      
+
       // Use the global supabase object created by the UMD bundle
       if (typeof supabase === 'undefined' || supabase === null) {
         if (typeof window.supabaseClient !== 'undefined') {
