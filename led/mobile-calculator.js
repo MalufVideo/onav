@@ -148,6 +148,28 @@ class MobileLEDCalculator {
   async fetchProductPrices() {
     console.log('[MobileLEDCalculator] Fetching prices from Supabase...');
 
+    // Wait for Supabase config to be ready before fetching prices
+    if (!window.SUPABASE_KEY) {
+      console.log('[MobileLEDCalculator] Waiting for Supabase config...');
+      await new Promise((resolve) => {
+        if (window.SUPABASE_KEY) {
+          resolve();
+        } else {
+          const handler = () => {
+            window.removeEventListener('supabaseConfigReady', handler);
+            resolve();
+          };
+          window.addEventListener('supabaseConfigReady', handler);
+
+          // Timeout after 10 seconds
+          setTimeout(() => {
+            window.removeEventListener('supabaseConfigReady', handler);
+            resolve();
+          }, 10000);
+        }
+      });
+    }
+
     try {
       // Use the quote-service which handles Supabase client initialization
       if (!window.quoteService || typeof window.quoteService.getProductPrices !== 'function') {
