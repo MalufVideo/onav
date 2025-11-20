@@ -92,6 +92,16 @@ class MobileLEDCalculator {
       total: !!this.totalPriceEl
     });
 
+    // Immediately set loading text to verify DOM manipulation works
+    if (this.modulesPriceEl) {
+      this.modulesPriceEl.textContent = 'Iniciando...';
+      console.log('[MobileLEDCalculator] Set modules price to "Iniciando..."');
+    }
+    if (this.totalPriceEl) {
+      this.totalPriceEl.textContent = 'Iniciando...';
+      console.log('[MobileLEDCalculator] Set total price to "Iniciando..."');
+    }
+
     // Price rows (for hiding/showing)
     this.rxiiPriceRow = document.getElementById('rxii-price-row');
     this.trackingPriceRow = document.getElementById('tracking-price-row');
