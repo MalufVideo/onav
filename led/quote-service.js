@@ -414,8 +414,9 @@ async function getProductPrices() {
 // Export the service
 window.quoteService = {
   saveQuote,
+  saveProposal: saveQuote, // Alias for mobile compatibility
   getProposals,
   getProposalById,
   getEquipeTecnicaPrice,
-  getProductPrices 
+  getProductPrices
 };
