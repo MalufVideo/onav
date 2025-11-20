@@ -7,7 +7,7 @@ body {
 }
 
 /* Prevent shifts in services grid */
-#services .grid > * {
+#services .grid>* {
     min-height: 400px;
 }
 
@@ -20,14 +20,16 @@ body {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: 12px;
-    min-height: 400px; /* Reserve consistent height */
+    min-height: 400px;
+    /* Reserve consistent height */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
-.glass-card > * {
-    flex-shrink: 0; /* Prevent content from shrinking */
+.glass-card>* {
+    flex-shrink: 0;
+    /* Prevent content from shrinking */
 }
 
 /* Ensure consistent hover states */
@@ -168,8 +170,15 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .subtle-float {
@@ -177,8 +186,15 @@ body {
 }
 
 @keyframes subtle-float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); }
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
 }
 
 /* Responsive Image Gallery */
@@ -253,12 +269,29 @@ body {
 }
 
 /* Utility Classes */
-.text-primary { color: #00ff9d; }
-.text-secondary { color: #0066ff; }
-.text-light-text { color: #e0e0e0; }
-.text-medium-text { color: #a0a0a0; }
-.bg-dark { background-color: #0a0a0a; }
-.bg-darker { background-color: #020202; }
+.text-primary {
+    color: #00ff9d;
+}
+
+.text-secondary {
+    color: #0066ff;
+}
+
+.text-light-text {
+    color: #e0e0e0;
+}
+
+.text-medium-text {
+    color: #a0a0a0;
+}
+
+.bg-dark {
+    background-color: #0a0a0a;
+}
+
+.bg-darker {
+    background-color: #020202;
+}
 
 /* Hero section gradient overlay */
 .hero-gradient-overlay {
@@ -269,6 +302,7 @@ body {
 .glow-text-primary {
     text-shadow: 0 0 12px rgba(0, 255, 157, 0.6);
 }
+
 .glow-text-secondary {
     text-shadow: 0 0 12px rgba(0, 102, 255, 0.6);
 }
@@ -280,14 +314,17 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all 0.3s ease;
 }
+
 .feature-card:hover {
     border-color: #00ff9d;
     transform: translateY(-5px);
 }
+
 .feature-icon {
     transition: all 0.3s ease;
     color: #00ff9d;
 }
+
 .feature-card:hover .feature-icon {
     transform: scale(1.1);
     filter: drop-shadow(0 0 8px rgba(0, 255, 157, 0.7));
@@ -307,6 +344,7 @@ body {
     overflow: hidden;
     border-radius: 0.75rem;
 }
+
 .video-container iframe {
     position: absolute;
     top: 0;
@@ -322,6 +360,7 @@ body {
     color: #050505;
     transition: all 0.3s ease;
 }
+
 .btn-primary:hover {
     opacity: 0.9;
     box-shadow: 0 5px 15px rgba(0, 255, 157, 0.3);
@@ -333,6 +372,7 @@ body {
     color: #00ff9d;
     transition: all 0.3s ease;
 }
+
 .btn-secondary:hover {
     background-color: rgba(0, 255, 157, 0.1);
     transform: translateY(-2px);
@@ -351,13 +391,18 @@ body {
 }
 
 /* Form input styling */
-input, textarea, select {
+input,
+textarea,
+select {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #e0e0e0;
     transition: all 0.3s ease;
 }
-input:focus, textarea:focus, select:focus {
+
+input:focus,
+textarea:focus,
+select:focus {
     outline: none;
     border-color: #00ff9d;
     box-shadow: 0 0 0 3px rgba(0, 255, 157, 0.2);
@@ -375,6 +420,7 @@ select {
     background-size: 1em;
     padding-right: 2.5rem;
 }
+
 select option {
     background-color: #000000;
     color: #ffffff;
@@ -384,6 +430,7 @@ select option {
 nav.fixed {
     background-color: rgba(2, 2, 2, 0.8);
 }
+
 footer {
     background-color: #050505;
 }
@@ -406,6 +453,7 @@ footer {
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all 0.3s ease-in-out;
 }
+
 .content-section:hover {
     border-color: #00ff9d;
 }
@@ -416,6 +464,7 @@ footer {
     align-items: flex-start;
     margin-bottom: 0.75rem;
 }
+
 .styled-list li i {
     color: #00ff9d;
     margin-right: 0.875rem;
@@ -427,11 +476,10 @@ footer {
 /* Hero complex gradient */
 .hero-complex-gradient {
     background: linear-gradient(to bottom,
-        rgba(2, 2, 2, 0.3) 0%,
-        rgba(2, 2, 2, 0.5) 40%,
-        rgba(2, 2, 2, 0.85) 70%,
-        rgba(2, 2, 2, 1) 100%
-    );
+            rgba(2, 2, 2, 0.3) 0%,
+            rgba(2, 2, 2, 0.5) 40%,
+            rgba(2, 2, 2, 0.85) 70%,
+            rgba(2, 2, 2, 1) 100%);
 }
 
 /* Section icon */

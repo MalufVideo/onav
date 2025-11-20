@@ -306,18 +306,16 @@
 
     /* Primary button style */
     .btn-primary {
-      background: linear-gradient(90deg, #00ff9d, #0066ff);
-      /* Gradient background */
-      color: #050505;
-      /* Dark text for contrast */
+      background: linear-gradient(135deg, #ccffeb, #00ff9d);
+      /* Light green to green gradient */
+      color: #000000;
+      /* Black text */
       transition: all 0.3s ease;
     }
 
     .btn-primary:hover {
-      opacity: 0.9;
-      /* Slightly fade on hover */
-      box-shadow: 0 5px 15px rgba(0, 255, 157, 0.3);
-      /* Primary glow */
+      box-shadow: 0 0 20px rgba(0, 255, 157, 0.6), 0 0 40px rgba(0, 255, 157, 0.4);
+      /* Green glow effect */
       transform: translateY(-2px);
       /* Slight lift */
     }
@@ -491,6 +489,7 @@
         opacity: 0;
         transform: translateY(20px) scale(0.8);
       }
+
       to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -498,10 +497,13 @@
     }
 
     @keyframes pulseBubble {
-      0%, 100% {
+
+      0%,
+      100% {
         transform: scale(1);
         box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
       }
+
       50% {
         transform: scale(1.05);
         box-shadow: 0 6px 20px rgba(37, 211, 102, 0.8), 0 0 0 10px rgba(37, 211, 102, 0.15);
@@ -516,6 +518,7 @@
         bottom: 20px;
         right: 20px;
       }
+
       .whatsapp-bubble i {
         font-size: 26px;
       }
@@ -609,10 +612,7 @@
 
   <!-- WhatsApp Floating Bubble -->
   <a href="https://wa.me/5511920550210?text=Olá%2C%20gostaria%20de%20falar%20com%20um%20especialista"
-     class="whatsapp-bubble"
-     target="_blank"
-     rel="noopener noreferrer"
-     aria-label="Fale conosco no WhatsApp">
+    class="whatsapp-bubble" target="_blank" rel="noopener noreferrer" aria-label="Fale conosco no WhatsApp">
     <i class="fab fa-whatsapp"></i>
   </a>
 
@@ -805,9 +805,8 @@
             <div class="relative">
               <img id="heroAnimationImg" src="img/animation/still_03.webp" alt="On+Av Showreel Preview"
                 class="w-full aspect-video object-cover" width="600" height="338" loading="lazy">
-              <div
-                class="absolute inset-0 bg-black bg-opacity-30 flex flex-col items-center cursor-pointer text-center" style="justify-content: flex-start; padding-top: 25%;"
-                id="heroPlayButton">
+              <div class="absolute inset-0 bg-black bg-opacity-30 flex flex-col items-center cursor-pointer text-center"
+                style="justify-content: flex-start; padding-top: 25%;" id="heroPlayButton">
                 <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-4">
                   <i class="fas fa-play text-dark text-xl"></i>
                 </div>
@@ -1885,8 +1884,7 @@
         e oferecer a melhor solução em tecnologia visual para seu projeto.</p>
       <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
         <a href="https://wa.me/5511920550210?text=Olá%2C%20gostaria%20de%20discutir%20sobre%20meu%20projeto%20e%20descobrir%20como%20os%20serviços%20da%20On%2BAv%20podem%20me%20ajudar."
-          target="_blank"
-          class="btn-primary font-bold py-4 px-10 rounded-md text-lg flex items-center justify-center">
+          target="_blank" class="btn-primary font-bold py-4 px-10 rounded-md text-lg flex items-center justify-center">
           <i class="fab fa-whatsapp mr-2"></i> (11) 92055-0210 </a>
       </div>
     </div>
