@@ -22,19 +22,41 @@ class MobileLEDCalculator {
   async initialize() {
     console.log('[MobileLEDCalculator] Initializing...');
 
-    // Fetch prices first
-    await this.fetchProductPrices();
-
-    // Setup DOM elements
+    // Setup DOM elements first (needed for error display)
     this.setupElements();
+
+    // Fetch prices first with retry
+    let pricesLoaded = false;
+    let attempts = 0;
+    const maxAttempts = 3;
+
+    while (!pricesLoaded && attempts < maxAttempts) {
+      attempts++;
+      console.log(`[MobileLEDCalculator] Attempting to fetch prices (attempt ${attempts}/${maxAttempts})...`);
+      await this.fetchProductPrices();
+
+      if (this.pricesLoaded && this.productPrices && Object.keys(this.productPrices).length > 0) {
+        pricesLoaded = true;
+        console.log('[MobileLEDCalculator] Prices loaded successfully');
+      } else {
+        console.warn(`[MobileLEDCalculator] Price fetch attempt ${attempts} failed, retrying...`);
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
+      }
+    }
+
+    if (!pricesLoaded) {
+      console.error('[MobileLEDCalculator] Failed to load prices after all attempts');
+      this.showPriceLoadError();
+      // Continue initialization anyway - some features may still work
+    }
 
     // Setup event listeners
     this.setupEventListeners();
 
-    // Initial calculation
+    // Initial calculation (will check if prices are loaded)
     this.calculateAll();
 
-    console.log('[MobileLEDCalculator] Initialized successfully');
+    console.log('[MobileLEDCalculator] Initialized successfully. Prices loaded:', this.pricesLoaded);
   }
 
   setupElements() {
@@ -422,9 +444,12 @@ class MobileLEDCalculator {
 
   calculatePrices() {
     if (!this.pricesLoaded || !this.productPrices || Object.keys(this.productPrices).length === 0) {
-      console.warn('[MobileLEDCalculator] Prices not loaded yet');
+      console.warn('[MobileLEDCalculator] Prices not loaded yet, displaying placeholders');
+      this.displayPricePlaceholders();
       return;
     }
+
+    console.log('[MobileLEDCalculator] Calculating prices with loaded product data:', Object.keys(this.productPrices));
 
     let total = 0;
 
@@ -438,16 +463,35 @@ class MobileLEDCalculator {
     const studioPrice = this.productPrices['Estúdio'] || 6000;
     const teamPrice = this.productPrices['Equipe Técnica da Diária'] || this.productPrices['Equipe Técnica Diária'] || 0;
 
-    // Calculate quantities
-    const principalModules = parseInt(this.moduleCount?.textContent || 0);
-    const tetoModules = parseInt(this.tetoModuleCount?.textContent || 0);
+    console.log('[MobileLEDCalculator] Unit prices:', {
+      modulePrice,
+      processorPrice,
+      vx4nBasePrice,
+      vx4nBackupPrice,
+      rxiiUnitPrice,
+      trackingPrice,
+      studioPrice,
+      teamPrice
+    });
+
+    // Calculate quantities - use stored info objects for accurate values
+    const principalModules = this.principalInfo?.total || 0;
+    const tetoModules = this.tetoInfo?.total || 0;
     const totalModules = principalModules + tetoModules;
+
+    console.log('[MobileLEDCalculator] Module counts:', {
+      principalModules,
+      tetoModules,
+      totalModules
+    });
 
     // Calculate processors using pixel-based logic from PRINCIPAL wall only (matching desktop)
     // Desktop only calculates processors from principal pixels, not teto
     const principalModulesX = this.principalInfo?.modulesX || 0;
     const principalModulesY = this.principalInfo?.modulesY || 0;
     const processorsNeeded = this.calculateProcessors(principalModules, principalModulesX, principalModulesY);
+
+    console.log('[MobileLEDCalculator] Calculated processors:', processorsNeeded, 'for grid:', principalModulesX, 'x', principalModulesY);
 
     // 1. LED Modules
     const modulesTotalCost = totalModules * modulePrice;
@@ -487,7 +531,18 @@ class MobileLEDCalculator {
     // Update total
     if (this.totalPriceEl) this.totalPriceEl.textContent = this.formatPrice(total);
 
-    console.log('[MobileLEDCalculator] Calculated total:', total);
+    console.log('[MobileLEDCalculator] Price calculation complete:');
+    console.log('  - LED Modules:', this.formatPrice(modulesTotalCost));
+    console.log('  - Processors:', this.formatPrice(processorsCost));
+    console.log('  - Server:', this.formatPrice(serverCost), this.isBackupActive ? '(with backup)' : '(base only)');
+    if (this.currentMode === '3d') {
+      const rxiiUnits = parseInt(this.rxiiSlider?.value || 2);
+      console.log('  - RXII (' + rxiiUnits + ' units):', this.formatPrice(rxiiUnits * rxiiUnitPrice));
+      console.log('  - Tracking:', this.formatPrice(trackingPrice));
+    }
+    console.log('  - Estúdio:', this.formatPrice(studioPrice));
+    console.log('  - Equipe:', this.formatPrice(teamPrice));
+    console.log('  TOTAL:', this.formatPrice(total));
   }
 
   handlePropostaClick() {
@@ -530,9 +585,9 @@ class MobileLEDCalculator {
 
     const items = [];
 
-    // Get current values
-    const principalModules = parseInt(this.moduleCount?.textContent || 0);
-    const tetoModules = parseInt(this.tetoModuleCount?.textContent || 0);
+    // Get current values from stored info objects (more accurate than DOM)
+    const principalModules = this.principalInfo?.total || 0;
+    const tetoModules = this.tetoInfo?.total || 0;
     const totalModules = principalModules + tetoModules;
     const processorsNeeded = this.calculateProcessors(
       principalModules,
@@ -540,6 +595,14 @@ class MobileLEDCalculator {
       this.principalInfo?.modulesY || 0
     );
     const rxiiUnits = parseInt(this.rxiiSlider?.value || 2);
+
+    console.log('[MobileLEDCalculator] Populating cart with:', {
+      principalModules,
+      tetoModules,
+      totalModules,
+      processorsNeeded,
+      rxiiUnits
+    });
 
     // Get prices
     const modulePrice = this.productPrices['LED Module'] || 0;
@@ -614,9 +677,9 @@ class MobileLEDCalculator {
       led_teto_modules: parseInt(this.tetoModuleCount?.textContent || 0),
 
       // Pricing
-      total_modules: parseInt(this.moduleCount?.textContent || 0) + parseInt(this.tetoModuleCount?.textContent || 0),
+      total_modules: (this.principalInfo?.total || 0) + (this.tetoInfo?.total || 0),
       processors_needed: this.calculateProcessors(
-        parseInt(this.moduleCount?.textContent || 0),
+        this.principalInfo?.total || 0,
         this.principalInfo?.modulesX || 0,
         this.principalInfo?.modulesY || 0
       ),
@@ -678,6 +741,37 @@ class MobileLEDCalculator {
         window.location.href = '/led/my-quotes.html';
       });
     }
+  }
+
+  displayPricePlaceholders() {
+    // Display loading placeholders when prices aren't loaded yet
+    const placeholder = 'Carregando...';
+    if (this.modulesPriceEl) this.modulesPriceEl.textContent = placeholder;
+    if (this.processorsPriceEl) this.processorsPriceEl.textContent = placeholder;
+    if (this.serverPriceEl) this.serverPriceEl.textContent = placeholder;
+    if (this.rxiiPriceEl) this.rxiiPriceEl.textContent = placeholder;
+    if (this.trackingPriceEl) this.trackingPriceEl.textContent = placeholder;
+    if (this.studioPriceEl) this.studioPriceEl.textContent = placeholder;
+    if (this.teamPriceEl) this.teamPriceEl.textContent = placeholder;
+    if (this.totalPriceEl) this.totalPriceEl.textContent = placeholder;
+  }
+
+  showPriceLoadError() {
+    // Display error message when prices fail to load
+    const errorMsg = 'Erro ao carregar preços';
+    if (this.modulesPriceEl) this.modulesPriceEl.textContent = errorMsg;
+    if (this.processorsPriceEl) this.processorsPriceEl.textContent = errorMsg;
+    if (this.serverPriceEl) this.serverPriceEl.textContent = errorMsg;
+    if (this.rxiiPriceEl) this.rxiiPriceEl.textContent = errorMsg;
+    if (this.trackingPriceEl) this.trackingPriceEl.textContent = errorMsg;
+    if (this.studioPriceEl) this.studioPriceEl.textContent = errorMsg;
+    if (this.teamPriceEl) this.teamPriceEl.textContent = errorMsg;
+    if (this.totalPriceEl) this.totalPriceEl.textContent = errorMsg;
+
+    console.error('[MobileLEDCalculator] Please check:',
+      '\n1. Supabase connection',
+      '\n2. Products table has data',
+      '\n3. Network connectivity');
   }
 }
 
