@@ -78,6 +78,12 @@ class MobileLEDCalculator {
     this.rxiiPriceRow = document.getElementById('rxii-price-row');
     this.trackingPriceRow = document.getElementById('tracking-price-row');
 
+    // Visual representation elements
+    this.visualCanvas = document.getElementById('led-visual-canvas');
+    this.visualCtx = this.visualCanvas?.getContext('2d');
+    this.visualWidthLabel = document.getElementById('visual-width-label');
+    this.visualHeightLabel = document.getElementById('visual-height-label');
+
     // Modal elements
     this.propostaBtn = document.getElementById('proposta-btn');
     this.quoteModal = document.getElementById('quote-modal');
@@ -196,12 +202,33 @@ class MobileLEDCalculator {
     // Each module is 0.5m x 0.5m
     const modulesX = Math.ceil(width / this.moduleSize);
     const modulesY = Math.ceil(height / this.moduleSize);
-    return modulesX * modulesY;
+    const totalModules = modulesX * modulesY;
+
+    // Return both total and grid dimensions for processor calculation
+    return {
+      total: totalModules,
+      modulesX: modulesX,
+      modulesY: modulesY
+    };
   }
 
-  calculateProcessors(totalModules) {
-    // Each processor handles up to 100 modules
-    return Math.ceil(totalModules / 100);
+  calculateProcessors(totalModules, modulesX, modulesY) {
+    // Each module has 192x192 pixels (2.6mm LED resolution)
+    // Each processor can handle up to 9,895,820 pixels
+    const pixelsPerModule = 192 * 192; // 36,864 pixels per module
+    const pixelsPerProcessor = 9895820;
+
+    // Calculate total pixels based on module grid dimensions
+    const totalPixelsWidth = modulesX * 192;
+    const totalPixelsHeight = modulesY * 192;
+    const totalPixels = totalPixelsWidth * totalPixelsHeight;
+
+    // Calculate processors needed based on pixel count (matching desktop logic)
+    const processorsNeeded = Math.ceil(totalPixels / pixelsPerProcessor);
+
+    console.log(`[calculateProcessors] Modules: ${totalModules} (${modulesX}x${modulesY}), Pixels: ${totalPixels.toLocaleString()}, Processors: ${processorsNeeded}`);
+
+    return processorsNeeded;
   }
 
   calculateAll() {
@@ -211,15 +238,152 @@ class MobileLEDCalculator {
     const roofWidth = parseFloat(this.roofWidthSlider?.value || 0);
     const roofHeight = parseFloat(this.roofHeightSlider?.value || 0);
 
-    const principalModules = this.calculateModules(width, height);
-    const tetoModules = this.calculateModules(roofWidth, roofHeight);
+    // Get module information with grid dimensions
+    const principalInfo = this.calculateModules(width, height);
+    const tetoInfo = this.calculateModules(roofWidth, roofHeight);
+
+    // Store for use in other methods
+    this.principalInfo = principalInfo;
+    this.tetoInfo = tetoInfo;
 
     // Update displays
-    if (this.moduleCount) this.moduleCount.textContent = principalModules;
-    if (this.tetoModuleCount) this.tetoModuleCount.textContent = tetoModules;
+    if (this.moduleCount) this.moduleCount.textContent = principalInfo.total;
+    if (this.tetoModuleCount) this.tetoModuleCount.textContent = tetoInfo.total;
+
+    // Update visual representation
+    this.drawLEDVisualization(width, height, roofWidth, roofHeight);
 
     // Calculate prices
     this.calculatePrices();
+  }
+
+  drawLEDVisualization(principalWidth, principalHeight, tetoWidth, tetoHeight) {
+    if (!this.visualCtx || !this.visualCanvas) return;
+
+    const ctx = this.visualCtx;
+    const canvas = this.visualCanvas;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Update dimension labels
+    if (this.visualWidthLabel) {
+      this.visualWidthLabel.textContent = `${principalWidth.toFixed(1)}m largura`;
+    }
+    if (this.visualHeightLabel) {
+      this.visualHeightLabel.textContent = `${principalHeight.toFixed(1)}m altura`;
+    }
+
+    // Canvas dimensions
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+    const padding = 20;
+    const drawWidth = canvasWidth - (padding * 2);
+    const drawHeight = canvasHeight - (padding * 2);
+
+    // Calculate scale to fit LED wall in canvas
+    const maxWidth = principalWidth > 0 ? principalWidth : 16;
+    const maxHeight = principalHeight + (tetoHeight > 0 ? tetoHeight : 0);
+    const scaleX = drawWidth / maxWidth;
+    const scaleY = drawHeight / maxHeight;
+    const scale = Math.min(scaleX, scaleY);
+
+    // Calculate actual drawing dimensions
+    const ledWallWidth = principalWidth * scale;
+    const ledWallHeight = principalHeight * scale;
+    const ledTetoWidth = tetoWidth * scale;
+    const ledTetoHeight = tetoHeight * scale;
+
+    // Center the visualization
+    const startX = (canvasWidth - ledWallWidth) / 2;
+    const startY = (canvasHeight - ledWallHeight - ledTetoHeight) / 2 + ledTetoHeight;
+
+    // Draw teto (ceiling) if present
+    if (tetoWidth > 0 && tetoHeight > 0) {
+      ctx.fillStyle = 'rgba(100, 150, 255, 0.3)';
+      ctx.strokeStyle = 'rgba(100, 150, 255, 0.8)';
+      ctx.lineWidth = 2;
+
+      const tetoX = (canvasWidth - ledTetoWidth) / 2;
+      const tetoY = startY - ledTetoHeight - 5;
+
+      ctx.fillRect(tetoX, tetoY, ledTetoWidth, ledTetoHeight);
+      ctx.strokeRect(tetoX, tetoY, ledTetoWidth, ledTetoHeight);
+
+      // Draw module grid for teto
+      const tetoModulesX = this.tetoInfo?.modulesX || 0;
+      const tetoModulesY = this.tetoInfo?.modulesY || 0;
+      if (tetoModulesX > 1 && tetoModulesY > 1) {
+        ctx.strokeStyle = 'rgba(100, 150, 255, 0.4)';
+        ctx.lineWidth = 0.5;
+        const moduleWidthTeto = ledTetoWidth / tetoModulesX;
+        const moduleHeightTeto = ledTetoHeight / tetoModulesY;
+
+        for (let i = 1; i < tetoModulesX; i++) {
+          ctx.beginPath();
+          ctx.moveTo(tetoX + (i * moduleWidthTeto), tetoY);
+          ctx.lineTo(tetoX + (i * moduleWidthTeto), tetoY + ledTetoHeight);
+          ctx.stroke();
+        }
+        for (let i = 1; i < tetoModulesY; i++) {
+          ctx.beginPath();
+          ctx.moveTo(tetoX, tetoY + (i * moduleHeightTeto));
+          ctx.lineTo(tetoX + ledTetoWidth, tetoY + (i * moduleHeightTeto));
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Draw principal LED wall
+    ctx.fillStyle = 'rgba(251, 191, 36, 0.2)';
+    ctx.strokeStyle = 'rgba(251, 191, 36, 1)';
+    ctx.lineWidth = 2;
+
+    ctx.fillRect(startX, startY, ledWallWidth, ledWallHeight);
+    ctx.strokeRect(startX, startY, ledWallWidth, ledWallHeight);
+
+    // Draw module grid
+    const principalModulesX = this.principalInfo?.modulesX || 0;
+    const principalModulesY = this.principalInfo?.modulesY || 0;
+
+    if (principalModulesX > 1 && principalModulesY > 1) {
+      ctx.strokeStyle = 'rgba(251, 191, 36, 0.4)';
+      ctx.lineWidth = 0.5;
+
+      const moduleWidth = ledWallWidth / principalModulesX;
+      const moduleHeight = ledWallHeight / principalModulesY;
+
+      // Vertical lines
+      for (let i = 1; i < principalModulesX; i++) {
+        ctx.beginPath();
+        ctx.moveTo(startX + (i * moduleWidth), startY);
+        ctx.lineTo(startX + (i * moduleWidth), startY + ledWallHeight);
+        ctx.stroke();
+      }
+
+      // Horizontal lines
+      for (let i = 1; i < principalModulesY; i++) {
+        ctx.beginPath();
+        ctx.moveTo(startX, startY + (i * moduleHeight));
+        ctx.lineTo(startX + ledWallWidth, startY + (i * moduleHeight));
+        ctx.stroke();
+      }
+    }
+
+    // Draw dimension annotations
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'center';
+
+    // Width annotation (bottom)
+    ctx.fillText(`${principalWidth.toFixed(1)}m`, canvasWidth / 2, startY + ledWallHeight + 15);
+
+    // Height annotation (right side)
+    ctx.save();
+    ctx.translate(startX + ledWallWidth + 15, startY + ledWallHeight / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText(`${principalHeight.toFixed(1)}m`, 0, 0);
+    ctx.restore();
   }
 
   switchMode(mode) {
@@ -278,7 +442,12 @@ class MobileLEDCalculator {
     const principalModules = parseInt(this.moduleCount?.textContent || 0);
     const tetoModules = parseInt(this.tetoModuleCount?.textContent || 0);
     const totalModules = principalModules + tetoModules;
-    const processorsNeeded = this.calculateProcessors(totalModules);
+
+    // Calculate processors using pixel-based logic from PRINCIPAL wall only (matching desktop)
+    // Desktop only calculates processors from principal pixels, not teto
+    const principalModulesX = this.principalInfo?.modulesX || 0;
+    const principalModulesY = this.principalInfo?.modulesY || 0;
+    const processorsNeeded = this.calculateProcessors(principalModules, principalModulesX, principalModulesY);
 
     // 1. LED Modules
     const modulesTotalCost = totalModules * modulePrice;
@@ -365,7 +534,11 @@ class MobileLEDCalculator {
     const principalModules = parseInt(this.moduleCount?.textContent || 0);
     const tetoModules = parseInt(this.tetoModuleCount?.textContent || 0);
     const totalModules = principalModules + tetoModules;
-    const processorsNeeded = this.calculateProcessors(totalModules);
+    const processorsNeeded = this.calculateProcessors(
+      principalModules,
+      this.principalInfo?.modulesX || 0,
+      this.principalInfo?.modulesY || 0
+    );
     const rxiiUnits = parseInt(this.rxiiSlider?.value || 2);
 
     // Get prices
@@ -442,7 +615,11 @@ class MobileLEDCalculator {
 
       // Pricing
       total_modules: parseInt(this.moduleCount?.textContent || 0) + parseInt(this.tetoModuleCount?.textContent || 0),
-      processors_needed: this.calculateProcessors(parseInt(this.moduleCount?.textContent || 0) + parseInt(this.tetoModuleCount?.textContent || 0)),
+      processors_needed: this.calculateProcessors(
+        parseInt(this.moduleCount?.textContent || 0),
+        this.principalInfo?.modulesX || 0,
+        this.principalInfo?.modulesY || 0
+      ),
       rxii_units: this.currentMode === '3d' ? parseInt(this.rxiiSlider?.value || 2) : 0,
       backup_active: this.isBackupActive,
 
