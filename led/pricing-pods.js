@@ -92,14 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 this.ledDataReady = true; // Set flag
 
-                // Check if both prices and LED data are ready to trigger initial calc
-                this.triggerInitialCalculationCheck('LED Data Ready');
-
-                // Always recalculate on subsequent events if initial calc is done
-                if (this.initialCalculationDone) {
-                    console.log('[pricing-pods.js] Recalculating total due to subsequent ledWallDataCalculated event.');
-                    this.calculateTotal(this.currentMode, 'LED Wall Data Updated'); // Pass trigger info
-                }
+                // Recalculate with updated values
+                console.log('[pricing-pods.js] LED data updated, recalculating...');
+                this.calculateTotal(this.currentMode, 'LED Wall Data Updated');
             });
 
             this.initialize();
@@ -120,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.productPrices = result.data;
                     console.log('[fetchProductPrices] Prices fetched successfully:', this.productPrices);
                     this.pricesReady = true;
-                    this.triggerInitialCalculationCheck('Prices Ready');
+                    // Initial calculation will be triggered at the end of initialize()
                 } else {
                     throw new Error(result.error || 'No price data returned');
                 }
@@ -143,6 +138,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Fetch prices BEFORE doing anything else
             await this.fetchProductPrices();
+
+            // --- Get initial LED data from DOM (led-wall.js should have already populated these) ---
+            const moduleCountElement = document.getElementById('module-count');
+            const tetoModuleCountElement = document.getElementById('teto-module-count');
+            const processorsElement = document.getElementById('processors');
+
+            if (moduleCountElement && tetoModuleCountElement) {
+                // Parse the text content as numbers
+                const principalModules = parseInt(moduleCountElement.textContent) || 0;
+                const tetoModules = parseInt(tetoModuleCountElement.textContent) || 0;
+                this.totalModules = principalModules + tetoModules;
+                console.log(`[initialize] Read initial modules from DOM: Principal=${principalModules}, Teto=${tetoModules}, Total=${this.totalModules}`);
+            } else {
+                console.warn('[initialize] Could not find module count elements in DOM, using default 0');
+                this.totalModules = 0;
+            }
+
+            if (processorsElement) {
+                this.processorsNeeded = parseInt(processorsElement.textContent) || 0;
+                console.log(`[initialize] Read initial processors from DOM: ${this.processorsNeeded}`);
+            } else {
+                console.warn('[initialize] Could not find processors element in DOM, using default 0');
+                this.processorsNeeded = 0;
+            }
+
+            // Mark LED data as ready since we've read from DOM
+            this.ledDataReady = true;
 
             // --- Set Initial Pod Title ---
             const initialPodTitleSpan = this.pricingPodElement.querySelector('#main-pod-title');
@@ -245,15 +267,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.calculateTotal(this.currentMode); // Recalculate with potentially new base prices
                 // REMOVED call to obsolete updateOrderSummary()
             });
-        }
 
-        // NEW METHOD: Check and trigger initial calculation
-        triggerInitialCalculationCheck(triggerSource) {
-            console.log(`[triggerInitialCalculationCheck] Source: ${triggerSource}. Prices Ready: ${this.pricesReady}, LED Data Ready: ${this.ledDataReady}, Initial Calc Done: ${this.initialCalculationDone}`);
-            if (this.pricesReady && this.ledDataReady && !this.initialCalculationDone) {
-                console.log('[triggerInitialCalculationCheck] Both prices and LED data ready. Performing initial calculation...');
-                this.calculateTotal(this.currentMode, 'Initial Calculation');
-                this.initialCalculationDone = true; // Mark initial calculation as done
+            // --- Trigger initial calculation now that everything is set up ---
+            console.log('[initialize] Setup complete. Triggering initial calculation...');
+            console.log(`[initialize] Prices ready: ${this.pricesReady}, LED data ready: ${this.ledDataReady}`);
+            if (this.pricesReady) {
+                this.calculateTotal(this.currentMode, 'Initial Load from DOM');
+                this.initialCalculationDone = true;
+            } else {
+                console.warn('[initialize] Prices not ready, calculation will be delayed');
             }
         }
 
