@@ -5085,8 +5085,14 @@
 
           const submitButton = contactForm.querySelector('button[type="submit"]');
           const originalButtonText = submitButton.innerHTML;
-          submitButton.innerHTML = 'Enviando...';
+          submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Enviando...';
           submitButton.disabled = true;
+
+          // Remove any existing message
+          const existingMessage = contactForm.querySelector('.form-message');
+          if (existingMessage) {
+            existingMessage.remove();
+          }
 
           const formData = new FormData(contactForm);
           const formObject = {};
@@ -5095,7 +5101,7 @@
           });
 
           try {
-            const response = await fetch('/api/send-email', { // Matches your form's action attribute
+            const response = await fetch('/api/send-email', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -5105,15 +5111,45 @@
 
             const result = await response.json();
 
+            // Create message element
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'form-message mt-4 p-4 rounded-lg text-center';
+
             if (response.ok) {
-              alert('Mensagem enviada com sucesso!'); // Or update a div with the message
+              messageDiv.classList.add('bg-green-900', 'bg-opacity-30', 'border', 'border-green-500', 'text-green-400');
+              messageDiv.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Mensagem enviada com sucesso! Entraremos em contato em breve.';
               contactForm.reset(); // Clear the form
+
+              // Scroll to message
+              setTimeout(() => {
+                messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }, 100);
             } else {
-              alert('Erro ao enviar mensagem: ' + (result.details || result.message || 'Por favor, tente novamente.'));
+              messageDiv.classList.add('bg-red-900', 'bg-opacity-30', 'border', 'border-red-500', 'text-red-400');
+              messageDiv.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i>' +
+                (result.message || 'Erro ao enviar mensagem. Por favor, tente novamente.');
             }
+
+            // Insert message after form
+            contactForm.appendChild(messageDiv);
+
+            // Auto-remove success message after 5 seconds
+            if (response.ok) {
+              setTimeout(() => {
+                messageDiv.style.transition = 'opacity 0.5s';
+                messageDiv.style.opacity = '0';
+                setTimeout(() => messageDiv.remove(), 500);
+              }, 5000);
+            }
+
           } catch (error) {
             console.error('Fetch Error:', error);
-            alert('Ocorreu um erro ao enviar sua mensagem. Verifique sua conexão e tente novamente.');
+
+            // Create error message
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'form-message mt-4 p-4 rounded-lg text-center bg-red-900 bg-opacity-30 border border-red-500 text-red-400';
+            messageDiv.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i>Ocorreu um erro ao enviar sua mensagem. Verifique sua conexão e tente novamente.';
+            contactForm.appendChild(messageDiv);
           } finally {
             submitButton.innerHTML = originalButtonText;
             submitButton.disabled = false;
