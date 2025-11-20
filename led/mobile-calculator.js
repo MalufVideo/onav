@@ -446,8 +446,8 @@ class MobileLEDCalculator {
       rxii_units: this.currentMode === '3d' ? parseInt(this.rxiiSlider?.value || 2) : 0,
       backup_active: this.isBackupActive,
 
-      // Total price (extract number from formatted string)
-      total_price: this.parsePrice(this.totalPriceEl?.textContent || '0')
+      // Total price (keep as formatted string for consistency with desktop version)
+      total_price: this.totalPriceEl?.textContent || 'R$ 0'
     };
 
     console.log('[MobileLEDCalculator] Proposal data:', proposalData);
