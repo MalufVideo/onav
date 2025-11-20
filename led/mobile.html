@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Calculadora LED Mobile - ON+AV</title>
+
+  <!-- Mobile-specific styles -->
+  <link rel="stylesheet" href="mobile-styles.css">
+
+  <!-- Configuration -->
+  <script src="../config.js"></script>
+
+  <!-- Authentication modules -->
+  <script src="auth-config.js" defer></script>
+  <script src="auth.js" defer></script>
+  <script src="auth-ui.js" defer></script>
+  <script src="auth-protection.js" defer></script>
+  <script src="quote-service.js" defer></script>
+  <script src="webhook-service.js" defer></script>
+  <script src="discount-calculator.js" defer></script>
+
+  <!-- Mobile calculator script -->
+  <script src="mobile-calculator.js" defer></script>
+
+  <!-- Flatpickr for date selection -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+  <div id="mobile-app">
+    <!-- Header -->
+    <header class="mobile-header">
+      <a href="/" class="logo-link">
+        <img src="/img/resized_logo.png" alt="ON+AV Logo" class="logo">
+      </a>
+      <h1>Calculadora LED</h1>
+    </header>
+
+    <!-- Main Content -->
+    <main class="mobile-content">
+      <!-- LED Configuration Card -->
+      <section class="mobile-card">
+        <h2>Configuração do LED</h2>
+
+        <!-- LED Principal -->
+        <div class="control-section">
+          <h3>Painel Principal</h3>
+
+          <div class="input-group">
+            <label for="width">
+              Largura (metros)
+              <span class="value-display" id="width-value">16</span>
+            </label>
+            <input type="range" id="width" min="1" max="36" step="0.5" value="16" class="mobile-slider">
+          </div>
+
+          <div class="input-group">
+            <label for="height">
+              Altura (metros)
+              <span class="value-display" id="height-value">5</span>
+            </label>
+            <input type="range" id="height" min="1" max="8" step="0.5" value="5" class="mobile-slider">
+          </div>
+
+          <div class="info-display">
+            <strong>Módulos LED:</strong> <span id="module-count">400</span>
+          </div>
+        </div>
+
+        <!-- Teto (Optional) -->
+        <div class="control-section">
+          <h3>Teto (Opcional)</h3>
+
+          <div class="input-group">
+            <label for="roof-width">
+              Largura (metros)
+              <span class="value-display" id="roof-width-value">0</span>
+            </label>
+            <input type="range" id="roof-width" min="0" max="8" step="0.5" value="0" class="mobile-slider">
+          </div>
+
+          <div class="input-group">
+            <label for="roof-height">
+              Altura (metros)
+              <span class="value-display" id="roof-height-value">0</span>
+            </label>
+            <input type="range" id="roof-height" min="0" max="7" step="0.5" value="0" class="mobile-slider">
+          </div>
+
+          <div class="info-display">
+            <strong>Módulos LED Teto:</strong> <span id="teto-module-count">0</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mode Selection Card -->
+      <section class="mobile-card">
+        <h2>Tipo de Produção</h2>
+        <div class="mode-selector">
+          <button class="mode-btn active" id="mode-3d" data-mode="3d">
+            <strong>3D</strong>
+            <small>Unreal 5 ou 2.5D</small>
+          </button>
+          <button class="mode-btn" id="mode-2d" data-mode="2d">
+            <strong>2D</strong>
+            <small>Plates ou Camera Car</small>
+          </button>
+        </div>
+      </section>
+
+      <!-- RXII Slider (Only visible in 3D mode) -->
+      <section class="mobile-card" id="rxii-section" style="display: block;">
+        <h2>Disguise RXII</h2>
+        <div class="input-group">
+          <label for="rxii-units">
+            Unidades
+            <span class="value-display" id="rxii-units-value">2</span>
+          </label>
+          <input type="range" id="rxii-units" min="1" max="5" step="1" value="2" class="mobile-slider">
+        </div>
+      </section>
+
+      <!-- Pricing Card -->
+      <section class="mobile-card pricing-card">
+        <h2>Investimento Estimado</h2>
+
+        <div class="price-breakdown">
+          <div class="price-item">
+            <span class="item-label">Painel de LED</span>
+            <span class="item-price" id="modules-price">...</span>
+          </div>
+
+          <div class="price-item">
+            <span class="item-label">Processadora</span>
+            <span class="item-price" id="processors-price">...</span>
+          </div>
+
+          <div class="price-item">
+            <span class="item-label">Disguise VX</span>
+            <span class="item-price" id="server-price">...</span>
+          </div>
+
+          <div class="price-item" id="backup-row">
+            <button class="backup-toggle" id="backup-btn">+ Adicionar Backup</button>
+          </div>
+
+          <div class="price-item" id="rxii-price-row">
+            <span class="item-label">Disguise RXII</span>
+            <span class="item-price" id="rxii-price">...</span>
+          </div>
+
+          <div class="price-item" id="tracking-price-row">
+            <span class="item-label">Camera Tracking</span>
+            <span class="item-price" id="tracking-price">...</span>
+          </div>
+
+          <div class="price-item">
+            <span class="item-label">Estúdio</span>
+            <span class="item-price" id="studio-price">...</span>
+          </div>
+
+          <div class="price-item">
+            <span class="item-label">Equipe Profissional</span>
+            <span class="item-price" id="team-price">...</span>
+          </div>
+
+          <div class="price-total">
+            <span class="total-label">Total</span>
+            <span class="total-price" id="total-price">...</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA Button -->
+      <section class="mobile-card cta-card">
+        <button id="proposta-btn" class="cta-button">Gerar Proposta</button>
+        <p class="cta-subtitle">Receba uma proposta personalizada em minutos</p>
+      </section>
+
+      <!-- Powered by Disguise -->
+      <div class="powered-by">
+        <span>Powered by</span>
+        <img src="../img/logo_disguise.svg" alt="Disguise Logo">
+      </div>
+    </main>
+
+    <!-- Quote Modal (Simplified) -->
+    <div id="quote-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-content">
+        <button id="quote-close-btn" class="modal-close">&times;</button>
+        <h2>Proposta de Orçamento</h2>
+
+        <!-- Project Details -->
+        <div class="form-group">
+          <label for="project-name">Nome do Projeto</label>
+          <input type="text" id="project-name" required>
+        </div>
+
+        <!-- Date Selection -->
+        <div class="form-group">
+          <label>Datas da Filmagem</label>
+          <div class="date-inputs">
+            <input type="text" id="shooting-dates-start" required readonly placeholder="Início">
+            <input type="text" id="shooting-dates-end" required readonly placeholder="Fim">
+          </div>
+        </div>
+
+        <!-- Cart Items (Will be populated by JS) -->
+        <div id="cart-items-container">
+          <p>Carregando itens...</p>
+        </div>
+
+        <!-- Total -->
+        <div class="cart-total">
+          <strong>Total:</strong> <span id="cart-total-price">R$ 0</span>
+        </div>
+
+        <!-- Submit Button -->
+        <button id="quote-submit-btn" class="form-submit">Requisitar Proposta</button>
+      </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-content">
+        <button id="confirmation-close-btn" class="modal-close">&times;</button>
+        <h2>Proposta Enviada!</h2>
+        <p>Sua proposta foi enviada com sucesso. Em breve nossa equipe entrará em contato.</p>
+
+        <!-- Cal.com Embed -->
+        <div id="my-cal-inline" style="min-width:320px;height:630px;"></div>
+
+        <button id="view-my-proposals-btn" class="button-secondary">Ver Minhas Propostas</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cal.com integration -->
+  <script>
+    (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; typeof namespace === "string" ? (cal.ns[namespace] = api) && p(api, ar) : p(cal, ar); return; } p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
+    Cal("init", {origin:"https://cal.com"});
+    Cal("inline", {
+      elementOrSelector: "#my-cal-inline",
+      calLink: "us-aluga-h2l9n4/30min",
+      config: {
+        name: "Cliente LED",
+        email: "cliente@email.com",
+        notes: "Reunião sobre painel de LED",
+        layout: "month_view",
+        hideEventTypeDetails: false,
+        hideBranding: true,
+      }
+    });
+  </script>
+
+  <!-- Flatpickr initialization -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      flatpickr("#shooting-dates-start", {
+        dateFormat: "d/m/Y",
+        locale: "pt",
+        allowInput: false,
+        disableMobile: false,
+        onChange: function(selectedDates, dateStr, instance) {
+          const endDatePicker = flatpickr("#shooting-dates-end");
+          if (endDatePicker) {
+            endDatePicker.set("minDate", selectedDates[0]);
+          }
+        }
+      });
+
+      flatpickr("#shooting-dates-end", {
+        dateFormat: "d/m/Y",
+        locale: "pt",
+        allowInput: false,
+        disableMobile: false
+      });
+    });
+  </script>
+
+  <!-- Initialize authentication -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('[mobile.html] DOM loaded, initializing authentication...');
+
+      const waitForAuth = () => {
+        return new Promise((resolve) => {
+          let attempts = 0;
+          const maxAttempts = 20;
+
+          const checkAuth = () => {
+            if (window.auth) {
+              console.log('[mobile.html] Auth module found');
+              resolve();
+            } else {
+              attempts++;
+              if (attempts >= maxAttempts) {
+                console.error('[mobile.html] Auth module not found after maximum attempts');
+                resolve();
+                return;
+              }
+              console.log(`[mobile.html] Waiting for auth... (${attempts}/${maxAttempts})`);
+              setTimeout(checkAuth, 500);
+            }
+          };
+          checkAuth();
+        });
+      };
+
+      waitForAuth()
+        .then(async () => {
+          if (window.auth) {
+            console.log('[mobile.html] Initializing auth...');
+            await window.auth.initAuth();
+            console.log('[mobile.html] Auth initialized');
+          }
+
+          if (window.authUI) {
+            window.authUI.initAuthUI();
+            console.log('[mobile.html] Authentication UI initialized');
+          }
+        })
+        .catch(error => {
+          console.error('[mobile.html] Failed to initialize authentication:', error);
+        });
+    });
+  </script>
+</body>
+</html>
