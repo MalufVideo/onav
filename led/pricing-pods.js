@@ -75,9 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // --- Add properties to store dynamic data ---
             this.totalModules = 0;
-            this.moduleUnitPrice = 0;
             this.processorsNeeded = 0;
-            this.processorUnitPrice = 0;
 
             if (!this.pricingPodElement) {
                 console.error('[PricingPodsController] Pricing pod element #sidebar-pricing not found!');
@@ -87,10 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // --- Add event listener for LED wall data ---
             document.addEventListener('ledWallDataCalculated', (event) => {
                 console.log('[pricing-pods.js] Received ledWallDataCalculated event:', event.detail);
+                // Only get the quantities from the event, NOT the prices
+                // We'll use our own fetched prices from Supabase
                 this.totalModules = event.detail.totalModules || 0;
-                this.moduleUnitPrice = event.detail.moduleUnitPrice || 0;
                 this.processorsNeeded = event.detail.processorsNeeded || 0;
-                this.processorUnitPrice = event.detail.processorUnitPrice || 0;
 
                 this.ledDataReady = true; // Set flag
 
@@ -263,27 +261,31 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(`[PricingPodsController] calculateTotal called. Mode: ${mode}, Trigger: ${trigger}`);
             const pod = this.pricingPodElement;
 
-            // Check for early exit condition
-            if (!pod || this.totalModules === 0 || this.moduleUnitPrice === 0) {
-                console.warn(`[calculateTotal] Exiting early. Trigger: ${trigger}. Reason: Pod element or LED data missing (Modules: ${this.totalModules}, Unit Price: ${this.moduleUnitPrice})`);
-                // Optionally update UI to show calculation is pending
-                const mainTotalPriceSpan = pod?.querySelector('#total-price');
+            // Check for early exit condition - only check for pod element and if prices are loaded
+            if (!pod) {
+                console.warn(`[calculateTotal] Exiting early. Trigger: ${trigger}. Reason: Pod element not found`);
+                return;
+            }
+
+            if (!this.pricesReady || !this.productPrices || Object.keys(this.productPrices).length === 0) {
+                console.warn(`[calculateTotal] Exiting early. Trigger: ${trigger}. Reason: Prices not loaded yet`);
+                // Update UI to show calculation is pending
+                const mainTotalPriceSpan = pod.querySelector('#total-price');
                 if (mainTotalPriceSpan) {
-                    mainTotalPriceSpan.textContent = 'Calculating...';
+                    mainTotalPriceSpan.textContent = 'Carregando...';
                 }
-                return; // Exit calculation if essential data is missing
+                return;
+            }
+
+            // Allow calculation even if totalModules is 0 (user might be setting up)
+            if (this.totalModules === 0) {
+                console.log(`[calculateTotal] Total modules is 0, will calculate with 0 modules`);
             }
 
             let total = 0;
             const itemsForCart = [];
 
             // --- Get Unit Prices from fetched data ---
-            // Check if prices are loaded
-            if (!this.productPrices || Object.keys(this.productPrices).length === 0) {
-                console.warn('[calculateTotal] Product prices not loaded yet, skipping calculation');
-                return;
-            }
-
             const modulePrice = this.productPrices['LED Module'] || 0;
             const processorPrice = this.productPrices['MX-40 Pro Processor'] || 0;
             const vx4nBasePrice = this.productPrices['Disguise VX4n (Base)'] || 0;
