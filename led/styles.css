@@ -518,31 +518,19 @@ html {
 
 body {
   margin: 0;
-  display: flex;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: radial-gradient(circle at 20% 20%, rgba(249, 115, 22, 0.12), transparent 45%),
     radial-gradient(circle at 80% 0%, rgba(251, 191, 36, 0.14), transparent 40%),
     linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-  height: 100vh;
+  min-height: 100vh;
   overflow: hidden;
-  width: 1920px; /* Fixed width for Full HD layout */
   color: var(--text-primary);
-  transform-origin: top left;
 }
 
-/* Scale down on lower resolutions */
-@media screen and (max-width: 1919px) {
-  body {
-    transform: scale(calc(100vw / 1920));
-    height: 1080px; /* Maintain the 1080p canvas before scaling */
-  }
-}
-
-/* Specific scaling for 720p (1280x720) */
-@media screen and (max-width: 1280px) {
-  body {
-    transform: scale(0.6667); /* 1280/1920 = 0.6667 */
-  }
+#app-wrapper {
+  position: fixed;
+  inset: 0;
+  display: flex;
 }
 p {
   margin: 8px 0;
