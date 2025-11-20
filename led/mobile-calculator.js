@@ -22,6 +22,12 @@ class MobileLEDCalculator {
   async initialize() {
     console.log('[MobileLEDCalculator] Initializing...');
 
+    // Show loading state
+    this.showLoadingState();
+
+    // Wait for quote service to be available
+    await this.waitForQuoteService();
+
     // Fetch prices first
     await this.fetchProductPrices();
 
@@ -31,10 +37,49 @@ class MobileLEDCalculator {
     // Setup event listeners
     this.setupEventListeners();
 
+    // Hide loading state
+    this.hideLoadingState();
+
     // Initial calculation
     this.calculateAll();
 
     console.log('[MobileLEDCalculator] Initialized successfully');
+  }
+
+  async waitForQuoteService() {
+    let attempts = 0;
+    const maxAttempts = 50; // 5 seconds max
+
+    while (!window.quoteService && attempts < maxAttempts) {
+      console.log('[MobileLEDCalculator] Waiting for quote service...', attempts + 1);
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+
+    if (!window.quoteService) {
+      console.error('[MobileLEDCalculator] Quote service not available after waiting');
+      throw new Error('Quote service not available');
+    }
+
+    console.log('[MobileLEDCalculator] Quote service is ready');
+  }
+
+  showLoadingState() {
+    // Show loading message in price displays
+    const priceElements = [
+      'modules-price', 'processors-price', 'server-price',
+      'rxii-price', 'tracking-price', 'studio-price',
+      'team-price', 'total-price'
+    ];
+
+    priceElements.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = 'Carregando...';
+    });
+  }
+
+  hideLoadingState() {
+    // Loading state will be replaced by actual prices in calculatePrices()
   }
 
   setupElements() {
@@ -160,6 +205,14 @@ class MobileLEDCalculator {
         this.productPrices = result.data;
         console.log('[MobileLEDCalculator] Prices fetched successfully:', this.productPrices);
         this.pricesLoaded = true;
+
+        // Verify we have the essential prices
+        const essentialPrices = ['LED Module', 'MX-40 Pro Processor', 'Disguise VX4n (Base)'];
+        const missingPrices = essentialPrices.filter(name => !this.productPrices[name]);
+
+        if (missingPrices.length > 0) {
+          console.warn('[MobileLEDCalculator] Missing essential prices:', missingPrices);
+        }
       } else {
         throw new Error(result.error || 'No price data returned');
       }
@@ -167,6 +220,24 @@ class MobileLEDCalculator {
       console.error('[MobileLEDCalculator] Error fetching prices:', error);
       this.productPrices = {};
       this.pricesLoaded = false;
+
+      // Show error message to user
+      const errorMsg = 'Erro ao carregar preços. Por favor, recarregue a página.';
+      alert(errorMsg);
+
+      // Set error state in all price displays
+      const priceElements = [
+        'modules-price', 'processors-price', 'server-price',
+        'rxii-price', 'tracking-price', 'studio-price',
+        'team-price', 'total-price'
+      ];
+
+      priceElements.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = 'Erro';
+      });
+
+      throw error; // Re-throw to prevent further initialization
     }
   }
 
@@ -396,49 +467,68 @@ class MobileLEDCalculator {
       return;
     }
 
+    // Get current user information
+    const currentUser = window.auth?.getCurrentUser();
+    const userProfile = window.auth?.getUserProfile();
+
     // Calculate days
     const start = this.parseDate(startDate);
     const end = this.parseDate(endDate);
     const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
 
-    // Build proposal data
+    // Get total modules
+    const principalModules = parseInt(this.moduleCount?.textContent || 0);
+    const tetoModules = parseInt(this.tetoModuleCount?.textContent || 0);
+    const totalModules = principalModules + tetoModules;
+
+    // Build proposal data matching the expected schema
     const proposalData = {
+      // User and session data
+      user_id: currentUser?.id,
+      status: 'pending',
+
+      // Client and project info
       project_name: projectName,
+      client_name: userProfile?.full_name || currentUser?.email || 'Cliente',
+      client_email: currentUser?.email || '',
+      client_phone: userProfile?.phone || '',
+      client_company: userProfile?.company || '',
+
+      // Shooting dates
       shooting_dates_start: startDate,
       shooting_dates_end: endDate,
       days_count: days,
-      selected_pod_type: this.currentMode,
 
-      // LED configuration
+      // LED Principal Configuration
       led_principal_width: parseFloat(this.widthSlider?.value || 0),
       led_principal_height: parseFloat(this.heightSlider?.value || 0),
-      led_principal_modules: parseInt(this.moduleCount?.textContent || 0),
+      led_principal_modules: principalModules,
+      led_principal_curvature: 0, // Mobile doesn't have curvature control
 
+      // LED Teto Configuration
       led_teto_width: parseFloat(this.roofWidthSlider?.value || 0),
       led_teto_height: parseFloat(this.roofHeightSlider?.value || 0),
-      led_teto_modules: parseInt(this.tetoModuleCount?.textContent || 0),
+      led_teto_modules: tetoModules,
 
-      // Pricing
-      total_modules: parseInt(this.moduleCount?.textContent || 0) + parseInt(this.tetoModuleCount?.textContent || 0),
-      processors_needed: this.calculateProcessors(parseInt(this.moduleCount?.textContent || 0) + parseInt(this.tetoModuleCount?.textContent || 0)),
-      rxii_units: this.currentMode === '3d' ? parseInt(this.rxiiSlider?.value || 2) : 0,
-      backup_active: this.isBackupActive,
+      // Selected mode and services
+      selected_pod_type: this.currentMode,
+      selected_services: this.currentMode === '3d' ? ['rxii', 'tracking'] : [],
 
-      // Total price (extract number from formatted string)
-      total_price: this.parsePrice(this.totalPriceEl?.textContent || '0')
+      // Total price
+      total_price: this.totalPriceEl?.textContent || 'R$ 0'
     };
 
     console.log('[MobileLEDCalculator] Proposal data:', proposalData);
 
-    // Save proposal using quote service
+    // Save quote using quote service (note: it's saveQuote, not saveProposal)
     try {
-      if (!window.quoteService || typeof window.quoteService.saveProposal !== 'function') {
+      if (!window.quoteService || typeof window.quoteService.saveQuote !== 'function') {
         throw new Error('Quote service not available');
       }
 
-      const result = await window.quoteService.saveProposal(proposalData);
+      const result = await window.quoteService.saveQuote(proposalData);
 
-      if (result.success) {
+      if (result.data && !result.error) {
         console.log('[MobileLEDCalculator] Quote saved successfully');
         this.closeModal();
         this.showConfirmationModal();
