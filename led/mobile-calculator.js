@@ -22,19 +22,22 @@ class MobileLEDCalculator {
   async initialize() {
     console.log('[MobileLEDCalculator] Initializing...');
 
-    // Fetch prices first
-    await this.fetchProductPrices();
-
-    // Setup DOM elements
+    // Setup DOM elements first
     this.setupElements();
 
     // Setup event listeners
     this.setupEventListeners();
 
-    // Initial calculation
+    // Show loading state immediately
     this.calculateAll();
 
-    console.log('[MobileLEDCalculator] Initialized successfully');
+    // Fetch prices (async)
+    await this.fetchProductPrices();
+
+    // Recalculate with actual prices after loading
+    this.calculateAll();
+
+    console.log('[MobileLEDCalculator] Initialized successfully with prices:', this.pricesLoaded);
   }
 
   setupElements() {
@@ -170,12 +173,27 @@ class MobileLEDCalculator {
       });
     }
 
-    try {
-      // Use the quote-service which handles Supabase client initialization
-      if (!window.quoteService || typeof window.quoteService.getProductPrices !== 'function') {
-        throw new Error('Quote service not available');
+    // Wait for quote service to be ready
+    if (!window.quoteService || typeof window.quoteService.getProductPrices !== 'function') {
+      console.log('[MobileLEDCalculator] Waiting for quote service...');
+      let attempts = 0;
+      const maxAttempts = 50; // 5 seconds max wait
+
+      while ((!window.quoteService || typeof window.quoteService.getProductPrices !== 'function') && attempts < maxAttempts) {
+        console.log(`[MobileLEDCalculator] Quote service not ready, attempt ${attempts + 1}/${maxAttempts}`);
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
       }
 
+      if (!window.quoteService || typeof window.quoteService.getProductPrices !== 'function') {
+        console.error('[MobileLEDCalculator] Quote service not available after waiting');
+        this.productPrices = {};
+        this.pricesLoaded = false;
+        return;
+      }
+    }
+
+    try {
       const result = await window.quoteService.getProductPrices();
 
       if (result.success && result.data) {
@@ -258,7 +276,18 @@ class MobileLEDCalculator {
 
   calculatePrices() {
     if (!this.pricesLoaded || !this.productPrices || Object.keys(this.productPrices).length === 0) {
-      console.warn('[MobileLEDCalculator] Prices not loaded yet');
+      console.warn('[MobileLEDCalculator] Prices not loaded yet, showing loading state');
+
+      // Show loading state
+      if (this.modulesPriceEl) this.modulesPriceEl.textContent = 'Carregando...';
+      if (this.processorsPriceEl) this.processorsPriceEl.textContent = 'Carregando...';
+      if (this.serverPriceEl) this.serverPriceEl.textContent = 'Carregando...';
+      if (this.rxiiPriceEl) this.rxiiPriceEl.textContent = 'Carregando...';
+      if (this.trackingPriceEl) this.trackingPriceEl.textContent = 'Carregando...';
+      if (this.studioPriceEl) this.studioPriceEl.textContent = 'Carregando...';
+      if (this.teamPriceEl) this.teamPriceEl.textContent = 'Carregando...';
+      if (this.totalPriceEl) this.totalPriceEl.textContent = 'Carregando...';
+
       return;
     }
 
