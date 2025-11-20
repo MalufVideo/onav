@@ -41,12 +41,20 @@ class MobileLEDCalculator {
   }
 
   setupElements() {
+    console.log('[MobileLEDCalculator] Setting up DOM elements...');
+
     // LED Principal controls
     this.widthSlider = document.getElementById('width');
     this.heightSlider = document.getElementById('height');
     this.widthValue = document.getElementById('width-value');
     this.heightValue = document.getElementById('height-value');
     this.moduleCount = document.getElementById('module-count');
+
+    console.log('[MobileLEDCalculator] Basic controls found:', {
+      width: !!this.widthSlider,
+      height: !!this.heightSlider,
+      moduleCount: !!this.moduleCount
+    });
 
     // Teto controls
     this.roofWidthSlider = document.getElementById('roof-width');
@@ -77,6 +85,13 @@ class MobileLEDCalculator {
     this.teamPriceEl = document.getElementById('team-price');
     this.totalPriceEl = document.getElementById('total-price');
 
+    console.log('[MobileLEDCalculator] Price elements found:', {
+      modules: !!this.modulesPriceEl,
+      processors: !!this.processorsPriceEl,
+      server: !!this.serverPriceEl,
+      total: !!this.totalPriceEl
+    });
+
     // Price rows (for hiding/showing)
     this.rxiiPriceRow = document.getElementById('rxii-price-row');
     this.trackingPriceRow = document.getElementById('tracking-price-row');
@@ -86,6 +101,8 @@ class MobileLEDCalculator {
     this.quoteModal = document.getElementById('quote-modal');
     this.quoteCloseBtn = document.getElementById('quote-close-btn');
     this.quoteSubmitBtn = document.getElementById('quote-submit-btn');
+
+    console.log('[MobileLEDCalculator] All DOM elements setup complete');
   }
 
   setupEventListeners() {
@@ -275,8 +292,18 @@ class MobileLEDCalculator {
   }
 
   calculatePrices() {
+    console.log('[MobileLEDCalculator] calculatePrices called');
+    console.log('[MobileLEDCalculator] pricesLoaded:', this.pricesLoaded);
+    console.log('[MobileLEDCalculator] productPrices keys:', Object.keys(this.productPrices || {}));
+
     if (!this.pricesLoaded || !this.productPrices || Object.keys(this.productPrices).length === 0) {
       console.warn('[MobileLEDCalculator] Prices not loaded yet, showing loading state');
+      console.log('[MobileLEDCalculator] Price elements check:', {
+        modules: !!this.modulesPriceEl,
+        processors: !!this.processorsPriceEl,
+        server: !!this.serverPriceEl,
+        total: !!this.totalPriceEl
+      });
 
       // Show loading state
       if (this.modulesPriceEl) this.modulesPriceEl.textContent = 'Carregando...';
@@ -288,9 +315,11 @@ class MobileLEDCalculator {
       if (this.teamPriceEl) this.teamPriceEl.textContent = 'Carregando...';
       if (this.totalPriceEl) this.totalPriceEl.textContent = 'Carregando...';
 
+      console.log('[MobileLEDCalculator] Loading state text should now be visible');
       return;
     }
 
+    console.log('[MobileLEDCalculator] Calculating prices with loaded data...');
     let total = 0;
 
     // Get unit prices from database
@@ -534,10 +563,25 @@ class MobileLEDCalculator {
 }
 
 // Initialize calculator when DOM is ready
+console.log('[mobile-calculator.js] Script loaded, readyState:', document.readyState);
+
 if (document.readyState === 'loading') {
+  console.log('[mobile-calculator.js] Waiting for DOMContentLoaded...');
   document.addEventListener('DOMContentLoaded', () => {
-    window.mobileCalculator = new MobileLEDCalculator();
+    console.log('[mobile-calculator.js] DOMContentLoaded fired, creating calculator instance');
+    try {
+      window.mobileCalculator = new MobileLEDCalculator();
+      console.log('[mobile-calculator.js] Calculator instance created successfully');
+    } catch (error) {
+      console.error('[mobile-calculator.js] Error creating calculator:', error);
+    }
   });
 } else {
-  window.mobileCalculator = new MobileLEDCalculator();
+  console.log('[mobile-calculator.js] DOM already loaded, creating calculator instance immediately');
+  try {
+    window.mobileCalculator = new MobileLEDCalculator();
+    console.log('[mobile-calculator.js] Calculator instance created successfully');
+  } catch (error) {
+    console.error('[mobile-calculator.js] Error creating calculator:', error);
+  }
 }
