@@ -75,9 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // --- Add properties to store dynamic data ---
             this.totalModules = 0;
-            this.moduleUnitPrice = 0;
             this.processorsNeeded = 0;
-            this.processorUnitPrice = 0;
 
             if (!this.pricingPodElement) {
                 console.error('[PricingPodsController] Pricing pod element #sidebar-pricing not found!');
@@ -87,21 +85,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // --- Add event listener for LED wall data ---
             document.addEventListener('ledWallDataCalculated', (event) => {
                 console.log('[pricing-pods.js] Received ledWallDataCalculated event:', event.detail);
+                // Only get the quantities from the event, NOT the prices
+                // We'll use our own fetched prices from Supabase
                 this.totalModules = event.detail.totalModules || 0;
-                this.moduleUnitPrice = event.detail.moduleUnitPrice || 0;
                 this.processorsNeeded = event.detail.processorsNeeded || 0;
-                this.processorUnitPrice = event.detail.processorUnitPrice || 0;
 
                 this.ledDataReady = true; // Set flag
 
-                // Check if both prices and LED data are ready to trigger initial calc
-                this.triggerInitialCalculationCheck('LED Data Ready');
-
-                // Always recalculate on subsequent events if initial calc is done
-                if (this.initialCalculationDone) {
-                    console.log('[pricing-pods.js] Recalculating total due to subsequent ledWallDataCalculated event.');
-                    this.calculateTotal(this.currentMode, 'LED Wall Data Updated'); // Pass trigger info
-                }
+                // Recalculate with updated values
+                console.log('[pricing-pods.js] LED data updated, recalculating...');
+                this.calculateTotal(this.currentMode, 'LED Wall Data Updated');
             });
 
             this.initialize();
@@ -122,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.productPrices = result.data;
                     console.log('[fetchProductPrices] Prices fetched successfully:', this.productPrices);
                     this.pricesReady = true;
-                    this.triggerInitialCalculationCheck('Prices Ready');
+                    // Initial calculation will be triggered at the end of initialize()
                 } else {
                     throw new Error(result.error || 'No price data returned');
                 }
@@ -145,6 +138,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Fetch prices BEFORE doing anything else
             await this.fetchProductPrices();
+
+            // --- Get initial LED data from DOM (led-wall.js should have already populated these) ---
+            const moduleCountElement = document.getElementById('module-count');
+            const tetoModuleCountElement = document.getElementById('teto-module-count');
+            const processorsElement = document.getElementById('processors');
+
+            if (moduleCountElement && tetoModuleCountElement) {
+                // Parse the text content as numbers
+                const principalModules = parseInt(moduleCountElement.textContent) || 0;
+                const tetoModules = parseInt(tetoModuleCountElement.textContent) || 0;
+                this.totalModules = principalModules + tetoModules;
+                console.log(`[initialize] Read initial modules from DOM: Principal=${principalModules}, Teto=${tetoModules}, Total=${this.totalModules}`);
+            } else {
+                console.warn('[initialize] Could not find module count elements in DOM, using default 0');
+                this.totalModules = 0;
+            }
+
+            if (processorsElement) {
+                this.processorsNeeded = parseInt(processorsElement.textContent) || 0;
+                console.log(`[initialize] Read initial processors from DOM: ${this.processorsNeeded}`);
+            } else {
+                console.warn('[initialize] Could not find processors element in DOM, using default 0');
+                this.processorsNeeded = 0;
+            }
+
+            // Mark LED data as ready since we've read from DOM
+            this.ledDataReady = true;
 
             // --- Set Initial Pod Title ---
             const initialPodTitleSpan = this.pricingPodElement.querySelector('#main-pod-title');
@@ -247,15 +267,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.calculateTotal(this.currentMode); // Recalculate with potentially new base prices
                 // REMOVED call to obsolete updateOrderSummary()
             });
-        }
 
-        // NEW METHOD: Check and trigger initial calculation
-        triggerInitialCalculationCheck(triggerSource) {
-            console.log(`[triggerInitialCalculationCheck] Source: ${triggerSource}. Prices Ready: ${this.pricesReady}, LED Data Ready: ${this.ledDataReady}, Initial Calc Done: ${this.initialCalculationDone}`);
-            if (this.pricesReady && this.ledDataReady && !this.initialCalculationDone) {
-                console.log('[triggerInitialCalculationCheck] Both prices and LED data ready. Performing initial calculation...');
-                this.calculateTotal(this.currentMode, 'Initial Calculation');
-                this.initialCalculationDone = true; // Mark initial calculation as done
+            // --- Trigger initial calculation now that everything is set up ---
+            console.log('[initialize] Setup complete. Triggering initial calculation...');
+            console.log(`[initialize] Prices ready: ${this.pricesReady}, LED data ready: ${this.ledDataReady}`);
+            if (this.pricesReady) {
+                this.calculateTotal(this.currentMode, 'Initial Load from DOM');
+                this.initialCalculationDone = true;
+            } else {
+                console.warn('[initialize] Prices not ready, calculation will be delayed');
             }
         }
 
@@ -263,27 +283,31 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(`[PricingPodsController] calculateTotal called. Mode: ${mode}, Trigger: ${trigger}`);
             const pod = this.pricingPodElement;
 
-            // Check for early exit condition
-            if (!pod || this.totalModules === 0 || this.moduleUnitPrice === 0) {
-                console.warn(`[calculateTotal] Exiting early. Trigger: ${trigger}. Reason: Pod element or LED data missing (Modules: ${this.totalModules}, Unit Price: ${this.moduleUnitPrice})`);
-                // Optionally update UI to show calculation is pending
-                const mainTotalPriceSpan = pod?.querySelector('#total-price');
+            // Check for early exit condition - only check for pod element and if prices are loaded
+            if (!pod) {
+                console.warn(`[calculateTotal] Exiting early. Trigger: ${trigger}. Reason: Pod element not found`);
+                return;
+            }
+
+            if (!this.pricesReady || !this.productPrices || Object.keys(this.productPrices).length === 0) {
+                console.warn(`[calculateTotal] Exiting early. Trigger: ${trigger}. Reason: Prices not loaded yet`);
+                // Update UI to show calculation is pending
+                const mainTotalPriceSpan = pod.querySelector('#total-price');
                 if (mainTotalPriceSpan) {
-                    mainTotalPriceSpan.textContent = 'Calculating...';
+                    mainTotalPriceSpan.textContent = 'Carregando...';
                 }
-                return; // Exit calculation if essential data is missing
+                return;
+            }
+
+            // Allow calculation even if totalModules is 0 (user might be setting up)
+            if (this.totalModules === 0) {
+                console.log(`[calculateTotal] Total modules is 0, will calculate with 0 modules`);
             }
 
             let total = 0;
             const itemsForCart = [];
 
             // --- Get Unit Prices from fetched data ---
-            // Check if prices are loaded
-            if (!this.productPrices || Object.keys(this.productPrices).length === 0) {
-                console.warn('[calculateTotal] Product prices not loaded yet, skipping calculation');
-                return;
-            }
-
             const modulePrice = this.productPrices['LED Module'] || 0;
             const processorPrice = this.productPrices['MX-40 Pro Processor'] || 0;
             const vx4nBasePrice = this.productPrices['Disguise VX4n (Base)'] || 0;
