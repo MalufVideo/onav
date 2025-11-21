@@ -33,14 +33,6 @@
 </head>
 <body>
   <div id="mobile-app">
-    <!-- Header -->
-    <header class="mobile-header">
-      <a href="/" class="logo-link">
-        <img src="/img/resized_logo.png" alt="ON+AV Logo" class="logo">
-      </a>
-      <h1>Calculadora LED</h1>
-    </header>
-
     <!-- Main Content -->
     <main class="mobile-content">
       <!-- LED Configuration Card -->
@@ -72,28 +64,33 @@
           </div>
         </div>
 
-        <!-- Teto (Optional) -->
-        <div class="control-section">
-          <h3>Teto (Opcional)</h3>
+        <!-- Teto (Optional) - Collapsible -->
+        <div class="control-section collapsible-section">
+          <h3 class="collapsible-header" id="teto-toggle">
+            Teto (Opcional)
+            <span class="toggle-icon">▼</span>
+          </h3>
 
-          <div class="input-group">
-            <label for="roof-width">
-              Largura (metros)
-              <span class="value-display" id="roof-width-value">0</span>
-            </label>
-            <input type="range" id="roof-width" min="0" max="8" step="0.5" value="0" class="mobile-slider">
-          </div>
+          <div class="collapsible-content" id="teto-content" style="display: none;">
+            <div class="input-group">
+              <label for="roof-width">
+                Largura (metros)
+                <span class="value-display" id="roof-width-value">0</span>
+              </label>
+              <input type="range" id="roof-width" min="0" max="8" step="0.5" value="0" class="mobile-slider">
+            </div>
 
-          <div class="input-group">
-            <label for="roof-height">
-              Altura (metros)
-              <span class="value-display" id="roof-height-value">0</span>
-            </label>
-            <input type="range" id="roof-height" min="0" max="7" step="0.5" value="0" class="mobile-slider">
-          </div>
+            <div class="input-group">
+              <label for="roof-height">
+                Altura (metros)
+                <span class="value-display" id="roof-height-value">0</span>
+              </label>
+              <input type="range" id="roof-height" min="0" max="7" step="0.5" value="0" class="mobile-slider">
+            </div>
 
-          <div class="info-display">
-            <strong>Módulos LED Teto:</strong> <span id="teto-module-count">0</span>
+            <div class="info-display">
+              <strong>Módulos LED Teto:</strong> <span id="teto-module-count">0</span>
+            </div>
           </div>
         </div>
       </section>
@@ -292,6 +289,31 @@
         allowInput: false,
         disableMobile: false
       });
+    });
+  </script>
+
+  <!-- Toggle functionality for Teto section -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const tetoToggle = document.getElementById('teto-toggle');
+      const tetoContent = document.getElementById('teto-content');
+
+      if (tetoToggle && tetoContent) {
+        tetoToggle.addEventListener('click', function() {
+          const isVisible = tetoContent.style.display !== 'none';
+          tetoContent.style.display = isVisible ? 'none' : 'block';
+
+          // Rotate the toggle icon
+          const toggleIcon = this.querySelector('.toggle-icon');
+          if (toggleIcon) {
+            toggleIcon.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(180deg)';
+          }
+        });
+
+        // Add cursor pointer style
+        tetoToggle.style.cursor = 'pointer';
+        tetoToggle.style.userSelect = 'none';
+      }
     });
   </script>
 
