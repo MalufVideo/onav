@@ -142,19 +142,26 @@ function setupAuthEventListeners() {
 async function handleLogin(e) {
   e.preventDefault();
   clearMessages();
-  
+
   const email = document.getElementById('login-email').value;
   const password = document.getElementById('login-password').value;
-  
+
   if (!email || !password) {
     showError(document.getElementById('login-error'), 'Please enter both email and password');
     return;
   }
-  
+
+  // Check if auth module is available
+  if (!window.auth || typeof window.auth.signIn !== 'function') {
+    showError(document.getElementById('login-error'), 'Authentication system not ready. Please refresh the page and try again.');
+    console.error('[auth-ui.js] Auth module not available in handleLogin');
+    return;
+  }
+
   try {
     // Show loading state
     setFormLoading(document.getElementById('login-form'), true);
-    
+
     // Attempt login
     const result = await window.auth.signIn(email, password);
     
@@ -177,28 +184,35 @@ async function handleLogin(e) {
 async function handleRegister(e) {
   e.preventDefault();
   clearMessages();
-  
+
   const name = document.getElementById('register-name').value;
   const company = document.getElementById('register-company').value;
   const email = document.getElementById('register-email').value;
   const phone = document.getElementById('register-phone').value;
   const password = document.getElementById('register-password').value;
   const confirmPassword = document.getElementById('register-password-confirm').value;
-  
+
   if (!name || !company || !email || !phone || !password) {
     showError(document.getElementById('register-error'), 'Por favor, preencha todos os campos');
     return;
   }
-  
+
   if (password !== confirmPassword) {
     showError(document.getElementById('register-error'), 'As senhas não correspondem');
     return;
   }
-  
+
+  // Check if auth module is available
+  if (!window.auth || typeof window.auth.signUp !== 'function') {
+    showError(document.getElementById('register-error'), 'Sistema de autenticação não está pronto. Por favor, recarregue a página e tente novamente.');
+    console.error('[auth-ui.js] Auth module not available in handleRegister');
+    return;
+  }
+
   try {
     // Show loading state
     setFormLoading(document.getElementById('register-form'), true);
-    
+
     // Attempt registration
     const result = await window.auth.signUp(email, password, { name, company, phone });
     
@@ -233,7 +247,13 @@ async function handleRegister(e) {
 // Handle logout button click
 async function handleLogout(e) {
   e.preventDefault();
-  
+
+  // Check if auth module is available
+  if (!window.auth || typeof window.auth.signOut !== 'function') {
+    console.error('[auth-ui.js] Auth module not available in handleLogout');
+    return;
+  }
+
   try {
     const result = await window.auth.signOut();
     if (!result.success) {
@@ -268,12 +288,18 @@ function closeAllModals() {
 
 // Update UI based on authentication state
 async function updateAuthUI() {
+  // Check if auth module is available
+  if (!window.auth || typeof window.auth.getCurrentUser !== 'function') {
+    console.warn('[auth-ui.js] Auth module not available yet in updateAuthUI');
+    return;
+  }
+
   const currentUser = window.auth.getCurrentUser();
   const loginButton = document.getElementById('login-button');
   const registerButton = document.getElementById('register-button');
   const userProfile = document.getElementById('user-profile');
   const userName = document.getElementById('user-name');
-  
+
   if (currentUser) {
     // User is logged in
     loginButton.style.display = 'none';
