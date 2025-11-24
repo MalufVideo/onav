@@ -1,25 +1,31 @@
 /* Responsive LED Calculator Styles */
-/* This file combines desktop (styles.css) and mobile (mobile-styles.css) */
-
-/* Import base desktop styles */
-@import url('styles.css');
+/* This file handles responsive breakpoints for desktop and mobile layouts */
+/* Note: styles.css is already loaded via HTML <link> tag */
 
 /* Mobile-specific breakpoint: 768px and below */
 @media screen and (max-width: 768px) {
   /* Hide desktop layout */
-  #app-wrapper {
+  #app-wrapper,
+  #canvas-container,
+  #controls,
+  #info-sidebar {
     display: none !important;
+    visibility: hidden !important;
   }
 
   /* Show mobile layout */
   #mobile-app {
     display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   /* Mobile app styles */
   body {
     overflow-x: hidden;
     overflow-y: auto;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
   }
 
   #mobile-app {
