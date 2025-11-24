@@ -103,6 +103,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         async fetchProductPrices() {
             console.log('[fetchProductPrices] Fetching prices from Supabase...');
+            console.log('[fetchProductPrices] Window.SUPABASE_KEY present:', !!window.SUPABASE_KEY);
+            console.log('[fetchProductPrices] Window.supabase present:', !!window.supabase);
+            console.log('[fetchProductPrices] Window.quoteService present:', !!window.quoteService);
+
             try {
                 // Use the quote-service which handles Supabase client initialization
                 if (!window.quoteService || typeof window.quoteService.getProductPrices !== 'function') {
@@ -110,10 +114,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const result = await window.quoteService.getProductPrices();
+                console.log('[fetchProductPrices] Raw result from getProductPrices:', result);
 
                 if (result.success && result.data) {
                     this.productPrices = result.data;
                     console.log('[fetchProductPrices] Prices fetched successfully:', this.productPrices);
+                    console.log('[fetchProductPrices] Number of products loaded:', Object.keys(this.productPrices).length);
+
+                    // Show user-facing warning if no products found
+                    if (Object.keys(this.productPrices).length === 0) {
+                        console.error('[fetchProductPrices] WARNING: Products table is empty!');
+                        alert('AVISO: Tabela de produtos está vazia. Os preços não serão exibidos. Por favor, contate o administrador.');
+                    }
+
                     this.pricesReady = true;
                     // Initial calculation will be triggered at the end of initialize()
                 } else {
@@ -121,14 +134,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (error) {
                 console.error('[fetchProductPrices] Error fetching prices:', error);
-                // Do NOT use hardcoded fallbacks as per user requirement. 
+                console.error('[fetchProductPrices] Error stack:', error.stack);
+
+                // Do NOT use hardcoded fallbacks as per user requirement.
                 // Prices must come from the database.
-                this.productPrices = {}; 
+                this.productPrices = {};
                 console.error('[fetchProductPrices] Failed to load prices. Pricing calculations will be incorrect.');
-                
-                // Optionally show a user-facing error
-                if(window.showToast) window.showToast('Erro ao carregar tabela de preços. Por favor, recarregue a página.', 'error');
-                
+
+                // Show user-facing error
+                alert('ERRO: Não foi possível carregar os preços. Detalhes: ' + error.message + '\nPor favor, recarregue a página ou contate o suporte.');
+
                 this.pricesReady = false; // Keep false so we don't trigger calculations with bad data
             }
         }
