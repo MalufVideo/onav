@@ -357,56 +357,76 @@ async function getEquipeTecnicaPrice() {
  */
 async function getProductPrices() {
   try {
+    console.log('[quote-service][getProductPrices] Starting price fetch...');
+
     // Try to get existing Supabase client first
     let supabase = window.auth?.getSupabaseClient();
+    console.log('[quote-service][getProductPrices] Existing client from auth:', !!supabase);
 
     // If not available (guest user), create a public client
     if (!supabase) {
-      console.log('[quote-service] Creating public Supabase client for product prices');
+      console.log('[quote-service][getProductPrices] Creating public Supabase client for product prices');
 
       // Wait for both Supabase library and key to be loaded
       let attempts = 0;
       const maxAttempts = 50; // 5 seconds max wait (50 * 100ms)
 
       while ((!window.supabase || !window.SUPABASE_KEY) && attempts < maxAttempts) {
-        console.log(`[quote-service] Waiting for Supabase... attempt ${attempts + 1}/${maxAttempts}`);
+        console.log(`[quote-service][getProductPrices] Waiting for Supabase... attempt ${attempts + 1}/${maxAttempts}`);
+        console.log(`[quote-service][getProductPrices] - window.supabase: ${!!window.supabase}, window.SUPABASE_KEY: ${!!window.SUPABASE_KEY}`);
         await new Promise(resolve => setTimeout(resolve, 100));
         attempts++;
       }
 
       if (!window.supabase) {
+        console.error('[quote-service][getProductPrices] FAILED: Supabase library not loaded after waiting');
         throw new Error('Supabase library not loaded');
       }
 
       if (!window.SUPABASE_KEY) {
+        console.error('[quote-service][getProductPrices] FAILED: Supabase key not loaded after waiting');
         throw new Error('Supabase key not loaded');
       }
 
       // Create public client with anon key
       const supabaseUrl = window.APP_CONFIG.current.supabaseUrl;
+      console.log('[quote-service][getProductPrices] Creating client with URL:', supabaseUrl);
+      console.log('[quote-service][getProductPrices] Using key (first 20 chars):', window.SUPABASE_KEY.substring(0, 20) + '...');
+
       supabase = window.supabase.createClient(supabaseUrl, window.SUPABASE_KEY);
-      console.log('[quote-service] Public Supabase client created successfully');
+      console.log('[quote-service][getProductPrices] Public Supabase client created successfully');
     }
 
+    console.log('[quote-service][getProductPrices] Querying products table...');
     const { data, error } = await supabase
       .from('products')
       .select('name, price');
 
-    if (error) throw error;
+    console.log('[quote-service][getProductPrices] Query result - data:', data, 'error:', error);
+
+    if (error) {
+      console.error('[quote-service][getProductPrices] Supabase query error:', error);
+      throw error;
+    }
 
     if (!data || data.length === 0) {
+      console.error('[quote-service][getProductPrices] WARNING: No products found in database');
+      console.error('[quote-service][getProductPrices] This usually means the products table is empty or RLS is blocking access');
       throw new Error('No products found in database');
     }
+
+    console.log('[quote-service][getProductPrices] Found', data.length, 'products');
 
     const prices = data.reduce((acc, product) => {
       acc[product.name] = parseFloat(product.price); // Parse to number
       return acc;
     }, {});
 
-    console.log('[quote-service] Fetched product prices:', prices);
+    console.log('[quote-service][getProductPrices] Fetched product prices:', prices);
     return { success: true, data: prices };
   } catch (error) {
-    console.error('[quote-service] Error fetching product prices:', error.message);
+    console.error('[quote-service][getProductPrices] Error fetching product prices:', error.message);
+    console.error('[quote-service][getProductPrices] Error object:', error);
     return { success: false, error: error.message, data: {} };
   }
 }

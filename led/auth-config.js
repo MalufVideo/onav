@@ -4,6 +4,9 @@
 // The anon key is safe to use in the browser with Row Level Security (RLS) enabled in Supabase
 // Load from environment variable or fetch from server endpoint
 
+// Fallback anon key (safe to expose - public key protected by RLS)
+const FALLBACK_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1ODk4NzksImV4cCI6MjA1NTE2NTg3OX0.kAcBsHJnlr56fJ6qvXSLOWRiLTnQR7ilXUi_2Qzj4RE';
+
 // Immediate check and async loading
 (async function loadSupabaseKey() {
   if (typeof window.SUPABASE_KEY !== 'undefined') {
@@ -14,59 +17,32 @@
   try {
     console.log('[auth-config.js] Loading Supabase key from server...');
     const response = await fetch('/api/config/supabase-key');
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
-    
+
     if (data.key) {
       window.SUPABASE_KEY = data.key;
-      console.log('[auth-config.js] Supabase key loaded successfully');
-      
+      console.log('[auth-config.js] Supabase key loaded successfully from server');
+
       // Dispatch event to notify that config is ready
       window.dispatchEvent(new CustomEvent('supabaseConfigReady'));
     } else {
       throw new Error('No key found in response');
     }
   } catch (error) {
-    console.error('[auth-config.js] Failed to load Supabase key:', error);
-    
-    // Retry mechanism
-    let retryCount = 0;
-    const maxRetries = 3;
-    
-    const retryLoad = async () => {
-      if (retryCount >= maxRetries) {
-        console.error('[auth-config.js] Max retries reached, unable to load Supabase key');
-        return;
-      }
-      
-      retryCount++;
-      console.log(`[auth-config.js] Retry attempt ${retryCount}/${maxRetries}`);
-      
-      try {
-        await new Promise(resolve => setTimeout(resolve, 1000 * retryCount)); // Progressive delay
-        const response = await fetch('/api/config/supabase-key');
-        const data = await response.json();
-        
-        if (data.key) {
-          window.SUPABASE_KEY = data.key;
-          console.log('[auth-config.js] Supabase key loaded successfully on retry');
-          window.dispatchEvent(new CustomEvent('supabaseConfigReady'));
-        } else {
-          throw new Error('No key found in retry response');
-        }
-      } catch (retryError) {
-        console.error(`[auth-config.js] Retry ${retryCount} failed:`, retryError);
-        if (retryCount < maxRetries) {
-          setTimeout(retryLoad, 1000);
-        }
-      }
-    };
-    
-    setTimeout(retryLoad, 1000);
+    console.error('[auth-config.js] Failed to load Supabase key from server:', error);
+
+    // Use fallback key immediately instead of retrying
+    console.log('[auth-config.js] Using fallback Supabase anon key');
+    window.SUPABASE_KEY = FALLBACK_SUPABASE_ANON_KEY;
+
+    // Dispatch event to notify that config is ready with fallback
+    window.dispatchEvent(new CustomEvent('supabaseConfigReady'));
+    console.log('[auth-config.js] Supabase key loaded successfully (fallback)');
   }
 })();
 
