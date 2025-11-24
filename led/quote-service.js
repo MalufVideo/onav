@@ -389,7 +389,8 @@ async function getProductPrices() {
       }
 
       // Create public client with anon key
-      const supabaseUrl = window.APP_CONFIG.current.supabaseUrl;
+      // Safety check: if APP_CONFIG is not loaded, use fallback URL
+      const supabaseUrl = window.APP_CONFIG?.current?.supabaseUrl || 'https://qhhjvpsxkfjcxitpnhxi.supabase.co';
       console.log('[quote-service][getProductPrices] Creating client with URL:', supabaseUrl);
       console.log('[quote-service][getProductPrices] Using key (first 20 chars):', window.SUPABASE_KEY.substring(0, 20) + '...');
 
