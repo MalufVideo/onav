@@ -390,7 +390,20 @@ async function getProductPrices() {
 
       // Create public client with anon key
       // Safety check: if APP_CONFIG is not loaded, use fallback URL
-      const supabaseUrl = window.APP_CONFIG?.current?.supabaseUrl || 'https://qhhjvpsxkfjcxitpnhxi.supabase.co';
+      let supabaseUrl = 'https://qhhjvpsxkfjcxitpnhxi.supabase.co'; // Fallback URL
+
+      try {
+        if (window.APP_CONFIG && window.APP_CONFIG.current && window.APP_CONFIG.current.supabaseUrl) {
+          supabaseUrl = window.APP_CONFIG.current.supabaseUrl;
+          console.log('[quote-service][getProductPrices] Using Supabase URL from APP_CONFIG:', supabaseUrl);
+        } else {
+          console.log('[quote-service][getProductPrices] APP_CONFIG not available, using fallback URL:', supabaseUrl);
+        }
+      } catch (configError) {
+        console.warn('[quote-service][getProductPrices] Error accessing APP_CONFIG:', configError);
+        console.log('[quote-service][getProductPrices] Using fallback URL:', supabaseUrl);
+      }
+
       console.log('[quote-service][getProductPrices] Creating client with URL:', supabaseUrl);
       console.log('[quote-service][getProductPrices] Using key (first 20 chars):', window.SUPABASE_KEY.substring(0, 20) + '...');
 

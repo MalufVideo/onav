@@ -27,9 +27,18 @@ window.APP_CONFIG = {
 
 // Helper function to get API URL
 window.getApiUrl = function(endpoint) {
+  // Defensive check - if APP_CONFIG is not loaded yet, use fallback
+  if (!window.APP_CONFIG || !window.APP_CONFIG.current) {
+    console.warn('[config.js] APP_CONFIG not loaded yet, using fallback API URL');
+    return `/api${endpoint}`;
+  }
   const config = window.APP_CONFIG.current;
   return `${config.apiBaseUrl}${endpoint}`;
 };
 
 console.log('Environment detected:', window.location.hostname === 'localhost' ? 'development' : 'production');
-console.log('API Base URL:', window.APP_CONFIG.current.apiBaseUrl);
+if (window.APP_CONFIG && window.APP_CONFIG.current) {
+  console.log('API Base URL:', window.APP_CONFIG.current.apiBaseUrl);
+} else {
+  console.warn('[config.js] APP_CONFIG not fully initialized');
+}
