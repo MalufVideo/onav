@@ -4,13 +4,22 @@
 
 /* Mobile-specific breakpoint: 768px and below */
 @media screen and (max-width: 768px) {
-  /* Hide desktop layout */
+  /* Fix overflow issues from desktop styles */
+  html {
+    overflow: visible !important;
+    overflow-y: auto !important;
+  }
+
+  /* Hide desktop layout completely */
   #app-wrapper,
   #canvas-container,
   #controls,
   #info-sidebar {
     display: none !important;
     visibility: hidden !important;
+    position: absolute !important;
+    pointer-events: none !important;
+    z-index: -9999 !important;
   }
 
   /* Show mobile layout */
@@ -18,20 +27,52 @@
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
+    position: relative !important;
+    z-index: 1 !important;
   }
 
   /* Mobile app styles */
   body {
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
     min-height: 100vh;
-    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%) !important;
+    position: relative !important;
   }
 
   #mobile-app {
     width: 100%;
     min-height: 100vh;
     padding-bottom: 20px;
+  }
+
+  /* Header */
+  .mobile-header {
+    background: rgba(7, 12, 24, 0.96);
+    padding: 15px 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--card-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+
+  .mobile-header .logo-link {
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+
+  .mobile-header .logo {
+    height: 40px;
+    width: auto;
+  }
+
+  .mobile-header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
   }
 
   /* Main Content */
