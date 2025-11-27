@@ -419,7 +419,7 @@
   <div class="container" id="quotes-container">
     <div class="header">
       <h1>Minhas Propostas</h1>
-      <a href="index.html" class="back-button">Voltar ao Calculador</a>
+      <a href="#" class="back-button" id="back-to-calculator-btn">Voltar ao Calculador</a>
     </div>
     
     <div id="quotes-list">
@@ -431,7 +431,24 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       console.log('[my-quotes.html] DOM loaded, initializing authentication...');
-      
+
+      // Setup back to calculator button navigation
+      const backBtn = document.getElementById('back-to-calculator-btn');
+      if (backBtn) {
+        backBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          const calculatorSource = localStorage.getItem('calculatorSource');
+
+          // Navigate to the appropriate calculator
+          if (calculatorSource === 'multicamera') {
+            window.location.href = 'multicamera.html';
+          } else {
+            // Default to LED calculator (index.html)
+            window.location.href = 'index.html';
+          }
+        });
+      }
+
       // Check if auth module is available
       const waitForAuth = () => {
         return new Promise((resolve) => {

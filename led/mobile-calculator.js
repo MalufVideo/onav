@@ -738,6 +738,8 @@ class MobileLEDCalculator {
       // Setup view proposals button
       const viewBtn = document.getElementById('view-my-proposals-btn');
       viewBtn?.addEventListener('click', () => {
+        // Store calculator source for back navigation
+        localStorage.setItem('calculatorSource', 'led');
         window.location.href = 'my-quotes.html';
       });
     }
