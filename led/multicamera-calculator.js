@@ -968,30 +968,177 @@ class MulticameraCalculator {
   }
 
   async submitQuote() {
+    console.log('[MulticameraCalculator] Starting submitQuote...');
+
+    // Prevent multiple simultaneous submissions
+    if (this.isSubmitting) {
+      console.log('[MulticameraCalculator] Already submitting, ignoring duplicate call');
+      return;
+    }
+    this.isSubmitting = true;
+
     const projectName = document.getElementById('cart-project-name')?.value;
     const startDate = document.getElementById('cart-shooting-dates-start')?.value;
     const endDate = document.getElementById('cart-shooting-dates-end')?.value;
 
     if (!projectName) {
       alert('Por favor, insira um nome para o projeto.');
+      this.isSubmitting = false;
       return;
     }
 
     if (!startDate || !endDate) {
       alert('Por favor, selecione as datas do evento.');
+      this.isSubmitting = false;
       return;
     }
 
-    // Check if user is authenticated
-    if (!window.auth || !window.auth.isAuthenticated()) {
-      alert('Você precisa estar logado para salvar propostas.');
-      // Redirect to login or show auth modal
-      return;
+    // Disable submit button to prevent multiple submissions
+    const submitButton = document.getElementById('quote-cart-submit-btn');
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = 'Enviando...'; // Provide feedback
     }
 
-    // Get current user info
-    const currentUser = window.auth.getCurrentUser();
-    const userProfile = window.auth.getUserProfile();
+    try {
+      // --- Get User Info (Handle Guest or Authenticated Users) ---
+      let userId = null;
+      let userEmail = '';
+      let clientName = '';
+      let clientCompany = '';
+      let clientPhone = '';
+      let isGuestUser = false;
+      let guestUserCreated = false;
+
+      if (!window.supabase || !window.supabase.auth || typeof window.supabase.auth.getSession !== 'function') {
+        console.error('[submitQuote] Supabase auth not available');
+        alert('Erro: Sistema de autenticação não disponível.');
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = 'Requisitar Proposta';
+        }
+        this.isSubmitting = false;
+        return;
+      }
+
+      // Check if user is authenticated
+      const { data: { session }, error: sessionError } = await window.supabase.auth.getSession();
+
+      if (session && session.user) {
+        // Authenticated user - use existing session
+        const user = session.user;
+        userId = user.id;
+        userEmail = user.email || '';
+        clientName = user.user_metadata?.full_name;
+        if (!clientName || clientName === 'Nome não disponível') {
+          const emailName = userEmail.split('@')[0] || '';
+          clientName = emailName
+            .replace(/[._]/g, ' ')
+            .replace(/\b\w/g, l => l.toUpperCase());
+        }
+        clientCompany = user.user_metadata?.company || '';
+        clientPhone = user.user_metadata?.phone || '';
+        console.log('[submitQuote] Using authenticated user:', userEmail);
+      } else {
+        // Guest user - collect email/phone info
+        isGuestUser = true;
+        console.log('[submitQuote] Guest user detected - collecting contact info');
+
+        // Prompt for email and phone
+        const guestEmail = prompt('Para receber sua proposta, por favor insira seu email:');
+        if (!guestEmail || !guestEmail.includes('@')) {
+          alert('Email válido é necessário para receber a proposta.');
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Requisitar Proposta';
+          }
+          this.isSubmitting = false;
+          return;
+        }
+
+        const guestPhone = prompt('Por favor insira seu telefone (com DDD):');
+        if (!guestPhone || guestPhone.length < 10) {
+          alert('Telefone válido é necessário para contato.');
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Requisitar Proposta';
+          }
+          this.isSubmitting = false;
+          return;
+        }
+
+        const guestName = prompt('Por favor insira seu nome:');
+        if (!guestName || guestName.trim().length < 2) {
+          alert('Nome é necessário.');
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Requisitar Proposta';
+          }
+          this.isSubmitting = false;
+          return;
+        }
+
+        userEmail = guestEmail.trim().toLowerCase();
+        clientPhone = guestPhone.trim();
+        clientName = guestName.trim();
+
+        // Check if user already exists
+        try {
+          const checkResponse = await fetch('/api/check-user-by-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: userEmail })
+          });
+
+          const checkResult = await checkResponse.json();
+
+          if (checkResult.exists) {
+            // User exists - use their ID
+            userId = checkResult.userId;
+            console.log('[submitQuote] Found existing user:', userId);
+          } else {
+            // Create new guest user account using public endpoint
+            console.log('[submitQuote] Creating new guest user account...');
+            const createResponse = await fetch('/api/register-guest', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: userEmail,
+                phone: clientPhone,
+                full_name: clientName,
+                sendEmail: true // Send login link
+              })
+            });
+
+            const createResult = await createResponse.json();
+
+            if (createResult.success) {
+              userId = createResult.userId;
+              guestUserCreated = true;
+              console.log('[submitQuote] Guest user created successfully:', userId);
+            } else {
+              throw new Error(createResult.error || 'Erro ao criar conta de usuário');
+            }
+          }
+        } catch (error) {
+          console.error('[submitQuote] Error handling guest user:', error);
+          alert('Erro ao processar seu cadastro. Por favor, tente novamente.');
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Requisitar Proposta';
+          }
+          this.isSubmitting = false;
+          return;
+        }
+      }
+
+      if (!userId) {
+        throw new Error('Não foi possível identificar ou criar usuário.');
+      }
+
+    // Get current user info (fallback for authenticated flow)
+    const currentUser = session?.user || window.auth?.getCurrentUser();
+    const userProfile = window.auth?.getUserProfile();
 
     // Calculate date range
     const parseDate = (str) => {
@@ -1225,48 +1372,172 @@ class MulticameraCalculator {
       discount_percentage: discountPercentage
     };
 
-    // Save quote to database
-    try {
-      if (!window.quoteService) {
-        throw new Error('Quote service not available');
-      }
+    // --- Save Data to Supabase ---
+    const { data: savedProposal, error: saveError } = await window.supabase
+      .from('proposals')
+      .insert([quoteData])
+      .select() // Important: Select the inserted data to get the ID
+      .single(); // Expecting a single record back
 
-      const result = await window.quoteService.saveQuote(quoteData);
-
-      if (result.error) {
-        throw new Error(result.error.message || 'Failed to save quote');
-      }
-
-      console.log('[MulticameraCalculator] Quote saved successfully:', result.data);
-
-      // Hide the quote cart modal
-      document.getElementById('quote-cart-modal').style.display = 'none';
-
-      // Show confirmation modal
-      const confirmationModal = document.getElementById('confirmation-modal');
-      if (confirmationModal) {
-        confirmationModal.style.display = 'flex';
-
-        const closeBtn = document.getElementById('confirmation-close-btn');
-        if (closeBtn) {
-          closeBtn.onclick = () => {
-            confirmationModal.style.display = 'none';
-          };
-        }
-
-        const viewProposalsBtn = document.getElementById('view-my-proposals-btn');
-        if (viewProposalsBtn) {
-          viewProposalsBtn.onclick = () => {
-            // Store calculator source for back navigation
-            localStorage.setItem('calculatorSource', 'multicamera');
-            window.location.href = 'my-quotes.html';
-          };
-        }
-      }
-    } catch (error) {
-      console.error('[MulticameraCalculator] Error saving quote:', error);
-      alert(`Erro ao salvar proposta: ${error.message}`);
+    if (saveError) {
+      console.error('[MulticameraCalculator] Error saving quote:', saveError);
+      throw new Error(`Erro ao salvar proposta: ${saveError.message}`);
     }
+
+    if (!savedProposal || !savedProposal.id) {
+      console.error('[MulticameraCalculator] Error: Saved proposal data or ID is missing.', savedProposal);
+      throw new Error('Erro ao salvar proposta: ID da proposta não retornado.');
+    }
+
+    const proposalId = savedProposal.id;
+    console.log(`[MulticameraCalculator] Quote saved successfully with ID: ${proposalId}`);
+
+    // --- Invoke Edge Function to Generate and Email PDF ---
+    console.log(`[MulticameraCalculator] Invoking Edge Function for proposalId: ${proposalId}...`);
+    try {
+      const { data: functionData, error: functionError } = await window.supabase.functions.invoke(
+        'generate-and-email-proposal-pdf',
+        {
+          body: { proposalId: proposalId }
+        }
+      );
+
+      if (functionError) {
+        console.error('[MulticameraCalculator] Error invoking Edge Function:', functionError);
+        // Show error to user, but maybe less critical as the proposal is saved
+        alert(`Proposta salva (ID: ${proposalId}), mas ocorreu um erro ao enviar o email: ${functionError.message}. Por favor, contate o suporte.`);
+        // Optionally, still show confirmation but with a warning
+      } else {
+        console.log('[MulticameraCalculator] Edge Function invoked successfully:', functionData);
+        // Email sending likely succeeded or is in progress
+      }
+    } catch (invokeError) {
+      console.error('[MulticameraCalculator] Critical error during function invocation:', invokeError);
+      alert(`Proposta salva (ID: ${proposalId}), mas ocorreu um erro crítico ao tentar enviar o email: ${invokeError.message}. Por favor, contate o suporte.`);
+    }
+
+    // --- Success Handling ---
+    console.log('[MulticameraCalculator] Resetting cart and showing confirmation...');
+
+    // Hide the quote cart modal
+    document.getElementById('quote-cart-modal').style.display = 'none';
+
+    // Show confirmation modal with proper content
+    this.showConfirmationModal(projectName, isGuestUser, guestUserCreated, clientName);
+    console.log('[MulticameraCalculator] Successfully called showConfirmationModal.');
+
+    } catch (error) {
+      console.error('[MulticameraCalculator] Caught error during submitQuote process:', error);
+      if (error && error.message) {
+        console.error('Error message:', error.message);
+      }
+      if (error && error.stack) {
+        console.error('Error stack trace:', error.stack);
+      }
+      // Show generic error message to user
+      alert('Ocorreu um erro inesperado ao processar sua requisição. Verifique o console para detalhes.');
+
+    } finally {
+      // Re-enable submit button and reset submission flag
+      this.isSubmitting = false;
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Requisitar Proposta';
+      }
+    }
+  }
+
+  showConfirmationModal(projectName, isGuestUser = false, guestUserCreated = false, userName = 'Cliente') {
+    console.log('[MulticameraCalculator] Entering showConfirmationModal...');
+    const confirmationModal = document.getElementById('confirmation-modal');
+    const confirmationHeader = document.getElementById('confirmation-header');
+    const confirmationBody = document.getElementById('confirmation-body');
+    const confirmationFooter = document.getElementById('confirmation-footer');
+    const confirmationCloseBtn = document.getElementById('confirmation-close-btn');
+
+    // Update modal content based on user type
+    if (confirmationHeader) {
+      confirmationHeader.innerHTML = `<h2>Obrigado!</h2>`;
+    }
+
+    if (confirmationBody) {
+      if (isGuestUser && guestUserCreated) {
+        // New guest user - inform about login link
+        confirmationBody.innerHTML = `
+          <p>Obrigado <strong>${userName}</strong>! Sua estimativa do projeto <strong>${projectName}</strong> foi enviada.</p>
+          <br>
+          <p>✉️ <strong>Enviamos um link de acesso para seu email</strong> onde você pode visualizar sua proposta a qualquer momento.</p>
+          <br>
+          <p>Saiba que a <strong>ONAV</strong> tem um desconto extra para esse projeto. Clique em "Falar com Especialista" e agende uma conversa sobre seu projeto e converta a estimativa em proposta oficial com desconto.</p>
+        `;
+      } else if (isGuestUser && !guestUserCreated) {
+        // Existing user submitting as guest
+        confirmationBody.innerHTML = `
+          <p>Obrigado <strong>${userName}</strong>. Sua estimativa do projeto <strong>${projectName}</strong> foi enviada e você já recebeu no seu email.</p>
+          <br>
+          <p><strong>${userName}</strong>, saiba que a <strong>ONAV</strong> tem um desconto extra para esse projeto. Clique em "Falar com Especialista" e agende uma conversa sobre seu projeto e converta a estimativa em proposta oficial com desconto.</p>
+        `;
+      } else {
+        // Authenticated user - standard message
+        confirmationBody.innerHTML = `
+          <p>Obrigado <strong>${userName}</strong>. Sua estimativa do projeto <strong>${projectName}</strong> foi enviada e você já recebeu no seu email.</p>
+          <br>
+          <p><strong>${userName}</strong>, saiba que a <strong>ONAV</strong> tem um desconto extra para esse projeto. Clique em "Falar com Especialista" e agende uma conversa sobre seu projeto e converta a estimativa em proposta oficial com desconto.</p>
+        `;
+      }
+    }
+
+    if (confirmationFooter) {
+      if (isGuestUser) {
+        // Guest users - show only "Falar com Especialista" button
+        confirmationFooter.innerHTML = `
+          <button id="talk-to-specialist-btn" class="form-submit">Falar com Especialista</button>
+          <button id="close-modal-btn" class="form-submit" style="margin-left:10px; background-color: #6c757d;">Fechar</button>
+        `;
+      } else {
+        // Authenticated users - show both buttons
+        confirmationFooter.innerHTML = `
+          <button id="view-my-proposals-btn" class="form-submit">Minhas Propostas</button>
+          <button id="talk-to-specialist-btn" class="form-submit" style="margin-left:10px;">Falar com Especialista</button>
+        `;
+      }
+    }
+
+    // Hide the close button if present
+    if (confirmationCloseBtn) confirmationCloseBtn.style.display = 'none';
+
+    // Show modal
+    if (confirmationModal) {
+      confirmationModal.style.display = 'flex';
+    }
+
+    // Button event listeners
+    setTimeout(() => {
+      const myProposalsBtn = document.getElementById('view-my-proposals-btn');
+      const talkBtn = document.getElementById('talk-to-specialist-btn');
+      const closeBtn = document.getElementById('close-modal-btn');
+
+      if (myProposalsBtn) {
+        myProposalsBtn.onclick = () => {
+          // Store calculator source for back navigation
+          localStorage.setItem('calculatorSource', 'multicamera');
+          window.location.href = 'my-quotes.html';
+          if (confirmationModal) confirmationModal.style.display = 'none';
+        };
+      }
+      if (talkBtn) {
+        talkBtn.onclick = () => {
+          // Open WhatsApp
+          window.open('https://wa.me/5519981454647?text=Olá! Gostaria de conversar sobre minha proposta.', '_blank');
+        };
+      }
+      if (closeBtn) {
+        closeBtn.onclick = () => {
+          if (confirmationModal) confirmationModal.style.display = 'none';
+          window.location.reload(); // Reload to reset calculator
+        };
+      }
+    }, 0);
   }
 
   // Mouse control methods
