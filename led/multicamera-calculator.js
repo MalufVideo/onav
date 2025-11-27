@@ -971,38 +971,299 @@ class MulticameraCalculator {
     const projectName = document.getElementById('cart-project-name')?.value;
     const startDate = document.getElementById('cart-shooting-dates-start')?.value;
     const endDate = document.getElementById('cart-shooting-dates-end')?.value;
-    
+
     if (!projectName) {
       alert('Por favor, insira um nome para o projeto.');
       return;
     }
-    
+
     if (!startDate || !endDate) {
       alert('Por favor, selecione as datas do evento.');
       return;
     }
-    
-    // Hide the quote cart modal
-    document.getElementById('quote-cart-modal').style.display = 'none';
-    
-    // Show confirmation modal
-    const confirmationModal = document.getElementById('confirmation-modal');
-    if (confirmationModal) {
-      confirmationModal.style.display = 'flex';
-      
-      const closeBtn = document.getElementById('confirmation-close-btn');
-      if (closeBtn) {
-        closeBtn.onclick = () => {
-          confirmationModal.style.display = 'none';
-        };
+
+    // Check if user is authenticated
+    if (!window.auth || !window.auth.isAuthenticated()) {
+      alert('Você precisa estar logado para salvar propostas.');
+      // Redirect to login or show auth modal
+      return;
+    }
+
+    // Get current user info
+    const currentUser = window.auth.getCurrentUser();
+    const userProfile = window.auth.getUserProfile();
+
+    // Calculate date range
+    const parseDate = (str) => {
+      const parts = str.split('/');
+      if (parts.length !== 3) return null;
+      const [day, month, year] = parts.map(Number);
+      return new Date(year, month - 1, day);
+    };
+
+    const startDateObj = parseDate(startDate);
+    const endDateObj = parseDate(endDate);
+    const timeDiff = endDateObj.getTime() - startDateObj.getTime();
+    const numberOfDays = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+
+    // Format dates to YYYY-MM-DD for database
+    const formatDateForDB = (dateStr) => {
+      const parts = dateStr.split('/');
+      if (parts.length !== 3) return null;
+      const [day, month, year] = parts;
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    };
+
+    // Get LED wall dimensions
+    const width = parseFloat(document.getElementById('width')?.value) || 16;
+    const height = parseFloat(document.getElementById('height')?.value) || 5;
+    const curvature = parseFloat(document.getElementById('curvature')?.value) || 5;
+    const modulesX = Math.ceil(width / this.moduleSize);
+    const modulesY = Math.ceil(height / this.moduleSize);
+    const totalModules = modulesX * modulesY;
+
+    // Calculate pixels
+    const pixelsWidth = modulesX * 192;
+    const pixelsHeight = modulesY * 192;
+    const totalPixels = pixelsWidth * pixelsHeight;
+
+    // Build selected services array
+    const selectedServices = [];
+
+    // LED Modules
+    if (this.currentPricing.ledModules.total > 0) {
+      selectedServices.push({
+        name: 'Módulos LED',
+        quantity: this.currentPricing.ledModules.quantity,
+        unit_price: this.currentPricing.ledModules.unitPrice
+      });
+    }
+
+    // Processors
+    if (this.currentPricing.processors.total > 0) {
+      selectedServices.push({
+        name: 'Processadores MX-40 Pro',
+        quantity: this.currentPricing.processors.quantity,
+        unit_price: this.currentPricing.processors.unitPrice
+      });
+    }
+
+    // Disguise Server
+    if (this.currentPricing.disguiseServer.total > 0) {
+      selectedServices.push({
+        name: this.currentPricing.disguiseServer.hasBackup ? 'Disguise VX + Backup' : 'Disguise VX',
+        quantity: 1,
+        unit_price: this.currentPricing.disguiseServer.total
+      });
+    }
+
+    // RXII (only for 3D mode)
+    if (this.currentPricing.mode === '3d' && this.currentPricing.rxii.total > 0) {
+      selectedServices.push({
+        name: 'Disguise RXII',
+        quantity: this.currentPricing.rxii.quantity,
+        unit_price: this.currentPricing.rxii.unitPrice
+      });
+    }
+
+    // Tracking (only for 3D mode)
+    if (this.currentPricing.mode === '3d' && this.currentPricing.tracking.total > 0) {
+      selectedServices.push({
+        name: 'Camera Tracking (Stype)',
+        quantity: 1,
+        unit_price: this.currentPricing.tracking.unitPrice
+      });
+    }
+
+    // Cameras
+    if (this.currentPricing.cameras.total > 0) {
+      selectedServices.push({
+        name: `Câmeras ${this.cameraNames[this.currentPricing.cameras.model]}`,
+        quantity: this.currentPricing.cameras.quantity,
+        unit_price: this.currentPricing.cameras.unitPrice
+      });
+    }
+
+    // Tripods
+    if (this.currentPricing.tripods.total > 0) {
+      selectedServices.push({
+        name: 'Tripés Sachtler',
+        quantity: this.currentPricing.tripods.quantity,
+        unit_price: this.currentPricing.tripods.unitPrice
+      });
+    }
+
+    // Switcher
+    if (this.currentPricing.switcher.total > 0) {
+      selectedServices.push({
+        name: `Switcher ${this.switcherNames[this.currentPricing.switcher.model]}`,
+        quantity: 1,
+        unit_price: this.currentPricing.switcher.unitPrice
+      });
+    }
+
+    // vMix Server
+    if (this.currentPricing.vmix.total > 0) {
+      selectedServices.push({
+        name: 'Servidor vMix',
+        quantity: 1,
+        unit_price: this.currentPricing.vmix.unitPrice
+      });
+    }
+
+    // Operators
+    if (this.currentPricing.operators.total > 0) {
+      selectedServices.push({
+        name: 'Operadores de Câmera',
+        quantity: this.currentPricing.operators.quantity,
+        unit_price: this.currentPricing.operators.unitPrice
+      });
+    }
+
+    // vMix Operator
+    if (this.currentPricing.vmixOperator.total > 0) {
+      selectedServices.push({
+        name: 'Operador vMix',
+        quantity: 1,
+        unit_price: this.currentPricing.vmixOperator.unitPrice
+      });
+    }
+
+    // Intercom
+    if (this.currentPricing.intercom.total > 0) {
+      selectedServices.push({
+        name: 'Intercom Clearcom',
+        quantity: 1,
+        unit_price: this.currentPricing.intercom.unitPrice
+      });
+    }
+
+    // Director
+    if (this.currentPricing.diretor.total > 0) {
+      selectedServices.push({
+        name: 'Diretor de Corte',
+        quantity: 1,
+        unit_price: this.currentPricing.diretor.unitPrice
+      });
+    }
+
+    // Studio
+    if (this.currentPricing.studio.total > 0) {
+      selectedServices.push({
+        name: 'Estúdio',
+        quantity: 1,
+        unit_price: this.currentPricing.studio.unitPrice
+      });
+    }
+
+    // Professional Team
+    if (this.currentPricing.team.total > 0) {
+      selectedServices.push({
+        name: 'Equipe Profissional',
+        quantity: 1,
+        unit_price: this.currentPricing.team.unitPrice
+      });
+    }
+
+    // Calculate totals with discount
+    const dailyTotal = this.currentPricing.dailyTotal;
+    const originalTotal = dailyTotal * numberOfDays;
+    let finalTotal = originalTotal;
+    let discountPercentage = 0;
+
+    if (window.DiscountCalculator && numberOfDays > 0) {
+      const discountInfo = window.DiscountCalculator.applyDayBasedDiscount(dailyTotal, numberOfDays);
+      finalTotal = discountInfo.finalPrice;
+      discountPercentage = discountInfo.discountPercentage || 0;
+    }
+
+    // Format final price
+    const formatCurrency = (value) => {
+      return `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    };
+
+    // Build quote data object
+    const quoteData = {
+      user_id: currentUser.id,
+      status: 'pending',
+
+      // Project info
+      project_name: projectName,
+      client_name: userProfile?.full_name || currentUser.email,
+      client_email: currentUser.email,
+      client_phone: userProfile?.phone || '',
+      client_company: userProfile?.company || '',
+
+      // Dates
+      shooting_dates_start: formatDateForDB(startDate),
+      shooting_dates_end: formatDateForDB(endDate),
+      days_count: numberOfDays,
+
+      // LED Principal Configuration
+      led_principal_width: width,
+      led_principal_height: height,
+      led_principal_curvature: curvature,
+      led_principal_modules: totalModules,
+      led_principal_resolution: '2.6mm',
+      led_principal_pixels_width: pixelsWidth,
+      led_principal_pixels_height: pixelsHeight,
+      led_principal_total_pixels: totalPixels,
+
+      // LED Teto (not applicable for multi-camera)
+      led_teto_width: 0,
+      led_teto_height: 0,
+      led_teto_modules: 0,
+
+      // Selected services
+      selected_services: selectedServices,
+      selected_pod_type: this.selectedMode,
+
+      // Pricing
+      daily_rate: dailyTotal,
+      total_price: formatCurrency(finalTotal),
+      original_total_price: originalTotal,
+      discount_percentage: discountPercentage
+    };
+
+    // Save quote to database
+    try {
+      if (!window.quoteService) {
+        throw new Error('Quote service not available');
       }
-      
-      const viewProposalsBtn = document.getElementById('view-my-proposals-btn');
-      if (viewProposalsBtn) {
-        viewProposalsBtn.onclick = () => {
-          window.location.href = 'my-quotes.html';
-        };
+
+      const result = await window.quoteService.saveQuote(quoteData);
+
+      if (result.error) {
+        throw new Error(result.error.message || 'Failed to save quote');
       }
+
+      console.log('[MulticameraCalculator] Quote saved successfully:', result.data);
+
+      // Hide the quote cart modal
+      document.getElementById('quote-cart-modal').style.display = 'none';
+
+      // Show confirmation modal
+      const confirmationModal = document.getElementById('confirmation-modal');
+      if (confirmationModal) {
+        confirmationModal.style.display = 'flex';
+
+        const closeBtn = document.getElementById('confirmation-close-btn');
+        if (closeBtn) {
+          closeBtn.onclick = () => {
+            confirmationModal.style.display = 'none';
+          };
+        }
+
+        const viewProposalsBtn = document.getElementById('view-my-proposals-btn');
+        if (viewProposalsBtn) {
+          viewProposalsBtn.onclick = () => {
+            window.location.href = 'my-quotes.html';
+          };
+        }
+      }
+    } catch (error) {
+      console.error('[MulticameraCalculator] Error saving quote:', error);
+      alert(`Erro ao salvar proposta: ${error.message}`);
     }
   }
 
