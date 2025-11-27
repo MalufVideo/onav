@@ -1257,6 +1257,8 @@ class MulticameraCalculator {
         const viewProposalsBtn = document.getElementById('view-my-proposals-btn');
         if (viewProposalsBtn) {
           viewProposalsBtn.onclick = () => {
+            // Store calculator source for back navigation
+            localStorage.setItem('calculatorSource', 'multicamera');
             window.location.href = 'my-quotes.html';
           };
         }

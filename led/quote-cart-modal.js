@@ -1035,6 +1035,15 @@ class QuoteCartModal {
 
             if (myProposalsBtn) {
                 myProposalsBtn.onclick = () => {
+                    // Store calculator source for back navigation
+                    // Detect which calculator we're on based on current page URL
+                    const currentPage = window.location.pathname;
+                    if (currentPage.includes('multicamera')) {
+                        localStorage.setItem('calculatorSource', 'multicamera');
+                    } else {
+                        // Default to LED calculator (index.html)
+                        localStorage.setItem('calculatorSource', 'led');
+                    }
                     window.location.href = 'my-quotes.html';
                     if (confirmationModal) confirmationModal.style.display = 'none';
                 };
