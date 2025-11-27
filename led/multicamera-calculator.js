@@ -1010,9 +1010,11 @@ class MulticameraCalculator {
       let isGuestUser = false;
       let guestUserCreated = false;
 
-      if (!window.supabase || !window.supabase.auth || typeof window.supabase.auth.getSession !== 'function') {
+      // Get the initialized Supabase client from auth module
+      const supabaseClient = window.auth?.getSupabaseClient();
+      if (!supabaseClient || !supabaseClient.auth || typeof supabaseClient.auth.getSession !== 'function') {
         console.error('[submitQuote] Supabase auth not available');
-        alert('Erro: Sistema de autenticação não disponível.');
+        alert('Erro: Sistema de autenticação não disponível. Por favor, recarregue a página.');
         if (submitButton) {
           submitButton.disabled = false;
           submitButton.textContent = 'Requisitar Proposta';
@@ -1022,7 +1024,7 @@ class MulticameraCalculator {
       }
 
       // Check if user is authenticated
-      const { data: { session }, error: sessionError } = await window.supabase.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
 
       if (session && session.user) {
         // Authenticated user - use existing session
@@ -1373,7 +1375,7 @@ class MulticameraCalculator {
     };
 
     // --- Save Data to Supabase ---
-    const { data: savedProposal, error: saveError } = await window.supabase
+    const { data: savedProposal, error: saveError } = await supabaseClient
       .from('proposals')
       .insert([quoteData])
       .select() // Important: Select the inserted data to get the ID
@@ -1395,7 +1397,7 @@ class MulticameraCalculator {
     // --- Invoke Edge Function to Generate and Email PDF ---
     console.log(`[MulticameraCalculator] Invoking Edge Function for proposalId: ${proposalId}...`);
     try {
-      const { data: functionData, error: functionError } = await window.supabase.functions.invoke(
+      const { data: functionData, error: functionError } = await supabaseClient.functions.invoke(
         'generate-and-email-proposal-pdf',
         {
           body: { proposalId: proposalId }
