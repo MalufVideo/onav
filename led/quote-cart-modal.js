@@ -1035,14 +1035,14 @@ class QuoteCartModal {
 
             if (myProposalsBtn) {
                 myProposalsBtn.onclick = () => {
-                    window.location.href = '/led/my-quotes.html';
+                    window.location.href = 'my-quotes.html';
                     if (confirmationModal) confirmationModal.style.display = 'none';
                 };
             }
             if (talkBtn) {
                 talkBtn.onclick = () => {
                     // Open WhatsApp or Cal.com
-                    window.open('https://wa.me/5511981234567?text=Olá! Gostaria de conversar sobre minha proposta.', '_blank');
+                    window.open('https://wa.me/5519981454647?text=Olá! Gostaria de conversar sobre minha proposta.', '_blank');
                 };
             }
             if (closeBtn) {

@@ -44,7 +44,27 @@
                 </div>
                 <div class="form-group">
                     <label for="product-category">Category:</label>
-                    <input type="text" id="product-category" required>
+                    <select id="product-category" required>
+                        <option value="">-- Select Category --</option>
+                        <optgroup label="LED Wall Equipment">
+                            <option value="LED Modules">LED Modules</option>
+                            <option value="Processors">Processors</option>
+                            <option value="Servers">Servers</option>
+                            <option value="Tracking">Tracking</option>
+                        </optgroup>
+                        <optgroup label="Multi-Camera / Live">
+                            <option value="Cameras">Cameras</option>
+                            <option value="Camera Support">Camera Support</option>
+                            <option value="Switchers">Switchers</option>
+                        </optgroup>
+                        <optgroup label="Studio & Crew">
+                            <option value="Studio">Studio</option>
+                            <option value="Crew">Crew</option>
+                        </optgroup>
+                        <optgroup label="Other">
+                            <option value="Other">Other</option>
+                        </optgroup>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="product-price">Price:</label>
@@ -53,6 +73,7 @@
                 <div class="form-group">
                     <label for="product-unit-type">Unit Type:</label>
                     <select id="product-unit-type" required>
+                        <option value="diária">Diária (Daily)</option>
                         <option value="per_day">Per Day</option>
                         <option value="per_unit">Per Unit</option>
                         <option value="per_module">Per Module</option>

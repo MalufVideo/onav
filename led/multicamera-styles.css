@@ -1,0 +1,348 @@
+/* multicamera-styles.css - Styles specific to Multi-Camera / Live Calculator */
+
+/* Inherit base styles from styles.css */
+
+/* Camera type selector buttons */
+.camera-type-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.camera-type-btn {
+  padding: 10px 15px 10px 34px;
+  border: 2px solid #333;
+  background: #1a1a1a;
+  color: #888;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-family: inherit;
+}
+
+.camera-type-btn:hover {
+  border-color: #00ff9d;
+  color: #00ff9d;
+}
+
+.camera-type-btn.active {
+  border-color: #00ff9d;
+  background: rgba(0, 255, 157, 0.1);
+  color: #00ff9d;
+}
+
+.camera-type-btn strong {
+  display: block;
+  font-size: 14px;
+}
+
+.camera-type-btn small {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* Service toggle buttons */
+.service-toggle {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.service-btn {
+  flex: 1;
+  padding: 12px 15px 12px 34px;
+  border: 2px solid #333;
+  background: #1a1a1a;
+  color: #888;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-family: inherit;
+}
+
+.service-btn:hover {
+  border-color: #00ff9d;
+  color: #00ff9d;
+}
+
+.service-btn.active {
+  border-color: #00ff9d;
+  background: rgba(0, 255, 157, 0.1);
+  color: #00ff9d;
+}
+
+.service-btn strong {
+  font-size: 13px;
+}
+
+/* Equipment section */
+.equipment-section {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #333;
+}
+
+.equipment-section h3 {
+  font-size: 14px;
+  color: #00ff9d;
+  margin-bottom: 10px;
+}
+
+/* Switcher selector */
+.switcher-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.switcher-btn {
+  padding: 10px 15px 10px 34px;
+  border: 2px solid #333;
+  background: #1a1a1a;
+  color: #888;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-family: inherit;
+}
+
+.camera-type-btn,
+.switcher-btn,
+.service-btn {
+  position: relative;
+}
+
+.camera-type-btn::before,
+.switcher-btn::before,
+.service-btn::before {
+  content: '✓';
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #00ff9d;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.camera-type-btn::before,
+.switcher-btn::before {
+  top: 14px;
+  transform: none;
+}
+
+.camera-type-btn.active::before,
+.switcher-btn.active::before,
+.service-btn.active::before {
+  opacity: 1;
+}
+
+.switcher-btn:hover {
+  border-color: #00ff9d;
+  color: #00ff9d;
+}
+
+.switcher-btn.active {
+  border-color: #00ff9d;
+  background: rgba(0, 255, 157, 0.1);
+  color: #00ff9d;
+}
+
+.switcher-btn strong {
+  display: block;
+  font-size: 14px;
+}
+
+.switcher-btn small {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* Pricing pod adjustments for multicamera */
+#sidebar-pricing p {
+  margin: 8px 0;
+  font-size: 13px;
+  color: #ccc;
+}
+
+#sidebar-pricing span {
+  color: #00ff9d;
+  font-weight: 500;
+}
+
+#total-line {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #333;
+  font-size: 15px;
+}
+
+#total-line span {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Cart modal styles */
+.cart-item {
+  display: grid;
+  grid-template-columns: 2fr 0.5fr 1fr 1fr;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+}
+
+.cart-item.cart-header {
+  font-weight: bold;
+  background: #f5f5f5;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 5px;
+}
+
+.cart-item-name {
+  text-align: left;
+}
+
+.cart-item-qty {
+  text-align: center;
+}
+
+.cart-item-price,
+.cart-item-subtotal {
+  text-align: right;
+}
+
+.cart-total {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 2px solid #333;
+  font-size: 16px;
+  text-align: right;
+}
+
+/* Info pod for cameras */
+#info-cameras .bottom-info-content p {
+  margin: 5px 0;
+  font-size: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .camera-type-selector,
+  .switcher-selector {
+    gap: 6px;
+  }
+  
+  .camera-type-btn,
+  .switcher-btn {
+    padding: 8px 12px;
+  }
+  
+  .camera-type-btn strong,
+  .switcher-btn strong {
+    font-size: 13px;
+  }
+  
+  .camera-type-btn small,
+  .switcher-btn small {
+    font-size: 10px;
+  }
+}
+
+/* Control card adjustments */
+#card-cameras h3,
+#card-equipment h3 {
+  font-size: 12px;
+  color: #666;
+  margin-top: 12px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Animation for camera models in 3D view */
+@keyframes cameraPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Clickable items in pricing pod - styled as buttons */
+.clickable-item {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  margin: 2px 0;
+  background: rgba(0, 255, 157, 0.08);
+  border: 1px solid rgba(0, 255, 157, 0.3);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.clickable-item:hover {
+  background: rgba(0, 255, 157, 0.15);
+  border-color: #00ff9d;
+}
+
+.clickable-item .item-name {
+  color: #00ff9d;
+  font-weight: 500;
+}
+
+.clickable-item::after {
+  content: '▼';
+  font-size: 8px;
+  color: #00ff9d;
+  margin-left: 4px;
+}
+
+.item-name {
+  color: #00ff9d;
+}
+
+/* Item dropdowns */
+.item-dropdown {
+  position: absolute;
+  background: #1a1a1a;
+  border: 2px solid #00ff9d;
+  border-radius: 8px;
+  padding: 8px 0;
+  z-index: 100;
+  min-width: 220px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.dropdown-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  color: #ccc;
+}
+
+.dropdown-item:hover {
+  background: rgba(0, 255, 157, 0.1);
+  color: #00ff9d;
+}
+
+.dropdown-item.active {
+  background: rgba(0, 255, 157, 0.2);
+  color: #00ff9d;
+}
+
+.dropdown-price {
+  color: #888;
+  font-size: 12px;
+}
+
+/* Highlight active selections */

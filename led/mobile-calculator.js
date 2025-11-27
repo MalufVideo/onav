@@ -738,7 +738,7 @@ class MobileLEDCalculator {
       // Setup view proposals button
       const viewBtn = document.getElementById('view-my-proposals-btn');
       viewBtn?.addEventListener('click', () => {
-        window.location.href = '/led/my-quotes.html';
+        window.location.href = 'my-quotes.html';
       });
     }
   }

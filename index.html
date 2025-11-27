@@ -404,8 +404,9 @@
       /* Slightly lighter dark for footer */
     }
 
-    /* Ensure Produção Virtual button text turns black on hover, regardless of inline/Tailwind styles */
-    #orcamentoModal .producao-virtual-btn:hover {
+    /* Ensure Produção Virtual and Multicamera button text turns black on hover, regardless of inline/Tailwind styles */
+    #orcamentoModal .producao-virtual-btn:hover,
+    #orcamentoModal .multicamera-btn:hover {
       color: #000 !important;
     }
 
@@ -525,11 +526,9 @@
     }
   </style>
 
-  <!-- Font Awesome - Load with media swap for performance -->
-  <link rel="stylesheet" href="/css/fontawesome-minimal.css" media="print" onload="this.media='all'">
-  <noscript>
-    <link rel="stylesheet" href="/css/fontawesome-minimal.css">
-  </noscript>
+  <!-- Font Awesome - Load from CDN for reliable icon display -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/fontawesome-minimal.css">
 
   <!-- Preload AOS CSS for smooth loading -->
   <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" as="style"
@@ -2047,13 +2046,14 @@
         <button
           class="w-full py-3 rounded-lg border-2 border-gray-700 bg-gray-900 text-gray-500 font-semibold text-lg cursor-not-allowed opacity-60"
           disabled>Projeção</button>
-        <button
-          class="w-full py-3 rounded-lg border-2 border-gray-700 bg-gray-900 text-gray-500 font-semibold text-lg cursor-not-allowed opacity-60"
-          disabled>Multi-camera</button>
+        <a href="led/multicamera.html" class="w-full">
+          <button
+            class="multicamera-btn w-full py-3 rounded-lg border-2 border-primary bg-black text-primary font-semibold text-lg transition-all duration-200 hover:bg-primary"
+            style="border-color: #00ff9d; color: #00ff9d;">Multi-camera / Live</button>
+        </a>
       </div>
-      <p class="mt-6 text-gray-400 text-center text-sm">Outras calculadoras em breve, para demandas de xR, LED, Projeção
-        e Multi-Camera</p>
-      <a href="https://cal.com/onav.com.br/30min" target="_blank" rel="noopener" class="w-full mt-4">
+      <p class="mt-6 text-gray-400 text-center text-sm">Outras calculadoras em breve, para demandas de xR, LED e Projeção</p>
+      <a href="https://wa.me/5511920550210?text=Olá%2C%20gostaria%20de%20falar%20com%20um%20especialista" target="_blank" rel="noopener" class="w-full mt-4">
         <button
           class="w-full py-3 rounded-lg border-2 border-primary bg-primary text-black font-semibold text-lg transition-all duration-200 hover:bg-green-400"
           style="border-color: #00ff9d;">
@@ -2077,7 +2077,7 @@
         <h2 class="text-2xl font-bold mb-4 text-primary" style="color: #00ff9d;">Calculadora apenas para desktop</h2>
         <p class="text-gray-300 mb-6">Nossa calculadora de orçamento foi otimizada para desktop. Para uma melhor
           experiência, acesse pelo computador ou fale diretamente com nossos especialistas.</p>
-        <a href="https://cal.com/onav.com.br/30min" target="_blank" rel="noopener" class="w-full">
+        <a href="https://wa.me/5511920550210?text=Olá%2C%20gostaria%20de%20falar%20com%20um%20especialista" target="_blank" rel="noopener" class="w-full">
           <button
             class="w-full py-3 rounded-lg border-2 border-primary bg-primary text-black font-semibold text-lg transition-all duration-200 hover:bg-green-400"
             style="border-color: #00ff9d;">

@@ -21,7 +21,8 @@
       "mcp__playwright__browser_take_screenshot",
       "mcp__playwright__browser_evaluate",
       "Bash(git rm:*)",
-      "mcp__supabase__list_edge_functions"
+      "mcp__supabase__list_edge_functions",
+      "Bash(npm install)"
     ],
     "deny": [],
     "ask": []

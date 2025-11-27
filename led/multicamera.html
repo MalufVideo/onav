@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora Multi-Camera / Live - ONAV</title>
+  <!-- Three.js (r128) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- GLTFLoader for 3D model import -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <!-- Supabase JS library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="modal-summary.css">
+  <link rel="stylesheet" href="multicamera-styles.css">
+  <!-- Configuration -->
+  <script src="../config.js"></script>
+  <!-- Authentication modules -->
+  <script src="auth-config.js" defer></script>
+  <script src="auth.js" defer></script>
+  <script src="auth-ui.js" defer></script>
+  <script src="auth-protection.js" defer></script>
+  <script src="quote-service.js" defer></script>
+  <script src="discount-calculator.js" defer></script>
+  <!-- Flatpickr for date selection -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <style>
+    /* Sidebar logo styling */
+    #sidebar-logo-link {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: -10px;
+      margin-bottom: 20px;
+    }
+    #sidebar-logo {
+      max-width: 180px;
+      width: 80%;
+      height: auto;
+      display: block;
+    }
+    
+    .camera-type-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    
+    .camera-type-btn {
+      padding: 10px 15px;
+      border: 2px solid #333;
+      background: #1a1a1a;
+      color: #888;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+    
+    .camera-type-btn:hover {
+      border-color: #00ff9d;
+      color: #00ff9d;
+    }
+    
+    .camera-type-btn.active {
+      border-color: #00ff9d;
+      background: rgba(0, 255, 157, 0.1);
+      color: #00ff9d;
+    }
+    
+    .camera-type-btn strong {
+      display: block;
+      font-size: 14px;
+    }
+    
+    .camera-type-btn small {
+      font-size: 11px;
+      opacity: 0.7;
+    }
+    
+    .service-toggle {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .service-btn {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #333;
+      background: #1a1a1a;
+      color: #888;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    
+    .service-btn:hover {
+      border-color: #00ff9d;
+      color: #00ff9d;
+    }
+    
+    .service-btn.active {
+      border-color: #00ff9d;
+      background: rgba(0, 255, 157, 0.1);
+      color: #00ff9d;
+    }
+    
+    .equipment-section {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #333;
+    }
+    
+    .equipment-section h3 {
+      font-size: 14px;
+      color: #00ff9d;
+      margin-bottom: 10px;
+    }
+    
+    .switcher-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .switcher-btn {
+      padding: 10px 15px;
+      border: 2px solid #333;
+      background: #1a1a1a;
+      color: #888;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+    
+    .switcher-btn:hover {
+      border-color: #00ff9d;
+      color: #00ff9d;
+    }
+    
+    .switcher-btn.active {
+      border-color: #00ff9d;
+      background: rgba(0, 255, 157, 0.1);
+      color: #00ff9d;
+    }
+    
+    .selector-btn {
+      flex: 1;
+      padding: 10px 12px;
+      border: 2px solid #333;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    
+    .selector-btn:hover {
+      border-color: #00ff9d;
+      color: #00ff9d;
+    }
+    
+    .selector-btn.active {
+      border-color: #00ff9d;
+      background: rgba(0, 255, 157, 0.1);
+      color: #00ff9d;
+    }
+    
+    .selector-btn strong {
+      display: block;
+      font-size: 14px;
+    }
+    
+    .selector-btn small {
+      font-size: 11px;
+      opacity: 0.7;
+    }
+    
+    .backup-btn {
+      font-size: 10px;
+      padding: 2px 5px;
+      margin-left: 5px;
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 3px;
+      cursor: pointer;
+      color: #888;
+    }
+    
+    .backup-btn.active {
+      background-color: #00ff9d;
+      color: #000;
+      border-color: #00ff9d;
+    }
+    
+    #card-disguise-selector {
+      padding-top: 16px;
+      margin-top: 24px;
+    }
+
+    #card-disguise-selector h2 {
+      margin-top: 0;
+      padding-top: 0;
+      padding-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app-wrapper">
+    <!-- Left Sidebar: Controls -->
+    <div id="controls">
+      <a href="/" id="sidebar-logo-link">
+        <img src="../img/resized_logo.png" alt="ON+AV Logo" id="sidebar-logo">
+      </a>
+      
+      <!-- Pod 1: LED Principal (No Roof for Live Events) -->
+      <div class="control-card" id="card-led-principal">
+        <h2>LED Principal</h2>
+        <div class="control-group">
+          <label for="width">Largura (metros): <span id="width-value">16</span></label>
+          <input type="range" id="width" min="1" max="36" step="0.5" value="16">
+        </div>
+        <div class="control-group">
+          <label for="height">Altura (metros): <span id="height-value">5</span></label>
+          <input type="range" id="height" min="1" max="8" step="0.5" value="5">
+        </div>
+        <div class="control-group">
+          <label for="curvature">Curvatura: <span id="curvature-value">5</span> graus</label>
+          <input type="range" id="curvature" min="0" max="5" step="1" value="5">
+        </div>
+        <p><strong>Módulos LED:</strong> <span id="module-count">400</span></p>
+      </div>
+
+      <!-- Pod 2: Cameras -->
+      <div class="control-card" id="card-cameras">
+        <h2>Câmeras</h2>
+        <div class="control-group">
+          <label for="camera-count">Quantidade: <span id="camera-count-value">3</span></label>
+          <input type="range" id="camera-count" min="2" max="8" step="1" value="3">
+        </div>
+      </div>
+
+      <!-- Pod 3: Service Type -->
+      <div class="control-card" id="card-service">
+        <h2>Tipo de Serviço</h2>
+        <div class="service-toggle">
+          <button class="service-btn active" data-service="streaming">
+            <strong>Live Streaming</strong>
+          </button>
+          <button class="service-btn" data-service="recording">
+            <strong>Gravação</strong>
+          </button>
+        </div>
+      </div>
+
+      <div class="control-card" id="powered-by-disguise" style="display:flex; align-items:center; justify-content: center; gap:10px; margin-top:10px;">
+        <p style="margin:0; font-size: 12px;"><strong>Powered by:</strong></p>
+        <img src="../img/logo_disguise.svg" alt="Disguise Logo" style="height:30px; width: auto;">
+      </div>
+    </div>
+
+    <!-- Center 3D Viewer -->
+    <div id="canvas-container">
+      <!-- Bottom LED detail pods -->
+      <div id="bottom-info-bar">
+        <details class="bottom-info-pod" id="info-principal">
+          <summary>Detalhes LED Principal</summary>
+          <div class="bottom-info-content">
+            <p><strong>Resolução:</strong> <span id="resolution">3840 x 960 pixels</span></p>
+            <p><strong>Processadores:</strong> <span id="processors">4 unidades</span></p>
+            <p><strong>Potência Máxima:</strong> <span id="power-max">40</span> W</p>
+            <p><strong>Potência Média:</strong> <span id="power-avg">20</span> W</p>
+            <p><strong>Peso Total:</strong> <span id="total-weight">800</span> kg</p>
+          </div>
+        </details>
+
+        <details class="bottom-info-pod" id="info-cameras">
+          <summary>Detalhes Câmeras</summary>
+          <div class="bottom-info-content">
+            <p><strong>Câmeras:</strong> <span id="camera-info">3x Sony EX3</span></p>
+            <p><strong>Tripés:</strong> <span id="tripod-info">3 unidades</span></p>
+            <p><strong>Operadores:</strong> <span id="operator-info">3 profissionais</span></p>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- Right Sidebar: Pricing Pod and CTA -->
+    <div id="info-sidebar">
+      <!-- Pod: Disguise Mode Selector -->
+      <div class="control-card" id="card-disguise-selector">
+        <h2>Conteúdo</h2>
+        <div class="selector-buttons" style="display: flex; gap: 10px; margin-top: 10px;">
+          <button class="selector-btn" id="disguise-mode-3d" data-mode="3d">
+            <strong>3D</strong>
+            <small>Unreal 5 ou 2.5D</small>
+          </button>
+          <button class="selector-btn active" id="disguise-mode-2d" data-mode="2d">
+            <strong>2D</strong>
+            <small>Plates ou Camera Car</small>
+          </button>
+        </div>
+      </div>
+
+      <!-- Pricing Pod -->
+      <div id="sidebar-pricing" class="control-card">
+        <h2><span id="main-pod-title">2D - Plates</span></h2>
+        <p>LED: <span class="item-name">Absen NT 2.6mm</span>: <span id="modules-price">...</span></p>
+        <p>Processadora: <span class="item-name">MX-40 Pro</span>: <span id="processors-price">...</span></p>
+        <p>Servidor: <span class="item-name">Disguise VX</span>: <span id="disguise-server-price">...</span> <button class="backup-btn" id="backup-btn">+backup</button></p>
+        <div class="control-group" id="rxii-group" style="display: none;">
+          <label for="rxii-units">Disguise RX: <span id="rxii-units-value">2</span> = <span id="rxii-price">...</span></label>
+          <input type="range" id="rxii-units" min="1" max="5" step="1" value="2">
+        </div>
+        <p id="tracking-item" style="display: none;">Camera Tracking: <span id="tracking-price">...</span></p>
+        <hr style="border: none; border-top: 1px solid #333; margin: 10px 0;">
+        <p><strong style="color: #00ff9d;">Equipamento Multi-Camera:</strong></p>
+        <p class="clickable-item" data-item="camera">Câmeras: <span class="item-name" id="camera-model-name">Sony EX3</span> (<span id="camera-qty">3</span>x): <span id="cameras-price">...</span></p>
+        <p>Tripés: <span class="item-name">Sachtler</span> (<span id="tripod-qty">3</span>x): <span id="tripods-price">...</span></p>
+        <p class="clickable-item" data-item="switcher">Switcher: <span class="item-name" id="switcher-model-name">Panasonic HS400</span>: <span id="switcher-price">...</span></p>
+        <p>Servidor Streaming: <span class="item-name">vMix</span>: <span id="server-price">...</span></p>
+        <hr style="border: none; border-top: 1px solid #333; margin: 10px 0;">
+        <p><strong style="color: #00ff9d;">Profissionais:</strong></p>
+        <p>Operadores Câmera (<span id="operator-qty">3</span>x): <span id="operators-price">...</span></p>
+        <p>Operador vMix: <span id="vmix-operator-price">...</span></p>
+        <p>Intercom Clearcom: <span id="intercom-price">...</span></p>
+        <p>Diretor de Corte: <span id="diretor-corte-price">...</span></p>
+        <hr style="border: none; border-top: 1px solid #333; margin: 10px 0;">
+        <p>Estúdio: <span id="studio-price">...</span></p>
+        <p>Equipe LED/Servidores: <span id="team-price">...</span></p>
+        <p id="total-line"><strong>Investimento Total:</strong> <span id="subtotal-price">...</span></p>
+      </div>
+      
+      <!-- Camera Selection Dropdown -->
+      <div id="camera-dropdown" class="item-dropdown" style="display: none;">
+        <div class="dropdown-item" data-camera="ex3">Sony EX3 - <span class="dropdown-price">R$ 500/dia</span></div>
+        <div class="dropdown-item" data-camera="fx6">Sony FX6 - <span class="dropdown-price">R$ 1.200/dia</span></div>
+        <div class="dropdown-item" data-camera="fx9">Sony FX9 - <span class="dropdown-price">R$ 1.800/dia</span></div>
+      </div>
+      
+      <!-- Switcher Selection Dropdown -->
+      <div id="switcher-dropdown" class="item-dropdown" style="display: none;">
+        <div class="dropdown-item" data-switcher="hs400">Panasonic HS400 - <span class="dropdown-price">R$ 650/dia</span></div>
+        <div class="dropdown-item" data-switcher="atem">Blackmagic ATEM 2M/E - <span class="dropdown-price">R$ 1.200/dia</span></div>
+      </div>
+
+      <div class="info-pod">
+        <button id="proposta-btn" class="form-submit">Gerar Proposta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quote Cart Modal -->
+  <div id="quote-cart-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <button id="quote-cart-close-btn" class="modal-close">&times;</button>
+      <h2 style="color: #000;">Proposta Multi-Camera / Live</h2>
+
+      <!-- Project Name and Dates -->
+      <div class="form-group">
+        <label for="cart-project-name">Projeto</label>
+        <input type="text" id="cart-project-name" required>
+      </div>
+      <div class="form-group">
+        <label>Datas do Evento</label>
+        <div class="date-range-container">
+          <div>
+            <label for="cart-shooting-dates-start">Início</label>
+            <input type="text" id="cart-shooting-dates-start" required readonly placeholder="DD/MM/AAAA">
+          </div>
+          <div>
+            <label for="cart-shooting-dates-end">Fim</label>
+            <input type="text" id="cart-shooting-dates-end" required readonly placeholder="DD/MM/AAAA">
+          </div>
+        </div>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid #eee; margin: 15px 0;">
+
+      <!-- Container for dynamically added cart items -->
+      <div id="cart-items-container">
+        <p>Seu carrinho de orçamento está vazio.</p>
+      </div>
+      
+      <!-- Total Price Display -->
+      <div class="cart-total">
+        <strong>Total Estimado:</strong> <span id="cart-total-price">R$ 0.00</span>
+      </div>
+      
+      <!-- Action Button -->
+      <button id="quote-cart-submit-btn" class="form-submit">Requisitar Proposta</button>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmation-modal" class="modal-overlay" style="display: none;">
+    <div id="confirmation-content" class="modal-content"> 
+      <button id="confirmation-close-btn" class="modal-close">&times;</button> 
+      <div id="confirmation-header"> 
+        <h2>Proposta Enviada!</h2>
+      </div>
+      <div id="confirmation-body"> 
+        <p>Sua proposta foi enviada com sucesso. Em breve nossa equipe entrará em contato.</p>
+      </div>
+      <div id="confirmation-footer"> 
+        <button id="view-my-proposals-btn" class="button-secondary">Ver Minhas Propostas</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Multi-Camera Calculator Script -->
+  <script src="multicamera-calculator.js"></script>
+  
+  <!-- Initialize Flatpickr -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize date pickers for the modal
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
+      
+      flatpickr("#cart-shooting-dates-start", {
+        dateFormat: "d/m/Y",
+        locale: "pt",
+        allowInput: false,
+        minDate: todayStr,
+        onChange: function(selectedDates, dateStr, instance) {
+          const endPicker = document.querySelector("#cart-shooting-dates-end")._flatpickr;
+          if (endPicker) {
+            endPicker.set("minDate", selectedDates[0]);
+          }
+          if (window.multicameraCalculator) {
+            window.multicameraCalculator.updateCart();
+          }
+        }
+      });
+      
+      flatpickr("#cart-shooting-dates-end", {
+        dateFormat: "d/m/Y",
+        locale: "pt",
+        allowInput: false,
+        minDate: todayStr,
+        onChange: function(selectedDates, dateStr, instance) {
+          if (window.multicameraCalculator) {
+            window.multicameraCalculator.updateCart();
+          }
+        }
+      });
+    });
+  </script>
+
+  <!-- Initialize authentication -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('[multicamera.html] DOM loaded, initializing...');
+      
+      const waitForAuth = () => {
+        return new Promise((resolve) => {
+          let attempts = 0;
+          const maxAttempts = 20;
+          
+          const checkAuth = () => {
+            if (window.auth) {
+              resolve();
+            } else {
+              attempts++;
+              if (attempts >= maxAttempts) {
+                resolve();
+                return;
+              }
+              setTimeout(checkAuth, 500);
+            }
+          };
+          checkAuth();
+        });
+      };
+
+      waitForAuth()
+        .then(async () => {
+          if (window.auth) {
+            await window.auth.initAuth();
+          }
+          if (window.authUI) {
+            window.authUI.initAuthUI();
+          }
+        })
+        .catch(error => {
+          console.error('[multicamera.html] Failed to initialize authentication:', error);
+        });
+    });
+  </script>
+</body>
+</html>
