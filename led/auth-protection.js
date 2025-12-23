@@ -51,8 +51,9 @@ async function protectRoute(destination = '/led/login.html') {
   
   // If auth module couldn't be loaded after maximum attempts
   if (!authChecked) {
-    console.error('[auth-protection.js] Auth module could not be loaded. Redirecting to safe page.');
-    redirectToSafePage(destination);
+    console.warn('[auth-protection.js] Auth module could not be loaded. Allowing guest access (Neon mode).');
+    // DISABLED: Don't redirect - allow guest access when using Neon without Supabase Auth
+    // redirectToSafePage(destination);
     return;
   }
   
