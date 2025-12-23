@@ -5,34 +5,218 @@ const { Server } = require('socket.io');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
 const cors = require('cors'); // Import CORS middleware
+const NeonDB = require('./db-neon'); // Import Neon database adapter
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// Check if using Neon (temporary migration) or Supabase
+const USE_NEON = process.env.DATABASE_URL !== undefined;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Error: SUPABASE_URL and SUPABASE_ANON_KEY must be provided in .env file');
-  process.exit(1); // Exit if keys are missing
-}
+let db, supabase, supabaseAdmin;
 
-// Create both clients - anon for regular operations, service for admin operations
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
-const supabaseAdmin = supabaseServiceKey ? createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
+if (USE_NEON) {
+  console.log('🔄 USING NEON DATABASE (Temporary migration while Supabase is down)');
+
+  if (!process.env.DATABASE_URL) {
+    console.error('Error: DATABASE_URL must be provided in .env file for Neon');
+    process.exit(1);
   }
-}) : supabase;
 
-// Warning if service key is missing
-if (!supabaseServiceKey) {
-  console.warn('WARNING: SUPABASE_SERVICE_ROLE_KEY not found. Admin functions (user creation from dashboard) will not work.');
-  console.warn('Please add SUPABASE_SERVICE_ROLE_KEY to your .env file for full functionality.');
+  // Initialize Neon database adapter
+  db = new NeonDB(process.env.DATABASE_URL);
+
+  // Create compatibility layer for existing code - supports chaining like Supabase
+  supabase = {
+    from: (table) => {
+      let queryBuilder = {
+        _select: '*',
+        _where: [],
+        _order: [],
+        _limit: null,
+        _single: false,
+
+        select: function(columns = '*') {
+          this._select = columns;
+          return this;
+        },
+
+        insert: async function(data) {
+          const keys = Object.keys(data);
+          const values = Object.values(data);
+          const placeholders = values.map((_, i) => `$${i + 1}`).join(', ');
+          const query = `INSERT INTO public.${table} (${keys.join(', ')}) VALUES (${placeholders}) RETURNING *`;
+          return await db.query(query, values);
+        },
+
+        update: function(data) {
+          this._updateData = data;
+          return this;
+        },
+
+        delete: function() {
+          this._delete = true;
+          return this;
+        },
+
+        eq: function(column, value) {
+          this._where.push({ column, op: '=', value });
+          return this;
+        },
+
+        match: async function(conditions) {
+          for (const [key, value] of Object.entries(conditions)) {
+            this._where.push({ column: key, op: '=', value });
+          }
+          return await this._execute();
+        },
+
+        order: function(column, options = {}) {
+          const direction = options.ascending ? 'ASC' : 'DESC';
+          this._order.push(`${column} ${direction}`);
+          return this;
+        },
+
+        limit: function(count) {
+          this._limit = count;
+          return this;
+        },
+
+        single: function() {
+          this._single = true;
+          this._limit = 1;
+          return this;
+        },
+
+        _execute: async function() {
+          let query;
+          const values = [];
+          let paramCount = 0;
+
+          if (this._delete) {
+            // DELETE query
+            query = `DELETE FROM public.${table}`;
+            if (this._where.length > 0) {
+              const whereClause = this._where.map(w => {
+                values.push(w.value);
+                return `${w.column} ${w.op} $${++paramCount}`;
+              }).join(' AND ');
+              query += ` WHERE ${whereClause}`;
+            }
+            query += ' RETURNING *';
+          } else if (this._updateData) {
+            // UPDATE query
+            const updateKeys = Object.keys(this._updateData);
+            const updateValues = Object.values(this._updateData);
+            const setClause = updateKeys.map(key => {
+              values.push(updateValues[updateKeys.indexOf(key)]);
+              return `${key} = $${++paramCount}`;
+            }).join(', ');
+            query = `UPDATE public.${table} SET ${setClause}`;
+
+            if (this._where.length > 0) {
+              const whereClause = this._where.map(w => {
+                values.push(w.value);
+                return `${w.column} ${w.op} $${++paramCount}`;
+              }).join(' AND ');
+              query += ` WHERE ${whereClause}`;
+            }
+            query += ' RETURNING *';
+          } else {
+            // SELECT query
+            query = `SELECT ${this._select} FROM public.${table}`;
+            if (this._where.length > 0) {
+              const whereClause = this._where.map(w => {
+                values.push(w.value);
+                return `${w.column} ${w.op} $${++paramCount}`;
+              }).join(' AND ');
+              query += ` WHERE ${whereClause}`;
+            }
+            if (this._order.length > 0) {
+              query += ` ORDER BY ${this._order.join(', ')}`;
+            }
+            if (this._limit) {
+              query += ` LIMIT ${this._limit}`;
+            }
+          }
+
+          const result = await db.query(query, values);
+
+          if (this._single && result.data) {
+            return { data: result.data[0] || null, error: result.error };
+          }
+
+          return result;
+        },
+
+        then: function(resolve, reject) {
+          return this._execute().then(resolve, reject);
+        }
+      };
+
+      return queryBuilder;
+    },
+    auth: {
+      getUser: async (token) => {
+        // Temporary: allow operations without strict auth during migration
+        return { data: { user: { id: 'temp-user', email: 'temp@onav.com' } }, error: null };
+      }
+    },
+    rpc: async (functionName, params) => {
+      if (functionName === 'execute_sql' || functionName === 'exec_sql') {
+        return await db.executeSQL(params.sql_query || params.query);
+      }
+      return { data: null, error: new Error('RPC function not supported in Neon mode') };
+    }
+  };
+
+  supabaseAdmin = {
+    auth: {
+      admin: {
+        listUsers: async () => await db.listUsers(),
+        createUser: async (userData) => await db.createUser(userData),
+        updateUserById: async (id, updates) => await db.updateUserById(id, updates),
+        deleteUser: async (id) => await db.deleteUser(id),
+        generateLink: async (options) => await db.generateLink(options)
+      }
+    },
+    rpc: async (functionName, params) => {
+      if (functionName === 'execute_sql' || functionName === 'exec_sql') {
+        return await db.executeSQL(params.sql_query || params.query);
+      }
+      return { data: null, error: new Error('RPC function not supported in Neon mode') };
+    }
+  };
+
+  console.log('✅ Neon database adapter initialized');
+} else {
+  console.log('📦 USING SUPABASE DATABASE');
+
+  // Initialize Supabase client (original code)
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('Error: SUPABASE_URL and SUPABASE_ANON_KEY must be provided in .env file');
+    process.exit(1); // Exit if keys are missing
+  }
+
+  // Create both clients - anon for regular operations, service for admin operations
+  supabase = createClient(supabaseUrl, supabaseAnonKey);
+  supabaseAdmin = supabaseServiceKey ? createClient(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }) : supabase;
+
+  // Warning if service key is missing
+  if (!supabaseServiceKey) {
+    console.warn('WARNING: SUPABASE_SERVICE_ROLE_KEY not found. Admin functions (user creation from dashboard) will not work.');
+    console.warn('Please add SUPABASE_SERVICE_ROLE_KEY to your .env file for full functionality.');
+  }
 }
 
 // Middleware to parse JSON bodies

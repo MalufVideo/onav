@@ -22,7 +22,11 @@
       "mcp__playwright__browser_evaluate",
       "Bash(git rm:*)",
       "mcp__supabase__list_edge_functions",
-      "Bash(npm install)"
+      "Bash(npm install)",
+      "mcp__Neon__list_projects",
+      "Bash(npm install:*)",
+      "mcp__Neon__run_sql_transaction",
+      "mcp__Neon__run_sql"
     ],
     "deny": [],
     "ask": []
