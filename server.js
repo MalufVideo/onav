@@ -3298,6 +3298,13 @@ app.post('/api/webhook-proxy', async (req, res) => {
   }
 });
 
+// Setup authentication routes (for Neon mode)
+if (USE_NEON) {
+  const { setupAuthRoutes } = require('./auth-routes');
+  setupAuthRoutes(app, db, USE_NEON);
+  console.log('✅ Custom authentication routes initialized (Neon mode)');
+}
+
 const PORT = process.env.PORT || 3000;
 
 // For local development
