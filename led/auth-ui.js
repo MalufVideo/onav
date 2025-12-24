@@ -4,29 +4,46 @@
 function createAuthUI() {
   // Create auth card for right sidebar
   const authCard = document.createElement('div');
-  authCard.className = 'info-card auth-container';
+  authCard.className = 'control-card';
   authCard.id = 'auth-card';
+  authCard.style.marginBottom = '15px';
   authCard.innerHTML = `
-    <div class="auth-nav-buttons">
-      <button id="login-button" class="auth-button">Entrar</button>
-      <button id="register-button" class="auth-button">Cadastrar</button>
-      <div id="user-profile" class="user-profile" style="display: none;">
-  // Auth card is now in HTML, just check if it exists
-  // Try both IDs for compatibility
-  const authCard = document.getElementById('auth-card-static') || document.getElementById('auth-card');
-  if (!authCard) {
-    console.error('[auth-ui.js] Auth card not found in HTML');
-    // Continue anyway to create modals if possible, but logging is good
+      <h2>Minha Conta</h2>
+      <div class="selector-buttons" style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+        <button id="login-button" class="selector-btn" style="flex: 1;">Entrar</button>
+        <button id="register-button" class="selector-btn" style="flex: 1;">Cadastrar</button>
+        
+        <div id="user-profile" class="user-profile" style="display: none; width: 100%; text-align: center;">
+          <p id="user-name" style="margin-bottom: 10px; font-weight: bold; color: #fff;"></p>
+          <div style="display: flex; gap: 10px; flex-direction: column;">
+            <a href="my-quotes.html" class="selector-btn active" id="my-quotes-button" style="text-decoration: none; padding: 10px;">Minhas Propostas</a>
+            <button id="logout-button" class="selector-btn" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.5);">Sair</button>
+          </div>
+        </div>
+      </div>
+  `;
+
+  // Add auth card to the right sidebar at the top
+  const infoSidebar = document.getElementById('info-sidebar');
+  if (infoSidebar) {
+    // Check if it already exists to avoid duplicates
+    const existingCard = document.getElementById('auth-card');
+    if (existingCard) {
+      existingCard.remove();
+    }
+    // Insert auth card as the first element of the sidebar
+    infoSidebar.insertBefore(authCard, infoSidebar.firstChild);
+    console.log('[auth-ui.js] Auth card injected');
   } else {
-    console.log('[auth-ui.js] Found auth card in HTML, setting up event listeners');
+    console.error('[auth-ui.js] info-sidebar not found!');
   }
-  
+
   // Create login modal
   const loginModal = document.createElement('div');
   loginModal.id = 'login-modal';
   loginModal.className = 'modal-overlay';
   loginModal.innerHTML = `
-    < div class="modal-content auth-modal" >
+    <div class="modal-content auth-modal">
       <button class="modal-close">&times;</button>
       <h2>Entrar</h2>
       <form id="login-form" class="auth-form">
@@ -42,15 +59,15 @@ function createAuthUI() {
         <div id="login-success" class="auth-success"></div>
         <button type="submit" class="form-submit">Entrar</button>
       </form>
-    </div >
-    `;
-  
+    </div>
+  `;
+
   // Create registration modal
   const registerModal = document.createElement('div');
   registerModal.id = 'register-modal';
   registerModal.className = 'modal-overlay';
   registerModal.innerHTML = `
-    < div class="modal-content auth-modal" >
+    <div class="modal-content auth-modal">
       <button class="modal-close">&times;</button>
       <h2>Criar Conta</h2>
       <form id="register-form" class="auth-form">
@@ -82,27 +99,26 @@ function createAuthUI() {
         <div id="register-success" class="auth-success"></div>
         <button type="submit" class="form-submit">Cadastrar</button>
       </form>
-    </div >
-    `;
-  
+    </div>
+  `;
+
   // Append modals to body
-  // Check if they already exist first to prevent duplicates
   if (!document.getElementById('login-modal')) document.body.appendChild(loginModal);
   if (!document.getElementById('register-modal')) document.body.appendChild(registerModal);
-  
+
   // Set up event listeners
   setupAuthEventListeners();
-  
+
   // Update UI based on authentication state
   updateAuthUI();
 }
 
 // Set up event listeners for auth UI elements
 function setupAuthEventListeners() {
-  // Static buttons in sidebar
-  const loginBtn = document.getElementById('login-button-static');
-  const registerBtn = document.getElementById('register-button-static');
-  const logoutBtn = document.getElementById('logout-button-static');
+  // Dynamic buttons in sidebar
+  const loginBtn = document.getElementById('login-button');
+  const registerBtn = document.getElementById('register-button');
+  const logoutBtn = document.getElementById('logout-button');
 
   if (loginBtn) {
     loginBtn.addEventListener('click', (e) => {
@@ -110,28 +126,28 @@ function setupAuthEventListeners() {
       openModal('login-modal');
     });
   }
-  
+
   if (registerBtn) {
     registerBtn.addEventListener('click', (e) => {
       e.preventDefault();
       openModal('register-modal');
     });
   }
-  
+
   if (logoutBtn) {
     logoutBtn.addEventListener('click', (e) => {
       e.preventDefault();
       handleLogout();
     });
   }
-  
+
   // Close modal buttons
   document.querySelectorAll('.modal-close').forEach(button => {
     button.addEventListener('click', () => {
       closeAllModals();
     });
   });
-  
+
   // Modal background click to close
   document.querySelectorAll('.modal-overlay').forEach(modal => {
     modal.addEventListener('click', (e) => {
@@ -140,12 +156,14 @@ function setupAuthEventListeners() {
       }
     });
   });
-  
+
   // Login form submission
-  document.getElementById('login-form').addEventListener('submit', handleLogin);
-  
+  const loginForm = document.getElementById('login-form');
+  if (loginForm) loginForm.addEventListener('submit', handleLogin);
+
   // Registration form submission
-  document.getElementById('register-form').addEventListener('submit', handleRegister);
+  const registerForm = document.getElementById('register-form');
+  if (registerForm) registerForm.addEventListener('submit', handleRegister);
 }
 
 // Handle login form submission
@@ -174,11 +192,13 @@ async function handleLogin(e) {
 
     // Attempt login
     const result = await window.auth.signIn(email, password);
-    
+
     if (result.success) {
       showSuccess(document.getElementById('login-success'), 'Login successful!');
       closeAllModals();
       updateAuthUI();
+      // Reload to ensure all state is updated
+      setTimeout(() => location.reload(), 500);
     } else {
       showError(document.getElementById('login-error'), result.error || 'Login failed. Please check your credentials.');
     }
@@ -225,107 +245,121 @@ async function handleRegister(e) {
 
     // Attempt registration
     const result = await window.auth.signUp(email, password, { name, company, phone });
-    
+
     if (result.success) {
       showSuccess(document.getElementById('register-success'), 'Cadastro realizado com sucesso! Você já pode fazer login.');
-      
-      // Clear the form
-      document.getElementById('register-name').value = '';
-      document.getElementById('register-company').value = '';
-      document.getElementById('register-email').value = '';
-      document.getElementById('register-phone').value = '';
-      document.getElementById('register-password').value = '';
-      document.getElementById('register-password-confirm').value = '';
-      
-      // Switch to login tab after 2 seconds
+      // Auto login or ask to login?
+      // For now, let's close and open login
       setTimeout(() => {
         closeAllModals();
         openModal('login-modal');
-      }, 2000);
+        // Fill email
+        document.getElementById('login-email').value = email;
+        showSuccess(document.getElementById('login-success'), 'Conta criada! Digite sua senha.');
+      }, 1500);
     } else {
-      showError(document.getElementById('register-error'), result.error || 'Erro ao criar conta. Tente novamente.');
+      showError(document.getElementById('register-error'), result.error || 'Falha no cadastro. Tente novamente.');
     }
   } catch (error) {
-    showError(document.getElementById('register-error'), error.message || 'Erro ao criar conta. Tente novamente mais tarde.');
-    console.error('Registration error:', error);
+    showError(document.getElementById('register-error'), error.message || 'Erro inesperado.');
+    console.error('Register error:', error);
   } finally {
-    // Reset loading state
     setFormLoading(document.getElementById('register-form'), false);
   }
 }
 
-// Handle logout button click
-async function handleLogout(e) {
-  e.preventDefault();
-
-  // Check if auth module is available
-  if (!window.auth || typeof window.auth.signOut !== 'function') {
-    console.error('[auth-ui.js] Auth module not available in handleLogout');
-    return;
-  }
-
-  try {
-    const result = await window.auth.signOut();
-    if (!result.success) {
-      console.error('Logout error:', result.error);
+// Handle logout
+async function handleLogout() {
+  if (confirm('Tem certeza que deseja sair?')) {
+    if (window.auth && window.auth.signOut) {
+      await window.auth.signOut();
+      updateAuthUI();
+      location.reload();
     }
-    updateAuthUI();
-  } catch (error) {
-    console.error('Logout error:', error);
   }
 }
 
-// Open a modal by ID
+// Helper to set form loading state
+function setFormLoading(form, isLoading) {
+  if (!form) return;
+  const submitBtn = form.querySelector('.form-submit');
+  if (submitBtn) {
+    submitBtn.disabled = isLoading;
+    submitBtn.textContent = isLoading ? 'Processando...' : (form.id === 'login-form' ? 'Entrar' : 'Cadastrar');
+  }
+}
+
+// Helper to show error message
+function showError(element, message) {
+  if (element) {
+    element.textContent = message;
+    element.style.display = 'block';
+  }
+}
+
+// Helper to show success message
+function showSuccess(element, message) {
+  if (element) {
+    element.textContent = message;
+    element.style.display = 'block';
+  }
+}
+
+// Open a modal
 function openModal(modalId) {
-  // Close any open modals first
   closeAllModals();
-  
-  // Open the requested modal
   const modal = document.getElementById(modalId);
   if (modal) {
+    modal.style.display = 'flex';
+    // Add active class if needed by CSS
     modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
+  } else {
+    console.error('[auth-ui.js] Modal not found:', modalId);
   }
 }
 
 // Close all modals
 function closeAllModals() {
   document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.style.display = 'none';
     modal.classList.remove('active');
   });
-  document.body.style.overflow = '';
+  clearMessages();
 }
 
-// Update UI based on authentication state
+// Update UI based on auth state
 async function updateAuthUI() {
-  // Check if auth module is available
-  if (!window.auth || typeof window.auth.getCurrentUser !== 'function') {
-    console.warn('[auth-ui.js] Auth module not available yet in updateAuthUI');
-    return;
-  }
-
-  const currentUser = window.auth.getCurrentUser();
+  console.log('[auth-ui.js] Updating Auth UI...');
   const loginButton = document.getElementById('login-button');
   const registerButton = document.getElementById('register-button');
   const userProfile = document.getElementById('user-profile');
   const userName = document.getElementById('user-name');
 
-  if (currentUser) {
+  if (!loginButton || !registerButton || !userProfile) {
+    console.warn('[auth-ui.js] UI elements not found');
+    return;
+  }
+
+  if (!window.auth) {
+    console.warn('[auth-ui.js] Auth module not ready');
+    return;
+  }
+
+  const isAuthenticated = window.auth.isAuthenticated();
+  console.log('[auth-ui.js] Is Authenticated:', isAuthenticated);
+
+  if (isAuthenticated) {
     // User is logged in
     loginButton.style.display = 'none';
     registerButton.style.display = 'none';
-    userProfile.style.display = 'flex';
-    
-    let displayName;
-    
-    // Special handling for known sales rep email
-    if (currentUser.email === 'nelson@avdesign.video') {
-      displayName = 'Nelson (Sales Rep)';
-    } else if (currentUser.email === 'nelson.maluf@onprojecoes.com.br') {
-      displayName = 'Nelson Maluf (Admin)';
-    } else {
-      // Try to get user profile first
+    userProfile.style.display = 'block';
+
+    const currentUser = window.auth.getCurrentUser();
+    let displayName = 'Usuário';
+
+    if (currentUser) {
       try {
+        // Try to get profile if available (depends on implementation)
         const userProfile = await window.auth.getUserProfile();
         if (userProfile && userProfile.full_name) {
           displayName = userProfile.full_name;
@@ -340,7 +374,7 @@ async function updateAuthUI() {
         displayName = userData.name || userData.company || currentUser.email;
       }
     }
-    
+
     userName.textContent = displayName;
   } else {
     // User is logged out
@@ -355,222 +389,34 @@ async function updateAuthUI() {
 function addAuthStyles() {
   const styleSheet = document.createElement('style');
   styleSheet.textContent = `
-      /* Main Auth Container Styles (mostly unchanged unless conflicting) */
-      .auth - container {
-    display: flex;
-    flex - direction: column;
-    align - items: flex - start;
-    width: 100 %;
-  }
-
-/* Auth Navigation Buttons (mostly unchanged unless conflicting) */
-.auth - nav - buttons {
-    display: flex;
-    flex - wrap: wrap;
-    gap: 10px;
-    justify - content: center;
-    padding: 5px;
-    background - color: transparent;
-    width: 100 %;
-  }
-
-.auth - button { /* This is for sidebar buttons, not modal submit */
-    padding: 8px 14px;
-    border: none;
-    border - radius: 999px;
-    background - image: linear - gradient(120deg, #f97316, #fbbf24);
-    color: #0f172a;
-    font - weight: 600;
-    cursor: pointer;
-    font - size: 14px;
-    transition: transform 0.2s ease, box - shadow 0.2s ease;
-    text - decoration: none;
-    display: inline - block;
-    text - align: center;
-    box - shadow: 0 10px 20px rgba(249, 115, 22, 0.3);
-  }
-
-.auth - button:hover {
-    transform: translateY(-1px);
-    box - shadow: 0 14px 26px rgba(249, 115, 22, 0.35);
-  }
-
-.logout - btn {
-    background - image: linear - gradient(120deg, #f87171, #ef4444);
-    color: #fff;
-    box - shadow: 0 10px 20px rgba(239, 68, 68, 0.25);
-  }
-
-.logout - btn:hover {
-    box - shadow: 0 14px 26px rgba(239, 68, 68, 0.35);
-  }
-
-.user - profile {
-    display: flex;
-    align - items: center;
-    justify - content: center;
-    flex - wrap: wrap;
-    gap: 6px;
-    width: 100 %;
-  }
-
-  #user - name {
-    color: #fff;
-    font - weight: bold;
-    flex - grow: 1;
-    text - align: center;
-    width: 100 %;
-    margin - bottom: 5px;
-    white - space: normal;
-    word - wrap: break-word;
-    line - height: 1.2;
-    max - height: 2.4em;
-    overflow: hidden;
-  }
-
-/* --- NEW/MODIFIED MODAL STYLES START HERE --- */
-
-/* General Modal Overlay (assuming this is handled by existing .modal-overlay) */
-/* .modal-overlay { ... } */
-
-/* Modal Content Base (assuming this is handled by existing .modal-content) */
-/* .modal-content { ... } */
-
-/* Auth Modal Specific Styles */
-.auth - modal { /* This class is on the modal-content div */
-    background - color: #ffffff;
-    padding: 30px 40px; /* Increased padding */
-    border - radius: 12px; /* Softer, larger radius */
-    box - shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
-    max - width: 480px; /* Increased width */
-    width: 90 %; /* Responsive width */
-    text - align: left; /* Align content to the left */
-  }
-
-.auth - modal h2 {
-    font - size: 22px; /* Slightly smaller title */
-    font - weight: 600;
-    color: #333;
-    margin - bottom: 20px; /* Reduced space below title */
-    text - align: center; /* Center the title */
-  }
-
-.auth - modal.modal - close { /* Style the close button */
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    font - size: 28px;
-    color: #aaa;
-    background: none;
-    border: none;
-    cursor: pointer;
-    line - height: 1;
-  }
-
-.auth - modal.modal - close:hover {
-    color: #333;
-  }
-
-.auth - form {
-    display: flex;
-    flex - direction: column;
-    gap: 15px; /* Reduced gap between form groups */
-  }
-
-.auth - form.form - group {
-    margin - bottom: 0; /* Remove margin as gap is handled by flex on auth-form */
-  }
-
-.auth - form label {
-    display: block;
-    font - size: 14px;
-    font - weight: 500; /* Slightly less bold */
-    color: #555;
-    margin - bottom: 5px; /* Reduced space between label and input */
-  }
-
-.auth - form input[type = "text"],
-.auth - form input[type = "email"],
-.auth - form input[type = "password"],
-.auth - form input[type = "tel"] {
-    width: 100 %;
-    padding: 10px 12px; /* Reduced padding */
-    font - size: 15px; /* Slightly smaller font in input */
-    color: #333;
-    background - color: #f9f9f9; /* Light background for inputs */
-    border: 1px solid #ddd; /* Softer border */
-    border - radius: 8px; /* Rounded corners */
-    box - sizing: border - box;
-    transition: border - color 0.2s, box - shadow 0.2s;
-  }
-
-.auth - form input[type = "text"]: focus,
-.auth - form input[type = "email"]: focus,
-.auth - form input[type = "password"]: focus,
-.auth - form input[type = "tel"]:focus {
-    outline: none;
-    border - color: #007bff; /* Highlight color on focus */
-    background - color: #fff;
-    box - shadow: 0 0 0 3px rgba(0, 123, 255, 0.1); /* Subtle glow on focus */
-  }
-
-.auth - form.form - submit { /* This is the main action button in the modal */
-    width: 100 %;
-    padding: 10px 15px; /* Reduced padding */
-    font - size: 16px;
-    font - weight: 600; /* Bolder text */
-    color: #fff;
-    background - color: #007bff; /* Modern blue */
-    border: none;
-    border - radius: 8px;
-    cursor: pointer;
-    transition: background - color 0.2s, transform 0.1s;
-    margin - top: 15px; /* Adjusted space above the button, can be 10px if needed */
-    text - transform: none; /* No uppercase, more modern */
-  }
-
-.auth - form.form - submit:hover {
-    background - color: #0056b3; /* Darker blue on hover */
-  }
-
-.auth - form.form - submit:active {
-    transform: translateY(1px); /* Slight press effect */
-  }
-
-/* Error and Success Messages */
-.auth - error,
-.auth - success {
-    display: none; /* Hidden by default */
-    margin: 10px 0 0 0; /* Adjusted margin */
-    padding: 12px 15px; /* Increased padding */
-    border - radius: 8px; /* Rounded corners */
-    font - size: 14px;
-    text - align: left; /* Align text to left */
-    border - width: 1px;
-    border - style: solid;
-  }
-
-.auth - error {
-    background - color: #f8d7da; /* Softer red */
-    color: #721c24;
-    border - color: #f5c6cb;
-  }
-
-.auth - success {
-    background - color: #d4edda; /* Softer green */
-    color: #155724;
-    border - color: #c3e6cb;
-  }
-
-  /* Optional: Add a subtle divider line if needed */
-  /* .auth-modal hr {
-    border: 0;
-    height: 1px;
-    background-color: #eee;
-    margin: 25px 0;
-  } */
-
-  /* --- NEW/MODIFIED MODAL STYLES END HERE --- */
+    /* Modal Styles */
+    .auth-modal {
+      max-width: 400px;
+    }
+    
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .auth-error {
+      color: #ef4444;
+      font-size: 0.9em;
+      display: none;
+      padding: 10px;
+      background: rgba(239, 68, 68, 0.1);
+      border-radius: 6px;
+    }
+    
+    .auth-success {
+      color: #22c55e;
+      font-size: 0.9em;
+      display: none;
+      padding: 10px;
+      background: rgba(34, 197, 94, 0.1);
+      border-radius: 6px;
+    }
   `;
   document.head.appendChild(styleSheet);
 }
@@ -583,7 +429,7 @@ function initAuthUI() {
     setTimeout(initAuthUI, 500);
     return;
   }
-  
+
   addAuthStyles();
   createAuthUI();
 }
@@ -606,29 +452,4 @@ function clearMessages() {
     success.textContent = '';
     success.style.display = 'none';
   });
-}
-
-function showError(element, message) {
-  if (element) {
-    element.textContent = message;
-    element.style.display = 'block';
-  }
-}
-
-function showSuccess(element, message) {
-  if (element) {
-    element.textContent = message;
-    element.style.display = 'block';
-    // Color is handled by CSS class .auth-success
-  }
-}
-
-function setFormLoading(form, isLoading) {
-  if (isLoading) {
-    form.querySelector('button[type="submit"]').disabled = true;
-    form.querySelector('button[type="submit"]').textContent = 'Loading...';
-  } else {
-    form.querySelector('button[type="submit"]').disabled = false;
-    form.querySelector('button[type="submit"]').textContent = 'Submit';
-  }
 }

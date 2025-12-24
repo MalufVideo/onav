@@ -155,23 +155,7 @@
     <!-- Right Sidebar: Pricing Pod and CTA -->
     <div id="info-sidebar">
       <!-- Auth Card - Login/Register buttons -->
-      <div class="control-card" id="auth-card-static" style="margin-bottom: 15px;">
-        <h2>Minha Conta</h2>
-        <div class="selector-buttons" style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
-          <button id="login-button-static" class="selector-btn" style="flex: 1;">Entrar</button>
-          <button id="register-button-static" class="selector-btn" style="flex: 1;">Cadastrar</button>
-
-          <div id="user-profile-static" class="user-profile" style="display: none; width: 100%; text-align: center;">
-            <p id="user-name-static" style="margin-bottom: 10px; font-weight: bold; color: #fff;"></p>
-            <div style="display: flex; gap: 10px; flex-direction: column;">
-              <a href="my-quotes.html" class="selector-btn active" id="my-quotes-button-static"
-                style="text-decoration: none; padding: 10px;">Minhas Propostas</a>
-              <button id="logout-button-static" class="selector-btn"
-                style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.5);">Sair</button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Auth Card - Injected dynamically by auth-ui.js -->
       <!-- Pod 3: Disguise Mode Selector -->
       <div class="control-card" id="card-disguise-selector">
         <h2>Produção Virtual em:</h2>
@@ -811,76 +795,10 @@
           console.log('[index.html] Static auth card updated - user not logged in');
         }
       }
-
-      // Setup event listeners for static auth buttons - SAFETY NET
-      function setupStaticAuthButtons() {
-        console.log('[index.html] Setting up static auth button listeners...');
-
-        const loginBtn = document.getElementById('login-button-static');
-        const registerBtn = document.getElementById('register-button-static');
-        const logoutBtn = document.getElementById('logout-button-static');
-
-        if (loginBtn) {
-          // Remove old listeners by cloning (optional, but ensures clean slate)
-          const newLoginBtn = loginBtn.cloneNode(true);
-          loginBtn.parentNode.replaceChild(newLoginBtn, loginBtn);
-
-          newLoginBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            console.log('[index.html] Login button clicked');
-            if (window.authUI && window.authUI.openModal) {
-              window.authUI.openModal('login-modal');
-            } else {
-              console.error('[index.html] Auth UI not ready yet!');
-              alert('O sistema de autenticação ainda está carregando. Tente novamente em alguns segundos.');
-            }
-          });
-          console.log('[index.html] Login button listener attached');
-        } else {
-          console.error('[index.html] Login button not found!');
-        }
-
-        if (registerBtn) {
-          const newRegisterBtn = registerBtn.cloneNode(true);
-          registerBtn.parentNode.replaceChild(newRegisterBtn, registerBtn);
-
-          newRegisterBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            console.log('[index.html] Register button clicked');
-            if (window.authUI && window.authUI.openModal) {
-              window.authUI.openModal('register-modal');
-            } else {
-              console.error('[index.html] Auth UI not ready yet!');
-              alert('O sistema de autenticação ainda está carregando. Tente novamente em alguns segundos.');
-            }
-          });
-          console.log('[index.html] Register button listener attached');
-        }
-
-        if (logoutBtn) {
-          const newLogoutBtn = logoutBtn.cloneNode(true);
-          logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
-
-          newLogoutBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            console.log('[index.html] Logout button clicked');
-            if (window.auth && window.auth.signOut) {
-              await window.auth.signOut();
-              location.reload(); // Reload to update UI
-            }
-          });
-        }
-      }
-
-      // Call setup after DOM is ready
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupStaticAuthButtons);
-      } else {
-        setupStaticAuthButtons();
-      }
-
-      // Also retry after a short delay to ensure everything is loaded
-      setTimeout(setupStaticAuthButtons, 1000);
+    </script>
+    <script>
+      // Auth button listeners are handled by auth-ui.js which injects the UI
+      // No extra script needed here for auth buttons
     </script>
     <!-- fix-rube-draco.js script removed -->
 
