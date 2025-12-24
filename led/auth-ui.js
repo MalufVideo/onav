@@ -4,8 +4,9 @@
 function createAuthUI() {
   // Create auth card for right sidebar
   const authCard = document.createElement('div');
-  authCard.className = 'info-card auth-container';
+  authCard.className = 'control-card auth-container';
   authCard.id = 'auth-card';
+  authCard.style.marginBottom = '15px';
   authCard.innerHTML = `
     <div class="auth-nav-buttons">
       <button id="login-button" class="auth-button">Entrar</button>
@@ -17,14 +18,14 @@ function createAuthUI() {
       </div>
     </div>
   `;
-  
-  // Add auth card to the right sidebar at the top
+
+  // Add auth card to the right sidebar at the top (above "Produção Virtual em:" card)
   const infoSidebar = document.getElementById('info-sidebar');
   if (infoSidebar) {
     // Insert auth card as the first element of the sidebar
     infoSidebar.insertBefore(authCard, infoSidebar.firstChild);
   }
-  
+
   // Create login modal
   const loginModal = document.createElement('div');
   loginModal.id = 'login-modal';
@@ -48,7 +49,7 @@ function createAuthUI() {
       </form>
     </div>
   `;
-  
+
   // Create registration modal
   const registerModal = document.createElement('div');
   registerModal.id = 'register-modal';
@@ -88,14 +89,14 @@ function createAuthUI() {
       </form>
     </div>
   `;
-  
+
   // Append modals to body
   document.body.appendChild(loginModal);
   document.body.appendChild(registerModal);
-  
+
   // Set up event listeners
   setupAuthEventListeners();
-  
+
   // Update UI based on authentication state
   updateAuthUI();
 }
@@ -106,22 +107,22 @@ function setupAuthEventListeners() {
   document.getElementById('login-button').addEventListener('click', () => {
     openModal('login-modal');
   });
-  
+
   // Register button click
   document.getElementById('register-button').addEventListener('click', () => {
     openModal('register-modal');
   });
-  
+
   // Logout button click
   document.getElementById('logout-button').addEventListener('click', handleLogout);
-  
+
   // Close modal buttons
   document.querySelectorAll('.modal-close').forEach(button => {
     button.addEventListener('click', () => {
       closeAllModals();
     });
   });
-  
+
   // Modal background click to close
   document.querySelectorAll('.modal-overlay').forEach(modal => {
     modal.addEventListener('click', (e) => {
@@ -130,10 +131,10 @@ function setupAuthEventListeners() {
       }
     });
   });
-  
+
   // Login form submission
   document.getElementById('login-form').addEventListener('submit', handleLogin);
-  
+
   // Registration form submission
   document.getElementById('register-form').addEventListener('submit', handleRegister);
 }
@@ -164,7 +165,7 @@ async function handleLogin(e) {
 
     // Attempt login
     const result = await window.auth.signIn(email, password);
-    
+
     if (result.success) {
       showSuccess(document.getElementById('login-success'), 'Login successful!');
       closeAllModals();
@@ -215,10 +216,10 @@ async function handleRegister(e) {
 
     // Attempt registration
     const result = await window.auth.signUp(email, password, { name, company, phone });
-    
+
     if (result.success) {
       showSuccess(document.getElementById('register-success'), 'Cadastro realizado com sucesso! Você já pode fazer login.');
-      
+
       // Clear the form
       document.getElementById('register-name').value = '';
       document.getElementById('register-company').value = '';
@@ -226,7 +227,7 @@ async function handleRegister(e) {
       document.getElementById('register-phone').value = '';
       document.getElementById('register-password').value = '';
       document.getElementById('register-password-confirm').value = '';
-      
+
       // Switch to login tab after 2 seconds
       setTimeout(() => {
         closeAllModals();
@@ -269,7 +270,7 @@ async function handleLogout(e) {
 function openModal(modalId) {
   // Close any open modals first
   closeAllModals();
-  
+
   // Open the requested modal
   const modal = document.getElementById(modalId);
   if (modal) {
@@ -305,9 +306,9 @@ async function updateAuthUI() {
     loginButton.style.display = 'none';
     registerButton.style.display = 'none';
     userProfile.style.display = 'flex';
-    
+
     let displayName;
-    
+
     // Special handling for known sales rep email
     if (currentUser.email === 'nelson@avdesign.video') {
       displayName = 'Nelson (Sales Rep)';
@@ -330,7 +331,7 @@ async function updateAuthUI() {
         displayName = userData.name || userData.company || currentUser.email;
       }
     }
-    
+
     userName.textContent = displayName;
   } else {
     // User is logged out
@@ -573,7 +574,7 @@ function initAuthUI() {
     setTimeout(initAuthUI, 500);
     return;
   }
-  
+
   addAuthStyles();
   createAuthUI();
 }
