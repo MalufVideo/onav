@@ -1672,6 +1672,13 @@ app.post('/api/save-proposal', async (req, res) => {
       // Don't fail the proposal creation if email fails
     }
 
+    // Send WhatsApp notification for pre-reserve
+    try {
+      await sendWhatsAppNotification('pre_reserve', data);
+    } catch (whatsappError) {
+      console.warn('WhatsApp notification failed but proposal was saved:', whatsappError.message);
+    }
+
     res.status(201).json({
       success: true,
       message: 'Proposal saved successfully',
@@ -2610,6 +2617,28 @@ app.post('/api/check-availability', async (req, res) => {
       // Generate some alternatives (example: next 7 days)
       // This is a basic implementation, can be improved to search for actual gaps
       const alternatives = []; // Populate if needed
+
+      // Send WhatsApp notification for date unavailable
+      if (quoteId) {
+        try {
+          // Fetch quote data to get client contact info
+          const { data: quoteData, error: quoteError } = await supabaseAdmin
+            .from('proposals')
+            .select('project_name, client_name, client_phone, client_email, client_company')
+            .eq('id', quoteId)
+            .single();
+
+          if (!quoteError && quoteData) {
+            await sendWhatsAppNotification('date_unavailable', {
+              ...quoteData,
+              requested_date: `${startDate} a ${endDate || startDate}`
+            });
+          }
+        } catch (whatsappError) {
+          console.warn('WhatsApp notification failed for date unavailable:', whatsappError.message);
+        }
+      }
+
       return res.json({
         available: false,
         busySlots: busySlots,
@@ -2981,7 +3010,13 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
       completeQuote = data;
     }
 
-    // TODO: Send approval notification email to admin/sales team
+    // Send WhatsApp notification for approval
+    try {
+      await sendWhatsAppNotification('approval', completeQuote);
+    } catch (whatsappError) {
+      console.warn('WhatsApp notification failed but quote was approved:', whatsappError.message);
+    }
+
     console.log(`Quote approved: ${existingQuote.project_name} by client at ${clientIP}`);
 
     res.json({
@@ -3233,6 +3268,95 @@ io.on('connection', (socket) => {
     }
   });
 });
+
+// =====================================================
+// WhatsApp Notification System
+// =====================================================
+const WHATSAPP_API_URL = 'http://72.60.142.28:3000/send';
+const NOTIFICATION_PHONE = '5519981454647';
+
+/**
+ * Send WhatsApp notification for reservation events
+ * @param {string} eventType - 'pre_reserve' | 'approval' | 'date_unavailable'
+ * @param {object} data - Event data containing client info and details
+ */
+async function sendWhatsAppNotification(eventType, data) {
+  try {
+    let message = '';
+    const timestamp = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+
+    switch (eventType) {
+      case 'pre_reserve':
+        message = `🔔 *NOVA PRÉ-RESERVA*\n\n` +
+          `📅 ${timestamp}\n\n` +
+          `*Projeto:* ${data.project_name || 'Não informado'}\n` +
+          `*Período:* ${data.shooting_dates_start || 'N/A'} a ${data.shooting_dates_end || 'N/A'}\n` +
+          `*Dias:* ${data.days_count || 1}\n\n` +
+          `👤 *CONTATO DO LEAD:*\n` +
+          `*Nome:* ${data.client_name || 'Não informado'}\n` +
+          `*Telefone:* ${data.client_phone || 'Não informado'}\n` +
+          `*Email:* ${data.client_email || 'Não informado'}\n` +
+          `*Empresa:* ${data.client_company || 'Não informado'}\n\n` +
+          `💰 *Valor:* ${data.total_price || 'A calcular'}`;
+        break;
+
+      case 'approval':
+        message = `✅ *PROPOSTA APROVADA!*\n\n` +
+          `📅 ${timestamp}\n\n` +
+          `*Projeto:* ${data.project_name || 'Não informado'}\n` +
+          `*Período:* ${data.shooting_dates_start || 'N/A'} a ${data.shooting_dates_end || 'N/A'}\n\n` +
+          `👤 *CONTATO DO CLIENTE:*\n` +
+          `*Nome:* ${data.client_name || 'Não informado'}\n` +
+          `*Telefone:* ${data.client_phone || 'Não informado'}\n` +
+          `*Email:* ${data.client_email || 'Não informado'}\n` +
+          `*Empresa:* ${data.client_company || 'Não informado'}\n\n` +
+          `💰 *Valor Total:* ${data.total_price || 'N/A'}\n\n` +
+          `🎉 Entre em contato para confirmar os detalhes!`;
+        break;
+
+      case 'date_unavailable':
+        message = `⚠️ *DATA INDISPONÍVEL*\n\n` +
+          `📅 ${timestamp}\n\n` +
+          `Um cliente tentou aprovar uma proposta mas a data estava ocupada.\n\n` +
+          `*Projeto:* ${data.project_name || 'Não informado'}\n` +
+          `*Data Solicitada:* ${data.requested_date || 'N/A'}\n\n` +
+          `👤 *CONTATO DO CLIENTE:*\n` +
+          `*Nome:* ${data.client_name || 'Não informado'}\n` +
+          `*Telefone:* ${data.client_phone || 'Não informado'}\n` +
+          `*Email:* ${data.client_email || 'Não informado'}\n\n` +
+          `📞 Entre em contato para oferecer datas alternativas!`;
+        break;
+
+      default:
+        console.warn('Unknown WhatsApp notification event type:', eventType);
+        return;
+    }
+
+    console.log(`[WhatsApp] Sending ${eventType} notification to ${NOTIFICATION_PHONE}`);
+
+    const response = await fetch(WHATSAPP_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to: NOTIFICATION_PHONE,
+        message: message
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`WhatsApp API error: ${response.status} - ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log(`[WhatsApp] Notification sent successfully:`, result);
+    return result;
+
+  } catch (error) {
+    console.error(`[WhatsApp] Failed to send ${eventType} notification:`, error.message);
+    // Don't throw - we don't want to fail the main operation if notification fails
+  }
+}
 
 // Track sent webhooks to prevent duplicates
 const sentWebhooks = new Set();
