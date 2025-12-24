@@ -876,7 +876,7 @@ class QuoteCartModal {
             console.log('[QuoteCartModal] Data prepared for saving:', proposalDataToSave);
 
             // --- Save Data to Supabase ---
-            const { data: savedProposal, error: saveError } = await supabase
+            const { data: savedProposal, error: saveError } = await supabaseClient
                 .from('proposals')
                 .insert([proposalDataToSave])
                 .select() // Important: Select the inserted data to get the ID
@@ -898,7 +898,7 @@ class QuoteCartModal {
             // --- Invoke Edge Function to Generate and Email PDF ---
             console.log(`[QuoteCartModal] Invoking Edge Function for proposalId: ${proposalId}...`);
             try {
-                const { data: functionData, error: functionError } = await supabase.functions.invoke(
+                const { data: functionData, error: functionError } = await supabaseClient.functions.invoke(
                     'generate-and-email-proposal-pdf',
                     {
                         body: { proposalId: proposalId }
