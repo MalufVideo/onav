@@ -616,34 +616,36 @@ async function showQuoteDetails(quote) {
             }, 2000);
             return;
           }
+
+          // Handle date conflict (another booking exists for this date)
+          if (response.status === 409 && data.error === 'date_conflict') {
+            newApproveBtn.disabled = false;
+            newApproveBtn.textContent = 'Aprovar Orçamento';
+
+            // Show user-friendly message about date conflict
+            const conflictMessage = data.portugueseMessage || 'Esta data já está reservada. Um especialista entrará em contato.';
+            alert(`⚠️ Data Indisponível\n\n${conflictMessage}`);
+            return;
+          }
+
           throw new Error(data.error || 'Failed to approve quote');
         }
 
         // Trigger confetti animation
         createConfetti();
 
-        // Check calendar availability
-        newApproveBtn.textContent = 'Verificando disponibilidade...';
-        const availabilityResult = await checkCalendarAvailability(data.quote);
-
-        // Close modal first
+        // Close modal
         const modal = document.getElementById('quote-details-modal');
         if (modal) {
           modal.style.display = 'none';
           document.body.style.overflow = '';
         }
 
-        if (availabilityResult.available) {
-          // Redirect to thank you page
-          setTimeout(() => {
-            window.location.href = `/obrigado?quote=quote-${proposalIdToApprove}`;
-          }, 2000);
-        } else {
-          // Redirect to alternative dates page
-          setTimeout(() => {
-            window.location.href = `/escolher-data?quote=quote-${proposalIdToApprove}&alternatives=${encodeURIComponent(JSON.stringify(availabilityResult.alternatives || []))}`;
-          }, 2000);
-        }
+        // Show success message and redirect to thank you page
+        // (Calendar event was already created by the server during approval)
+        setTimeout(() => {
+          window.location.href = `/obrigado?quote=quote-${proposalIdToApprove}`;
+        }, 2000);
 
       } catch (error) {
         console.error('Error approving quote:', error);

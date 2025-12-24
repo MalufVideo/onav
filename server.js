@@ -126,6 +126,193 @@ async function getGoogleAuth(scopes) {
   }
 }
 
+// Calendar Event Prefixes
+const CALENDAR_PREFIX_PRE_RESERVE = '🔄 PRÉ-RESERVA:';
+const CALENDAR_PREFIX_CONFIRMED = '✅ CONFIRMADO:';
+
+/**
+ * Create a pre-reserve calendar event (when a quote is submitted)
+ * Multiple pre-reserves can exist for the same date
+ */
+async function createPreReserveEvent(proposal) {
+  try {
+    const tokens = await getGoogleAuth(['https://www.googleapis.com/auth/calendar.events']);
+    const createUrl = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events`;
+
+    const clientName = proposal.client_name || 'Cliente';
+    const projectName = proposal.project_name || 'Projeto';
+    const startDate = new Date(proposal.shooting_dates_start);
+    const endDate = proposal.shooting_dates_end ? new Date(proposal.shooting_dates_end) : new Date(startDate);
+
+    // Add one day to end date for all-day event (Google Calendar quirk)
+    endDate.setDate(endDate.getDate() + 1);
+
+    const eventData = {
+      summary: `${CALENDAR_PREFIX_PRE_RESERVE} ${clientName} - ${projectName}`,
+      description: `Pré-reserva de estúdio\n\nCliente: ${clientName}\nProjeto: ${projectName}\nEmail: ${proposal.client_email || 'N/A'}\nTelefone: ${proposal.client_phone || 'N/A'}\n\n⚠️ Esta é apenas uma pré-reserva. O estúdio só será bloqueado após a aprovação do orçamento.`,
+      start: { date: startDate.toISOString().split('T')[0] },
+      end: { date: endDate.toISOString().split('T')[0] },
+      colorId: '5', // Yellow for pre-reserve
+      transparency: 'transparent' // Doesn't block the time
+    };
+
+    const response = await fetch(createUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${tokens.access_token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(eventData)
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      console.error('Failed to create pre-reserve event:', data);
+      throw new Error(data.error?.message || 'Failed to create pre-reserve event');
+    }
+
+    console.log(`[Calendar] Pre-reserve event created: ${data.id} for ${clientName} - ${projectName}`);
+    return { success: true, eventId: data.id, htmlLink: data.htmlLink };
+  } catch (error) {
+    console.error('[Calendar] Error creating pre-reserve event:', error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Check if there's already a confirmed booking for any date in the range
+ * Returns { hasConflict: boolean, conflictingEvents: array }
+ */
+async function checkConfirmedBookingConflict(startDate, endDate) {
+  try {
+    const tokens = await getGoogleAuth(['https://www.googleapis.com/auth/calendar.readonly']);
+
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(endDate || startDate);
+    end.setHours(23, 59, 59, 999);
+
+    // List events in the date range
+    const listUrl = new URL(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events`);
+    listUrl.searchParams.set('timeMin', start.toISOString());
+    listUrl.searchParams.set('timeMax', end.toISOString());
+    listUrl.searchParams.set('singleEvents', 'true');
+    listUrl.searchParams.set('orderBy', 'startTime');
+
+    const response = await fetch(listUrl.toString(), {
+      headers: {
+        'Authorization': `Bearer ${tokens.access_token}`
+      }
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      console.error('Failed to check calendar events:', data);
+      throw new Error(data.error?.message || 'Failed to check calendar');
+    }
+
+    // Filter for confirmed bookings only
+    const confirmedEvents = (data.items || []).filter(event =>
+      event.summary && event.summary.startsWith(CALENDAR_PREFIX_CONFIRMED)
+    );
+
+    return {
+      hasConflict: confirmedEvents.length > 0,
+      conflictingEvents: confirmedEvents.map(e => ({
+        id: e.id,
+        summary: e.summary,
+        start: e.start?.date || e.start?.dateTime,
+        end: e.end?.date || e.end?.dateTime
+      }))
+    };
+  } catch (error) {
+    console.error('[Calendar] Error checking booking conflicts:', error.message);
+    // In case of error, allow the booking to proceed but log the issue
+    return { hasConflict: false, error: error.message };
+  }
+}
+
+/**
+ * Create a confirmed booking calendar event (when a quote is approved)
+ * This blocks the date - only one confirmed booking per date allowed
+ */
+async function createConfirmedBookingEvent(proposal) {
+  try {
+    const tokens = await getGoogleAuth(['https://www.googleapis.com/auth/calendar.events']);
+    const createUrl = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events`;
+
+    const clientName = proposal.client_name || 'Cliente';
+    const projectName = proposal.project_name || 'Projeto';
+    const startDate = new Date(proposal.shooting_dates_start);
+    const endDate = proposal.shooting_dates_end ? new Date(proposal.shooting_dates_end) : new Date(startDate);
+
+    // Add one day to end date for all-day event (Google Calendar quirk)
+    endDate.setDate(endDate.getDate() + 1);
+
+    const totalPrice = proposal.total_price ? `R$ ${Number(proposal.total_price).toLocaleString('pt-BR')}` : 'N/A';
+
+    const eventData = {
+      summary: `${CALENDAR_PREFIX_CONFIRMED} ${clientName} - ${projectName}`,
+      description: `Gravação confirmada!\n\nCliente: ${clientName}\nProjeto: ${projectName}\nEmail: ${proposal.client_email || 'N/A'}\nTelefone: ${proposal.client_phone || 'N/A'}\nValor: ${totalPrice}\n\n✅ Estúdio reservado e confirmado.`,
+      start: { date: startDate.toISOString().split('T')[0] },
+      end: { date: endDate.toISOString().split('T')[0] },
+      colorId: '10', // Green for confirmed
+      transparency: 'opaque' // Blocks the time
+    };
+
+    const response = await fetch(createUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${tokens.access_token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(eventData)
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      console.error('Failed to create confirmed booking event:', data);
+      throw new Error(data.error?.message || 'Failed to create confirmed booking event');
+    }
+
+    console.log(`[Calendar] Confirmed booking event created: ${data.id} for ${clientName} - ${projectName}`);
+    return { success: true, eventId: data.id, htmlLink: data.htmlLink };
+  } catch (error) {
+    console.error('[Calendar] Error creating confirmed booking event:', error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Delete a pre-reserve event (optional - when quote is approved, we might want to remove the pre-reserve)
+ */
+async function deleteCalendarEvent(eventId) {
+  try {
+    if (!eventId) return { success: true };
+
+    const tokens = await getGoogleAuth(['https://www.googleapis.com/auth/calendar.events']);
+    const deleteUrl = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events/${eventId}`;
+
+    const response = await fetch(deleteUrl, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${tokens.access_token}`
+      }
+    });
+
+    if (!response.ok && response.status !== 404) {
+      const data = await response.json();
+      throw new Error(data.error?.message || 'Failed to delete event');
+    }
+
+    console.log(`[Calendar] Event deleted: ${eventId}`);
+    return { success: true };
+  } catch (error) {
+    console.error('[Calendar] Error deleting event:', error.message);
+    return { success: false, error: error.message };
+  }
+}
+
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
@@ -1697,10 +1884,27 @@ app.post('/api/save-proposal', async (req, res) => {
       // Don't fail the proposal creation if email fails
     }
 
+    // Create pre-reserve calendar event (if shooting dates are provided)
+    let calendarResult = null;
+    if (data.shooting_dates_start) {
+      try {
+        calendarResult = await createPreReserveEvent(data);
+        if (calendarResult.success) {
+          console.log(`[save-proposal] Pre-reserve calendar event created for proposal ${data.id}`);
+        } else {
+          console.warn(`[save-proposal] Failed to create pre-reserve event: ${calendarResult.error}`);
+        }
+      } catch (calendarError) {
+        console.warn('Calendar event creation failed but proposal was saved:', calendarError.message);
+        // Don't fail the proposal creation if calendar fails
+      }
+    }
+
     res.status(201).json({
       success: true,
       message: 'Proposal saved successfully',
-      data: data
+      data: data,
+      calendar: calendarResult
     });
 
   } catch (error) {
@@ -2966,7 +3170,7 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
       return res.status(400).json({ error: 'Quote slug is required' });
     }
 
-    // First, check if quote exists and is not already approved
+    // First, get the complete quote data (need shooting dates for conflict check)
     let existingQuote = null;
     let fetchError = null;
 
@@ -2974,7 +3178,7 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
       const id = slug.replace('quote-', '');
       const { data, error } = await supabaseAdmin
         .from('proposals')
-        .select('id, quote_approved, project_name, client_email')
+        .select('*')
         .eq('id', id)
         .single();
       existingQuote = data;
@@ -2982,7 +3186,7 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
     } else {
       const { data, error } = await supabaseAdmin
         .from('proposals')
-        .select('id, quote_approved, project_name, client_email')
+        .select('*')
         .eq('quote_url_slug', slug)
         .single();
       existingQuote = data;
@@ -2997,15 +3201,35 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
       return res.status(400).json({ error: 'Quote has already been approved' });
     }
 
-    // Update quote with approval using RPC (works without service key)
+    // Check for confirmed booking conflicts on the shooting dates
+    if (existingQuote.shooting_dates_start) {
+      console.log(`[quote-approval] Checking calendar conflicts for dates: ${existingQuote.shooting_dates_start} to ${existingQuote.shooting_dates_end || existingQuote.shooting_dates_start}`);
+
+      const conflictCheck = await checkConfirmedBookingConflict(
+        existingQuote.shooting_dates_start,
+        existingQuote.shooting_dates_end || existingQuote.shooting_dates_start
+      );
+
+      if (conflictCheck.hasConflict) {
+        console.log(`[quote-approval] Date conflict found! Blocking approval for quote ${existingQuote.id}`);
+        return res.status(409).json({
+          error: 'date_conflict',
+          message: 'Esta data já está reservada para outra gravação. Um especialista entrará em contato para encontrar uma nova data disponível.',
+          conflictingEvents: conflictCheck.conflictingEvents,
+          portugueseMessage: 'Infelizmente, a data selecionada já foi confirmada para outro projeto. Nossa equipe entrará em contato em breve para ajudá-lo a encontrar uma data alternativa.'
+        });
+      }
+    }
+
+    // No conflict - proceed with approval
     const approvedAt = new Date().toISOString();
     console.log(`Attempting to approve quote ID: ${existingQuote.id}, IP: ${clientIP}`);
 
     const updateQuery = `
-      UPDATE proposals 
-      SET quote_approved = true, 
-          quote_approved_at = NOW(), 
-          quote_approval_ip = '${clientIP.replace(/'/g, "''")}', 
+      UPDATE proposals
+      SET quote_approved = true,
+          quote_approved_at = NOW(),
+          quote_approval_ip = '${clientIP.replace(/'/g, "''")}',
           status = 'approved'
       WHERE id = '${existingQuote.id}'
     `;
@@ -3018,7 +3242,23 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
       return res.status(500).json({ error: 'Failed to approve quote', details: updateError.message });
     }
 
-    // Get the complete quote data for the response
+    // Create confirmed booking calendar event
+    let calendarResult = null;
+    if (existingQuote.shooting_dates_start) {
+      try {
+        calendarResult = await createConfirmedBookingEvent(existingQuote);
+        if (calendarResult.success) {
+          console.log(`[quote-approval] Confirmed booking calendar event created for quote ${existingQuote.id}`);
+        } else {
+          console.warn(`[quote-approval] Failed to create confirmed booking event: ${calendarResult.error}`);
+        }
+      } catch (calendarError) {
+        console.warn('Calendar event creation failed but quote was approved:', calendarError.message);
+        // Don't fail the approval if calendar fails
+      }
+    }
+
+    // Get the updated quote data for the response
     let completeQuote = null;
     if (slug.startsWith('quote-')) {
       const id = slug.replace('quote-', '');
@@ -3044,7 +3284,8 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
       success: true,
       message: 'Quote approved successfully',
       approvedAt: approvedAt,
-      quote: completeQuote
+      quote: completeQuote,
+      calendar: calendarResult
     });
 
   } catch (error) {
