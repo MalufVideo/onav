@@ -113,9 +113,31 @@ window.authProtection = {
   protectRoute
 };
 
-// Auto-run route protection if DOM is already loaded
+// Listen for authReady event for faster initialization
+let authProtectionInitialized = false;
+window.addEventListener('authReady', () => {
+  if (!authProtectionInitialized) {
+    authProtectionInitialized = true;
+    console.log('[auth-protection.js] Received authReady event, running protectRoute');
+    protectRoute();
+  }
+});
+
+// Fallback: Auto-run route protection if DOM is already loaded
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
-  setTimeout(() => protectRoute(), 500);
+  setTimeout(() => {
+    if (!authProtectionInitialized) {
+      authProtectionInitialized = true;
+      protectRoute();
+    }
+  }, 500);
 } else {
-  document.addEventListener('DOMContentLoaded', () => setTimeout(() => protectRoute(), 500));
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      if (!authProtectionInitialized) {
+        authProtectionInitialized = true;
+        protectRoute();
+      }
+    }, 500);
+  });
 }
