@@ -59,13 +59,9 @@ async function getGoogleAuth(scopes) {
     key: normalizedKey,
     scopes: scopes,
   });
-  email: client_email,
-    key: normalizedKey,
-      scopes: scopes,
-  });
 
-const tokens = await jwtClient.authorize();
-return tokens;
+  const tokens = await jwtClient.authorize();
+  return tokens;
 }
 
 // Initialize Supabase client
