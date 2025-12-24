@@ -2431,7 +2431,7 @@ app.post('/api/check-availability', async (req, res) => {
     const tokens = await jwtClient.authorize();
 
     // Query FreeBusy via REST API
-    const freeBusyUrl = 'https://www.googleapis.com/calendar/v3/freeBusy/query';
+    const freeBusyUrl = 'https://www.googleapis.com/calendar/v3/freeBusy';
     const freeBusyRes = await fetch(freeBusyUrl, {
       method: 'POST',
       headers: {
@@ -2488,7 +2488,14 @@ app.post('/api/test-create-event', async (req, res) => {
     const client_email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || (googleCreds && googleCreds.client_email);
     const private_key = process.env.GOOGLE_PRIVATE_KEY || (googleCreds && googleCreds.private_key);
 
-    const normalizedKey = private_key.replace(/\\n/g, '\n').trim();
+    let normalizedKey = private_key;
+    if (normalizedKey && normalizedKey.includes('\\n')) {
+      normalizedKey = normalizedKey.replace(/\\n/g, '\n');
+    }
+    normalizedKey = normalizedKey.trim();
+    if (normalizedKey.startsWith('"') && normalizedKey.endsWith('"')) {
+      normalizedKey = normalizedKey.substring(1, normalizedKey.length - 1);
+    }
 
     const jwtClient = new JWT({
       email: client_email,
