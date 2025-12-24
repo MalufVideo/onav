@@ -5,7 +5,7 @@ const SUPABASE_URL = 'https://qhhjvpsxkfjcxitpnhxi.supabase.co';
 let SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1ODk4NzksImV4cCI6MjA1NTE2NTg3OX0.kAcBsHJnlr56fJ6qvXSLOWRiLTnQR7ilXUi_2Qzj4RE';
 const SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczOTU4OTg3OSwiZXhwIjoyMDU1MTY1ODc5fQ.z2VbGSyj6HCxtFyji69JX9uoBw1fRPWM74YSZisdDCU';
 
-let supabase = null;
+let supabaseClient = null;
 let supabaseAdmin = null;
 
 async function initSupabase() {
@@ -23,7 +23,7 @@ async function initSupabase() {
         console.warn('[Dashboard] Failed to fetch key, using fallback:', e);
     }
 
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
         auth: { autoRefreshToken: false, persistSession: false }
     });
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Authentication
 async function checkAuth() {
     console.log('[Dashboard] Checking authentication...');
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
 
     if (authError) {
         console.error('[Dashboard] Auth error:', authError);
@@ -78,7 +78,7 @@ async function checkAuth() {
 
     // Get user profile
     try {
-        const { data: profile, error } = await supabase
+        const { data: profile, error } = await supabaseClient
             .from('user_profiles')
             .select('*')
             .eq('id', user.id)
@@ -110,7 +110,7 @@ async function checkAuth() {
 
     // Update last login time for this user
     try {
-        const { error: updateError } = await supabase
+        const { error: updateError } = await supabaseClient
             .from('user_profiles')
             .update({
                 last_login_at: new Date().toISOString(),
@@ -142,7 +142,7 @@ async function checkAuth() {
                 const missingUsers = authUsers.users.filter(u => !profileIds.has(u.id));
 
                 for (const user of missingUsers) {
-                    const { error } = await supabase
+                    const { error } = await supabaseClient
                         .from('user_profiles')
                         .insert({
                             id: user.id,
@@ -217,7 +217,7 @@ function initializeEventListeners() {
     });
 
     logoutBtn.addEventListener('click', async () => {
-        await supabase.auth.signOut();
+        await supabaseClient.auth.signOut();
         window.location.href = '/admin/login';
     });
 
@@ -313,7 +313,7 @@ async function loadQuotesPage() {
     try {
         const response = await fetch('/api/proposals?context=dashboard', {
             headers: {
-                'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+                'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session?.access_token}`
             }
         });
 
@@ -447,7 +447,7 @@ async function loadUsersPage() {
         if (userProfile?.role === 'admin') {
             try {
                 // Use API endpoint with proper authentication
-                const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+                const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
                 console.log('Session data:', sessionData);
                 console.log('Session error:', sessionError);
                 console.log('Session status:', sessionData?.session ? 'Active' : 'No session');
@@ -478,7 +478,7 @@ async function loadUsersPage() {
                     // If unauthorized, try to refresh session
                     if (response.status === 401) {
                         console.log('Attempting to refresh session...');
-                        const { data: refreshedSession } = await supabase.auth.refreshSession();
+                        const { data: refreshedSession } = await supabaseClient.auth.refreshSession();
                         if (refreshedSession?.session) {
                             console.log('Session refreshed, retrying auth API call...');
                             const retryResponse = await fetch('/api/users/auth-data', {
@@ -503,7 +503,7 @@ async function loadUsersPage() {
         }
 
         // Get user profiles
-        const { data: profiles, error: profileError } = await supabase
+        const { data: profiles, error: profileError } = await supabaseClient
             .from('user_profiles')
             .select('*')
             .order('created_at', { ascending: false });
@@ -599,7 +599,7 @@ async function loadUsersPage() {
 
 async function loadCalendarPage() {
     pageTitle.textContent = 'Calendário de Eventos';
-    const { data: events } = await supabase.from('proposals').select('*').not('shooting_dates_start', 'is', null);
+    const { data: events } = await supabaseClient.from('proposals').select('*').not('shooting_dates_start', 'is', null);
     pageContent.innerHTML = `
         <div class="calendar-container">
             <div class="calendar-header">
@@ -782,7 +782,7 @@ async function generateRecentActivities() {
 
 // Quote/Lead Actions
 async function viewLeadDetails(leadId) {
-    const { data: lead } = await supabase.from('proposals').select('*').eq('id', leadId).single();
+    const { data: lead } = await supabaseClient.from('proposals').select('*').eq('id', leadId).single();
     if (!lead) return;
     const content = document.getElementById('leadDetailsContent');
     content.innerHTML = `
@@ -802,13 +802,13 @@ async function viewLeadDetails(leadId) {
 }
 
 async function editQuote(quoteId) {
-    const { data: quote } = await supabase.from('proposals').select('*').eq('id', quoteId).single();
+    const { data: quote } = await supabaseClient.from('proposals').select('*').eq('id', quoteId).single();
     if (!quote) return;
 
     // Get quote history for this proposal using direct Supabase query
     let historyData = [];
     try {
-        const { data: history, error } = await supabase
+        const { data: history, error } = await supabaseClient
             .from('quote_history')
             .select('*')
             .eq('proposal_id', quoteId)
@@ -1072,7 +1072,7 @@ function calculateNewTotal(originalTotal) {
 }
 
 async function approveQuote(quoteId) {
-    const { error } = await supabase.from('proposals').update({ status: 'approved' }).eq('id', quoteId);
+    const { error } = await supabaseClient.from('proposals').update({ status: 'approved' }).eq('id', quoteId);
     if (error) showToast('Erro ao aprovar orçamento', 'error');
     else {
         showToast('Orçamento aprovado!', 'success');
@@ -1081,7 +1081,7 @@ async function approveQuote(quoteId) {
 }
 
 async function rejectQuote(quoteId) {
-    const { error } = await supabase.from('proposals').update({ status: 'rejected' }).eq('id', quoteId);
+    const { error } = await supabaseClient.from('proposals').update({ status: 'rejected' }).eq('id', quoteId);
     if (error) showToast('Erro ao rejeitar orçamento', 'error');
     else {
         showToast('Orçamento rejeitado.', 'info');
@@ -1094,7 +1094,7 @@ async function viewQuoteDetails(quoteId) {
     console.log('viewQuoteDetails called with ID:', quoteId);
     try {
         console.log('Fetching quote from database...');
-        const { data: quote, error } = await supabase.from('proposals').select('*').eq('id', quoteId).single();
+        const { data: quote, error } = await supabaseClient.from('proposals').select('*').eq('id', quoteId).single();
         if (error) {
             console.error('Database error:', error);
             throw error;
@@ -1129,7 +1129,7 @@ async function viewQuoteHistory(quoteId) {
         const historyData = await response.json();
 
         // Also fetch the current proposal data for context
-        const { data: quote, error } = await supabase.from('proposals').select('*').eq('id', quoteId).single();
+        const { data: quote, error } = await supabaseClient.from('proposals').select('*').eq('id', quoteId).single();
         if (error) throw error;
 
         showQuoteHistoryModal(quote, historyData);
@@ -1709,7 +1709,7 @@ async function loadQuoteUrl(quoteId) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+                'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session?.access_token}`
             }
         });
 
@@ -2029,7 +2029,7 @@ function loadNotifications() {
 }
 
 function startRealtimeSubscriptions() {
-    supabase.channel('public:proposals')
+    supabaseClient.channel('public:proposals')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'proposals' }, payload => {
             showToast(`Novo lead recebido: ${payload.new.client_name}`, 'info');
             addNotification({ type: 'info', message: `Novo lead de ${payload.new.client_name}` });
@@ -2216,7 +2216,7 @@ function initializeNewQuoteModal() {
 
 async function checkExistingClient(email) {
     try {
-        const { data: session } = await supabase.auth.getSession();
+        const { data: session } = await supabaseClient.auth.getSession();
         if (!session?.session?.access_token) {
             throw new Error('No valid session');
         }
@@ -2378,7 +2378,7 @@ async function handleClientSelection() {
     }
 
     try {
-        const { data: session } = await supabase.auth.getSession();
+        const { data: session } = await supabaseClient.auth.getSession();
         if (!session?.session?.access_token) {
             throw new Error('No valid session');
         }
@@ -2560,7 +2560,7 @@ async function handleQuoteSubmissionFromCalculator(quoteData) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${await supabase.auth.getSession().then(s => s.data.session?.access_token)}`
+                'Authorization': `Bearer ${await supabaseClient.auth.getSession().then(s => s.data.session?.access_token)}`
             },
             body: JSON.stringify(completeQuoteData)
         });
@@ -3003,7 +3003,7 @@ async function saveUser(event, userId) {
     try {
         if (userId) {
             // Update existing user
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from("user_profiles")
                 .update({
                     full_name: userData.full_name,
@@ -3049,7 +3049,7 @@ async function deleteUser(userId) {
     }
 
     try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) {
             throw new Error('Not authenticated');
         }
@@ -3086,7 +3086,7 @@ async function deleteUser(userId) {
 async function toggleUserStatus(userId) {
     try {
         // Get current user status
-        const { data: user, error: fetchError } = await supabase
+        const { data: user, error: fetchError } = await supabaseClient
             .from("user_profiles")
             .select("is_active")
             .eq("id", userId)
@@ -3096,7 +3096,7 @@ async function toggleUserStatus(userId) {
 
         // Toggle status
         const newStatus = !user.is_active;
-        const { error } = await supabase
+        const { error } = await supabaseClient
             .from("user_profiles")
             .update({
                 is_active: newStatus,
@@ -3245,7 +3245,7 @@ async function saveQuoteChanges(event, quoteId, originalTotal) {
             last_modified_by: currentUser?.email || 'admin'
         };
 
-        const { error } = await supabase
+        const { error } = await supabaseClient
             .from('proposals')
             .update(updateData)
             .eq('id', quoteId);
@@ -3269,7 +3269,7 @@ async function saveQuoteChanges(event, quoteId, originalTotal) {
             created_at: new Date().toISOString()
         };
 
-        const { error: historyError } = await supabase
+        const { error: historyError } = await supabaseClient
             .from('quote_history')
             .insert([historyEntry]);
 
@@ -3293,7 +3293,7 @@ async function saveQuoteChanges(event, quoteId, originalTotal) {
 async function createUserProfile(userId) {
     try {
         // Get the auth user data via API
-        const { data: session } = await supabase.auth.getSession();
+        const { data: session } = await supabaseClient.auth.getSession();
         const response = await fetch('/api/users/auth-data', {
             headers: {
                 'Authorization': `Bearer ${session?.session?.access_token}`
@@ -3325,7 +3325,7 @@ async function createUserProfile(userId) {
         };
 
         // Insert the profile
-        const { data: profile, error: profileError } = await supabase
+        const { data: profile, error: profileError } = await supabaseClient
             .from('user_profiles')
             .insert([profileData])
             .select()
