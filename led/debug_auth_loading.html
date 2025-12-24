@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Loading Debugger</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #111;
+            color: #0f0;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 2px;
+        }
+
+        .error {
+            color: #f55;
+        }
+
+        .success {
+            color: #5f5;
+            font-weight: bold;
+        }
+
+        .warning {
+            color: #fa0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Auth Loading Debugger</h1>
+    <div id="log"></div>
+
+    <script>
+        function log(msg, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `log-entry ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            document.getElementById('log').appendChild(div);
+            console.log(msg);
+        }
+
+        window.onerror = function (msg, url, line, col, error) {
+            log(`Global Error: ${msg} at ${url}:${line}:${col}`, 'error');
+        };
+
+        log('Starting debug sequence...');
+
+        if (window.supabase) {
+            log('Supabase JS library loaded successfully.', 'success');
+        } else {
+            log('Supabase JS library NOT found!', 'error');
+        }
+    </script>
+
+    <script>log('Loading auth-config.js...');</script>
+    <script src="auth-config.js" onload="log('auth-config.js loaded.')"
+        onerror="log('Failed to load auth-config.js', 'error')"></script>
+
+    <script>
+        log('Checking strict execution order... auth-config should be done?');
+        if (typeof window.SUPABASE_KEY !== 'undefined') {
+            log(`SUPABASE_KEY is defined: ${window.SUPABASE_KEY.substring(0, 5)}...`, 'success');
+        } else {
+            log('SUPABASE_KEY is undefined (async fetch might be pending, or simple failure).', 'warning');
+        }
+
+        log('Loading auth.js...');
+    </script>
+    <script src="auth.js" onload="log('auth.js loaded.')" onerror="log('Failed to load auth.js', 'error')"></script>
+
+    <script>
+        log('Verifying window.auth...');
+        if (window.auth) {
+            log('window.auth is DEFINED.', 'success');
+            log(`Contains methods: ${Object.keys(window.auth).join(', ')}`);
+
+            // Try initialization
+            log('Attempting window.auth.initAuth()...');
+            window.auth.initAuth().then(() => {
+                log('initAuth returned.', 'success');
+            }).catch(e => {
+                log(`initAuth failed: ${e.message}`, 'error');
+            });
+
+        } else {
+            log('window.auth is UNDEFINED. Current global scope vars:', 'error');
+            // List globals to see if something shadowed it?
+        }
+    </script>
+
+    <script>
+        log('Loading auth-ui.js...');
+    </script>
+    <script src="auth-ui.js" onload="log('auth-ui.js loaded.')"
+        onerror="log('Failed to load auth-ui.js', 'error')"></script>
+
+    <script>
+        log('Final check...');
+        if (window.authUI) {
+            log('window.authUI is DEFINED.', 'success');
+        } else {
+            log('window.authUI is UNDEFINED.', 'error');
+        }
+    </script>
+</body>
+
+</html>
