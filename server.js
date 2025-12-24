@@ -457,6 +457,11 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'dashboard.html'));
 });
 
+// Route to serve the admin login page
+app.get('/admin/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin', 'login.html'));
+});
+
 // Route to serve the main index.html page for root path
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));

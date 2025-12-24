@@ -7,10 +7,10 @@ const SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3Mi
 // Create both clients: anon for regular operations, service role for admin operations
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
-  }
+    auth: {
+        autoRefreshToken: false,
+        persistSession: false
+    }
 });
 
 // Global state
@@ -45,11 +45,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function checkAuth() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-        window.location.href = '/led/login.html';
+        window.location.href = '/admin/login';
         return;
     }
     currentUser = user;
-    
+
     // Get user profile
     try {
         const { data: profile, error } = await supabase
@@ -57,11 +57,11 @@ async function checkAuth() {
             .select('*')
             .eq('id', user.id)
             .single();
-        
+
         if (error) {
             console.warn('User profile not found, checking if master admin');
             // Special handling for master admin
-            if (user.email === 'nelson.maluf@onprojecoes.com.br') {
+            if (user.email === 'nelson.maluf@onprojecoes.com.br' || user.email === 'nelsonhdvideo@gmail.com') {
                 userProfile = { role: 'admin', full_name: 'Nelson Maluf (Master Admin)' };
             } else {
                 userProfile = { role: 'end_user', full_name: user.email };
@@ -69,7 +69,7 @@ async function checkAuth() {
         } else {
             userProfile = profile;
             // Ensure master admin always has admin role
-            if (user.email === 'nelson.maluf@onprojecoes.com.br') {
+            if (user.email === 'nelson.maluf@onprojecoes.com.br' || user.email === 'nelsonhdvideo@gmail.com') {
                 userProfile.role = 'admin';
             }
         }
@@ -77,44 +77,44 @@ async function checkAuth() {
         console.warn('Error fetching user profile:', error);
         userProfile = { role: 'end_user', full_name: user.email };
     }
-    
+
     // Update UI based on role
     document.getElementById('userName').textContent = userProfile.full_name || user.email.split('@')[0];
     setupRoleBasedUI();
-    
+
     // Update last login time for this user
     try {
         const { error: updateError } = await supabase
             .from('user_profiles')
-            .update({ 
+            .update({
                 last_login_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
             })
             .eq('id', user.id);
-        
+
         if (updateError) {
             console.warn('Could not update admin last login:', updateError);
         }
     } catch (updateError) {
         console.warn('Error updating admin last login:', updateError);
     }
-    
+
     // Add admin functions for user management
-    if (userProfile?.role === 'admin' && user.email === 'nelson.maluf@onprojecoes.com.br') {
+    if (userProfile?.role === 'admin' && (user.email === 'nelson.maluf@onprojecoes.com.br' || user.email === 'nelsonhdvideo@gmail.com')) {
         window.syncMissingProfiles = async () => {
             try {
                 // Find users in auth.users that don't have profiles
                 const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
                 if (authError) throw authError;
-                
+
                 const { data: profiles, error: profileError } = await supabase
                     .from('user_profiles')
                     .select('id');
                 if (profileError) throw profileError;
-                
+
                 const profileIds = new Set(profiles.map(p => p.id));
                 const missingUsers = authUsers.users.filter(u => !profileIds.has(u.id));
-                
+
                 for (const user of missingUsers) {
                     const { error } = await supabase
                         .from('user_profiles')
@@ -124,10 +124,10 @@ async function checkAuth() {
                             full_name: user.email.split('@')[0],
                             role: 'end_user'
                         });
-                    
+
                     if (error) console.error('Error creating profile for', user.email, error);
                 }
-                
+
                 showToast(`Synced ${missingUsers.length} missing user profiles!`, 'success');
                 if (currentPage === 'users') loadPage('users'); // Refresh if on users page
             } catch (error) {
@@ -135,7 +135,7 @@ async function checkAuth() {
                 showToast('Error syncing profiles: ' + error.message, 'error');
             }
         };
-        
+
         console.log('Admin functions loaded. Run syncMissingProfiles() to sync any missing user profiles');
     }
 }
@@ -143,10 +143,10 @@ async function checkAuth() {
 // Setup UI based on user role
 function setupRoleBasedUI() {
     const adminOnlyElements = document.querySelectorAll('.admin-only');
-    
+
     console.log('Setting up role-based UI for:', userProfile);
     console.log('Admin-only elements found:', adminOnlyElements.length);
-    
+
     if (userProfile?.role === 'admin') {
         // Ensure admin elements are visible
         adminOnlyElements.forEach(element => {
@@ -192,7 +192,7 @@ function initializeEventListeners() {
 
     logoutBtn.addEventListener('click', async () => {
         await supabase.auth.signOut();
-        window.location.href = '/led/login.html';
+        window.location.href = '/admin/login';
     });
 
     document.querySelectorAll('.modal-close, [data-modal-close]').forEach(btn => {
@@ -201,14 +201,14 @@ function initializeEventListeners() {
             closeModal(modalId);
         });
     });
-    
+
     const settingsModal = document.getElementById('settingsModal');
     if (settingsModal) {
         const crmType = settingsModal.querySelector('#crmType');
         if (crmType) {
             crmType.addEventListener('change', (e) => {
                 const apiKeyGroup = settingsModal.querySelector('#crmApiKeyGroup');
-                if(apiKeyGroup) apiKeyGroup.style.display = e.target.value ? 'block' : 'none';
+                if (apiKeyGroup) apiKeyGroup.style.display = e.target.value ? 'block' : 'none';
             });
         }
     }
@@ -260,7 +260,8 @@ async function loadOverviewPage() {
 
 async function loadLeadsPage() {
     pageTitle.textContent = 'Gerenciamento de Leads';
-    const { data: leads } = await supabase.from('proposals').select('*').order('created_at', { ascending: false });
+    // USE ADMIN CLIENT TO SEE ALL LEADS
+    const { data: leads } = await supabaseAdmin.from('proposals').select('*').order('created_at', { ascending: false });
     pageContent.innerHTML = `
         <div class="data-table">
             <div class="table-header">
@@ -280,7 +281,7 @@ async function loadLeadsPage() {
 
 async function loadQuotesPage() {
     pageTitle.textContent = 'Gerenciamento de Orçamentos';
-    
+
     // Use API endpoint with role-based filtering instead of direct Supabase query
     let quotes = [];
     try {
@@ -289,7 +290,7 @@ async function loadQuotesPage() {
                 'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
             }
         });
-        
+
         if (response.ok) {
             quotes = await response.json();
         } else {
@@ -300,7 +301,7 @@ async function loadQuotesPage() {
         console.error('Error fetching quotes:', error);
         showToast('Erro ao carregar orçamentos', 'error');
     }
-    
+
     pageContent.innerHTML = `
         <div class="data-table">
             <div class="table-header">
@@ -315,10 +316,10 @@ async function loadQuotesPage() {
                 <tbody id="quotesTableBody">${generateQuotesTable(quotes)}</tbody>
             </table>
         </div>`;
-    
+
     // Add event listeners for the action buttons
     document.getElementById('statusFilter').addEventListener('change', (e) => filterTableByStatus('quotesTableBody', e.target.value));
-    
+
     // Add event listeners for quote action buttons
     const tableBody = document.getElementById('quotesTableBody');
     if (tableBody) {
@@ -329,7 +330,7 @@ async function loadQuotesPage() {
                 console.log('No button found');
                 return;
             }
-            
+
             console.log('Button found:', button);
             const quoteId = button.getAttribute('data-quote-id');
             console.log('Quote ID:', quoteId);
@@ -337,7 +338,7 @@ async function loadQuotesPage() {
                 console.log('No quote ID found');
                 return;
             }
-            
+
             if (button.classList.contains('view-quote-btn')) {
                 console.log('Calling viewQuoteDetails with ID:', quoteId);
                 viewQuoteDetails(quoteId);
@@ -354,7 +355,7 @@ async function loadQuotesPage() {
 
 async function loadProductsPage() {
     pageTitle.textContent = 'Gerenciamento de Produtos';
-    
+
     // Fetch products from Express API instead of Supabase directly
     let products = [];
     try {
@@ -369,7 +370,7 @@ async function loadProductsPage() {
         console.error('Error fetching products:', error);
         showToast('Erro ao carregar produtos', 'error');
     }
-    
+
     pageContent.innerHTML = `
         <div class="data-table">
             <div class="table-header">
@@ -381,7 +382,7 @@ async function loadProductsPage() {
                 <tbody id="productsTableBody">${generateProductsTable(products)}</tbody>
             </table>
         </div>`;
-    
+
     // Add event listener for the add product button
     const addProductBtn = document.getElementById('addProductBtn');
     if (addProductBtn) {
@@ -389,17 +390,17 @@ async function loadProductsPage() {
             openProductModal();
         });
     }
-    
+
     // Add event listeners for the product action buttons
     const tableBody = document.getElementById('productsTableBody');
     if (tableBody) {
         tableBody.addEventListener('click', (e) => {
             const button = e.target.closest('button');
             if (!button) return;
-            
+
             const productId = button.getAttribute('data-id');
             if (!productId) return;
-            
+
             if (button.classList.contains('edit-btn') || button.innerHTML.includes('fa-edit')) {
                 openProductModal(productId);
             } else if (button.classList.contains('delete-btn') || button.innerHTML.includes('fa-trash')) {
@@ -411,7 +412,7 @@ async function loadProductsPage() {
 
 async function loadUsersPage() {
     pageTitle.textContent = 'Gerenciamento de Usuários';
-    
+
     // Fetch users from Supabase with auth data
     let users = [];
     try {
@@ -424,15 +425,15 @@ async function loadUsersPage() {
                 console.log('Session data:', sessionData);
                 console.log('Session error:', sessionError);
                 console.log('Session status:', sessionData?.session ? 'Active' : 'No session');
-                
+
                 if (!sessionData?.session?.access_token) {
                     console.warn('No access token available for auth API call');
                     console.log('Session details:', sessionData);
                     return;
                 }
-                
+
                 console.log('Making API call with token length:', sessionData.session.access_token.length);
-                
+
                 const response = await fetch('/api/users/auth-data', {
                     method: 'GET',
                     headers: {
@@ -440,14 +441,14 @@ async function loadUsersPage() {
                         'Content-Type': 'application/json'
                     }
                 });
-                
+
                 if (response.ok) {
                     authUsers = await response.json();
                     console.log(`Found ${authUsers.length} users in auth via API`);
                 } else {
                     const errorData = await response.text();
                     console.warn('Auth API error:', response.status, errorData);
-                    
+
                     // If unauthorized, try to refresh session
                     if (response.status === 401) {
                         console.log('Attempting to refresh session...');
@@ -461,7 +462,7 @@ async function loadUsersPage() {
                                     'Content-Type': 'application/json'
                                 }
                             });
-                            
+
                             if (retryResponse.ok) {
                                 authUsers = await retryResponse.json();
                                 console.log(`Found ${authUsers.length} users in auth via API (after refresh)`);
@@ -474,21 +475,21 @@ async function loadUsersPage() {
                 showToast('Erro ao carregar dados de autenticação', 'error');
             }
         }
-        
+
         // Get user profiles
         const { data: profiles, error: profileError } = await supabase
             .from('user_profiles')
             .select('*')
             .order('created_at', { ascending: false });
-        
+
         if (profileError && profileError.code !== 'PGRST116') { // PGRST116 means table doesn't exist or no rows
             console.warn('Error fetching profiles:', profileError);
         }
-        
+
         // Start with all auth users and merge profile data when available
         users = authUsers.map(authUser => {
             const profile = profiles?.find(p => p.id === authUser.id);
-            
+
             return {
                 id: authUser.id,
                 email: authUser.email,
@@ -509,15 +510,15 @@ async function loadUsersPage() {
                 created_at: profile?.created_at || authUser.created_at
             };
         });
-        
+
         // Sort by creation date (newest first)
         users.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-        
+
     } catch (error) {
         console.error('Error fetching users:', error);
         showToast('Erro ao carregar usuários', 'error');
     }
-    
+
     pageContent.innerHTML = `
         <div class="data-table">
             <div class="table-header">
@@ -540,7 +541,7 @@ async function loadUsersPage() {
                 <tbody id="usersTableBody">${generateUsersTable(users)}</tbody>
             </table>
         </div>`;
-    
+
     // Add event listener for the add user button
     const addUserBtn = document.getElementById('addUserBtn');
     if (addUserBtn) {
@@ -548,17 +549,17 @@ async function loadUsersPage() {
             openUserModal();
         });
     }
-    
+
     // Add event listeners for user action buttons
     const tableBody = document.getElementById('usersTableBody');
     if (tableBody) {
         tableBody.addEventListener('click', (e) => {
             const button = e.target.closest('button');
             if (!button) return;
-            
+
             const userId = button.getAttribute('data-user-id');
             if (!userId) return;
-            
+
             if (button.classList.contains('edit-user-btn')) {
                 openUserModal(userId);
             } else if (button.classList.contains('create-profile-btn')) {
@@ -621,11 +622,13 @@ async function loadSettingsPage() {
 async function fetchDashboardStats() {
     const today = new Date();
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1).toISOString();
-    const { data: leads } = await supabase.from('proposals').select('id').gte('created_at', firstDayOfMonth);
-    const { data: pending } = await supabase.from('proposals').select('id').eq('status', 'pending');
-    const { data: total } = await supabase.from('proposals').select('id');
-    const { data: approved } = await supabase.from('proposals').select('id').eq('status', 'approved');
-    const { data: revenueData } = await supabase.from('proposals').select('total_price').eq('status', 'approved').gte('created_at', firstDayOfMonth);
+
+    // USE ADMIN CLIENT FOR DASHBOARD STATS TO ENSURE VISIBILITY
+    const { data: leads } = await supabaseAdmin.from('proposals').select('id').gte('created_at', firstDayOfMonth);
+    const { data: pending } = await supabaseAdmin.from('proposals').select('id').eq('status', 'pending');
+    const { data: total } = await supabaseAdmin.from('proposals').select('id');
+    const { data: approved } = await supabaseAdmin.from('proposals').select('id').eq('status', 'approved');
+    const { data: revenueData } = await supabaseAdmin.from('proposals').select('total_price').eq('status', 'approved').gte('created_at', firstDayOfMonth);
     const revenue = revenueData?.reduce((sum, q) => sum + (parseFloat(q.total_price?.replace(/[^\d,]/g, '').replace(',', '.')) || 0), 0) || 0;
     return {
         newLeads: leads?.length || 0,
@@ -654,7 +657,7 @@ function generateLeadsTable(leads) {
 function getSalesRepName(quote) {
     // First try the direct field
     if (quote.sales_rep_name) return quote.sales_rep_name;
-    
+
     // Then try to extract from discount_description JSON
     try {
         if (quote.discount_description) {
@@ -665,14 +668,14 @@ function getSalesRepName(quote) {
         // Ignore JSON parse errors
         console.log('Error parsing sales rep data for quote:', quote.id, e);
     }
-    
+
     // Debug: log the quote data to see what we have
     console.log('Sales rep debug for quote:', quote.id, {
         sales_rep_name: quote.sales_rep_name,
         discount_description: quote.discount_description,
         all_quote_data: quote
     });
-    
+
     return '';
 }
 
@@ -693,7 +696,7 @@ function getExtendedQuoteData(quote) {
         led_teto_total_pixels: null,
         led_teto_resolution: null
     };
-    
+
     try {
         if (quote.discount_description) {
             const data = JSON.parse(quote.discount_description);
@@ -702,7 +705,7 @@ function getExtendedQuoteData(quote) {
     } catch (e) {
         // Ignore JSON parse errors
     }
-    
+
     return defaultData;
 }
 
@@ -740,7 +743,8 @@ function generateProductsTable(products) {
 }
 
 async function generateRecentActivities() {
-    const { data } = await supabase.from('proposals').select('*').order('created_at', { ascending: false }).limit(5);
+    // USE ADMIN CLIENT FOR ACTIVITIES
+    const { data } = await supabaseAdmin.from('proposals').select('*').order('created_at', { ascending: false }).limit(5);
     if (!data || data.length === 0) return '<tr><td colspan="5" class="text-center">Nenhuma atividade recente</td></tr>';
     return data.map(act => `
         <tr>
@@ -774,7 +778,7 @@ async function viewLeadDetails(leadId) {
 async function editQuote(quoteId) {
     const { data: quote } = await supabase.from('proposals').select('*').eq('id', quoteId).single();
     if (!quote) return;
-    
+
     // Get quote history for this proposal using direct Supabase query
     let historyData = [];
     try {
@@ -783,27 +787,27 @@ async function editQuote(quoteId) {
             .select('*')
             .eq('proposal_id', quoteId)
             .order('created_at', { ascending: false });
-        
+
         if (!error && history) {
             historyData = history;
         }
     } catch (error) {
         console.error('Error loading quote history:', error);
     }
-    
+
     const content = document.getElementById('quoteEditContent');
     const originalTotal = parseFloat((quote.original_total_price || quote.total_price)?.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
     const currentTotal = parseFloat(quote.total_price?.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
-    
+
     // Calculate current discount values to pre-fill the form
     const currentDiscountPercentage = quote.discount_percentage || 0;
     const currentDiscountAmount = quote.discount_amount || 0;
     const currentDiscountReason = quote.discount_reason || '';
-    
+
     // Determine discount type and value from current state
     let discountType = 'percentage';
     let discountValue = 0;
-    
+
     if (currentDiscountPercentage > 0) {
         discountType = 'percentage';
         discountValue = currentDiscountPercentage;
@@ -811,7 +815,7 @@ async function editQuote(quoteId) {
         discountType = 'fixed';
         discountValue = currentDiscountAmount;
     }
-    
+
     // Generate history timeline
     const historyTimeline = historyData.length > 0 ? historyData.map((entry, index) => {
         const isLatest = index === 0;
@@ -821,14 +825,14 @@ async function editQuote(quoteId) {
             'status_changed': 'Status Alterado',
             'quote_updated': 'Orçamento Atualizado'
         };
-        
+
         const formatDate = (dateString) => {
             if (!dateString) return 'N/A';
             try {
                 const date = new Date(dateString);
-                return date.toLocaleString('pt-BR', { 
-                    day: '2-digit', 
-                    month: '2-digit', 
+                return date.toLocaleString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
                     year: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit'
@@ -837,7 +841,7 @@ async function editQuote(quoteId) {
                 return dateString;
             }
         };
-        
+
         const formatCurrency = (value) => {
             if (typeof value === 'string' && value.trim().startsWith('R$')) {
                 return value;
@@ -852,12 +856,12 @@ async function editQuote(quoteId) {
                 minimumFractionDigits: 2
             }).format(numberValue);
         };
-        
-        const discountInfo = entry.discount_type && entry.discount_value ? 
+
+        const discountInfo = entry.discount_type && entry.discount_value ?
             `<strong>Desconto:</strong> ${entry.discount_type === 'percentage' ? entry.discount_value + '%' : formatCurrency(entry.discount_value)}<br>` : '';
-        
+
         const reasonInfo = entry.discount_reason ? `<strong>Motivo:</strong> ${entry.discount_reason}<br>` : '';
-        
+
         return `
             <div class="history-entry ${isLatest ? 'latest' : ''}" style="
                 border-left: 4px solid ${isLatest ? '#28a745' : '#6c757d'}; 
@@ -900,7 +904,7 @@ async function editQuote(quoteId) {
             </div>
         `;
     }).join('') : '<p style="text-align: center; color: #6c757d; padding: 40px;">Nenhum histórico disponível para este orçamento.</p>';
-    
+
     content.innerHTML = `
         <form id="editQuoteForm" onsubmit="saveQuoteChanges(event, '${quoteId}', ${originalTotal})">
             <h3>Editar Orçamento #${quote.id.substring(0, 8)}</h3>
@@ -951,9 +955,9 @@ async function editQuote(quoteId) {
                 <input type="number" id="discountValue" class="form-control" min="0" step="0.01" value="${discountValue}" oninput="calculateNewTotal(${originalTotal})">
                 <small class="form-help">
                     <span id="discountAmountDisplay" style="color: #dc3545; font-weight: 500;">
-                        ${discountType === 'percentage' && discountValue > 0 ? 
-                            `R$ ${((originalTotal * discountValue) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 
-                            ''}
+                        ${discountType === 'percentage' && discountValue > 0 ?
+            `R$ ${((originalTotal * discountValue) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` :
+            ''}
                     </span>
                 </small>
             </div>
@@ -979,10 +983,10 @@ async function editQuote(quoteId) {
                 <button type="button" class="btn btn-secondary" onclick="closeModal('quoteEditModal')">Cancelar</button>
             </div>
         </form>`;
-    
+
     // Calculate initial total display
     setTimeout(() => calculateNewTotal(originalTotal), 100);
-    
+
     openModal('quoteEditModal');
 }
 
@@ -992,7 +996,7 @@ async function saveQuoteChanges(event, quoteId, originalTotal) {
     const discountType = document.getElementById('discountType').value;
     const discountValue = parseFloat(document.getElementById('discountValue').value) || 0;
     const discountReason = document.getElementById('discountReason').value;
-    
+
     try {
         // Call the server API endpoint which handles both discount application and email sending
         const response = await fetch(`/api/proposals/${quoteId}/apply-discount`, {
@@ -1017,7 +1021,7 @@ async function saveQuoteChanges(event, quoteId, originalTotal) {
 
         // Show success message
         showToast('Orçamento atualizado com sucesso! E-mail de desconto enviado.', 'success');
-        
+
         closeModal('quoteEditModal');
         loadPage(currentPage);
 
@@ -1074,7 +1078,7 @@ async function viewQuoteDetails(quoteId) {
             showToast('Orçamento não encontrado', 'error');
             return;
         }
-        
+
         console.log('Quote found:', quote);
         showQuoteDetailsModal(quote);
     } catch (error) {
@@ -1095,13 +1099,13 @@ async function viewQuoteHistory(quoteId) {
         if (!response.ok) {
             throw new Error('Failed to fetch quote history');
         }
-        
+
         const historyData = await response.json();
-        
+
         // Also fetch the current proposal data for context
         const { data: quote, error } = await supabase.from('proposals').select('*').eq('id', quoteId).single();
         if (error) throw error;
-        
+
         showQuoteHistoryModal(quote, historyData);
     } catch (error) {
         console.error('Error loading quote history:', error);
@@ -1122,9 +1126,9 @@ function showQuoteHistoryModal(quote, historyData) {
         if (!dateString) return 'N/A';
         try {
             const date = new Date(dateString);
-            return date.toLocaleString('pt-BR', { 
-                day: '2-digit', 
-                month: '2-digit', 
+            return date.toLocaleString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
                 year: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit'
@@ -1162,9 +1166,9 @@ function showQuoteHistoryModal(quote, historyData) {
             'quote_updated': 'Orçamento Atualizado'
         };
 
-        const discountInfo = entry.discount_type && entry.discount_value ? 
+        const discountInfo = entry.discount_type && entry.discount_value ?
             `<strong>Desconto:</strong> ${entry.discount_type === 'percentage' ? entry.discount_value + '%' : formatCurrency(entry.discount_value)}<br>` : '';
-        
+
         const reasonInfo = entry.discount_reason ? `<strong>Motivo:</strong> ${entry.discount_reason}<br>` : '';
 
         return `
@@ -1257,10 +1261,10 @@ function showQuoteHistoryModal(quote, historyData) {
                 <div>
                     <strong>Desconto Total:</strong><br>
                     <span style="font-size: 1.1rem; color: #dc3545;">
-                        ${totalDiscountPercentage > 0 ? 
-                            `${totalDiscountPercentage.toFixed(1)}% (${formatCurrency(totalDiscountAmount)})` : 
-                            'Nenhum desconto aplicado'
-                        }
+                        ${totalDiscountPercentage > 0 ?
+            `${totalDiscountPercentage.toFixed(1)}% (${formatCurrency(totalDiscountAmount)})` :
+            'Nenhum desconto aplicado'
+        }
                     </span>
                 </div>
                 <div>
@@ -1350,18 +1354,18 @@ function showQuoteDetailsModal(quote) {
     // Helper function for formatting currency
     const formatCurrencyHelper = (value) => {
         let numberValue;
-        
+
         if (typeof value === 'string' && value.trim().startsWith('R$')) {
             const numStr = value.replace('R$', '').trim();
             numberValue = parseFloat(numStr.replace(/\./g, '').replace(',', '.'));
         } else {
             numberValue = Number(value);
         }
-        
+
         if (isNaN(numberValue)) {
             return 'R$ 0,00';
         }
-        
+
         return new Intl.NumberFormat('pt-BR', {
             style: 'currency',
             currency: 'BRL',
@@ -1393,7 +1397,7 @@ function showQuoteDetailsModal(quote) {
                 const unit_price = service.unit_price || 0;
                 const subtotal = quantity * unit_price;
                 dailySubtotalSum += subtotal;
-                
+
                 serviceItems.push({
                     name: name,
                     quantity: quantity,
@@ -1417,7 +1421,7 @@ function showQuoteDetailsModal(quote) {
 
     // Safely parse and process services
     let servicesProcessed = false;
-    
+
     // First try the direct field
     if (quote.selected_services) {
         if (typeof quote.selected_services === 'string') {
@@ -1433,7 +1437,7 @@ function showQuoteDetailsModal(quote) {
             servicesProcessed = true;
         }
     }
-    
+
     // If not found, try to get services from discount_description JSON
     if (!servicesProcessed && quote.discount_description) {
         try {
@@ -1446,7 +1450,7 @@ function showQuoteDetailsModal(quote) {
             console.log('Error parsing services from discount_description:', e);
         }
     }
-    
+
     // If still no services found, show empty message
     if (!servicesProcessed) {
         serviceTableRowsHtml = '<tr><td colspan="4" style="padding: 10px; text-align: center; border-bottom: 1px solid #dee2e6;">Nenhum serviço adicionado</td></tr>';
@@ -1467,7 +1471,7 @@ function showQuoteDetailsModal(quote) {
 
     // Get extended data from JSON
     const extendedData = getExtendedQuoteData(quote);
-    
+
     // Debug: log the quote data to see what we have
     console.log('Quote details debug:', {
         quote_id: quote.id,
@@ -1476,7 +1480,7 @@ function showQuoteDetailsModal(quote) {
         selected_services: quote.selected_services,
         full_quote: quote
     });
-    
+
     // LED Principal Data
     const ledPWidth = quote.led_principal_width || 'N/A';
     const ledPHeight = quote.led_principal_height || 'N/A';
@@ -1687,7 +1691,7 @@ async function loadQuoteUrl(quoteId) {
             const data = await response.json();
             const baseUrl = window.location.origin;
             currentQuoteUrl = `${baseUrl}/quote/${data.slug}`;
-            
+
             const urlInput = document.getElementById('quote-url-input');
             if (urlInput) {
                 urlInput.value = currentQuoteUrl;
@@ -1711,7 +1715,7 @@ async function loadQuoteUrl(quoteId) {
 async function copyQuoteUrl() {
     const urlInput = document.getElementById('quote-url-input');
     const copyBtn = document.getElementById('copy-url-btn');
-    
+
     if (!urlInput || !urlInput.value || urlInput.value.includes('Erro') || urlInput.value.includes('Gerando')) {
         showToast('Link não disponível', 'error');
         return;
@@ -1722,12 +1726,12 @@ async function copyQuoteUrl() {
         const originalText = copyBtn.innerHTML;
         copyBtn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
         copyBtn.style.backgroundColor = '#28a745';
-        
+
         setTimeout(() => {
             copyBtn.innerHTML = originalText;
             copyBtn.style.backgroundColor = '#28a745';
         }, 2000);
-        
+
         showToast('Link copiado para a área de transferência!', 'success');
     } catch (error) {
         console.error('Error copying to clipboard:', error);
@@ -1759,12 +1763,12 @@ function sendQuoteWhatsApp(clientPhone, quoteId) {
 
     // Clean phone number (remove non-digits)
     const cleanPhone = clientPhone.replace(/\D/g, '');
-    
+
     // Create WhatsApp message
     const message = `Olá! Sua proposta da ON+AV está pronta para visualização e aprovação. Acesse o link abaixo:\n\n${currentQuoteUrl}\n\nQualquer dúvida, estamos à disposição!`;
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/55${cleanPhone}?text=${encodedMessage}`;
-    
+
     window.open(whatsappUrl, '_blank');
 }
 
@@ -1784,13 +1788,13 @@ async function openProductModal(productId = null) {
             showToast('Erro ao carregar dados do produto', 'error');
         }
     }
-    
+
     // Update modal title
     const modalTitle = document.getElementById('productModalTitle');
     if (modalTitle) {
         modalTitle.textContent = productId ? 'Editar Produto' : 'Adicionar Produto';
     }
-    
+
     // Fill form fields
     const productIdInput = document.getElementById('productId');
     const productNameInput = document.getElementById('productName');
@@ -1798,28 +1802,28 @@ async function openProductModal(productId = null) {
     const productCategoryInput = document.getElementById('productCategory');
     const productPriceInput = document.getElementById('productPrice');
     const productUnitTypeInput = document.getElementById('productUnitType');
-    
+
     if (productIdInput) productIdInput.value = productId || '';
     if (productNameInput) productNameInput.value = product.name || '';
     if (productDescriptionInput) productDescriptionInput.value = product.description || '';
     if (productCategoryInput) productCategoryInput.value = product.category || '';
     if (productPriceInput) productPriceInput.value = product.price || 0;
     if (productUnitTypeInput) productUnitTypeInput.value = product.unit_type || 'per_day';
-    
+
     // Set up form submission handler
     const productForm = document.getElementById('productForm');
     if (productForm) {
         // Remove any existing listeners to avoid duplicates
         const newForm = productForm.cloneNode(true);
         productForm.parentNode.replaceChild(newForm, productForm);
-        
+
         newForm.addEventListener('submit', (event) => {
             event.preventDefault();
             const currentProductId = document.getElementById('productId').value;
             saveProduct(event, currentProductId || null);
         });
     }
-    
+
     openModal('productModal');
 }
 
@@ -1839,9 +1843,9 @@ async function saveProduct(event, productId) {
     try {
         const url = productId ? `/api/products/${productId}` : '/api/products';
         const method = productId ? 'PUT' : 'POST';
-        
+
         console.log('Making request to:', url, 'with method:', method);
-        
+
         const response = await fetch(url, {
             method: method,
             headers: {
@@ -1849,7 +1853,7 @@ async function saveProduct(event, productId) {
             },
             body: JSON.stringify(productData),
         });
-        
+
         console.log('Response status:', response.status);
         console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
@@ -1869,7 +1873,7 @@ async function saveProduct(event, productId) {
 
 async function deleteProduct(productId) {
     if (!confirm('Tem certeza que deseja excluir este produto?')) return;
-    
+
     try {
         const response = await fetch(`/api/products/${productId}`, {
             method: 'DELETE',
@@ -1892,16 +1896,16 @@ async function deleteProduct(productId) {
 function generateCalendar(events = []) {
     const calendarGrid = document.getElementById('calendarGrid');
     if (!calendarGrid) return;
-    
+
     calendarGrid.innerHTML = '';
     const month = currentCalendarDate.getMonth();
     const year = currentCalendarDate.getFullYear();
-    
+
     document.getElementById('currentMonth').textContent = `${currentCalendarDate.toLocaleString('pt-BR', { month: 'long' })} ${year}`;
-    
+
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
+
     const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
     daysOfWeek.forEach(day => {
         const dayHeader = document.createElement('div');
@@ -1918,12 +1922,12 @@ function generateCalendar(events = []) {
         const dayCell = document.createElement('div');
         dayCell.classList.add('calendar-day');
         dayCell.textContent = day;
-        
+
         const today = new Date();
         if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
             dayCell.classList.add('today');
         }
-        
+
         const cellDate = new Date(year, month, day);
         events.forEach(event => {
             const startDate = new Date(event.shooting_dates_start);
@@ -1935,7 +1939,7 @@ function generateCalendar(events = []) {
                 dayCell.appendChild(eventChip);
             }
         });
-        
+
         calendarGrid.appendChild(dayCell);
     }
 }
@@ -1955,7 +1959,7 @@ function generateUpcomingEvents(events) {
     const upcoming = events
         .filter(e => new Date(e.shooting_dates_start) >= new Date())
         .sort((a, b) => new Date(a.shooting_dates_start) - new Date(b.shooting_dates_start));
-    
+
     return upcoming.map(e => `
         <tr>
             <td>${e.project_name}</td><td>${e.client_name}</td>
@@ -2144,16 +2148,16 @@ function createNewQuote() {
                 </div>
             </div>
         </div>`;
-    
+
     // Remove existing modal if present
     const existingModal = document.getElementById('newQuoteModal');
     if (existingModal) {
         existingModal.remove();
     }
-    
+
     // Add modal to page
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
+
     // Initialize the modal functionality
     initializeNewQuoteModal();
 }
@@ -2168,7 +2172,7 @@ function closeNewQuoteModal() {
 function initializeNewQuoteModal() {
     const emailInput = document.getElementById('clientEmail');
     const clientForm = document.getElementById('clientSelectionForm');
-    
+
     // Add email input listener for auto-population
     emailInput.addEventListener('blur', async () => {
         const email = emailInput.value.trim();
@@ -2176,7 +2180,7 @@ function initializeNewQuoteModal() {
             await checkExistingClient(email);
         }
     });
-    
+
     // Handle form submission
     clientForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -2207,7 +2211,7 @@ async function checkExistingClient(email) {
         }
 
         const result = await response.json();
-        
+
         if (result.exists && result.profile) {
             // Check if current user is a sales rep and if this client belongs to them
             if (userProfile?.role === 'sales_rep') {
@@ -2217,11 +2221,11 @@ async function checkExistingClient(email) {
                         'Authorization': `Bearer ${session.session.access_token}`
                     }
                 });
-                
+
                 if (quotesResponse.ok) {
                     const salesRepQuotes = await quotesResponse.json();
                     const existingClientQuote = salesRepQuotes.find(quote => quote.user_id === result.user_id);
-                    
+
                     if (existingClientQuote) {
                         // Client belongs to this sales rep - allow normal flow
                         document.getElementById('clientName').value = result.profile.full_name || '';
@@ -2231,15 +2235,15 @@ async function checkExistingClient(email) {
                         document.getElementById('clientPassword').placeholder = 'Cliente já existe - senha não necessária';
                         document.getElementById('clientPassword').disabled = true;
                         document.getElementById('clientPassword').required = false;
-                        
+
                         // Store the user ID for later use
                         window.existingClientUserId = result.user_id;
-                        
+
                         showToast('Cliente encontrado! Dados preenchidos automaticamente.', 'success');
                     } else {
                         // Client exists but doesn't belong to this sales rep - redirect to calculator
                         closeNewQuoteModal();
-                        
+
                         // Store client info for the calculator
                         window.selectedClientForQuote = {
                             userId: result.user_id,
@@ -2249,10 +2253,10 @@ async function checkExistingClient(email) {
                             phone: result.profile.phone || '',
                             isNew: false
                         };
-                        
+
                         // Open the LED calculator modal directly
                         openLedCalculatorModal();
-                        
+
                         showToast('Cliente já existe no sistema. Redirecionando para a calculadora.', 'info');
                         return;
                     }
@@ -2265,10 +2269,10 @@ async function checkExistingClient(email) {
                     document.getElementById('clientPassword').placeholder = 'Cliente já existe - senha não necessária';
                     document.getElementById('clientPassword').disabled = true;
                     document.getElementById('clientPassword').required = false;
-                    
+
                     // Store the user ID for later use
                     window.existingClientUserId = result.user_id;
-                    
+
                     showToast('Cliente encontrado! Dados preenchidos automaticamente.', 'success');
                 }
             } else {
@@ -2280,16 +2284,16 @@ async function checkExistingClient(email) {
                 document.getElementById('clientPassword').placeholder = 'Cliente já existe - senha não necessária';
                 document.getElementById('clientPassword').disabled = true;
                 document.getElementById('clientPassword').required = false;
-                
+
                 // Store the user ID for later use
                 window.existingClientUserId = result.user_id;
-                
+
                 showToast('Cliente encontrado! Dados preenchidos automaticamente.', 'success');
             }
         } else if (result.exists && !result.profile) {
             // User exists in auth but no profile - redirect to calculator directly
             closeNewQuoteModal();
-            
+
             // Store client info for the calculator with basic info
             window.selectedClientForQuote = {
                 userId: result.user_id,
@@ -2299,10 +2303,10 @@ async function checkExistingClient(email) {
                 phone: '',
                 isNew: false
             };
-            
+
             // Open the LED calculator modal directly
             openLedCalculatorModal();
-            
+
             showToast('Cliente encontrado no sistema. Redirecionando para a calculadora.', 'info');
             return;
         } else {
@@ -2311,10 +2315,10 @@ async function checkExistingClient(email) {
             document.getElementById('clientPassword').disabled = false;
             document.getElementById('clientPassword').placeholder = 'Novo cliente - criar senha';
             document.getElementById('clientPassword').required = true;
-            
+
             // Clear any stored user ID
             window.existingClientUserId = null;
-            
+
             showToast('Novo cliente. Preencha todos os dados e crie uma senha.', 'info');
         }
     } catch (error) {
@@ -2341,12 +2345,12 @@ async function handleClientSelection() {
     const company = document.getElementById('clientCompany').value.trim();
     const phone = document.getElementById('clientPhone').value.trim();
     const password = document.getElementById('clientPassword').value.trim();
-    
+
     if (!email || !name) {
         showToast('Email e nome são obrigatórios.', 'error');
         return;
     }
-    
+
     try {
         const { data: session } = await supabase.auth.getSession();
         if (!session?.session?.access_token) {
@@ -2355,11 +2359,11 @@ async function handleClientSelection() {
 
         let clientUserId = null;
         let isNewClient = false;
-        
+
         if (window.existingClientUserId) {
             // User exists, update their profile
             clientUserId = window.existingClientUserId;
-            
+
             const response = await fetch('/api/update-user-profile', {
                 method: 'PUT',
                 headers: {
@@ -2379,7 +2383,7 @@ async function handleClientSelection() {
                 const error = await response.json();
                 throw new Error(error.error || 'Failed to update user profile');
             }
-            
+
             isNewClient = false;
         } else {
             // Create new user
@@ -2387,7 +2391,7 @@ async function handleClientSelection() {
                 showToast('Senha é obrigatória para novos clientes.', 'error');
                 return;
             }
-            
+
             const response = await fetch('/api/create-client-user', {
                 method: 'POST',
                 headers: {
@@ -2407,15 +2411,15 @@ async function handleClientSelection() {
                 const error = await response.json();
                 throw new Error(error.error || 'Failed to create client user');
             }
-            
+
             const result = await response.json();
             clientUserId = result.user_id;
             isNewClient = true;
         }
-        
+
         // Close the client modal and open the calculator
         closeNewQuoteModal();
-        
+
         // Store client info for the calculator
         window.selectedClientForQuote = {
             userId: clientUserId,
@@ -2425,12 +2429,12 @@ async function handleClientSelection() {
             phone: phone,
             isNew: isNewClient
         };
-        
+
         // Open the LED calculator modal
         openLedCalculatorModal();
-        
+
         showToast(isNewClient ? 'Novo cliente criado com sucesso!' : 'Cliente selecionado!', 'success');
-        
+
     } catch (error) {
         console.error('Error handling client selection:', error);
         showToast('Erro ao processar cliente: ' + error.message, 'error');
@@ -2456,10 +2460,10 @@ function openLedCalculatorModal() {
                 </div>
             </div>
         </div>`;
-    
+
     // Add modal to page
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
+
     // Initialize communication with iframe
     initializeCalculatorCommunication();
 }
@@ -2478,7 +2482,7 @@ function initializeCalculatorCommunication() {
     window.addEventListener('message', async (event) => {
         // Make sure the message is from our LED calculator
         if (event.origin !== window.location.origin) return;
-        
+
         if (event.data.type === 'QUOTE_READY_FOR_SUBMISSION') {
             // The LED calculator is ready to submit the quote
             await handleQuoteSubmissionFromCalculator(event.data.quoteData);
@@ -2501,7 +2505,7 @@ async function handleQuoteSubmissionFromCalculator(quoteData) {
             showToast('Informações do cliente não encontradas.', 'error');
             return;
         }
-        
+
         // Debug log to see what IDs we have
         console.log('Quote submission debug:', {
             selectedClient: window.selectedClientForQuote,
@@ -2524,7 +2528,7 @@ async function handleQuoteSubmissionFromCalculator(quoteData) {
         };
 
         console.log('Complete quote data to submit:', completeQuoteData);
-        
+
         // Save the quote using the existing quote service functionality
         const response = await fetch('/api/save-proposal', {
             method: 'POST',
@@ -2534,19 +2538,19 @@ async function handleQuoteSubmissionFromCalculator(quoteData) {
             },
             body: JSON.stringify(completeQuoteData)
         });
-        
+
         if (response.ok) {
             const result = await response.json();
             showToast('Orçamento criado com sucesso!', 'success');
-            
+
             // Close the calculator modal
             closeLedCalculatorModal();
-            
+
             // Refresh the quotes page if we're on it
             if (currentPage === 'quotes') {
                 await loadQuotesPage();
             }
-            
+
             // Optionally show the created quote
             if (result.data?.id) {
                 setTimeout(() => {
@@ -2562,8 +2566,8 @@ async function handleQuoteSubmissionFromCalculator(quoteData) {
         showToast('Erro ao salvar orçamento: ' + error.message, 'error');
     }
 }
-function sendWhatsApp(phone) { 
-    if(phone) {
+function sendWhatsApp(phone) {
+    if (phone) {
         window.open(`https://wa.me/${phone.replace(/\D/g, '')}`, '_blank');
     } else {
         showToast('Número de telefone não disponível.', 'error');
@@ -2573,78 +2577,78 @@ function sendWhatsApp(phone) {
 // Users Page
 async function loadUsersPage() {
     pageTitle.textContent = "Gerenciamento de Usuários";
-    
+
     try {
         // Get user profiles
         const { data: users, error } = await supabase
             .from("user_profiles")
             .select("*")
             .order("created_at", { ascending: false });
-        
+
         if (error) throw error;
-        
+
         // Get auth data for last sign-in information via server API
         let usersWithAuthData = users;
         try {
             // Get current session token for authentication
             const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
             console.log('Session available for auth API:', !!sessionData?.session?.access_token);
-            
+
             if (!sessionData?.session?.access_token) {
                 console.warn('No session token available for auth API call, showing only users with profiles');
                 // Continue with just the users from profiles table
             } else {
-            
-            const response = await fetch('/api/users/auth-data', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${sessionData.session.access_token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            console.log('Auth API response status:', response.status);
-            
-            if (response.ok) {
-                const authData = await response.json();
-                console.log('Auth data received:', authData.length, 'auth users');
-                
-                // Merge user profiles with auth data AND include auth-only users
-                const mergedUsers = users.map(user => {
-                    const authUser = authData.find(auth => auth.id === user.id);
-                    return {
-                        ...user,
-                        last_sign_in_at: authUser?.last_sign_in_at,
-                        raw_user_meta_data: authUser?.raw_user_meta_data || authUser?.user_metadata
-                    };
+
+                const response = await fetch('/api/users/auth-data', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${sessionData.session.access_token}`,
+                        'Content-Type': 'application/json'
+                    }
                 });
-                
-                // Add auth users who don't have profiles yet
-                const authOnlyUsers = authData.filter(authUser => 
-                    !users.find(user => user.id === authUser.id)
-                ).map(authUser => ({
-                    id: authUser.id,
-                    email: authUser.email,
-                    full_name: authUser.raw_user_meta_data?.full_name || authUser.user_metadata?.full_name || null,
-                    role: 'end_user', // Default role for new users
-                    is_active: true,
-                    created_at: authUser.created_at,
-                    last_sign_in_at: authUser.last_sign_in_at,
-                    raw_user_meta_data: authUser.raw_user_meta_data || authUser.user_metadata,
-                    hasProfile: false // Flag to indicate this user needs a profile
-                }));
-                
-                usersWithAuthData = [...mergedUsers, ...authOnlyUsers];
-                console.log('Total users after merge:', usersWithAuthData.length, 'profiles +', authOnlyUsers.length, 'auth-only');
-            } else {
-                const errorText = await response.text();
-                console.warn('Could not fetch auth data from server:', response.status, errorText);
-            }
+
+                console.log('Auth API response status:', response.status);
+
+                if (response.ok) {
+                    const authData = await response.json();
+                    console.log('Auth data received:', authData.length, 'auth users');
+
+                    // Merge user profiles with auth data AND include auth-only users
+                    const mergedUsers = users.map(user => {
+                        const authUser = authData.find(auth => auth.id === user.id);
+                        return {
+                            ...user,
+                            last_sign_in_at: authUser?.last_sign_in_at,
+                            raw_user_meta_data: authUser?.raw_user_meta_data || authUser?.user_metadata
+                        };
+                    });
+
+                    // Add auth users who don't have profiles yet
+                    const authOnlyUsers = authData.filter(authUser =>
+                        !users.find(user => user.id === authUser.id)
+                    ).map(authUser => ({
+                        id: authUser.id,
+                        email: authUser.email,
+                        full_name: authUser.raw_user_meta_data?.full_name || authUser.user_metadata?.full_name || null,
+                        role: 'end_user', // Default role for new users
+                        is_active: true,
+                        created_at: authUser.created_at,
+                        last_sign_in_at: authUser.last_sign_in_at,
+                        raw_user_meta_data: authUser.raw_user_meta_data || authUser.user_metadata,
+                        hasProfile: false // Flag to indicate this user needs a profile
+                    }));
+
+                    usersWithAuthData = [...mergedUsers, ...authOnlyUsers];
+                    console.log('Total users after merge:', usersWithAuthData.length, 'profiles +', authOnlyUsers.length, 'auth-only');
+                } else {
+                    const errorText = await response.text();
+                    console.warn('Could not fetch auth data from server:', response.status, errorText);
+                }
             }
         } catch (authError) {
             console.warn('Error fetching auth data:', authError);
         }
-        
+
         pageContent.innerHTML = `
             <div class="data-table">
                 <div class="table-header">
@@ -2679,27 +2683,27 @@ async function loadUsersPage() {
                     </tbody>
                 </table>
             </div>`;
-            
+
         // Add event listeners
-        document.getElementById("searchUsers").addEventListener("input", (e) => 
+        document.getElementById("searchUsers").addEventListener("input", (e) =>
             filterTable("usersTableBody", e.target.value));
-        
-        document.getElementById("addUserBtn").addEventListener("click", () => 
+
+        document.getElementById("addUserBtn").addEventListener("click", () =>
             openUserModal());
-        
-        document.getElementById("syncPhoneBtn").addEventListener("click", () => 
+
+        document.getElementById("syncPhoneBtn").addEventListener("click", () =>
             syncPhoneNumbers());
-        
+
         // Add event listeners for user action buttons
         const tableBody = document.getElementById("usersTableBody");
         if (tableBody) {
             tableBody.addEventListener("click", (e) => {
                 const button = e.target.closest("button");
                 if (!button) return;
-                
+
                 const userId = button.getAttribute("data-user-id");
                 if (!userId) return;
-                
+
                 if (button.classList.contains("edit-user-btn")) {
                     openUserModal(userId);
                 } else if (button.classList.contains("delete-user-btn")) {
@@ -2709,7 +2713,7 @@ async function loadUsersPage() {
                 }
             });
         }
-        
+
     } catch (error) {
         console.error("Error loading users:", error);
         showToast("Erro ao carregar usuários", "error");
@@ -2721,32 +2725,32 @@ function generateUsersTable(users) {
     if (!users || users.length === 0) {
         return "<tr><td colspan=\"8\" class=\"text-center\">Nenhum usuário encontrado</td></tr>";
     }
-    
+
     return users.map(user => {
         const roleLabel = getRoleLabel(user.role);
-        
+
         // Format phone number
         let phoneNumber = user.phone || "N/A";
-        
+
         // Format last login - use the most recent between profile and auth data
-        const lastSignIn = user.last_sign_in_at ? 
+        const lastSignIn = user.last_sign_in_at ?
             new Date(user.last_sign_in_at).toLocaleString('pt-BR', {
                 day: '2-digit',
-                month: '2-digit', 
+                month: '2-digit',
                 year: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit'
             }) : "Nunca logou";
-        
+
         // Status indicators
-        const emailConfirmed = user.email_confirmed_at ? 
-            '<span style="color: green;" title="Email confirmado"><i class="fas fa-check-circle"></i></span>' : 
+        const emailConfirmed = user.email_confirmed_at ?
+            '<span style="color: green;" title="Email confirmado"><i class="fas fa-check-circle"></i></span>' :
             '<span style="color: orange;" title="Email não confirmado"><i class="fas fa-exclamation-circle"></i></span>';
-        
-        const profileStatus = user.has_profile ? 
-            '<span style="color: blue;" title="Tem perfil"><i class="fas fa-user-check"></i></span>' : 
+
+        const profileStatus = user.has_profile ?
+            '<span style="color: blue;" title="Tem perfil"><i class="fas fa-user-check"></i></span>' :
             '<span style="color: gray;" title="Sem perfil"><i class="fas fa-user-plus"></i></span>';
-        
+
         return `
             <tr data-status="${user.is_active ? "active" : "inactive"}" ${!user.has_profile ? 'style="background-color: #fff3cd;"' : ''}>
                 <td>
@@ -2805,14 +2809,14 @@ function getRoleLabel(role) {
 }
 
 async function openUserModal(userId = null) {
-    let user = { 
-        full_name: "", 
-        email: "", 
-        phone: "", 
-        role: "end_user", 
-        is_active: true 
+    let user = {
+        full_name: "",
+        email: "",
+        phone: "",
+        role: "end_user",
+        is_active: true
     };
-    
+
     if (userId) {
         try {
             // First try to get from user_profiles table
@@ -2821,12 +2825,12 @@ async function openUserModal(userId = null) {
                 .select("*")
                 .eq("id", userId)
                 .single();
-            
+
             if (error && error.code !== 'PGRST116') {
                 // PGRST116 means no rows found, which is expected for auth-only users
                 throw error;
             }
-            
+
             if (userData) {
                 user = userData;
             } else {
@@ -2839,7 +2843,7 @@ async function openUserModal(userId = null) {
                         'Content-Type': 'application/json'
                     }
                 });
-                
+
                 if (response.ok) {
                     const authData = await response.json();
                     const authUser = authData.find(auth => auth.id === userId);
@@ -2862,7 +2866,7 @@ async function openUserModal(userId = null) {
             return;
         }
     }
-    
+
     // Create modal content dynamically
     const modalHTML = `
         <div class="modal" id="userModal">
@@ -2916,33 +2920,33 @@ async function openUserModal(userId = null) {
                 </div>
             </div>
         </div>`;
-    
+
     // Remove existing modal if present
     const existingModal = document.getElementById("userModal");
     if (existingModal) {
         existingModal.remove();
     }
-    
+
     // Add modal to page
     document.body.insertAdjacentHTML("beforeend", modalHTML);
-    
+
     // Add event listeners
     const modal = document.getElementById("userModal");
     const userForm = document.getElementById("userForm");
-    
+
     // Form submission
     userForm.addEventListener("submit", (e) => saveUser(e, userId));
-    
+
     // Modal close buttons
     modal.querySelectorAll(".modal-close, [data-modal-close]").forEach(btn => {
         btn.addEventListener("click", () => closeUserModal());
     });
-    
+
     // Close on backdrop click
     modal.addEventListener("click", (e) => {
         if (e.target === modal) closeUserModal();
     });
-    
+
     // Show modal
     modal.classList.add("active");
 }
@@ -2957,7 +2961,7 @@ function closeUserModal() {
 
 async function saveUser(event, userId) {
     event.preventDefault();
-    
+
     const userData = {
         full_name: document.getElementById("userFullName").value,
         email: document.getElementById("userEmail").value,
@@ -2965,11 +2969,11 @@ async function saveUser(event, userId) {
         role: document.getElementById("userRole").value,
         is_active: document.getElementById("userActive").checked
     };
-    
+
     if (!userId) {
         userData.password = document.getElementById("userPassword").value;
     }
-    
+
     try {
         if (userId) {
             // Update existing user
@@ -2983,7 +2987,7 @@ async function saveUser(event, userId) {
                     updated_at: new Date().toISOString()
                 })
                 .eq("id", userId);
-            
+
             if (error) throw error;
             showToast("Usuário atualizado com sucesso!", "success");
         } else {
@@ -2995,18 +2999,18 @@ async function saveUser(event, userId) {
                 },
                 body: JSON.stringify(userData),
             });
-            
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || "Falha ao criar usuário");
             }
-            
+
             showToast("Usuário criado com sucesso!", "success");
         }
-        
+
         closeUserModal();
         loadPage("users");
-        
+
     } catch (error) {
         console.error("Error saving user:", error);
         showToast(`Erro ao salvar usuário: ${error.message}`, "error");
@@ -3017,7 +3021,7 @@ async function deleteUser(userId) {
     if (!confirm("Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.")) {
         return;
     }
-    
+
     try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
@@ -3039,14 +3043,14 @@ async function deleteUser(userId) {
 
         const result = await response.json();
         console.log('User deletion result:', result);
-        
-        const message = result.deletedFromAuth 
-            ? "Usuário excluído com sucesso do sistema e autenticação!" 
+
+        const message = result.deletedFromAuth
+            ? "Usuário excluído com sucesso do sistema e autenticação!"
             : "Usuário excluído do sistema (perfil removido)!";
-        
+
         showToast(message, "success");
         loadPage("users");
-        
+
     } catch (error) {
         console.error("Error deleting user:", error);
         showToast(`Erro ao excluir usuário: ${error.message}`, "error");
@@ -3061,24 +3065,24 @@ async function toggleUserStatus(userId) {
             .select("is_active")
             .eq("id", userId)
             .single();
-        
+
         if (fetchError) throw fetchError;
-        
+
         // Toggle status
         const newStatus = !user.is_active;
         const { error } = await supabase
             .from("user_profiles")
-            .update({ 
+            .update({
                 is_active: newStatus,
                 updated_at: new Date().toISOString()
             })
             .eq("id", userId);
-        
+
         if (error) throw error;
-        
+
         showToast(`Usuário ${newStatus ? "ativado" : "desativado"} com sucesso!`, "success");
         loadPage("users");
-        
+
     } catch (error) {
         console.error("Error toggling user status:", error);
         showToast(`Erro ao alterar status do usuário: ${error.message}`, "error");
@@ -3092,7 +3096,7 @@ async function syncPhoneNumbers() {
         const originalText = syncBtn.innerHTML;
         syncBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sincronizando...';
         syncBtn.disabled = true;
-        
+
         // Call the sync endpoint
         const response = await fetch('/api/users/sync-phone-numbers', {
             method: 'POST',
@@ -3100,25 +3104,25 @@ async function syncPhoneNumbers() {
                 'Content-Type': 'application/json'
             }
         });
-        
+
         const result = await response.json();
-        
+
         if (!response.ok) {
             throw new Error(result.error || 'Failed to sync phone numbers');
         }
-        
+
         // Show success message
         let message = result.message;
         if (result.errors && result.errors.length > 0) {
             message += ` (${result.errors.length} erros encontrados)`;
             console.warn('Sync errors:', result.errors);
         }
-        
+
         showToast(message, "success");
-        
+
         // Reload the users page to show updated data
         loadPage("users");
-        
+
     } catch (error) {
         console.error("Error syncing phone numbers:", error);
         showToast(`Erro ao sincronizar telefones: ${error.message}`, "error");
@@ -3137,11 +3141,11 @@ function calculateNewTotal(originalTotal) {
     const discountType = document.getElementById('discountType')?.value;
     const discountValue = parseFloat(document.getElementById('discountValue')?.value) || 0;
     const newTotalElement = document.getElementById('newTotal');
-    
+
     if (!newTotalElement) return;
-    
+
     let newTotal = originalTotal;
-    
+
     if (discountType === 'percentage') {
         // Global percentage discount
         const discountAmount = (originalTotal * discountValue) / 100;
@@ -3150,13 +3154,13 @@ function calculateNewTotal(originalTotal) {
         // Fixed amount discount
         newTotal = originalTotal - discountValue;
     }
-    
+
     // Ensure total doesn't go below zero
     newTotal = Math.max(0, newTotal);
-    
+
     // Update display
     newTotalElement.textContent = `R$ ${newTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-    
+
     // Update discount amount display if percentage
     if (discountType === 'percentage') {
         const discountAmountDisplay = document.getElementById('discountAmountDisplay');
@@ -3169,17 +3173,17 @@ function calculateNewTotal(originalTotal) {
 
 async function saveQuoteChanges(event, quoteId, originalTotal) {
     event.preventDefault();
-    
+
     try {
         const status = document.getElementById('quoteStatus')?.value;
         const discountType = document.getElementById('discountType')?.value;
         const discountValue = parseFloat(document.getElementById('discountValue')?.value) || 0;
         const discountReason = document.getElementById('discountReason')?.value || '';
-        
+
         let newTotalPrice = originalTotal;
         let discountPercentage = 0;
         let discountAmount = 0;
-        
+
         if (discountValue > 0) {
             if (discountType === 'percentage') {
                 // Global percentage discount
@@ -3193,17 +3197,17 @@ async function saveQuoteChanges(event, quoteId, originalTotal) {
                 newTotalPrice = originalTotal - discountValue;
             }
         }
-        
+
         // Ensure total doesn't go below zero
         newTotalPrice = Math.max(0, newTotalPrice);
-        
+
         // Format the final price as currency string
         const formattedFinalPrice = new Intl.NumberFormat('pt-BR', {
             style: 'currency',
             currency: 'BRL',
             minimumFractionDigits: 2
         }).format(newTotalPrice);
-        
+
         // Update the proposal
         const updateData = {
             status: status,
@@ -3214,14 +3218,14 @@ async function saveQuoteChanges(event, quoteId, originalTotal) {
             last_modified_at: new Date().toISOString(),
             last_modified_by: currentUser?.email || 'admin'
         };
-        
+
         const { error } = await supabase
             .from('proposals')
             .update(updateData)
             .eq('id', quoteId);
-            
+
         if (error) throw error;
-        
+
         // Create history entry
         const historyEntry = {
             proposal_id: quoteId,
@@ -3238,21 +3242,21 @@ async function saveQuoteChanges(event, quoteId, originalTotal) {
             change_description: `Orçamento atualizado: ${discountType === 'percentage' ? discountValue + '%' : 'R$ ' + discountValue} desconto aplicado`,
             created_at: new Date().toISOString()
         };
-        
+
         const { error: historyError } = await supabase
             .from('quote_history')
             .insert([historyEntry]);
-            
+
         if (historyError) {
             console.warn('Failed to create history entry:', historyError);
         }
-        
+
         showToast('Orçamento atualizado com sucesso!', 'success');
         closeModal('quoteEditModal');
-        
+
         // Reload the current page to show updated data
         loadPage(currentPage);
-        
+
     } catch (error) {
         console.error('Error saving quote changes:', error);
         showToast('Erro ao salvar alterações: ' + error.message, 'error');
@@ -3269,19 +3273,19 @@ async function createUserProfile(userId) {
                 'Authorization': `Bearer ${session?.session?.access_token}`
             }
         });
-        
+
         if (!response.ok) {
             throw new Error('Failed to fetch auth users');
         }
-        
+
         const authUsers = await response.json();
         const authUser = authUsers.find(user => user.id === userId);
-        
+
         if (!authUser) {
             showToast('Usuário não encontrado', 'error');
             return;
         }
-        
+
         // Create a basic profile with auth data
         const profileData = {
             id: authUser.id,
@@ -3293,21 +3297,21 @@ async function createUserProfile(userId) {
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
         };
-        
+
         // Insert the profile
         const { data: profile, error: profileError } = await supabase
             .from('user_profiles')
             .insert([profileData])
             .select()
             .single();
-        
+
         if (profileError) throw profileError;
-        
+
         showToast('Perfil criado com sucesso', 'success');
-        
+
         // Reload the users page to show the updated data
         loadPage('users');
-        
+
     } catch (error) {
         console.error('Error creating user profile:', error);
         showToast('Erro ao criar perfil: ' + error.message, 'error');

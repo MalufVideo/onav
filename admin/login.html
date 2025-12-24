@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Administrativo - ON+AV</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --primary-color: #e50914; /* Netflix Red-ish */
+            --primary-hover: #b20710;
+            --bg-color: #141414;
+            --card-bg: #1f1f1f;
+            --text-color: #ffffff;
+            --text-muted: #b3b3b3;
+            --input-bg: #333333;
+            --border-color: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/img/hero-bg.jpg'); /* Assuming this exists, fallback to black if not */
+            background-size: cover;
+            background-position: center;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 60px 68px 40px;
+            background-color: rgba(0, 0, 0, 0.75);
+            border-radius: 4px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo-area {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-area img {
+            height: 50px;
+            object-fit: contain;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 28px;
+            text-align: inherit; /* Left aligned by default in container, but usually centered looks better for simple login? Netflix aligns left */
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .form-control {
+            width: 100%;
+            height: 50px;
+            padding: 16px 20px;
+            background: var(--input-bg);
+            border: 0;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            background: #454545;
+        }
+
+        .form-control::placeholder {
+            color: #8c8c8c;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .error-message {
+            color: #e87c03;
+            font-size: 14px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .footer {
+            margin-top: 50px;
+            color: #737373;
+            font-size: 13px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="logo-area">
+            <!-- Adjust path if needed. Assuming /img/resized_logo.png exists as seen in file list -->
+            <img src="/img/resized_logo.png" alt="ON+AV">
+        </div>
+        
+        <h1>Entrar</h1>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <input type="email" id="email" class="form-control" placeholder="Email ou número de telefone" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" class="form-control" placeholder="Senha" required>
+            </div>
+            
+            <div id="errorArea" class="error-message">
+                <i class="fas fa-exclamation-circle"></i> <span id="errorText"></span>
+            </div>
+
+            <button type="submit" class="btn-primary" id="submitBtn">Entrar</button>
+            
+            <div style="display: flex; justify-content: space-between; color: #b3b3b3; font-size: 13px;">
+                <label>
+                    <input type="checkbox" checked> Lembrar de mim
+                </label>
+                <a href="#" style="color: #b3b3b3; text-decoration: none;">Precisa de ajuda?</a>
+            </div>
+        </form>
+
+        <div class="footer">
+            <p>Acesso restrito a administradores ON+AV.</p>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration - mimicking dashboard.js setup
+        const SUPABASE_URL = 'https://qhhjvpsxkfjcxitpnhxi.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1ODk4NzksImV4cCI6MjA1NTE2NTg3OX0.kAcBsHJnlr56fJ6qvXSLOWRiLTnQR7ilXUi_2Qzj4RE';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const submitBtn = document.getElementById('submitBtn');
+        const errorArea = document.getElementById('errorArea');
+        const errorText = document.getElementById('errorText');
+
+        // Check if already logged in
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                window.location.href = '/dashboard';
+            }
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // UI Loading state
+            submitBtn.textContent = 'Carregando...';
+            submitBtn.classList.add('loading');
+            errorArea.style.display = 'none';
+
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    throw error;
+                }
+
+                // Initial success check - verify if admin
+                // We'll let the dashboard handle the strict role check, 
+                // but we can do a quick check here if we wanted.
+                // For now, just redirect.
+                window.location.href = '/dashboard';
+
+            } catch (error) {
+                console.error('Login error:', error);
+                errorText.textContent = 'Senha incorreta. Por favor, tente novamente.';
+                errorArea.style.display = 'block';
+                submitBtn.textContent = 'Entrar';
+                submitBtn.classList.remove('loading');
+            }
+        });
+    </script>
+</body>
+</html>
