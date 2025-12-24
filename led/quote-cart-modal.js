@@ -52,13 +52,13 @@ function getNumberById(id) {
 }
 
 function getIntegerById(id) {
-     const value = getValueOrTextById(id);
-     const integer = parseInt(value.replace(/\D/g, ''), 10); // Remove all non-digits
-     if (isNaN(integer)) {
+    const value = getValueOrTextById(id);
+    const integer = parseInt(value.replace(/\D/g, ''), 10); // Remove all non-digits
+    if (isNaN(integer)) {
         console.warn(`Could not parse integer from element '${id}', value: '${value}'`);
         return 0;
-     }
-     return integer;
+    }
+    return integer;
 }
 
 // Placeholder for Supabase client initialization if needed directly,
@@ -147,11 +147,11 @@ class QuoteCartModal {
         // Get items from the single pod
         this.cartItems = await this.getSelectedItemsFromPods();
         console.log('[updateCart] Items retrieved:', this.cartItems);
-    
+
         // Fetch details if necessary (or skip if not needed)
         await this.fetchItemDetailsAndPrices();
         console.log('[updateCart] Fetching complete (or skipped). Cart items after fetch:', this.cartItems);
-    
+
         // Now render the cart with the potentially updated items
         this.renderCart();
         console.log('[updateCart] Cart rendering triggered.');
@@ -493,14 +493,14 @@ class QuoteCartModal {
 
     async submitQuote() {
         console.log('[QuoteCartModal] Starting submitQuote...');
-        
+
         // Prevent multiple simultaneous submissions
         if (this.isSubmitting) {
             console.log('[QuoteCartModal] Already submitting, ignoring duplicate call');
             return;
         }
         this.isSubmitting = true;
-        
+
         if (!this.cartItems || this.cartItems.length === 0) {
             console.warn('[QuoteCartModal] submitQuote: Cart is empty.');
             alert('Seu carrinho está vazio. Adicione itens antes de requisitar uma proposta.');
@@ -513,7 +513,7 @@ class QuoteCartModal {
             this.submitButton.disabled = true;
             this.submitButton.textContent = 'Enviando...'; // Provide feedback
         }
-        
+
         // Generate unique submission token
         const submissionToken = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         console.log('[QuoteCartModal] Submission token:', submissionToken);
@@ -528,7 +528,9 @@ class QuoteCartModal {
             let isGuestUser = false;
             let guestUserCreated = false;
 
-            if (!supabase || !supabase.auth || typeof supabase.auth.getSession !== 'function') {
+            const supabaseClient = window.auth ? window.auth.getSupabaseClient() : null;
+
+            if (!supabaseClient || !supabaseClient.auth || typeof supabaseClient.auth.getSession !== 'function') {
                 console.error('[submitQuote] Supabase auth not available');
                 alert('Erro: Sistema de autenticação não disponível.');
                 if (this.submitButton) {
@@ -539,7 +541,7 @@ class QuoteCartModal {
             }
 
             // Check if user is authenticated
-            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+            const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
 
             if (session && session.user) {
                 // Authenticated user - use existing session
@@ -675,7 +677,7 @@ class QuoteCartModal {
                 // Format as YYYY-MM-DD for Supabase 'date' type
                 return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
             }
-            
+
             const shootingStartDate = parseDate(this.selectedStartDate);
             const shootingEndDate = parseDate(this.selectedEndDate);
 
@@ -699,7 +701,7 @@ class QuoteCartModal {
             const ledPrincipalCurvature = getNumberById('curvature-value'); // Raw number 5
             const ledPrincipalModules = getIntegerById('module-count'); // Raw number 400
             const ledPrincipalResolution = getValueOrTextById('resolution-value'); // Text '2.6mm'
-            
+
             // Calculate pixel values
             const widthValue = getNumberById('width-value');
             const heightValue = getNumberById('height-value');
@@ -707,7 +709,7 @@ class QuoteCartModal {
             const ledPrincipalPixelsWidth = Math.round(widthValue * 2 * 192); // width * 2 * 192 (2 tiles per meter)
             const ledPrincipalPixelsHeight = Math.round(heightValue * 2 * 192); // height * 2 * 192 (2 tiles per meter)
             const ledPrincipalTotalPixels = ledPrincipalPixelsWidth * ledPrincipalPixelsHeight;
-            
+
             // Get formatted power/weight values
             const principalPowerMax = getValueOrTextById('power-max'); // '69000 W'
             const principalPowerAvg = getValueOrTextById('power-avg'); // '23000 W'
@@ -718,7 +720,7 @@ class QuoteCartModal {
             const ledTetoHeight = getValueOrTextById('roof-height-value'); // Raw value '6'
             const ledTetoModules = getIntegerById('teto-module-count'); // Raw number 192
             const ledTetoResolution = getValueOrTextById('teto-resolution-value') || ledPrincipalResolution;
-            
+
             // Calculate teto pixel values
             const roofWidthValue = getNumberById('roof-width-value');
             const roofHeightValue = getNumberById('roof-height-value');
@@ -726,7 +728,7 @@ class QuoteCartModal {
             const ledTetoPixelsWidth = Math.round(roofWidthValue * 2 * 192); // width * 2 * 192 (2 tiles per meter)
             const ledTetoPixelsHeight = Math.round(roofHeightValue * 2 * 192); // height * 2 * 192 (2 tiles per meter)
             const ledTetoTotalPixels = ledTetoPixelsWidth * ledTetoPixelsHeight;
-            
+
             // Get formatted teto power/weight values
             const tetoPowerMax = getValueOrTextById('teto-power-max'); // '33120 W'
             const tetoPowerAvg = getValueOrTextById('teto-power-avg'); // '11040 W'
@@ -766,7 +768,7 @@ class QuoteCartModal {
                     }
 
                     // Filter out configuration lines and items with zero subtotal or zero quantity
-                    if (!name.startsWith('Config:') && subtotal > 0 && quantity > 0) { 
+                    if (!name.startsWith('Config:') && subtotal > 0 && quantity > 0) {
                         console.log(`[submitQuote] Adding service: ${name} | Qty: ${quantity} | Unit Price: ${unitPrice} | Subtotal: ${subtotal}`);
                         selectedServices.push({
                             name: name, // Keep the name as rendered (may include units)
@@ -774,7 +776,7 @@ class QuoteCartModal {
                             unit_price: unitPrice // Correct parsed unit price (numeric)
                         });
                     } else {
-                         console.log(`[submitQuote] Skipping rendered item: ${name}`);
+                        console.log(`[submitQuote] Skipping rendered item: ${name}`);
                     }
                 } else {
                     console.warn('[submitQuote] Could not find required elements (name, qty, price, subtotal) in a rendered cart item row:', element);
@@ -785,26 +787,26 @@ class QuoteCartModal {
             console.log('[submitQuote] Final selected services FROM RENDERED CART:', JSON.stringify(selectedServices));
 
             if (selectedServices.length === 0) {
-                 console.warn('[submitQuote] No valid services found in the rendered cart to save.');
-                 // Consider alerting the user if appropriate, though filtering Config/zero items is expected
+                console.warn('[submitQuote] No valid services found in the rendered cart to save.');
+                // Consider alerting the user if appropriate, though filtering Config/zero items is expected
             }
 
             // --- Get Selected Pod Type ---
             const selectedPodType = document.querySelector('input[name="disguise-mode"]:checked')?.value || '2d';
-            
+
             const dailyRate = calculatedDailyRate; // Use calculated daily rate from cart items
             const rawTotalPriceString = getValueOrTextById('cart-total-price') || '';
-            const totalPriceMatch = rawTotalPriceString.match(/R\$\s?[\d.,]+/); 
+            const totalPriceMatch = rawTotalPriceString.match(/R\$\s?[\d.,]+/);
             const totalPrice = totalPriceMatch ? totalPriceMatch[0] : 'R$ 0,00';
-            
+
             console.log(`[submitQuote] Calculated daily rate from cart: ${dailyRate}`);
-            
+
             // Calculate discount information for saving
             let discountPercentage = 0;
             let originalTotalPrice = dailyRate * daysCount;
             let discountAmount = 0;
             let finalTotalPrice = originalTotalPrice; // Default to original if no discount
-            
+
             if (window.DiscountCalculator && daysCount > 1) {
                 const discountInfo = window.DiscountCalculator.applyDayBasedDiscount(dailyRate, daysCount);
                 discountPercentage = discountInfo.discountPercentage;
@@ -831,7 +833,7 @@ class QuoteCartModal {
                 shooting_dates_start: shootingStartDate,
                 shooting_dates_end: shootingEndDate,
                 days_count: daysCount,
-                
+
                 // LED Principal Configuration
                 led_principal_width: ledPrincipalWidth,
                 led_principal_height: ledPrincipalHeight,
@@ -841,7 +843,7 @@ class QuoteCartModal {
                 led_principal_pixels_width: ledPrincipalPixelsWidth,
                 led_principal_pixels_height: ledPrincipalPixelsHeight,
                 led_principal_total_pixels: ledPrincipalTotalPixels,
-                
+
                 // LED Teto Configuration
                 led_teto_width: ledTetoWidth,
                 led_teto_height: ledTetoHeight,
@@ -850,7 +852,7 @@ class QuoteCartModal {
                 led_teto_pixels_width: ledTetoPixelsWidth,
                 led_teto_pixels_height: ledTetoPixelsHeight,
                 led_teto_total_pixels: ledTetoTotalPixels,
-                
+
                 // Power and Weight data
                 principal_power_max: principalPowerMax,
                 principal_power_avg: principalPowerAvg,
@@ -858,13 +860,13 @@ class QuoteCartModal {
                 teto_power_max: tetoPowerMax,
                 teto_power_avg: tetoPowerAvg,
                 teto_weight: tetoWeight,
-                
+
                 // Service and Pricing data
                 selected_pod_type: selectedPodType,
                 selected_services: selectedServices, // Use the array built from the rendered cart
                 daily_rate: dailyRate,
                 total_price: formatCurrency(finalTotalPrice), // Save the calculated final price as formatted currency
-                
+
                 // Discount information
                 discount_percentage: discountPercentage,
                 discount_amount: discountAmount,
@@ -889,7 +891,7 @@ class QuoteCartModal {
                 console.error('[QuoteCartModal] Error: Saved proposal data or ID is missing.', savedProposal);
                 throw new Error('Erro ao salvar proposta: ID da proposta não retornado.');
             }
-            
+
             const proposalId = savedProposal.id;
             console.log(`[QuoteCartModal] Quote saved successfully with ID: ${proposalId}`);
 
@@ -897,9 +899,9 @@ class QuoteCartModal {
             console.log(`[QuoteCartModal] Invoking Edge Function for proposalId: ${proposalId}...`);
             try {
                 const { data: functionData, error: functionError } = await supabase.functions.invoke(
-                    'generate-and-email-proposal-pdf', 
+                    'generate-and-email-proposal-pdf',
                     {
-                        body: { proposalId: proposalId } 
+                        body: { proposalId: proposalId }
                     }
                 );
 
@@ -926,13 +928,13 @@ class QuoteCartModal {
         } catch (error) {
             console.error('[QuoteCartModal] Caught error during submitQuote process:', error);
             if (error && error.message) {
-                 console.error('Error message:', error.message);
+                console.error('Error message:', error.message);
             }
             if (error && error.stack) {
-                 console.error('Error stack trace:', error.stack);
+                console.error('Error stack trace:', error.stack);
             }
             // Show generic error message to user
-             alert('Ocorreu um erro inesperado ao processar sua requisição. Verifique o console para detalhes.');
+            alert('Ocorreu um erro inesperado ao processar sua requisição. Verifique o console para detalhes.');
 
         } finally {
             // Re-enable submit button and reset submission flag
@@ -943,7 +945,7 @@ class QuoteCartModal {
             }
         }
     }
-    
+
     // ... (other methods like showCalEmbed, etc.) ...
 
     showConfirmationModal(projectName, isGuestUser = false, guestUserCreated = false) {
@@ -1157,7 +1159,7 @@ class QuoteCartModal {
                     if (selectedDates && selectedDates[0]) {
                         // Store as d/m/Y for parsing in renderCart
                         const d = selectedDates[0];
-                        this.selectedStartDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+                        this.selectedStartDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
                         // Optionally update endPicker's minDate
                         if (this.endPicker) {
                             this.endPicker.set('minDate', d);
@@ -1186,7 +1188,7 @@ class QuoteCartModal {
                 onChange: (selectedDates, dateStr, instance) => {
                     if (selectedDates && selectedDates[0]) {
                         const d = selectedDates[0];
-                        this.selectedEndDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+                        this.selectedEndDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
                     }
                     // Re-render cart to update days count
                     this.renderCart();
