@@ -340,8 +340,13 @@ async function updateAuthUI() {
     return;
   }
 
+  // If auth is not ready, just show login buttons (default state)
   if (!window.auth) {
-    console.warn('[auth-ui.js] Auth module not ready');
+    console.warn('[auth-ui.js] Auth module not ready yet, showing default login buttons');
+    loginButton.style.display = 'inline-block';
+    registerButton.style.display = 'inline-block';
+    userProfile.style.display = 'none';
+    userName.textContent = '';
     return;
   }
 
@@ -423,15 +428,22 @@ function addAuthStyles() {
 
 // Initialize auth UI
 function initAuthUI() {
-  // Check if auth is available
-  if (!window.auth) {
-    console.warn('Auth not available, waiting before initializing UI...');
-    setTimeout(initAuthUI, 500);
-    return;
-  }
+  console.log('[auth-ui.js] Initializing Auth UI immediately...');
 
+  // Always create UI first, don't wait for auth
   addAuthStyles();
   createAuthUI();
+
+  // If auth is not ready, we can wait to UPDATE the UI, but the buttons should exist
+  if (!window.auth) {
+    console.log('[auth-ui.js] Auth not ready, setting up poller to update UI when ready');
+    const checkAuth = setInterval(() => {
+      if (window.auth) {
+        clearInterval(checkAuth);
+        updateAuthUI();
+      }
+    }, 500);
+  }
 }
 
 // Export auth UI functions
@@ -442,7 +454,14 @@ window.authUI = {
   updateAuthUI
 };
 
-// Helper functions
+// Auto-init if DOM is ready (fallback)
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  setTimeout(initAuthUI, 100);
+} else {
+  document.addEventListener('DOMContentLoaded', () => setTimeout(initAuthUI, 100));
+}
+
+// Helper functions (kept same)
 function clearMessages() {
   document.querySelectorAll('.auth-error').forEach(error => {
     error.textContent = '';
