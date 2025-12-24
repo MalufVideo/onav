@@ -17,11 +17,7 @@
   <link rel="stylesheet" href="responsive-styles.css">
   <!-- Configuration -->
   <script src="../config.js"></script>
-  <!-- Authentication modules -->
-  <script src="auth-config.js" defer></script>
-  <script src="auth.js" defer></script>
-  <script src="auth-ui.js" defer></script>
-  <script src="auth-protection.js" defer></script>
+
   <script src="quote-service.js" defer></script>
   <script src="webhook-service.js" defer></script>
   <script src="pricing-pods.js" defer></script>
@@ -838,6 +834,12 @@
       // Set calculator source when page loads
       localStorage.setItem('calculatorSource', 'led');
     </script>
+
+    <!-- Authentication modules (Loaded synchronously at end of body to ensure order) -->
+    <script src="auth-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="auth-ui.js"></script>
+    <script src="auth-protection.js"></script>
 
 </body>
 
