@@ -461,6 +461,17 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
   document.addEventListener('DOMContentLoaded', () => setTimeout(initAuthUI, 100));
 }
 
+// Also listen for auth events to update UI when auth becomes available
+window.addEventListener('authModuleReady', () => {
+  console.log('[auth-ui.js] Received authModuleReady event, updating UI');
+  updateAuthUI();
+});
+
+window.addEventListener('authReady', () => {
+  console.log('[auth-ui.js] Received authReady event, updating UI');
+  updateAuthUI();
+});
+
 // Helper functions (kept same)
 function clearMessages() {
   document.querySelectorAll('.auth-error').forEach(error => {

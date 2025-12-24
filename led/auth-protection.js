@@ -26,23 +26,17 @@ const MAX_AUTH_WAIT_ATTEMPTS = 20;
 async function protectRoute(destination = '/led/login.html') {
   console.log('[auth-protection.js] Starting route protection for:', window.location.pathname);
 
-  // Wait for auth module to initialize
-  let authChecked = false;
+  // Wait for auth module to be available
+  let authAvailable = false;
   let attempts = 0;
 
-  while (!authChecked && attempts < MAX_AUTH_WAIT_ATTEMPTS) {
+  while (!authAvailable && attempts < MAX_AUTH_WAIT_ATTEMPTS) {
     attempts++;
 
+    // Check if window.auth exists and has the initAuth function
     if (window.auth && typeof window.auth.initAuth === 'function') {
-      // Initialize auth if not already done
-      try {
-        await window.auth.initAuth();
-        authChecked = true;
-        console.log('[auth-protection.js] Auth module initialized successfully');
-      } catch (error) {
-        console.warn('[auth-protection.js] Error initializing auth:', error);
-        await new Promise(resolve => setTimeout(resolve, AUTH_INIT_DELAY));
-      }
+      authAvailable = true;
+      console.log('[auth-protection.js] Auth module found after', attempts, 'attempts');
     } else {
       console.log(`[auth-protection.js] Waiting for auth module to load... (attempt ${attempts}/${MAX_AUTH_WAIT_ATTEMPTS})`);
       await new Promise(resolve => setTimeout(resolve, AUTH_INIT_DELAY));
@@ -51,9 +45,20 @@ async function protectRoute(destination = '/led/login.html') {
 
   // If auth module couldn't be loaded after maximum attempts
   // DON'T redirect - just log and continue so users can still use the calculator
-  if (!authChecked) {
+  if (!authAvailable) {
     console.warn('[auth-protection.js] Auth module could not be loaded. Continuing without auth protection.');
     // Do NOT redirect - allow guest access to calculator
+    return;
+  }
+
+  // Now initialize auth if not already initialized
+  try {
+    console.log('[auth-protection.js] Calling initAuth...');
+    await window.auth.initAuth();
+    console.log('[auth-protection.js] Auth module initialized successfully');
+  } catch (error) {
+    console.warn('[auth-protection.js] Error initializing auth:', error);
+    // Continue without auth - allow guest access
     return;
   }
 
@@ -89,6 +94,9 @@ async function protectRoute(destination = '/led/login.html') {
 
   // Allow all users (authenticated and guests) to access calculator
   console.log('[auth-protection.js] Guest access enabled - allowing access to all users');
+
+  // Dispatch event to signal that route protection is complete
+  window.dispatchEvent(new CustomEvent('authProtectionComplete'));
 }
 
 /**
@@ -113,31 +121,52 @@ window.authProtection = {
   protectRoute
 };
 
-// Listen for authReady event for faster initialization
+// Track initialization state
 let authProtectionInitialized = false;
-window.addEventListener('authReady', () => {
-  if (!authProtectionInitialized) {
-    authProtectionInitialized = true;
-    console.log('[auth-protection.js] Received authReady event, running protectRoute');
-    protectRoute();
+
+// Initialize when auth module is ready
+function initProtection() {
+  if (authProtectionInitialized) {
+    console.log('[auth-protection.js] Already initialized, skipping');
+    return;
   }
+  authProtectionInitialized = true;
+  console.log('[auth-protection.js] Initializing protection...');
+  protectRoute();
+}
+
+// Listen for both event names (legacy and new)
+window.addEventListener('authReady', () => {
+  console.log('[auth-protection.js] Received authReady event');
+  initProtection();
 });
 
-// Fallback: Auto-run route protection if DOM is already loaded
-if (document.readyState === 'complete' || document.readyState === 'interactive') {
+window.addEventListener('authModuleReady', () => {
+  console.log('[auth-protection.js] Received authModuleReady event');
+  initProtection();
+});
+
+// Fallback: Check if auth is already available
+if (window.auth && typeof window.auth.initAuth === 'function') {
+  console.log('[auth-protection.js] Auth module already available on load');
+  setTimeout(initProtection, 100);
+} else if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  // Auto-run route protection with a delay to allow auth scripts to load
   setTimeout(() => {
     if (!authProtectionInitialized) {
-      authProtectionInitialized = true;
-      protectRoute();
+      console.log('[auth-protection.js] Fallback initialization triggered');
+      initProtection();
     }
   }, 500);
 } else {
   document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
       if (!authProtectionInitialized) {
-        authProtectionInitialized = true;
-        protectRoute();
+        console.log('[auth-protection.js] DOMContentLoaded fallback initialization');
+        initProtection();
       }
     }, 500);
   });
 }
+
+console.log('[auth-protection.js] Script loaded');
