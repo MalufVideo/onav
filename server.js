@@ -257,7 +257,7 @@ app.put('/api/products/:id', async (req, res) => {
     // updated_at is handled by the trigger
 
     if (Object.keys(updateData).length === 0) {
-        return res.status(400).json({ error: 'No fields provided for update' });
+      return res.status(400).json({ error: 'No fields provided for update' });
     }
 
     console.log('Performing update with data:', updateData);
@@ -272,7 +272,7 @@ app.put('/api/products/:id', async (req, res) => {
 
     if (error) throw error;
     if (!data || data.length === 0) {
-        return res.status(404).json({ error: 'Product update failed - no rows affected' });
+      return res.status(404).json({ error: 'Product update failed - no rows affected' });
     }
     res.json(data[0]); // Return the updated product
   } catch (error) {
@@ -303,8 +303,8 @@ app.delete('/api/products/:id', async (req, res) => {
 
 // Test endpoint to verify server is working
 app.get('/api/test', (req, res) => {
-  res.json({ 
-    message: 'Server is working!', 
+  res.json({
+    message: 'Server is working!',
     timestamp: new Date().toISOString(),
     supabase_configured: !!supabaseUrl && !!supabaseAnonKey,
     admin_client_available: !!supabaseServiceKey
@@ -313,7 +313,7 @@ app.get('/api/test', (req, res) => {
 
 // Config endpoint to serve Supabase anon key to frontend
 app.get('/api/config/supabase-key', (req, res) => {
-  res.json({ 
+  res.json({
     key: process.env.SUPABASE_ANON_KEY || supabaseAnonKey
   });
 });
@@ -322,7 +322,7 @@ app.get('/api/config/supabase-key', (req, res) => {
 app.get('/api/debug/quote/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const { data, error } = await supabaseAdmin
       .from('proposals')
       .select('*')
@@ -357,7 +357,7 @@ app.get('/api/debug/quote/:id', async (req, res) => {
 app.post('/api/test-proposal-data', async (req, res) => {
   try {
     const rawData = req.body;
-    
+
     // Helper functions (same as in save-proposal)
     function safeNumber(value) {
       if (value === null || value === undefined || value === '') return null;
@@ -374,7 +374,7 @@ app.post('/api/test-proposal-data', async (req, res) => {
       const num = parseInt(cleanedValue, 10);
       return isNaN(num) ? null : num;
     }
-    
+
     // Process data same as save-proposal but don't save
     const processedData = {
       user_id: rawData.user_id,
@@ -384,7 +384,7 @@ app.post('/api/test-proposal-data', async (req, res) => {
       principal_power_max: safeInteger(rawData.principal_power_max),
       principal_power_avg: safeInteger(rawData.principal_power_avg)
     };
-    
+
     res.json({
       success: true,
       raw_data_sample: {
@@ -488,7 +488,7 @@ app.post('/api/setup-quote-history', async (req, res) => {
 app.get('/api/quote-history/:proposalId', async (req, res) => {
   try {
     const { proposalId } = req.params;
-    
+
     const { data, error } = await supabaseAdmin
       .from('quote_history')
       .select('*')
@@ -507,7 +507,7 @@ app.get('/api/quote-history/:proposalId', async (req, res) => {
 app.post('/api/quote-history', async (req, res) => {
   try {
     const historyEntry = req.body;
-    
+
     const { data, error } = await supabaseAdmin
       .from('quote_history')
       .insert([historyEntry])
@@ -525,12 +525,12 @@ app.post('/api/quote-history', async (req, res) => {
 app.put('/api/proposals/:id/apply-discount', async (req, res) => {
   try {
     const { id } = req.params;
-    const { 
-      discountType, 
-      discountValue, 
-      discountReason, 
-      newStatus, 
-      changedBy 
+    const {
+      discountType,
+      discountValue,
+      discountReason,
+      newStatus,
+      changedBy
     } = req.body;
 
     // First, get the current proposal
@@ -547,15 +547,15 @@ app.put('/api/proposals/:id/apply-discount', async (req, res) => {
 
     // Set original price if not set
     const originalPrice = currentProposal.original_total_price || currentProposal.total_price;
-    
+
     // Parse current price
     const currentPriceStr = currentProposal.total_price || 'R$ 0,00';
     const currentPriceNum = parseFloat(currentPriceStr.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
-    
+
     // Calculate new price and discount amounts
     let newPrice = currentPriceNum;
     let discountAmount = 0;
-    
+
     if (discountValue > 0) {
       if (discountType === 'percentage') {
         discountAmount = currentPriceNum * (discountValue / 100);
@@ -568,7 +568,7 @@ app.put('/api/proposals/:id/apply-discount', async (req, res) => {
 
     // Format new price
     const formattedNewPrice = `R$ ${newPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-    
+
     // Calculate total discount from original
     const originalPriceNum = parseFloat(originalPrice.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
     const totalDiscountAmount = originalPriceNum - newPrice;
@@ -625,11 +625,11 @@ app.put('/api/proposals/:id/apply-discount', async (req, res) => {
     console.log('About to call discount email function for proposal ID:', id);
     console.log('SUPABASE_URL:', process.env.SUPABASE_URL);
     console.log('SERVICE_ROLE_KEY exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
-    
+
     try {
       const functionUrl = `${process.env.SUPABASE_URL}/functions/v1/send-discount-email`;
       console.log('Calling Edge Function at:', functionUrl);
-      
+
       const discountEmailResponse = await fetch(functionUrl, {
         method: 'POST',
         headers: {
@@ -640,7 +640,7 @@ app.put('/api/proposals/:id/apply-discount', async (req, res) => {
       });
 
       console.log('Edge Function response status:', discountEmailResponse.status);
-      
+
       if (!discountEmailResponse.ok) {
         const errorText = await discountEmailResponse.text();
         console.error('Failed to send discount email:', errorText);
@@ -653,8 +653,8 @@ app.put('/api/proposals/:id/apply-discount', async (req, res) => {
       // Don't fail the discount application if email fails
     }
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: 'Discount applied successfully',
       newPrice: formattedNewPrice,
       totalDiscountPercentage: totalDiscountPercentage.toFixed(2),
@@ -681,7 +681,7 @@ app.get('/api/auth/profile', async (req, res) => {
 
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error } = await supabase.auth.getUser(token);
-    
+
     if (error || !user) {
       return res.status(401).json({ error: 'Invalid token' });
     }
@@ -723,11 +723,11 @@ app.get('/api/users', async (req, res) => {
 app.get('/api/users/auth-data', async (req, res) => {
   try {
     console.log('Auth data endpoint called with service role access');
-    
+
     // Verify user has admin role
     const authHeader = req.headers.authorization;
     console.log('Auth header present:', !!authHeader);
-    
+
     if (!authHeader) {
       console.log('No authorization header provided');
       return res.status(401).json({ error: 'No authorization header' });
@@ -735,9 +735,9 @@ app.get('/api/users/auth-data', async (req, res) => {
 
     const token = authHeader.replace('Bearer ', '');
     console.log('Token length:', token.length);
-    
+
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+
     if (authError || !user) {
       console.log('Auth error:', authError?.message || 'No user found');
       return res.status(401).json({ error: 'Invalid token', details: authError?.message });
@@ -768,7 +768,7 @@ app.get('/api/users/auth-data', async (req, res) => {
 
     // Use service role client to get all auth users
     const { data: authData, error: listError } = await supabaseAdmin.auth.admin.listUsers();
-    
+
     if (listError) {
       console.error('Error listing users:', listError);
       return res.status(500).json({ error: 'Failed to fetch auth users', details: listError.message });
@@ -776,7 +776,7 @@ app.get('/api/users/auth-data', async (req, res) => {
 
     console.log(`Successfully fetched ${authData.users.length} auth users`);
     res.json(authData.users);
-    
+
   } catch (error) {
     console.error('Error fetching auth data:', error.message);
     res.status(500).json({ error: 'Failed to fetch auth data', details: error.message });
@@ -787,7 +787,7 @@ app.get('/api/users/auth-data', async (req, res) => {
 app.post('/api/users', async (req, res) => {
   try {
     const { email, full_name, password, role, phone } = req.body;
-    
+
     if (!email || !full_name || !password) {
       return res.status(400).json({ error: 'Email, full name, and password are required' });
     }
@@ -898,7 +898,7 @@ app.delete('/api/users/:id', async (req, res) => {
 
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+
     if (authError || !user) {
       return res.status(401).json({ error: 'Invalid token' });
     }
@@ -912,7 +912,7 @@ app.delete('/api/users/:id', async (req, res) => {
 
     // Special handling for master admin
     let userRole = userProfile?.role;
-    
+
     if (user.email === 'nelson.maluf@onprojecoes.com.br') {
       userRole = 'admin';
       console.log('Master admin detected, granting admin role');
@@ -931,7 +931,7 @@ app.delete('/api/users/:id', async (req, res) => {
         profile_found: !!userProfile,
         profile_error: profileError
       });
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: 'Unauthorized: Only admins and sales reps can delete users',
         debug: {
           user_email: user.email,
@@ -975,7 +975,7 @@ app.delete('/api/users/:id', async (req, res) => {
     if (supabaseServiceKey) {
       try {
         const { error: authDeleteError } = await supabaseAdmin.auth.admin.deleteUser(id);
-        
+
         if (authDeleteError) {
           console.error('Error deleting user from auth:', authDeleteError);
           // Don't throw here - profile is already deleted, just log the auth error
@@ -991,8 +991,8 @@ app.delete('/api/users/:id', async (req, res) => {
       console.warn('Service role key not available - user deleted from profiles only');
     }
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: 'User deleted successfully',
       deletedFromAuth: !!supabaseServiceKey
     });
@@ -1112,7 +1112,7 @@ app.get('/api/leads/search', async (req, res) => {
 app.post('/api/leads', async (req, res) => {
   try {
     const { name, email, phone, company, created_by } = req.body;
-    
+
     if (!name) {
       return res.status(400).json({ error: 'Name is required' });
     }
@@ -1169,7 +1169,7 @@ app.get('/api/proposals', async (req, res) => {
 
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error } = await supabase.auth.getUser(token);
-    
+
     if (error || !user) {
       return res.status(401).json({ error: 'Invalid token' });
     }
@@ -1183,7 +1183,7 @@ app.get('/api/proposals', async (req, res) => {
 
     // Special handling for master admin
     let userRole = userProfile?.role;
-    
+
     if (user.email === 'nelson.maluf@onprojecoes.com.br') {
       userRole = 'admin';
       console.log('Master admin detected, granting admin role for proposals');
@@ -1193,7 +1193,7 @@ app.get('/api/proposals', async (req, res) => {
     if (!userRole && user.email === 'nelson@avdesign.video') {
       userRole = 'sales_rep';
       console.log('Known sales rep email detected, granting sales_rep role for proposals');
-      
+
       // Auto-create profile for known sales rep
       try {
         const { error: createError } = await supabaseAdmin
@@ -1207,7 +1207,7 @@ app.get('/api/proposals', async (req, res) => {
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           }]);
-        
+
         if (!createError) {
           console.log('Created user profile for sales rep:', user.email);
         }
@@ -1217,36 +1217,36 @@ app.get('/api/proposals', async (req, res) => {
     }
 
     const context = req.query.context || 'my-quotes';
-    
+
     // For admin users and sales reps in dashboard context, use service role client to bypass RLS
     const clientToUse = (['admin', 'sales_rep'].includes(userRole) && context === 'dashboard') ? supabaseAdmin : supabase;
     console.log(`[DEBUG] Using ${clientToUse === supabaseAdmin ? 'ADMIN' : 'ANON'} client for query`);
-    
+
     let query = clientToUse
       .from('proposals')
       .select('*');
 
     // Apply filtering based on user role and context
     console.log(`[DEBUG] Applying filters - Role: ${userRole}, Context: ${context}, User ID: ${user.id}`);
-    
+
     if (context === 'my-quotes') {
       if (userRole === 'sales_rep') {
         // Sales reps see quotes they created AND quotes from their clients
         console.log('[DEBUG] Sales rep - filtering by sales_rep_id OR client relationship');
-        
+
         // Get client IDs for this sales rep
         const { data: clientRels, error: clientError } = await supabaseAdmin
           .from('client_sales_rep_relationships')
           .select('client_id')
           .eq('sales_rep_id', user.id)
           .eq('is_active', true);
-        
+
         if (clientError) {
           console.error('Error fetching client relationships:', clientError);
         }
-        
+
         const clientIds = clientRels?.map(rel => rel.client_id) || [];
-        
+
         if (clientIds.length > 0) {
           // Show quotes created by sales rep OR by their clients (but avoid duplicates)
           const userIdFilter = clientIds.map(id => `user_id.eq.${id}`).join(',');
@@ -1274,20 +1274,20 @@ app.get('/api/proposals', async (req, res) => {
       // Admins see all quotes, sales reps see quotes they created AND client quotes
       if (userRole === 'sales_rep') {
         console.log('[DEBUG] Sales rep in dashboard - filtering by sales_rep_id OR client relationship');
-        
+
         // Get client IDs for this sales rep
         const { data: clientRels, error: clientError } = await supabaseAdmin
           .from('client_sales_rep_relationships')
           .select('client_id')
           .eq('sales_rep_id', user.id)
           .eq('is_active', true);
-        
+
         if (clientError) {
           console.error('Error fetching client relationships:', clientError);
         }
-        
+
         const clientIds = clientRels?.map(rel => rel.client_id) || [];
-        
+
         if (clientIds.length > 0) {
           // Show quotes created by sales rep OR by their clients (but avoid duplicates)
           const userIdFilter = clientIds.map(id => `user_id.eq.${id}`).join(',');
@@ -1309,16 +1309,16 @@ app.get('/api/proposals', async (req, res) => {
     }
 
     const { data, error: queryError } = await query.order('created_at', { ascending: false });
-    
+
     if (queryError) throw queryError;
-    
+
     // Remove duplicates that might occur when OR conditions overlap
-    const uniqueData = data.filter((item, index, self) => 
+    const uniqueData = data.filter((item, index, self) =>
       index === self.findIndex(t => t.id === item.id)
     );
-    
+
     console.log(`[/api/proposals] User: ${user.email} (${user.id}), Role: ${userRole}, Context: ${context}, Found ${uniqueData.length} unique quotes (${data.length} total)`);
-    
+
     res.json(uniqueData);
   } catch (error) {
     console.error('Error fetching proposals:', error.message);
@@ -1336,32 +1336,32 @@ app.post('/api/save-proposal', async (req, res) => {
     if (!authHeader) {
       return res.status(401).json({ error: 'No authorization header' });
     }
-    
+
     // Create a unique key for this submission to prevent duplicates
     const submissionKey = `${req.body.user_id || 'unknown'}_${req.body.project_name || 'unknown'}_${Date.now()}`;
     const shortKey = `${req.body.user_id || 'unknown'}_${req.body.project_name || 'unknown'}`;
-    
+
     // Check if we received a similar submission recently (within 30 seconds)
     const now = Date.now();
-    const recentSubmission = Array.from(recentSubmissions.entries()).find(([key, timestamp]) => 
+    const recentSubmission = Array.from(recentSubmissions.entries()).find(([key, timestamp]) =>
       key.startsWith(shortKey) && (now - timestamp) < 30000
     );
-    
+
     if (recentSubmission) {
       console.log('Duplicate proposal submission detected, rejecting:', {
         submissionKey,
         recentKey: recentSubmission[0],
         timeDiff: now - recentSubmission[1]
       });
-      return res.status(409).json({ 
+      return res.status(409).json({
         error: 'Duplicate submission detected',
         message: 'A similar proposal was just submitted. Please wait before submitting again.'
       });
     }
-    
+
     // Add this submission to tracking
     recentSubmissions.set(submissionKey, now);
-    
+
     // Clean up old entries (keep only last 100)
     if (recentSubmissions.size > 100) {
       const oldEntries = Array.from(recentSubmissions.entries())
@@ -1369,20 +1369,20 @@ app.post('/api/save-proposal', async (req, res) => {
         .slice(0, 50);
       oldEntries.forEach(([key]) => recentSubmissions.delete(key));
     }
-    
+
     console.log('Processing new proposal submission:', submissionKey);
 
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+
     if (authError || !user) {
       return res.status(401).json({ error: 'Invalid token' });
     }
 
     const rawProposalData = req.body;
-    
+
     console.log('Received proposal data:', JSON.stringify(rawProposalData, null, 2));
-    
+
     // Ensure required fields are present
     if (!rawProposalData.user_id || !rawProposalData.project_name) {
       return res.status(400).json({ error: 'Missing required fields: user_id and project_name' });
@@ -1413,21 +1413,21 @@ app.post('/api/save-proposal', async (req, res) => {
       user_id: rawProposalData.user_id,
       project_name: rawProposalData.project_name,
       status: rawProposalData.status || 'pending',
-      
+
       // Client Information
       client_name: rawProposalData.client_name,
       client_company: rawProposalData.client_company,
       client_email: rawProposalData.client_email,
       client_phone: rawProposalData.client_phone,
-      
+
       // Date fields
       shooting_dates_start: rawProposalData.shooting_dates_start,
       shooting_dates_end: rawProposalData.shooting_dates_end,
-      
+
       // Basic pricing
       days_count: safeInteger(rawProposalData.days_count) || 1,
       total_price: rawProposalData.total_price,
-      
+
       // Service Selection
       selected_pod_type: rawProposalData.selected_pod_type
     };
@@ -1448,7 +1448,7 @@ app.post('/api/save-proposal', async (req, res) => {
     if (rawProposalData.led_principal_resolution !== undefined) {
       proposalData.led_principal_resolution = rawProposalData.led_principal_resolution;
     }
-    
+
     // Add LED Teto configuration if exists
     if (rawProposalData.led_teto_width !== undefined) {
       proposalData.led_teto_width = safeNumber(rawProposalData.led_teto_width);
@@ -1459,12 +1459,12 @@ app.post('/api/save-proposal', async (req, res) => {
     if (rawProposalData.led_teto_modules !== undefined) {
       proposalData.led_teto_modules = safeInteger(rawProposalData.led_teto_modules);
     }
-    
+
     // Add power/weight data only if columns exist (they might not be in the actual DB)
     if (rawProposalData.daily_rate !== undefined) {
       proposalData.daily_rate = safeNumber(rawProposalData.daily_rate);
     }
-    
+
     // Add progressive discount information if provided
     if (rawProposalData.discount_percentage !== undefined) {
       proposalData.discount_percentage = safeNumber(rawProposalData.discount_percentage);
@@ -1478,21 +1478,21 @@ app.post('/api/save-proposal', async (req, res) => {
     if (rawProposalData.discount_reason !== undefined) {
       proposalData.discount_reason = rawProposalData.discount_reason;
     }
-    
+
     // Add selected services if provided
     if (rawProposalData.selected_services && Array.isArray(rawProposalData.selected_services)) {
       proposalData.selected_services = JSON.stringify(rawProposalData.selected_services);
     }
-    
+
     // Add sales rep information directly (using existing discount_description field to store structured data)
     if (rawProposalData.sales_rep_name) {
       // Store sales rep name in an existing column that we know exists
       // We'll put it in the discount_description as structured data and also try other existing fields
     }
-    
+
     // Store all additional data in discount_description as JSON
     // This includes power, weight, pixels, and sales rep data
-    
+
     // Store sales rep information in dedicated columns
     if (rawProposalData.sales_rep_id) {
       proposalData.sales_rep_id = rawProposalData.sales_rep_id;
@@ -1502,13 +1502,13 @@ app.post('/api/save-proposal', async (req, res) => {
     if (rawProposalData.sales_rep_name) {
       proposalData.sales_rep_name = rawProposalData.sales_rep_name;
     }
-    
+
     console.log(`[save-proposal] Setting sales_rep_id: ${proposalData.sales_rep_id} for user: ${user.email} (${user.id})`);
-    
+
     // Store dashboard-specific data as JSON in discount_description
     const dashboardData = {
       created_by_dashboard: rawProposalData.created_by_dashboard || false,
-      
+
       // Power and weight data
       principal_power_max: safeInteger(rawProposalData.principal_power_max),
       principal_power_avg: safeInteger(rawProposalData.principal_power_avg),
@@ -1516,7 +1516,7 @@ app.post('/api/save-proposal', async (req, res) => {
       teto_power_max: safeInteger(rawProposalData.teto_power_max),
       teto_power_avg: safeInteger(rawProposalData.teto_power_avg),
       teto_weight: safeInteger(rawProposalData.teto_weight),
-      
+
       // Pixel data
       led_principal_pixels_width: safeInteger(rawProposalData.led_principal_pixels_width),
       led_principal_pixels_height: safeInteger(rawProposalData.led_principal_pixels_height),
@@ -1526,23 +1526,23 @@ app.post('/api/save-proposal', async (req, res) => {
       led_teto_total_pixels: safeInteger(rawProposalData.led_teto_total_pixels),
       led_teto_resolution: rawProposalData.led_teto_resolution
     };
-    
+
     if (rawProposalData.selected_services && Array.isArray(rawProposalData.selected_services)) {
       dashboardData.services = rawProposalData.selected_services;
     }
-    
+
     proposalData.discount_description = JSON.stringify(dashboardData);
-    
+
     // Remove null/undefined values to avoid database issues
     Object.keys(proposalData).forEach(key => {
       if (proposalData[key] === null || proposalData[key] === undefined) {
         delete proposalData[key];
       }
     });
-    
+
     console.log('Final proposal data to insert:', JSON.stringify(proposalData, null, 2));
     console.log('Discount description content:', proposalData.discount_description);
-    
+
     // Log progressive discount fields specifically for debugging
     if (proposalData.discount_percentage > 0) {
       console.log('Progressive discount applied:', {
@@ -1564,7 +1564,7 @@ app.post('/api/save-proposal', async (req, res) => {
       console.error('Database error details:', error);
       throw error;
     }
-    
+
     // Send webhook to N8N/CRM with proposal data
     try {
       await sendProposalWebhook(data);
@@ -1572,7 +1572,7 @@ app.post('/api/save-proposal', async (req, res) => {
       console.warn('Webhook failed but proposal was saved:', webhookError.message);
       // Don't fail the proposal creation if webhook fails
     }
-    
+
     // Send email notification based on rules
     try {
       await sendProposalEmailNotification(data, user.id, userRole);
@@ -1580,18 +1580,18 @@ app.post('/api/save-proposal', async (req, res) => {
       console.warn('Email notification failed but proposal was saved:', emailError.message);
       // Don't fail the proposal creation if email fails
     }
-    
-    res.status(201).json({ 
-      success: true, 
+
+    res.status(201).json({
+      success: true,
       message: 'Proposal saved successfully',
-      data: data 
+      data: data
     });
-    
+
   } catch (error) {
     console.error('Error saving proposal:', error.message);
     console.error('Full error object:', error);
-    res.status(500).json({ 
-      error: 'Failed to save proposal', 
+    res.status(500).json({
+      error: 'Failed to save proposal',
       details: error.message,
       hint: error.hint || 'Check server logs for more details'
     });
@@ -1608,7 +1608,7 @@ app.post('/api/check-user-by-email', async (req, res) => {
 
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+
     if (authError || !user) {
       return res.status(401).json({ error: 'Invalid token' });
     }
@@ -1624,7 +1624,7 @@ app.post('/api/check-user-by-email', async (req, res) => {
 
     // Special handling for master admin
     let userRole = userProfile?.role;
-    
+
     if (user.email === 'nelson.maluf@onprojecoes.com.br') {
       userRole = 'admin';
       console.log('Master admin detected, granting admin role');
@@ -1634,7 +1634,7 @@ app.post('/api/check-user-by-email', async (req, res) => {
     if (!userRole && user.email === 'nelson@avdesign.video') {
       userRole = 'sales_rep';
       console.log('Known sales rep email detected, granting sales_rep role');
-      
+
       // Auto-create profile for known sales rep
       try {
         const { error: createError } = await supabaseAdmin
@@ -1648,7 +1648,7 @@ app.post('/api/check-user-by-email', async (req, res) => {
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           }]);
-        
+
         if (!createError) {
           console.log('Created user profile for sales rep in check-user-by-email:', user.email);
         }
@@ -1664,7 +1664,7 @@ app.post('/api/check-user-by-email', async (req, res) => {
         profile_found: !!userProfile,
         profile_error: profileError
       });
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: 'Unauthorized: Only admins and sales reps can check users',
         debug: {
           user_email: user.email,
@@ -1694,12 +1694,12 @@ app.post('/api/check-user-by-email', async (req, res) => {
         .select('id, email')
         .eq('email', email)
         .single();
-      
+
       if (profileUser) {
         existingUser = { id: profileUser.id };
       }
     }
-    
+
     if (existingUser) {
       // Check for profile data
       const { data: profile } = await supabaseAdmin
@@ -1896,7 +1896,7 @@ app.post('/api/create-client-user', async (req, res) => {
 
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+
     if (authError || !user) {
       return res.status(401).json({ error: 'Invalid token' });
     }
@@ -1910,7 +1910,7 @@ app.post('/api/create-client-user', async (req, res) => {
 
     // Special handling for master admin
     let userRole = userProfile?.role;
-    
+
     if (user.email === 'nelson.maluf@onprojecoes.com.br') {
       userRole = 'admin';
       console.log('Master admin detected, granting admin role');
@@ -1929,7 +1929,7 @@ app.post('/api/create-client-user', async (req, res) => {
         profile_found: !!userProfile,
         profile_error: userProfileError
       });
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: 'Unauthorized: Only admins and sales reps can create users',
         debug: {
           user_email: user.email,
@@ -1941,7 +1941,7 @@ app.post('/api/create-client-user', async (req, res) => {
     }
 
     const { email, password, full_name, company, phone } = req.body;
-    
+
     if (!email || !password || !full_name) {
       return res.status(400).json({ error: 'Email, password, and full_name are required' });
     }
@@ -1959,7 +1959,7 @@ app.post('/api/create-client-user', async (req, res) => {
     } catch (error) {
       // If admin createUser doesn't work, return an error with instructions
       if (!supabaseServiceKey) {
-        return res.status(500).json({ 
+        return res.status(500).json({
           error: 'Cannot create users without service role key',
           message: 'Please add SUPABASE_SERVICE_ROLE_KEY to your .env file to enable user creation from dashboard',
           details: error.message
@@ -2015,7 +2015,7 @@ app.put('/api/update-user-profile', async (req, res) => {
 
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+
     if (authError || !user) {
       return res.status(401).json({ error: 'Invalid token' });
     }
@@ -2029,13 +2029,13 @@ app.put('/api/update-user-profile', async (req, res) => {
 
     // Special handling for master admin
     let userRole = userProfile?.role;
-    
+
     if (user.email === 'nelson.maluf@onprojecoes.com.br') {
       userRole = 'admin';
     }
 
     if (!userRole || !['admin', 'sales_rep'].includes(userRole)) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: 'Unauthorized: Only admins and sales reps can update user profiles',
         debug: {
           user_email: user.email,
@@ -2046,7 +2046,7 @@ app.put('/api/update-user-profile', async (req, res) => {
     }
 
     const { user_id, email, full_name, company, phone } = req.body;
-    
+
     if (!user_id || !email || !full_name) {
       return res.status(400).json({ error: 'user_id, email, and full_name are required' });
     }
@@ -2093,7 +2093,7 @@ app.get('/api/debug/current-user', async (req, res) => {
 
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+
     if (authError || !user) {
       return res.status(401).json({ error: 'Invalid token' });
     }
@@ -2132,20 +2132,20 @@ app.post('/api/setup-admin-profile', async (req, res) => {
 
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+
     if (authError || !user) {
       return res.status(401).json({ error: 'Invalid token' });
     }
 
     // Only allow master admin to set up profiles
-    
+
     if (user.email !== 'nelson.maluf@onprojecoes.com.br') {
       return res.status(403).json({ error: 'Only master admin can setup profiles' });
     }
 
     // Create or update profile for current user
     const adminName = 'Nelson Maluf (Master Admin)';
-    
+
     const { data: profile, error: setupProfileError } = await supabaseAdmin
       .from('user_profiles')
       .upsert({
@@ -2178,20 +2178,20 @@ app.post('/api/setup-admin-profile', async (req, res) => {
 app.post('/api/bootstrap-admin', async (req, res) => {
   try {
     const { user_id, email } = req.body;
-    
+
     if (!user_id || !email) {
       return res.status(400).json({ error: 'user_id and email are required' });
     }
 
     // Only allow for master admin emails
-    
+
     if (email !== 'nelson.maluf@onprojecoes.com.br') {
       return res.status(403).json({ error: 'Only master admin can be bootstrapped' });
     }
 
     // Create or update profile for the user
     const adminName = 'Nelson Maluf (Master Admin)';
-    
+
     const { data: profile, error: bootstrapError } = await supabaseAdmin
       .from('user_profiles')
       .upsert({
@@ -2231,13 +2231,13 @@ app.get('/api/debug/table-structure', async (req, res) => {
 
     if (error) {
       console.error('Error querying user_profiles:', error);
-      
+
       // Try basic query to see what columns exist
       const { data: basicData, error: basicError } = await supabaseAdmin
         .from('user_profiles')
         .select()
         .limit(1);
-      
+
       return res.json({
         error: error,
         basic_query: basicData,
@@ -2274,20 +2274,20 @@ app.post('/api/setup-database', async (req, res) => {
       );
     `;
 
-    const { error: createError } = await supabaseAdmin.rpc('exec_sql', { 
-      sql: createTableSQL 
+    const { error: createError } = await supabaseAdmin.rpc('exec_sql', {
+      sql: createTableSQL
     });
-    
+
     if (createError) {
       console.log('Table creation error (may already exist):', createError);
     }
 
     // Enable RLS
     const enableRLSSQL = `ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;`;
-    const { error: rlsError } = await supabaseAdmin.rpc('exec_sql', { 
-      sql: enableRLSSQL 
+    const { error: rlsError } = await supabaseAdmin.rpc('exec_sql', {
+      sql: enableRLSSQL
     });
-    
+
     if (rlsError) {
       console.log('RLS enable error (may already be enabled):', rlsError);
     }
@@ -2296,42 +2296,70 @@ app.post('/api/setup-database', async (req, res) => {
     const policies = [
       // Allow service role to do everything
       `CREATE POLICY IF NOT EXISTS "Service role can do everything" ON user_profiles FOR ALL USING (true);`,
-      
+
       // Allow users to read their own profile
-      `CREATE POLICY IF NOT EXISTS "Users can read own profile" ON user_profiles FOR SELECT USING (auth.uid() = id);`,
-      
+      `CREATE POLICY IF NOT EXISTS "Service role can do everything" ON user_profiles FOR ALL USING (true);`,
+
+      // Allow users to view their own profile
+      `CREATE POLICY IF NOT EXISTS "Users can view own profile" ON user_profiles FOR SELECT USING (auth.uid() = id);`,
+
       // Allow users to update their own profile
-      `CREATE POLICY IF NOT EXISTS "Users can update own profile" ON user_profiles FOR UPDATE USING (auth.uid() = id);`,
-      
-      // Allow admins to do everything
-      `CREATE POLICY IF NOT EXISTS "Admins can do everything" ON user_profiles FOR ALL USING (
-        EXISTS (
-          SELECT 1 FROM user_profiles up 
-          WHERE up.id = auth.uid() AND up.role = 'admin'
-        )
-      );`
+      `CREATE POLICY IF NOT EXISTS "Users can update own profile" ON user_profiles FOR UPDATE USING (auth.uid() = id);`
     ];
 
     for (const policy of policies) {
-      const { error: policyError } = await supabaseAdmin.rpc('exec_sql', { 
-        sql: policy 
-      });
-      
-      if (policyError) {
-        console.log('Policy creation error (may already exist):', policyError);
+      const { error } = await supabaseAdmin.rpc('exec_sql', { sql: policy });
+      if (error) {
+        console.log('Policy creation warning (may already exist):', error.message);
       }
     }
 
-    res.json({
-      success: true,
-      message: 'Database setup completed'
-    });
+    res.json({ success: true, message: 'Database setup completed' });
 
   } catch (error) {
     console.error('Error setting up database:', error.message);
     res.status(500).json({ error: 'Failed to setup database', details: error.message });
   }
 });
+
+// --- Public Quote Sharing Routes ---
+
+// Serve the quote viewer page
+app.get('/quote/:slug', (req, res) => {
+  res.sendFile(path.join(__dirname, 'quote.html'));
+});
+
+// Public API to fetch quote data by ID (or slug)
+app.get('/api/quotes/public/:slug', async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    // For now, we assume the 'slug' is just the UUID of the proposal.
+    // In a production specific slug implementation, we would query by a 'slug' column.
+
+    const { data, error } = await supabaseAdmin
+      .from('proposals')
+      .select('*')
+      .eq('id', slug)
+      .single();
+
+    if (error) {
+      console.error('Error fetching public quote:', error);
+      return res.status(404).json({ error: 'Quote not found' });
+    }
+
+    // Return only necessary public data (sanitize if needed)
+    res.json({ quote: data });
+
+  } catch (error) {
+    console.error('Error in public quote API:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// --- End Public Quote Routes ---
+
+
 
 // --- Email API Route ---
 
@@ -2343,28 +2371,28 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 app.post('/api/send-email', async (req, res) => {
   try {
     const { name, email, subject, message, phone, company, project, 'equipment-interest': equipmentInterest } = req.body;
-    
+
     // Basic validation - check for either message or project field
     if (!name || !email || (!message && !project)) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Campos obrigatórios: nome, email e mensagem',
-        message: 'Por favor, preencha todos os campos obrigatórios.' 
+        message: 'Por favor, preencha todos os campos obrigatórios.'
       });
     }
 
     // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Email inválido',
-        message: 'Por favor, insira um endereço de email válido.' 
+        message: 'Por favor, insira um endereço de email válido.'
       });
     }
 
     // Prepare email content
     const emailContent = message || project || '';
     const emailSubject = subject || `On+Av Site: Nova Mensagem de Contato de ${name}`;
-    
+
     // Send email using Resend
     const { data, error } = await resend.emails.send({
       from: 'On+Av Contato <contato@onav.com.br>',
@@ -2387,26 +2415,26 @@ app.post('/api/send-email', async (req, res) => {
 
     if (error) {
       console.error('Resend API Error:', error);
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Erro ao enviar email',
         message: 'Erro ao enviar o email. Tente novamente mais tarde.',
-        details: error.message 
+        details: error.message
       });
     }
 
     console.log('Email sent successfully:', data);
-    
-    res.json({ 
-      success: true, 
-      message: 'Mensagem enviada com sucesso! Entraremos em contato em breve.' 
+
+    res.json({
+      success: true,
+      message: 'Mensagem enviada com sucesso! Entraremos em contato em breve.'
     });
-    
+
   } catch (error) {
     console.error('Error handling contact form:', error.message);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Erro interno do servidor',
       message: 'Ocorreu um erro ao processar sua mensagem. Tente novamente mais tarde.',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -2440,7 +2468,7 @@ app.get('/api/debug/slug/:slug', async (req, res) => {
   const { slug } = req.params;
   const isTemporary = slug.startsWith('quote-');
   const id = isTemporary ? slug.replace('quote-', '') : null;
-  
+
   res.json({
     originalSlug: slug,
     isTemporary,
@@ -2453,7 +2481,7 @@ app.get('/api/debug/slug/:slug', async (req, res) => {
 app.get('/api/quotes/public/:slug', async (req, res) => {
   try {
     const { slug } = req.params;
-    
+
     if (!slug) {
       return res.status(400).json({ error: 'Quote slug is required' });
     }
@@ -2461,21 +2489,21 @@ app.get('/api/quotes/public/:slug', async (req, res) => {
     // Get quote by slug or ID (for temporary slugs)
     let quote = null;
     let error = null;
-    
+
     console.log('Looking up quote with slug:', slug);
-    
+
     // Check if this is a temporary slug format (quote-{id})
     if (slug.startsWith('quote-')) {
       const id = slug.replace('quote-', '');
       console.log('Detected temporary slug format, looking up by ID:', id);
-      
+
       // Try ID-based lookup for temporary slugs
       const { data, error: idError } = await supabaseAdmin
         .from('proposals')
         .select('*')
         .eq('id', id)
         .single();
-      
+
       quote = data;
       error = idError;
     } else {
@@ -2486,7 +2514,7 @@ app.get('/api/quotes/public/:slug', async (req, res) => {
         .select('*')
         .eq('quote_url_slug', slug)
         .single();
-      
+
       quote = data;
       error = slugError;
     }
@@ -2500,12 +2528,12 @@ app.get('/api/quotes/public/:slug', async (req, res) => {
       console.log('No quote found for slug:', slug);
       return res.status(404).json({ error: 'Quote not found' });
     }
-    
+
     console.log('Found quote:', quote.id, quote.project_name);
 
     // Parse services data - it can be stored in multiple places
     let parsedServices = [];
-    
+
     // First, try to parse selected_services column
     if (quote.selected_services) {
       try {
@@ -2518,7 +2546,7 @@ app.get('/api/quotes/public/:slug', async (req, res) => {
         console.error('Error parsing selected_services:', e);
       }
     }
-    
+
     // If no services found, try discount_description field (for dashboard-created quotes)
     if (parsedServices.length === 0 && quote.discount_description) {
       try {
@@ -2574,7 +2602,7 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
   try {
     const { slug } = req.params;
     const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
-    
+
     if (!slug) {
       return res.status(400).json({ error: 'Quote slug is required' });
     }
@@ -2582,7 +2610,7 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
     // First, check if quote exists and is not already approved
     let existingQuote = null;
     let fetchError = null;
-    
+
     if (slug.startsWith('quote-')) {
       const id = slug.replace('quote-', '');
       const { data, error } = await supabaseAdmin
@@ -2613,7 +2641,7 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
     // Update quote with approval using RPC (works without service key)
     const approvedAt = new Date().toISOString();
     console.log(`Attempting to approve quote ID: ${existingQuote.id}, IP: ${clientIP}`);
-    
+
     const updateQuery = `
       UPDATE proposals 
       SET quote_approved = true, 
@@ -2622,7 +2650,7 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
           status = 'approved'
       WHERE id = '${existingQuote.id}'
     `;
-    
+
     const { error: updateError } = await supabase.rpc('execute_sql', { sql_query: updateQuery });
 
     if (updateError) {
@@ -2653,8 +2681,8 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
     // TODO: Send approval notification email to admin/sales team
     console.log(`Quote approved: ${existingQuote.project_name} by client at ${clientIP}`);
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: 'Quote approved successfully',
       approvedAt: approvedAt,
       quote: completeQuote
@@ -2670,7 +2698,7 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
 app.post('/api/proposals/:id/generate-slug', async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     if (!id) {
       return res.status(400).json({ error: 'Proposal ID is required' });
     }
@@ -2683,7 +2711,7 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
 
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+
     if (authError || !user) {
       return res.status(401).json({ error: 'Invalid token' });
     }
@@ -2697,7 +2725,7 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
 
     // Special handling for master admin
     let userRole = userProfile?.role;
-    
+
     if (user.email === 'nelson.maluf@onprojecoes.com.br') {
       userRole = 'admin';
     }
@@ -2718,18 +2746,18 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
     }
 
     console.log('Fetching proposal with ID:', id);
-    
+
     // Try to get proposal with quote_url_slug first, fallback to basic fields if column doesn't exist
     let proposal = null;
     let fetchError = null;
-    
+
     try {
       const { data, error } = await supabaseAdmin
         .from('proposals')
         .select('project_name, quote_url_slug')
         .eq('id', id)
         .single();
-      
+
       proposal = data;
       fetchError = error;
     } catch (error) {
@@ -2741,7 +2769,7 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
           .select('project_name')
           .eq('id', id)
           .single();
-        
+
         proposal = data ? { ...data, quote_url_slug: null } : null;
         fetchError = basicError;
       } else {
@@ -2801,11 +2829,11 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
         }
 
         if (!existing) break; // Slug is unique
-        
+
         finalSlug = `${baseSlug}-${counter}`;
         counter++;
         console.log('Slug exists, trying:', finalSlug);
-        
+
         if (counter > 100) { // Prevent infinite loop
           finalSlug = `${baseSlug}-${Date.now()}`;
           break;
@@ -2819,7 +2847,7 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
 
     // Update proposal with the generated slug
     console.log('Updating proposal with slug:', finalSlug);
-    
+
     try {
       const { error: updateError } = await supabaseAdmin
         .from('proposals')
@@ -2843,7 +2871,7 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
       res.json({ slug: finalSlug });
     } catch (updateError) {
       console.error('Error updating proposal with slug:', updateError);
-      
+
       // Fallback: return a temporary slug based on ID
       const tempSlug = `quote-${id}`;
       console.log('Fallback: using temporary slug due to update error:', tempSlug);
@@ -2853,8 +2881,8 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
   } catch (error) {
     console.error('Error in generate slug endpoint:', error);
     console.error('Error stack:', error.stack);
-    res.status(500).json({ 
-      error: 'Internal server error', 
+    res.status(500).json({
+      error: 'Internal server error',
       details: error.message,
       stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
@@ -2911,55 +2939,55 @@ async function sendProposalWebhook(proposalData) {
   try {
     // Create a unique key for this proposal
     const webhookKey = `${proposalData.id || 'unknown'}_${Date.now()}`;
-    
+
     // Check if we already sent this webhook recently (within 10 seconds)
     const recentKey = `${proposalData.id || 'unknown'}`;
     const now = Date.now();
-    const isRecent = Array.from(sentWebhooks).some(key => 
+    const isRecent = Array.from(sentWebhooks).some(key =>
       key.startsWith(recentKey) && (now - parseInt(key.split('_')[1])) < 10000
     );
-    
+
     if (isRecent) {
       console.log('Skipping duplicate webhook for proposal:', proposalData.id);
       return;
     }
-    
+
     // Add to sent webhooks
     sentWebhooks.add(webhookKey);
-    
+
     // Clean up old entries (keep only last 100)
     if (sentWebhooks.size > 100) {
       const oldestKeys = Array.from(sentWebhooks).slice(0, 50);
       oldestKeys.forEach(key => sentWebhooks.delete(key));
     }
-    
+
     console.log('Sending webhook from SERVER for proposal:', proposalData.id);
-    
+
     const webhookPayload = {
       // Client Information
       client_name: proposalData.client_name,
-      client_email: proposalData.client_email, 
+      client_email: proposalData.client_email,
       client_phone: proposalData.client_phone,
       client_company: proposalData.client_company,
-      
+
       // Sales Rep Information
       sales_rep_name: proposalData.sales_rep_name,
       sales_rep_id: proposalData.sales_rep_id,
-      
+
       // Project Information
       project_name: proposalData.project_name,
-      
+
       // Shooting Dates
       shooting_dates_start: proposalData.shooting_dates_start,
       shooting_dates_end: proposalData.shooting_dates_end,
       days_count: proposalData.days_count,
-      
+
       // Quote/Pricing Information
       total_price: proposalData.total_price,
       daily_rate: proposalData.daily_rate,
       selected_pod_type: proposalData.selected_pod_type,
       selected_services: proposalData.selected_services,
-      
+
       // LED Configuration Details  
       led_principal_width: proposalData.led_principal_width,
       led_principal_height: proposalData.led_principal_height,
@@ -2969,7 +2997,7 @@ async function sendProposalWebhook(proposalData) {
       led_principal_pixels_height: proposalData.led_principal_pixels_height,
       led_principal_total_pixels: proposalData.led_principal_total_pixels,
       led_principal_curvature: proposalData.led_principal_curvature,
-      
+
       // LED Teto Configuration (if available)
       led_teto_width: proposalData.led_teto_width,
       led_teto_height: proposalData.led_teto_height,
@@ -2978,7 +3006,7 @@ async function sendProposalWebhook(proposalData) {
       led_teto_pixels_width: proposalData.led_teto_pixels_width,
       led_teto_pixels_height: proposalData.led_teto_pixels_height,
       led_teto_total_pixels: proposalData.led_teto_total_pixels,
-      
+
       // Power and weight data
       principal_power_max: proposalData.principal_power_max,
       principal_power_avg: proposalData.principal_power_avg,
@@ -2986,47 +3014,47 @@ async function sendProposalWebhook(proposalData) {
       teto_power_max: proposalData.teto_power_max,
       teto_power_avg: proposalData.teto_power_avg,
       teto_weight: proposalData.teto_weight,
-      
+
       // System Information
       proposal_id: proposalData.id,
       created_at: proposalData.created_at,
       status: proposalData.status,
-      
+
       // Additional context
       source: 'onav_led_calculator_server',
       timestamp: new Date().toISOString(),
       webhook_call_id: `server_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     };
-    
+
     console.log('Sending proposal webhook to N8N from server:', proposalData.id);
-    
+
     // Send to N8N webhook using GET with query parameters
     const queryParams = new URLSearchParams();
     Object.keys(webhookPayload).forEach(key => {
       if (webhookPayload[key] !== null && webhookPayload[key] !== undefined) {
         // Convert arrays to string format for URL params
-        const value = Array.isArray(webhookPayload[key]) 
-          ? JSON.stringify(webhookPayload[key]) 
+        const value = Array.isArray(webhookPayload[key])
+          ? JSON.stringify(webhookPayload[key])
           : String(webhookPayload[key]);
         queryParams.append(key, value);
       }
     });
-    
+
     const webhookUrl = `https://n8n.avauto.fun/webhook/061d8866-fa53-435a-9a5f-ceafb3e2e639?${queryParams.toString()}`;
-    
+
     console.log('Server webhook URL being called:', webhookUrl);
     console.log('Server query parameters count:', queryParams.toString().split('&').length);
-    
+
     const response = await fetch(webhookUrl, {
       method: 'GET'
     });
-    
+
     if (!response.ok) {
       throw new Error(`Webhook failed: ${response.status} ${response.statusText}`);
     }
-    
+
     console.log('Webhook sent successfully to N8N from server');
-    
+
   } catch (error) {
     console.error('Error sending webhook to N8N from server:', error);
     throw error;
@@ -3037,10 +3065,10 @@ async function sendProposalWebhook(proposalData) {
 async function sendProposalEmailNotification(proposalData, createdByUserId, currentUserRole) {
   try {
     console.log('Sending proposal email notification from server via Supabase Edge Function');
-    
+
     // Create a server-side supabase client for calling Edge Functions
     const supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
-    
+
     // Call the Supabase Edge Function
     const { data, error } = await supabaseClient.functions.invoke('send-quote-notification', {
       body: {
@@ -3049,13 +3077,13 @@ async function sendProposalEmailNotification(proposalData, createdByUserId, curr
         currentUserRole: currentUserRole
       }
     });
-    
+
     if (error) {
       throw new Error(`Email notification failed: ${error.message}`);
     }
-    
+
     console.log('Email notification sent successfully from server:', data);
-    
+
   } catch (error) {
     console.error('Error sending email notification from server:', error);
     throw error;
@@ -3067,17 +3095,17 @@ async function sendProposalEmailNotification(proposalData, createdByUserId, curr
 app.post('/api/webhook-proxy', async (req, res) => {
   try {
     const { targetUrl, payload } = req.body;
-    
+
     if (!targetUrl || !payload) {
       return res.status(400).json({ error: 'Missing targetUrl or payload' });
     }
-    
+
     console.log('Proxying webhook to:', targetUrl);
     console.log('Payload:', JSON.stringify(payload, null, 2));
-    
+
     // Import fetch dynamically for Node.js compatibility
     const fetch = (await import('node-fetch')).default;
-    
+
     const response = await fetch(targetUrl, {
       method: 'POST',
       headers: {
@@ -3086,11 +3114,11 @@ app.post('/api/webhook-proxy', async (req, res) => {
       },
       body: JSON.stringify(payload)
     });
-    
+
     const responseText = await response.text();
     console.log('Webhook response status:', response.status);
     console.log('Webhook response:', responseText);
-    
+
     // Try to parse as JSON, fallback to text
     let responseData;
     try {
@@ -3098,18 +3126,18 @@ app.post('/api/webhook-proxy', async (req, res) => {
     } catch (e) {
       responseData = responseText;
     }
-    
+
     res.status(response.status).json({
       success: response.ok,
       status: response.status,
       data: responseData
     });
-    
+
   } catch (error) {
     console.error('Webhook proxy error:', error);
-    res.status(500).json({ 
-      error: 'Webhook proxy failed', 
-      details: error.message 
+    res.status(500).json({
+      error: 'Webhook proxy failed',
+      details: error.message
     });
   }
 });

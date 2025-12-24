@@ -922,7 +922,7 @@ class QuoteCartModal {
             // --- Success Handling ---
             console.log('[QuoteCartModal] Resetting cart and showing confirmation...');
             this.hide();
-            this.showConfirmationModal(projectName, isGuestUser, guestUserCreated);
+            this.showConfirmationModal(projectName, isGuestUser, guestUserCreated, savedProposal?.id);
             console.log('[QuoteCartModal] Successfully called showConfirmationModal.');
 
         } catch (error) {
@@ -948,7 +948,7 @@ class QuoteCartModal {
 
     // ... (other methods like showCalEmbed, etc.) ...
 
-    showConfirmationModal(projectName, isGuestUser = false, guestUserCreated = false) {
+    showConfirmationModal(projectName, isGuestUser = false, guestUserCreated = false, proposalId = null) {
         console.log('[QuoteCartModal] Entering showConfirmationModal...');
         const confirmationModal = document.getElementById('confirmation-modal');
         const confirmationHeader = document.getElementById('confirmation-header');
