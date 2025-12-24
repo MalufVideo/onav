@@ -346,6 +346,35 @@ async function deleteCalendarEvent(eventId) {
   }
 }
 
+// --- WhatsApp Notification Configuration ---
+const WHATSAPP_API_URL = 'http://72.60.142.28:3000/send';
+const WHATSAPP_NOTIFICATION_PHONE = '5519981454647';
+
+/**
+ * Send a WhatsApp notification message
+ * @param {string} message - The message to send
+ * @returns {Promise<boolean>} - True if sent successfully
+ */
+async function sendWhatsAppNotification(message) {
+  try {
+    console.log('📱 Sending WhatsApp notification...');
+    const response = await fetch(WHATSAPP_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to: WHATSAPP_NOTIFICATION_PHONE, message })
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`WhatsApp API error: ${response.status} - ${errorText}`);
+    }
+    console.log('✅ WhatsApp notification sent successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ WhatsApp notification failed:', error.message);
+    return false;
+  }
+}
+
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
@@ -1924,6 +1953,13 @@ app.post('/api/save-proposal', async (req, res) => {
         calendarResult = await createPreReserveEvent(data);
         if (calendarResult.success) {
           console.log(`[save-proposal] Pre-reserve calendar event created for proposal ${data.id}`);
+          // Send WhatsApp notification for PRÉ-RESERVA
+          try {
+            const whatsappMsg = `🔄 *PRÉ-RESERVA CRIADA*\n\n📋 *Projeto:* ${data.project_name || 'N/A'}\n👤 *Cliente:* ${data.client_name || 'N/A'}\n📧 *Email:* ${data.client_email || 'N/A'}\n📞 *Telefone:* ${data.client_phone || 'N/A'}\n📅 *Data:* ${data.shooting_dates_start || 'N/A'}\n💰 *Valor:* ${data.total_price || 'N/A'}\n\n🔗 ID: ${data.id}`;
+            await sendWhatsAppNotification(whatsappMsg);
+          } catch (whatsappError) {
+            console.warn('WhatsApp notification failed:', whatsappError.message);
+          }
         } else {
           console.warn(`[save-proposal] Failed to create pre-reserve event: ${calendarResult.error}`);
         }
@@ -3291,6 +3327,13 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
 
       if (conflictCheck.hasConflict) {
         console.log(`[quote-approval] Date conflict found! Blocking approval for quote ${existingQuote.id}`);
+        // Send WhatsApp notification for Data Indisponível
+        try {
+          const whatsappMsg = `⚠️ *DATA INDISPONÍVEL*\n\n📅 *Data Solicitada:* ${existingQuote.shooting_dates_start || 'N/A'}\n👤 *Cliente:* ${existingQuote.client_name || 'N/A'}\n📧 *Email:* ${existingQuote.client_email || 'N/A'}\n📞 *Telefone:* ${existingQuote.client_phone || 'N/A'}\n📋 *Projeto:* ${existingQuote.project_name || 'N/A'}\n\n❌ Cliente tentou reservar data já ocupada!\n🔗 ID: ${existingQuote.id}`;
+          await sendWhatsAppNotification(whatsappMsg);
+        } catch (whatsappError) {
+          console.warn('WhatsApp notification failed:', whatsappError.message);
+        }
         return res.status(409).json({
           error: 'date_conflict',
           message: 'Esta data já está reservada para outra gravação. Um especialista entrará em contato para encontrar uma nova data disponível.',
@@ -3328,6 +3371,13 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
         calendarResult = await createConfirmedBookingEvent(existingQuote);
         if (calendarResult.success) {
           console.log(`[quote-approval] Confirmed booking calendar event created for quote ${existingQuote.id}`);
+          // Send WhatsApp notification for CONFIRMADO
+          try {
+            const whatsappMsg = `✅ *CONFIRMADO*\n\n📋 *Projeto:* ${existingQuote.project_name || 'N/A'}\n👤 *Cliente:* ${existingQuote.client_name || 'N/A'}\n📧 *Email:* ${existingQuote.client_email || 'N/A'}\n📞 *Telefone:* ${existingQuote.client_phone || 'N/A'}\n📅 *Data:* ${existingQuote.shooting_dates_start || 'N/A'}\n💰 *Valor:* ${existingQuote.total_price || 'N/A'}\n\n🎉 Proposta aprovada pelo cliente!\n🔗 ID: ${existingQuote.id}`;
+            await sendWhatsAppNotification(whatsappMsg);
+          } catch (whatsappError) {
+            console.warn('WhatsApp notification failed:', whatsappError.message);
+          }
         } else {
           console.warn(`[quote-approval] Failed to create confirmed booking event: ${calendarResult.error}`);
         }
