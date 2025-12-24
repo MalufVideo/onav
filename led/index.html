@@ -155,14 +155,20 @@
     <!-- Right Sidebar: Pricing Pod and CTA -->
     <div id="info-sidebar">
       <!-- Auth Card - Login/Register buttons -->
-      <div class="control-card auth-container" id="auth-card-static" style="margin-bottom: 15px;">
-        <div class="auth-nav-buttons">
-          <button id="login-button-static" class="auth-button">Entrar</button>
-          <button id="register-button-static" class="auth-button">Cadastrar</button>
-          <div id="user-profile-static" class="user-profile" style="display: none;">
-            <span id="user-name-static"></span>
-            <a href="my-quotes.html" class="auth-button" id="my-quotes-button-static">Minhas Propostas</a>
-            <button id="logout-button-static" class="auth-button logout-btn">Sair</button>
+      <div class="control-card" id="auth-card-static" style="margin-bottom: 15px;">
+        <h2>Minha Conta</h2>
+        <div class="selector-buttons" style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+          <button id="login-button-static" class="selector-btn" style="flex: 1;">Entrar</button>
+          <button id="register-button-static" class="selector-btn" style="flex: 1;">Cadastrar</button>
+
+          <div id="user-profile-static" class="user-profile" style="display: none; width: 100%; text-align: center;">
+            <p id="user-name-static" style="margin-bottom: 10px; font-weight: bold; color: #fff;"></p>
+            <div style="display: flex; gap: 10px; flex-direction: column;">
+              <a href="my-quotes.html" class="selector-btn active" id="my-quotes-button-static"
+                style="text-decoration: none; padding: 10px;">Minhas Propostas</a>
+              <button id="logout-button-static" class="selector-btn"
+                style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.5);">Sair</button>
+            </div>
           </div>
         </div>
       </div>
@@ -806,61 +812,13 @@
         }
       }
 
-      // Setup event listeners for static auth buttons
-      function setupStaticAuthButtons() {
-        const loginBtn = document.getElementById('login-button-static');
-        const registerBtn = document.getElementById('register-button-static');
-        const logoutBtn = document.getElementById('logout-button-static');
-
-        if (loginBtn) {
-          loginBtn.addEventListener('click', () => {
-            if (window.authUI && window.authUI.openModal) {
-              window.authUI.openModal('login-modal');
-            } else {
-              console.log('Auth UI not ready, waiting...');
-              setTimeout(() => {
-                if (window.authUI && window.authUI.openModal) {
-                  window.authUI.openModal('login-modal');
-                }
-              }, 1000);
-            }
-          });
-        }
-
-        if (registerBtn) {
-          registerBtn.addEventListener('click', () => {
-            if (window.authUI && window.authUI.openModal) {
-              window.authUI.openModal('register-modal');
-            } else {
-              console.log('Auth UI not ready, waiting...');
-              setTimeout(() => {
-                if (window.authUI && window.authUI.openModal) {
-                  window.authUI.openModal('register-modal');
-                }
-              }, 1000);
-            }
-          });
-        }
-
-        if (logoutBtn) {
-          logoutBtn.addEventListener('click', async () => {
-            if (window.auth && window.auth.signOut) {
-              await window.auth.signOut();
-              location.reload();
-            }
-          });
-        }
-
-        console.log('[index.html] Static auth button listeners set up');
-      }
-
       // Call setup after DOM is ready
-      setupStaticAuthButtons();
+      // setupStaticAuthButtons() removed - handled by auth-ui.js
     </script>
     <!-- fix-rube-draco.js script removed -->
 
     <script>
-      // Instantiate the Quote Cart Modal globally after DOM is ready
+      // Instantiate the Quote Cart Modal globally after DOM ready
       // Ensure this runs after the QuoteCartModal class definition is loaded
       document.addEventListener('DOMContentLoaded', () => {
         console.log('[index.optimized.html] DOMContentLoaded fired for modal instantiation.'); // Log listener start

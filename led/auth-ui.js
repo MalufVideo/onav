@@ -11,18 +11,14 @@ function createAuthUI() {
       <button id="login-button" class="auth-button">Entrar</button>
       <button id="register-button" class="auth-button">Cadastrar</button>
       <div id="user-profile" class="user-profile" style="display: none;">
-        <span id="user-name" style="margin-right: 10px; font-weight: bold; color: #fff;"></span>
-        <a href="my-quotes.html" class="auth-button" id="my-quotes-button" style="margin-right: 10px;">Minhas Propostas</a>
-        <button id="logout-button" class="auth-button logout-btn">Sair</button>
-      </div>
-    </div>
-  `;
-  
-  // Add auth card to the right sidebar at the top
-  const infoSidebar = document.getElementById('info-sidebar');
-  if (infoSidebar) {
-    // Insert auth card as the first element of the sidebar
-    infoSidebar.insertBefore(authCard, infoSidebar.firstChild);
+  // Auth card is now in HTML, just check if it exists
+  // Try both IDs for compatibility
+  const authCard = document.getElementById('auth-card-static') || document.getElementById('auth-card');
+  if (!authCard) {
+    console.error('[auth-ui.js] Auth card not found in HTML');
+    // Continue anyway to create modals if possible, but logging is good
+  } else {
+    console.log('[auth-ui.js] Found auth card in HTML, setting up event listeners');
   }
   
   // Create login modal
@@ -30,7 +26,7 @@ function createAuthUI() {
   loginModal.id = 'login-modal';
   loginModal.className = 'modal-overlay';
   loginModal.innerHTML = `
-    <div class="modal-content auth-modal">
+    < div class="modal-content auth-modal" >
       <button class="modal-close">&times;</button>
       <h2>Entrar</h2>
       <form id="login-form" class="auth-form">
@@ -46,15 +42,15 @@ function createAuthUI() {
         <div id="login-success" class="auth-success"></div>
         <button type="submit" class="form-submit">Entrar</button>
       </form>
-    </div>
-  `;
+    </div >
+    `;
   
   // Create registration modal
   const registerModal = document.createElement('div');
   registerModal.id = 'register-modal';
   registerModal.className = 'modal-overlay';
   registerModal.innerHTML = `
-    <div class="modal-content auth-modal">
+    < div class="modal-content auth-modal" >
       <button class="modal-close">&times;</button>
       <h2>Criar Conta</h2>
       <form id="register-form" class="auth-form">
@@ -86,12 +82,13 @@ function createAuthUI() {
         <div id="register-success" class="auth-success"></div>
         <button type="submit" class="form-submit">Cadastrar</button>
       </form>
-    </div>
-  `;
+    </div >
+    `;
   
   // Append modals to body
-  document.body.appendChild(loginModal);
-  document.body.appendChild(registerModal);
+  // Check if they already exist first to prevent duplicates
+  if (!document.getElementById('login-modal')) document.body.appendChild(loginModal);
+  if (!document.getElementById('register-modal')) document.body.appendChild(registerModal);
   
   // Set up event listeners
   setupAuthEventListeners();
@@ -102,18 +99,31 @@ function createAuthUI() {
 
 // Set up event listeners for auth UI elements
 function setupAuthEventListeners() {
-  // Login button click
-  document.getElementById('login-button').addEventListener('click', () => {
-    openModal('login-modal');
-  });
+  // Static buttons in sidebar
+  const loginBtn = document.getElementById('login-button-static');
+  const registerBtn = document.getElementById('register-button-static');
+  const logoutBtn = document.getElementById('logout-button-static');
+
+  if (loginBtn) {
+    loginBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openModal('login-modal');
+    });
+  }
   
-  // Register button click
-  document.getElementById('register-button').addEventListener('click', () => {
-    openModal('register-modal');
-  });
+  if (registerBtn) {
+    registerBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openModal('register-modal');
+    });
+  }
   
-  // Logout button click
-  document.getElementById('logout-button').addEventListener('click', handleLogout);
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      handleLogout();
+    });
+  }
   
   // Close modal buttons
   document.querySelectorAll('.modal-close').forEach(button => {
@@ -345,78 +355,78 @@ async function updateAuthUI() {
 function addAuthStyles() {
   const styleSheet = document.createElement('style');
   styleSheet.textContent = `
-/* Main Auth Container Styles (mostly unchanged unless conflicting) */
-.auth-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  width: 100%;
-}
+      /* Main Auth Container Styles (mostly unchanged unless conflicting) */
+      .auth - container {
+    display: flex;
+    flex - direction: column;
+    align - items: flex - start;
+    width: 100 %;
+  }
 
 /* Auth Navigation Buttons (mostly unchanged unless conflicting) */
-.auth-nav-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  padding: 5px;
-  background-color: transparent;
-  width: 100%;
-}
+.auth - nav - buttons {
+    display: flex;
+    flex - wrap: wrap;
+    gap: 10px;
+    justify - content: center;
+    padding: 5px;
+    background - color: transparent;
+    width: 100 %;
+  }
 
-.auth-button { /* This is for sidebar buttons, not modal submit */
-  padding: 8px 14px;
-  border: none;
-  border-radius: 999px;
-  background-image: linear-gradient(120deg, #f97316, #fbbf24);
-  color: #0f172a;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 14px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  text-decoration: none;
-  display: inline-block;
-  text-align: center;
-  box-shadow: 0 10px 20px rgba(249, 115, 22, 0.3);
-}
+.auth - button { /* This is for sidebar buttons, not modal submit */
+    padding: 8px 14px;
+    border: none;
+    border - radius: 999px;
+    background - image: linear - gradient(120deg, #f97316, #fbbf24);
+    color: #0f172a;
+    font - weight: 600;
+    cursor: pointer;
+    font - size: 14px;
+    transition: transform 0.2s ease, box - shadow 0.2s ease;
+    text - decoration: none;
+    display: inline - block;
+    text - align: center;
+    box - shadow: 0 10px 20px rgba(249, 115, 22, 0.3);
+  }
 
-.auth-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 14px 26px rgba(249, 115, 22, 0.35);
-}
+.auth - button:hover {
+    transform: translateY(-1px);
+    box - shadow: 0 14px 26px rgba(249, 115, 22, 0.35);
+  }
 
-.logout-btn {
-  background-image: linear-gradient(120deg, #f87171, #ef4444);
-  color: #fff;
-  box-shadow: 0 10px 20px rgba(239, 68, 68, 0.25);
-}
+.logout - btn {
+    background - image: linear - gradient(120deg, #f87171, #ef4444);
+    color: #fff;
+    box - shadow: 0 10px 20px rgba(239, 68, 68, 0.25);
+  }
 
-.logout-btn:hover {
-  box-shadow: 0 14px 26px rgba(239, 68, 68, 0.35);
-}
+.logout - btn:hover {
+    box - shadow: 0 14px 26px rgba(239, 68, 68, 0.35);
+  }
 
-.user-profile {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  width: 100%;
-}
+.user - profile {
+    display: flex;
+    align - items: center;
+    justify - content: center;
+    flex - wrap: wrap;
+    gap: 6px;
+    width: 100 %;
+  }
 
-#user-name {
-  color: #fff;
-  font-weight: bold;
-  flex-grow: 1;
-  text-align: center;
-  width: 100%;
-  margin-bottom: 5px;
-  white-space: normal;
-  word-wrap: break-word;
-  line-height: 1.2;
-  max-height: 2.4em;
-  overflow: hidden;
-}
+  #user - name {
+    color: #fff;
+    font - weight: bold;
+    flex - grow: 1;
+    text - align: center;
+    width: 100 %;
+    margin - bottom: 5px;
+    white - space: normal;
+    word - wrap: break-word;
+    line - height: 1.2;
+    max - height: 2.4em;
+    overflow: hidden;
+  }
 
 /* --- NEW/MODIFIED MODAL STYLES START HERE --- */
 
@@ -427,141 +437,141 @@ function addAuthStyles() {
 /* .modal-content { ... } */
 
 /* Auth Modal Specific Styles */
-.auth-modal { /* This class is on the modal-content div */
-  background-color: #ffffff;
-  padding: 30px 40px; /* Increased padding */
-  border-radius: 12px; /* Softer, larger radius */
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
-  max-width: 480px; /* Increased width */
-  width: 90%; /* Responsive width */
-  text-align: left; /* Align content to the left */
-}
+.auth - modal { /* This class is on the modal-content div */
+    background - color: #ffffff;
+    padding: 30px 40px; /* Increased padding */
+    border - radius: 12px; /* Softer, larger radius */
+    box - shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
+    max - width: 480px; /* Increased width */
+    width: 90 %; /* Responsive width */
+    text - align: left; /* Align content to the left */
+  }
 
-.auth-modal h2 {
-  font-size: 22px; /* Slightly smaller title */
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 20px; /* Reduced space below title */
-  text-align: center; /* Center the title */
-}
+.auth - modal h2 {
+    font - size: 22px; /* Slightly smaller title */
+    font - weight: 600;
+    color: #333;
+    margin - bottom: 20px; /* Reduced space below title */
+    text - align: center; /* Center the title */
+  }
 
-.auth-modal .modal-close { /* Style the close button */
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  font-size: 28px;
-  color: #aaa;
-  background: none;
-  border: none;
-  cursor: pointer;
-  line-height: 1;
-}
+.auth - modal.modal - close { /* Style the close button */
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font - size: 28px;
+    color: #aaa;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line - height: 1;
+  }
 
-.auth-modal .modal-close:hover {
-  color: #333;
-}
+.auth - modal.modal - close:hover {
+    color: #333;
+  }
 
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px; /* Reduced gap between form groups */
-}
+.auth - form {
+    display: flex;
+    flex - direction: column;
+    gap: 15px; /* Reduced gap between form groups */
+  }
 
-.auth-form .form-group {
-  margin-bottom: 0; /* Remove margin as gap is handled by flex on auth-form */
-}
+.auth - form.form - group {
+    margin - bottom: 0; /* Remove margin as gap is handled by flex on auth-form */
+  }
 
-.auth-form label {
-  display: block;
-  font-size: 14px;
-  font-weight: 500; /* Slightly less bold */
-  color: #555;
-  margin-bottom: 5px; /* Reduced space between label and input */
-}
+.auth - form label {
+    display: block;
+    font - size: 14px;
+    font - weight: 500; /* Slightly less bold */
+    color: #555;
+    margin - bottom: 5px; /* Reduced space between label and input */
+  }
 
-.auth-form input[type="text"],
-.auth-form input[type="email"],
-.auth-form input[type="password"],
-.auth-form input[type="tel"] {
-  width: 100%;
-  padding: 10px 12px; /* Reduced padding */
-  font-size: 15px; /* Slightly smaller font in input */
-  color: #333;
-  background-color: #f9f9f9; /* Light background for inputs */
-  border: 1px solid #ddd; /* Softer border */
-  border-radius: 8px; /* Rounded corners */
-  box-sizing: border-box;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
+.auth - form input[type = "text"],
+.auth - form input[type = "email"],
+.auth - form input[type = "password"],
+.auth - form input[type = "tel"] {
+    width: 100 %;
+    padding: 10px 12px; /* Reduced padding */
+    font - size: 15px; /* Slightly smaller font in input */
+    color: #333;
+    background - color: #f9f9f9; /* Light background for inputs */
+    border: 1px solid #ddd; /* Softer border */
+    border - radius: 8px; /* Rounded corners */
+    box - sizing: border - box;
+    transition: border - color 0.2s, box - shadow 0.2s;
+  }
 
-.auth-form input[type="text"]:focus,
-.auth-form input[type="email"]:focus,
-.auth-form input[type="password"]:focus,
-.auth-form input[type="tel"]:focus {
-  outline: none;
-  border-color: #007bff; /* Highlight color on focus */
-  background-color: #fff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1); /* Subtle glow on focus */
-}
+.auth - form input[type = "text"]: focus,
+.auth - form input[type = "email"]: focus,
+.auth - form input[type = "password"]: focus,
+.auth - form input[type = "tel"]:focus {
+    outline: none;
+    border - color: #007bff; /* Highlight color on focus */
+    background - color: #fff;
+    box - shadow: 0 0 0 3px rgba(0, 123, 255, 0.1); /* Subtle glow on focus */
+  }
 
-.auth-form .form-submit { /* This is the main action button in the modal */
-  width: 100%;
-  padding: 10px 15px; /* Reduced padding */
-  font-size: 16px;
-  font-weight: 600; /* Bolder text */
-  color: #fff;
-  background-color: #007bff; /* Modern blue */
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
-  margin-top: 15px; /* Adjusted space above the button, can be 10px if needed */
-  text-transform: none; /* No uppercase, more modern */
-}
+.auth - form.form - submit { /* This is the main action button in the modal */
+    width: 100 %;
+    padding: 10px 15px; /* Reduced padding */
+    font - size: 16px;
+    font - weight: 600; /* Bolder text */
+    color: #fff;
+    background - color: #007bff; /* Modern blue */
+    border: none;
+    border - radius: 8px;
+    cursor: pointer;
+    transition: background - color 0.2s, transform 0.1s;
+    margin - top: 15px; /* Adjusted space above the button, can be 10px if needed */
+    text - transform: none; /* No uppercase, more modern */
+  }
 
-.auth-form .form-submit:hover {
-  background-color: #0056b3; /* Darker blue on hover */
-}
+.auth - form.form - submit:hover {
+    background - color: #0056b3; /* Darker blue on hover */
+  }
 
-.auth-form .form-submit:active {
-  transform: translateY(1px); /* Slight press effect */
-}
+.auth - form.form - submit:active {
+    transform: translateY(1px); /* Slight press effect */
+  }
 
 /* Error and Success Messages */
-.auth-error,
-.auth-success {
-  display: none; /* Hidden by default */
-  margin: 10px 0 0 0; /* Adjusted margin */
-  padding: 12px 15px; /* Increased padding */
-  border-radius: 8px; /* Rounded corners */
-  font-size: 14px;
-  text-align: left; /* Align text to left */
-  border-width: 1px;
-  border-style: solid;
-}
+.auth - error,
+.auth - success {
+    display: none; /* Hidden by default */
+    margin: 10px 0 0 0; /* Adjusted margin */
+    padding: 12px 15px; /* Increased padding */
+    border - radius: 8px; /* Rounded corners */
+    font - size: 14px;
+    text - align: left; /* Align text to left */
+    border - width: 1px;
+    border - style: solid;
+  }
 
-.auth-error {
-  background-color: #f8d7da; /* Softer red */
-  color: #721c24;
-  border-color: #f5c6cb;
-}
+.auth - error {
+    background - color: #f8d7da; /* Softer red */
+    color: #721c24;
+    border - color: #f5c6cb;
+  }
 
-.auth-success {
-  background-color: #d4edda; /* Softer green */
-  color: #155724;
-  border-color: #c3e6cb;
-}
+.auth - success {
+    background - color: #d4edda; /* Softer green */
+    color: #155724;
+    border - color: #c3e6cb;
+  }
 
-/* Optional: Add a subtle divider line if needed */
-/* .auth-modal hr {
-  border: 0;
-  height: 1px;
-  background-color: #eee;
-  margin: 25px 0;
-} */
+  /* Optional: Add a subtle divider line if needed */
+  /* .auth-modal hr {
+    border: 0;
+    height: 1px;
+    background-color: #eee;
+    margin: 25px 0;
+  } */
 
-/* --- NEW/MODIFIED MODAL STYLES END HERE --- */
-`;
+  /* --- NEW/MODIFIED MODAL STYLES END HERE --- */
+  `;
   document.head.appendChild(styleSheet);
 }
 
