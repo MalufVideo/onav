@@ -38,9 +38,23 @@ async function getGoogleAuth(scopes) {
     normalizedKey = normalizedKey.substring(1, normalizedKey.length - 1);
   }
 
-  // Ensure the key has the correct PEM structure
-  if (!normalizedKey.includes('-----BEGIN PRIVATE KEY-----')) {
-    normalizedKey = `-----BEGIN PRIVATE KEY-----\n${normalizedKey}\n-----END PRIVATE KEY-----`;
+  // Ensure the key has the correct PEM structure and newlines
+  if (normalizedKey.includes('-----BEGIN PRIVATE KEY-----')) {
+    const header = '-----BEGIN PRIVATE KEY-----';
+    const footer = '-----END PRIVATE KEY-----';
+
+    let content = normalizedKey
+      .replace(header, '')
+      .replace(footer, '')
+      .replace(/\s/g, ''); // Remove all whitespace
+
+    // Split into 64-character lines (standard PEM)
+    const lines = content.match(/.{1,64}/g) || [];
+    normalizedKey = `${header}\n${lines.join('\n')}\n${footer}`;
+  } else {
+    // If it's just the base64 string
+    const lines = normalizedKey.replace(/\s/g, '').match(/.{1,64}/g) || [];
+    normalizedKey = `-----BEGIN PRIVATE KEY-----\n${lines.join('\n')}\n-----END PRIVATE KEY-----`;
   }
 
   const jwtClient = new JWT({
