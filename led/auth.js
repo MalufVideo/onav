@@ -1,3 +1,4 @@
+// Auth module - exports window.auth immediately for availability
 console.log('[auth.js] Script execution started');
 
 // Initialize Supabase client
@@ -6,19 +7,52 @@ let supabaseKey = '';
 let supabase = null;
 let currentUser = null;
 let authListeners = [];
+let authInitialized = false;
+
+// Export window.auth IMMEDIATELY so other scripts can check for it
+// Functions will work once initAuth is called
+window.auth = {
+  initAuth,
+  signUp,
+  signIn,
+  signOut,
+  getCurrentUser,
+  isAuthenticated,
+  onAuthStateChange,
+  getSupabaseClient,
+  getUserProfile,
+  isInitialized: () => authInitialized
+};
+
+console.log('[auth.js] window.auth exported immediately');
 
 async function initAuth() {
   console.log('[auth.js] initAuth called');
+
+  // Prevent double initialization
+  if (authInitialized) {
+    console.log('[auth.js] Already initialized, skipping');
+    return true;
+  }
+
   try {
+    // Wait for Supabase library
     if (typeof window.supabase === 'undefined') {
-      console.error('[auth.js] Supabase library not loaded.');
-      return;
+      console.log('[auth.js] Waiting for Supabase library...');
+      await waitForSupabase();
     }
 
+    if (typeof window.supabase === 'undefined') {
+      console.error('[auth.js] Supabase library not loaded after waiting.');
+      return false;
+    }
+
+    // Wait for config (SUPABASE_KEY)
     await waitForConfig();
 
     if (typeof window.SUPABASE_KEY !== 'undefined') {
       supabaseKey = window.SUPABASE_KEY;
+      console.log('[auth.js] Got SUPABASE_KEY');
 
       if (!supabase) {
         if (window.supabaseClient) {
@@ -26,6 +60,7 @@ async function initAuth() {
         } else {
           supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
         }
+        console.log('[auth.js] Supabase client created');
       }
 
       await restoreSession();
@@ -43,23 +78,47 @@ async function initAuth() {
         }
         notifyListeners();
       });
+
+      authInitialized = true;
+      console.log('[auth.js] Auth initialized successfully');
+      return true;
     } else {
-      console.error('[auth.js] SUPABASE_KEY missing');
+      console.error('[auth.js] SUPABASE_KEY missing after waiting');
+      return false;
     }
   } catch (error) {
     console.error('[auth.js] initAuth error:', error);
+    return false;
   }
 }
 
+async function waitForSupabase() {
+  return new Promise((resolve) => {
+    let attempts = 0;
+    const check = () => {
+      if (typeof window.supabase !== 'undefined') {
+        resolve();
+      } else if (attempts > 30) {
+        console.warn('[auth.js] Supabase library timeout');
+        resolve();
+      } else {
+        attempts++;
+        setTimeout(check, 100);
+      }
+    };
+    check();
+  });
+}
+
 async function waitForConfig() {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     let attempts = 0;
     const check = () => {
       if (typeof window.SUPABASE_KEY !== 'undefined') {
         resolve();
       } else if (attempts > 50) {
-        console.warn('[auth.js] Config timeout, using fallback if available or failing');
-        resolve(); // Resolve anyway to try continuing?
+        console.warn('[auth.js] Config timeout, using fallback if available');
+        resolve();
       } else {
         attempts++;
         setTimeout(check, 100);
@@ -70,11 +129,11 @@ async function waitForConfig() {
 }
 
 async function restoreSession() {
-  // Simplified restoration logic
   try {
     const { data, error } = await supabase.auth.getSession();
     if (data?.session?.user) {
       currentUser = data.session.user;
+      console.log('[auth.js] Session restored for:', currentUser.email);
       notifyListeners();
     }
   } catch (e) {
@@ -113,25 +172,29 @@ async function getUserProfile() {
   } catch (e) { return null; }
 }
 
-// Export
-window.auth = {
-  initAuth,
-  signUp,
-  signIn,
-  signOut,
-  getCurrentUser,
-  isAuthenticated,
-  onAuthStateChange,
-  getSupabaseClient,
-  getUserProfile
-};
-
-console.log('[auth.js] Script execution finished, window.auth exported:', !!window.auth);
+console.log('[auth.js] Script execution finished');
 
 // Dispatch event to notify that auth module is ready
+// Note: This signals that window.auth is available, not that initAuth has been called
 try {
+  window.dispatchEvent(new CustomEvent('authModuleReady'));
+  console.log('[auth.js] authModuleReady event dispatched');
+
+  // Also dispatch legacy event for backwards compatibility
   window.dispatchEvent(new CustomEvent('authReady'));
   console.log('[auth.js] authReady event dispatched');
 } catch (e) {
-  console.error('[auth.js] Failed to dispatch authReady event:', e);
+  console.error('[auth.js] Failed to dispatch events:', e);
+}
+
+// Auto-initialize when Supabase config is ready
+window.addEventListener('supabaseConfigReady', async () => {
+  console.log('[auth.js] Received supabaseConfigReady, auto-initializing...');
+  await initAuth();
+});
+
+// Fallback: If config is already available, initialize immediately
+if (typeof window.SUPABASE_KEY !== 'undefined') {
+  console.log('[auth.js] SUPABASE_KEY already available, initializing immediately');
+  initAuth();
 }

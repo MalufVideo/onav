@@ -512,6 +512,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Wait for auth to be initialized and then set up listener
     let authListenerSetup = false;
+    let authWaitAttempts = 0;
+    const MAX_AUTH_WAIT_ATTEMPTS = 20;
+
     const waitForAuthAndListen = () => {
         if (authListenerSetup) return; // Prevent duplicate setup
 
@@ -526,14 +529,26 @@ document.addEventListener('DOMContentLoaded', () => {
             checkAuthStateAndUpdate();
 
         } else {
-            console.log('[pricing-pods.js] Waiting for auth...');
-            setTimeout(waitForAuthAndListen, 500); // Check again shortly
+            authWaitAttempts++;
+            if (authWaitAttempts <= MAX_AUTH_WAIT_ATTEMPTS) {
+                console.log('[pricing-pods.js] Waiting for auth... (attempt ' + authWaitAttempts + '/' + MAX_AUTH_WAIT_ATTEMPTS + ')');
+                setTimeout(waitForAuthAndListen, 500);
+            } else {
+                console.log('[pricing-pods.js] Auth not available after max attempts, continuing with guest access');
+                // Continue without auth - guest access mode
+                checkAuthStateAndUpdate();
+            }
         }
     };
 
-    // Listen for authReady event for faster initialization
+    // Listen for auth events for faster initialization
     window.addEventListener('authReady', () => {
         console.log('[pricing-pods.js] Received authReady event');
+        waitForAuthAndListen();
+    });
+
+    window.addEventListener('authModuleReady', () => {
+        console.log('[pricing-pods.js] Received authModuleReady event');
         waitForAuthAndListen();
     });
 
