@@ -12,17 +12,46 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Load Google Credentials
-let googleCreds = null;
-try {
-  googleCreds = require('./google-credentials.json');
-  console.log('✅ Loaded google-credentials.json');
-} catch (e) {
-  console.warn('⚠️ google-credentials.json not found. Google Calendar features will not work.');
-}
-
 // Google Calendar Configuration
 const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID || 'd0be053c3b4590597dbffe0b1b08fb68bfcce6d060901d2bfc1574fb7e515c1f@group.calendar.google.com';
+
+/**
+ * Helper to get a Google Auth JWT client with robust key normalization
+ */
+async function getGoogleAuth(scopes) {
+  const client_email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || (googleCreds && googleCreds.client_email);
+  const private_key = process.env.GOOGLE_PRIVATE_KEY || (googleCreds && googleCreds.private_key);
+
+  if (!client_email || !private_key) {
+    throw new Error('Google Calendar credentials not configured');
+  }
+
+  // Robust private key normalization
+  let normalizedKey = private_key;
+
+  // Handle literal newlines and escaped newlines
+  normalizedKey = normalizedKey.replace(/\\n/g, '\n');
+
+  // Remove leading/trailing quotes if the user pasted them
+  normalizedKey = normalizedKey.trim();
+  if (normalizedKey.startsWith('"') && normalizedKey.endsWith('"')) {
+    normalizedKey = normalizedKey.substring(1, normalizedKey.length - 1);
+  }
+
+  // Ensure the key has the correct PEM structure
+  if (!normalizedKey.includes('-----BEGIN PRIVATE KEY-----')) {
+    normalizedKey = `-----BEGIN PRIVATE KEY-----\n${normalizedKey}\n-----END PRIVATE KEY-----`;
+  }
+
+  const jwtClient = new JWT({
+    email: client_email,
+    key: normalizedKey,
+    scopes: scopes,
+  });
+
+  const tokens = await jwtClient.authorize();
+  return tokens;
+}
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
