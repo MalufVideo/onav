@@ -154,19 +154,15 @@
 
     <!-- Right Sidebar: Pricing Pod and CTA -->
     <div id="info-sidebar">
-      <!-- Auth Card - Login/Register buttons (added directly in HTML for reliability) -->
-      <div class="control-card auth-container" id="auth-card-static" style="margin-bottom: 15px; padding: 12px;">
-        <div class="auth-nav-buttons" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-          <button id="login-button-static" class="auth-button"
-            onclick="if(window.authUI && window.authUI.openModal) { window.authUI.openModal('login-modal'); } else { alert('Carregando...'); }">Entrar</button>
-          <button id="register-button-static" class="auth-button"
-            onclick="if(window.authUI && window.authUI.openModal) { window.authUI.openModal('register-modal'); } else { alert('Carregando...'); }">Cadastrar</button>
-          <div id="user-profile-static" class="user-profile" style="display: none; width: 100%; text-align: center;">
-            <span id="user-name-static"
-              style="display: block; margin-bottom: 8px; font-weight: bold; color: #fff;"></span>
-            <a href="my-quotes.html" class="auth-button" style="margin-right: 10px;">Minhas Propostas</a>
-            <button id="logout-button-static" class="auth-button logout-btn"
-              onclick="if(window.auth && window.auth.signOut) { window.auth.signOut().then(() => location.reload()); }">Sair</button>
+      <!-- Auth Card - Login/Register buttons -->
+      <div class="control-card auth-container" id="auth-card-static" style="margin-bottom: 15px;">
+        <div class="auth-nav-buttons">
+          <button id="login-button-static" class="auth-button">Entrar</button>
+          <button id="register-button-static" class="auth-button">Cadastrar</button>
+          <div id="user-profile-static" class="user-profile" style="display: none;">
+            <span id="user-name-static"></span>
+            <a href="my-quotes.html" class="auth-button" id="my-quotes-button-static">Minhas Propostas</a>
+            <button id="logout-button-static" class="auth-button logout-btn">Sair</button>
           </div>
         </div>
       </div>
@@ -809,6 +805,57 @@
           console.log('[index.html] Static auth card updated - user not logged in');
         }
       }
+
+      // Setup event listeners for static auth buttons
+      function setupStaticAuthButtons() {
+        const loginBtn = document.getElementById('login-button-static');
+        const registerBtn = document.getElementById('register-button-static');
+        const logoutBtn = document.getElementById('logout-button-static');
+
+        if (loginBtn) {
+          loginBtn.addEventListener('click', () => {
+            if (window.authUI && window.authUI.openModal) {
+              window.authUI.openModal('login-modal');
+            } else {
+              console.log('Auth UI not ready, waiting...');
+              setTimeout(() => {
+                if (window.authUI && window.authUI.openModal) {
+                  window.authUI.openModal('login-modal');
+                }
+              }, 1000);
+            }
+          });
+        }
+
+        if (registerBtn) {
+          registerBtn.addEventListener('click', () => {
+            if (window.authUI && window.authUI.openModal) {
+              window.authUI.openModal('register-modal');
+            } else {
+              console.log('Auth UI not ready, waiting...');
+              setTimeout(() => {
+                if (window.authUI && window.authUI.openModal) {
+                  window.authUI.openModal('register-modal');
+                }
+              }, 1000);
+            }
+          });
+        }
+
+        if (logoutBtn) {
+          logoutBtn.addEventListener('click', async () => {
+            if (window.auth && window.auth.signOut) {
+              await window.auth.signOut();
+              location.reload();
+            }
+          });
+        }
+
+        console.log('[index.html] Static auth button listeners set up');
+      }
+
+      // Call setup after DOM is ready
+      setupStaticAuthButtons();
     </script>
     <!-- fix-rube-draco.js script removed -->
 
