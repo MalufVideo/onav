@@ -2343,6 +2343,11 @@ app.get('/quote/:slug', (req, res) => {
   res.sendFile(path.join(__dirname, 'quote.html'));
 });
 
+// Serve the calendar test page
+app.get('/test-calendar.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'test-calendar.html'));
+});
+
 // Public API to fetch quote data by ID (or slug)
 app.get('/api/quotes/public/:slug', async (req, res) => {
   try {
