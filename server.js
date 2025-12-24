@@ -35,20 +35,22 @@ async function getGoogleAuth(scopes) {
   }
 
   // Robust private key normalization - foolproof for Vercel dashboard pastes
-  let base64Content = private_key
-    .replace(/-----BEGIN PRIVATE KEY-----/g, '')
-    .replace(/-----END PRIVATE KEY-----/g, '')
-    .replace(/\\n/g, '') // Remove escaped \n
-    .replace(/\s/g, ''); // Remove all literal whitespace
+  let base64Content = private_key;
 
-  // Strip anything not base64
+  // 1. Try to extract content between BEGIN and END markers (case-insensitive)
+  const markerMatch = private_key.match(/-----BEGIN[^-]*-----([A-Za-z0-9+/=\s\n\r]+)-----END[^-]*-----/i);
+  if (markerMatch) {
+    base64Content = markerMatch[1];
+  }
+
+  // 2. Remove ANY non-base64 characters remaining
   base64Content = base64Content.replace(/[^A-Za-z0-9+/=]/g, '');
 
   if (!base64Content || base64Content.length < 500) {
-    throw new Error(`Invalid private key: length too short (${base64Content?.length || 0})`);
+    throw new Error(`Invalid private key length: ${base64Content?.length || 0}. Check your GOOGLE_PRIVATE_KEY variable.`);
   }
 
-  // Reconstruct PEM
+  // 3. Reconstruct standard PEM with 64-character lines
   const lines = base64Content.match(/.{1,64}/g) || [];
   const normalizedKey = `-----BEGIN PRIVATE KEY-----\n${lines.join('\n')}\n-----END PRIVATE KEY-----`;
 
@@ -2442,7 +2444,15 @@ app.post('/api/check-availability', async (req, res) => {
 
     // If dates are invalid
     if (isNaN(start.getTime())) {
-      return res.status(400).json({ available: false, error: 'Invalid start date' });
+      return res.status(400).json({ available: false, error: 'Data de início inválida' });
+    }
+
+    if (endDate && isNaN(new Date(endDate).getTime())) {
+      return res.status(400).json({ available: false, error: 'Data de fim inválida' });
+    }
+
+    if (endDate && new Date(endDate) < start) {
+      return res.status(400).json({ available: false, error: 'A data de fim deve ser posterior à data de início' });
     }
 
     // Adjust end date to ensure it covers the full day or range
