@@ -249,11 +249,25 @@ async function createConfirmedBookingEvent(proposal) {
     // Add one day to end date for all-day event (Google Calendar quirk)
     endDate.setDate(endDate.getDate() + 1);
 
-    const totalPrice = proposal.total_price ? `R$ ${Number(proposal.total_price).toLocaleString('pt-BR')}` : 'N/A';
+    // Parse total_price - handle both number and Brazilian currency format (R$ 1.234,56)
+    let totalPriceDisplay = 'N/A';
+    if (proposal.total_price) {
+      if (typeof proposal.total_price === 'string' && proposal.total_price.includes('R$')) {
+        // Already formatted, use as-is
+        totalPriceDisplay = proposal.total_price;
+      } else {
+        // Parse the value - remove R$, dots (thousands), and convert comma to dot
+        const priceStr = String(proposal.total_price).replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.');
+        const priceNum = parseFloat(priceStr);
+        if (!isNaN(priceNum)) {
+          totalPriceDisplay = `R$ ${priceNum.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+      }
+    }
 
     const eventData = {
       summary: `${CALENDAR_PREFIX_CONFIRMED} ${clientName} - ${projectName}`,
-      description: `Gravação confirmada!\n\nCliente: ${clientName}\nProjeto: ${projectName}\nEmail: ${proposal.client_email || 'N/A'}\nTelefone: ${proposal.client_phone || 'N/A'}\nValor: ${totalPrice}\n\n✅ Estúdio reservado e confirmado.`,
+      description: `Gravação confirmada!\n\nCliente: ${clientName}\nProjeto: ${projectName}\nEmail: ${proposal.client_email || 'N/A'}\nTelefone: ${proposal.client_phone || 'N/A'}\nValor: ${totalPriceDisplay}\n\n✅ Estúdio reservado e confirmado.`,
       start: { date: startDate.toISOString().split('T')[0] },
       end: { date: endDate.toISOString().split('T')[0] },
       colorId: '10', // Green for confirmed
@@ -2921,6 +2935,52 @@ app.post('/api/test-create-event', async (req, res) => {
     res.json({ success: true, id: data.id, htmlLink: data.htmlLink });
   } catch (error) {
     console.error('Create event error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Create pre-reserve calendar event for a proposal
+app.post('/api/calendar/pre-reserve', async (req, res) => {
+  try {
+    const { proposalId } = req.body;
+
+    if (!proposalId) {
+      return res.status(400).json({ error: 'proposalId is required' });
+    }
+
+    // Fetch the proposal from Supabase
+    const { data: proposal, error: fetchError } = await supabaseAdmin
+      .from('proposals')
+      .select('*')
+      .eq('id', proposalId)
+      .single();
+
+    if (fetchError || !proposal) {
+      console.error('[calendar/pre-reserve] Error fetching proposal:', fetchError);
+      return res.status(404).json({ error: 'Proposal not found' });
+    }
+
+    if (!proposal.shooting_dates_start) {
+      return res.status(400).json({ error: 'Proposal has no shooting dates' });
+    }
+
+    // Create the pre-reserve event
+    const result = await createPreReserveEvent(proposal);
+
+    if (result.success) {
+      console.log(`[calendar/pre-reserve] Pre-reserve created for proposal ${proposalId}`);
+      res.json({
+        success: true,
+        eventId: result.eventId,
+        htmlLink: result.htmlLink,
+        message: 'Pré-reserva criada no calendário'
+      });
+    } else {
+      console.error('[calendar/pre-reserve] Failed to create event:', result.error);
+      res.status(500).json({ error: result.error });
+    }
+  } catch (error) {
+    console.error('[calendar/pre-reserve] Error:', error);
     res.status(500).json({ error: error.message });
   }
 });

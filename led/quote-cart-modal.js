@@ -895,6 +895,29 @@ class QuoteCartModal {
             const proposalId = savedProposal.id;
             console.log(`[QuoteCartModal] Quote saved successfully with ID: ${proposalId}`);
 
+            // --- Create Pre-Reserve Calendar Event ---
+            try {
+                console.log(`[QuoteCartModal] Creating pre-reserve calendar event for proposal ${proposalId}...`);
+                const calendarResponse = await fetch('/api/calendar/pre-reserve', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ proposalId: proposalId })
+                });
+
+                const calendarResult = await calendarResponse.json();
+                if (calendarResponse.ok && calendarResult.success) {
+                    console.log('[QuoteCartModal] Pre-reserve calendar event created:', calendarResult.eventId);
+                } else {
+                    console.warn('[QuoteCartModal] Failed to create pre-reserve event:', calendarResult.error);
+                    // Don't fail the quote submission if calendar fails
+                }
+            } catch (calendarError) {
+                console.warn('[QuoteCartModal] Calendar pre-reserve error (non-blocking):', calendarError.message);
+                // Don't fail the quote submission if calendar fails
+            }
+
             // --- Invoke Edge Function to Generate and Email PDF ---
             console.log(`[QuoteCartModal] Invoking Edge Function for proposalId: ${proposalId}...`);
             try {
