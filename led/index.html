@@ -759,42 +759,22 @@
               window.authUI.initAuthUI();
               console.log('[index.html] Authentication UI initialized');
             } else {
-              console.error('[index.html] Auth UI module not available');
+              console.warn('[index.html] Auth UI module not available yet, verifying later...');
+              setTimeout(() => {
+                if (window.authUI) {
+                  window.authUI.initAuthUI();
+                  console.log('[index.html] Authentication UI initialized (delayed)');
+                } else {
+                  console.error('[index.html] Auth UI module failed to load');
+                }
+              }, 1000);
             }
-
-            // Update static auth card based on auth state
-            updateStaticAuthCard();
           })
           .catch(error => {
             console.error('[index.html] Failed to initialize authentication:', error);
           });
       });
-
-      // Function to update the static auth card based on authentication state
-      function updateStaticAuthCard() {
-        const loginBtn = document.getElementById('login-button-static');
-        const registerBtn = document.getElementById('register-button-static');
-        const userProfile = document.getElementById('user-profile-static');
-        const userName = document.getElementById('user-name-static');
-
-        if (!loginBtn || !registerBtn || !userProfile) return;
-
-        if (window.auth && window.auth.isAuthenticated()) {
-          const user = window.auth.getCurrentUser();
-          const displayName = user?.user_metadata?.name || user?.email || 'Usuário';
-
-          loginBtn.style.display = 'none';
-          registerBtn.style.display = 'none';
-          userProfile.style.display = 'block';
-          userName.textContent = displayName;
-          console.log('[index.html] Static auth card updated - user logged in:', displayName);
-        } else {
-          loginBtn.style.display = 'inline-block';
-          registerBtn.style.display = 'inline-block';
-          userProfile.style.display = 'none';
-          console.log('[index.html] Static auth card updated - user not logged in');
-        }
-      }
+      // updateStaticAuthCard function removed as it is now handled by auth-ui.js dynamic injection
     </script>
     <script>
       // Auth button listeners are handled by auth-ui.js which injects the UI
