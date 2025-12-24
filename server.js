@@ -2417,12 +2417,14 @@ app.post('/api/check-availability', async (req, res) => {
       return res.status(500).json({ available: false, error: 'Calendar credentials not configured' });
     }
 
+    const normalizedKey = private_key.replace(/\\n/g, '\n').trim();
+
     const jwtClient = new JWT({
       email: client_email,
-      key: private_key.replace(/\\n/g, '\n'),
+      key: normalizedKey,
       scopes: [
         'https://www.googleapis.com/auth/calendar.readonly',
-        'https://www.googleapis.com/auth/calendar.events' // Added for testing write access
+        'https://www.googleapis.com/auth/calendar.events'
       ],
     });
 
@@ -2449,7 +2451,10 @@ app.post('/api/check-availability', async (req, res) => {
     }
 
     const freeBusyData = await freeBusyRes.json();
-    const busySlots = freeBusyData.calendars[CALENDAR_ID].busy;
+
+    // Safely access busy slots - handle case where ID might not match exactly in the response keys
+    const calendarData = freeBusyData.calendars[CALENDAR_ID] || freeBusyData.calendars[Object.keys(freeBusyData.calendars)[0]];
+    const busySlots = (calendarData && calendarData.busy) || [];
 
     // Simplistic check: if ANY busy slot overlaps or exists in this range, it's unavailable.
     // Since we queried the exact range, any result means conflict.
@@ -2483,9 +2488,11 @@ app.post('/api/test-create-event', async (req, res) => {
     const client_email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || (googleCreds && googleCreds.client_email);
     const private_key = process.env.GOOGLE_PRIVATE_KEY || (googleCreds && googleCreds.private_key);
 
+    const normalizedKey = private_key.replace(/\\n/g, '\n').trim();
+
     const jwtClient = new JWT({
       email: client_email,
-      key: private_key.replace(/\\n/g, '\n'),
+      key: normalizedKey,
       scopes: ['https://www.googleapis.com/auth/calendar.events'],
     });
 
