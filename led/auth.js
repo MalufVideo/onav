@@ -127,3 +127,11 @@ window.auth = {
 };
 
 console.log('[auth.js] Script execution finished, window.auth exported:', !!window.auth);
+
+// Dispatch event to notify that auth module is ready
+try {
+  window.dispatchEvent(new CustomEvent('authReady'));
+  console.log('[auth.js] authReady event dispatched');
+} catch (e) {
+  console.error('[auth.js] Failed to dispatch authReady event:', e);
+}

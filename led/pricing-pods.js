@@ -511,21 +511,31 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Wait for auth to be initialized and then set up listener
+    let authListenerSetup = false;
     const waitForAuthAndListen = () => {
+        if (authListenerSetup) return; // Prevent duplicate setup
+
         if (window.auth && typeof window.auth.onAuthStateChange === 'function') {
+            authListenerSetup = true;
             console.log('[pricing-pods.js] Auth found, setting up listener and checking initial state.');
-            
+
             // Set up listener for future changes
             window.auth.onAuthStateChange(updatePodVisibility);
-            
+
             // Check current state immediately
             checkAuthStateAndUpdate();
-            
+
         } else {
             console.log('[pricing-pods.js] Waiting for auth...');
             setTimeout(waitForAuthAndListen, 500); // Check again shortly
         }
     };
+
+    // Listen for authReady event for faster initialization
+    window.addEventListener('authReady', () => {
+        console.log('[pricing-pods.js] Received authReady event');
+        waitForAuthAndListen();
+    });
 
     // Start checking for auth immediately
     waitForAuthAndListen();

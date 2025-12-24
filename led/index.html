@@ -713,64 +713,77 @@
 
     <!-- Initialize authentication -->
     <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        console.log('[index.html] DOM loaded, initializing authentication...');
+      // Auth initialization function - will be called when auth is ready
+      async function initializeAuth() {
+        console.log('[index.html] initializeAuth called');
 
-        // Check if auth module is available
-        const waitForAuth = () => {
-          return new Promise((resolve) => {
-            let attempts = 0;
-            const maxAttempts = 20;
+        if (window.auth) {
+          console.log('[index.html] Initializing auth...');
+          try {
+            await window.auth.initAuth();
+            console.log('[index.html] Auth initialized successfully');
+          } catch (err) {
+            console.error('[index.html] Auth init error:', err);
+          }
+        } else {
+          console.warn('[index.html] window.auth not available in initializeAuth');
+        }
 
-            const checkAuth = () => {
-              if (window.auth) {
-                console.log('[index.html] Auth module found');
-                resolve();
-              } else {
-                attempts++;
-                if (attempts >= maxAttempts) {
-                  console.error('[index.html] Auth module not found after maximum attempts');
-                  resolve(); // Resolve anyway to prevent hanging
-                  return;
-                }
-                console.log(`[index.html] Waiting for auth to be available... (${attempts}/${maxAttempts})`);
-                setTimeout(checkAuth, 500);
-              }
-            };
-            checkAuth();
-          });
-        };
-
-        // Initialize authentication
-        waitForAuth()
-          .then(async () => {
-            if (window.auth) {
-              console.log('[index.html] Initializing auth...');
-              await window.auth.initAuth();
-              console.log('[index.html] Auth initialized');
-            }
-
-            // Initialize authentication UI
+        // Initialize authentication UI
+        if (window.authUI) {
+          window.authUI.initAuthUI();
+          console.log('[index.html] Authentication UI initialized');
+        } else {
+          console.warn('[index.html] Auth UI module not available yet, verifying later...');
+          setTimeout(() => {
             if (window.authUI) {
               window.authUI.initAuthUI();
-              console.log('[index.html] Authentication UI initialized');
+              console.log('[index.html] Authentication UI initialized (delayed)');
             } else {
-              console.warn('[index.html] Auth UI module not available yet, verifying later...');
-              setTimeout(() => {
-                if (window.authUI) {
-                  window.authUI.initAuthUI();
-                  console.log('[index.html] Authentication UI initialized (delayed)');
-                } else {
-                  console.error('[index.html] Auth UI module failed to load');
-                }
-              }, 1000);
+              console.error('[index.html] Auth UI module failed to load');
             }
-          })
-          .catch(error => {
-            console.error('[index.html] Failed to initialize authentication:', error);
-          });
+          }, 1000);
+        }
+      }
+
+      // Listen for authReady event (dispatched after auth.js loads)
+      window.addEventListener('authReady', function() {
+        console.log('[index.html] Received authReady event');
+        initializeAuth();
       });
-      // updateStaticAuthCard function removed as it is now handled by auth-ui.js dynamic injection
+
+      // Fallback: Check on DOMContentLoaded in case auth loaded before this listener
+      document.addEventListener('DOMContentLoaded', function () {
+        console.log('[index.html] DOM loaded, checking auth status...');
+
+        // If auth is already available, initialize immediately
+        if (window.auth) {
+          console.log('[index.html] Auth already available on DOMContentLoaded');
+          initializeAuth();
+        } else {
+          // Auth scripts are at end of body, so they should load after this
+          // Set up a short polling as fallback
+          console.log('[index.html] Auth not yet available, waiting...');
+          let attempts = 0;
+          const maxAttempts = 10;
+
+          const checkAuth = () => {
+            attempts++;
+            if (window.auth) {
+              console.log('[index.html] Auth module found after ' + attempts + ' attempts');
+              initializeAuth();
+            } else if (attempts < maxAttempts) {
+              setTimeout(checkAuth, 300);
+            } else {
+              console.error('[index.html] Auth module not found after ' + maxAttempts + ' attempts');
+              console.error('[index.html] Script status:', JSON.stringify(window._authScriptStatus || {}));
+            }
+          };
+
+          // Give auth scripts a moment to load
+          setTimeout(checkAuth, 100);
+        }
+      });
     </script>
     <script>
       // Auth button listeners are handled by auth-ui.js which injects the UI
@@ -836,10 +849,32 @@
     </script>
 
     <!-- Authentication modules (Loaded synchronously at end of body to ensure order) -->
-    <script src="auth-config.js"></script>
-    <script src="auth.js"></script>
-    <script src="auth-ui.js"></script>
-    <script src="auth-protection.js"></script>
+    <script>
+      // Track auth script loading for debugging
+      window._authScriptStatus = { config: false, auth: false, ui: false, protection: false };
+    </script>
+    <script src="auth-config.js"
+            onload="window._authScriptStatus.config = true; console.log('[index.html] auth-config.js loaded');"
+            onerror="console.error('[index.html] Failed to load auth-config.js');"></script>
+    <script src="auth.js"
+            onload="window._authScriptStatus.auth = true; console.log('[index.html] auth.js loaded, window.auth:', !!window.auth);"
+            onerror="console.error('[index.html] Failed to load auth.js');"></script>
+    <script src="auth-ui.js"
+            onload="window._authScriptStatus.ui = true; console.log('[index.html] auth-ui.js loaded');"
+            onerror="console.error('[index.html] Failed to load auth-ui.js');"></script>
+    <script src="auth-protection.js"
+            onload="window._authScriptStatus.protection = true; console.log('[index.html] auth-protection.js loaded');"
+            onerror="console.error('[index.html] Failed to load auth-protection.js');"></script>
+    <script>
+      // Dispatch event when all auth scripts are loaded
+      console.log('[index.html] Auth scripts status:', JSON.stringify(window._authScriptStatus));
+      if (window.auth) {
+        console.log('[index.html] Dispatching authReady event');
+        window.dispatchEvent(new CustomEvent('authReady'));
+      } else {
+        console.error('[index.html] window.auth not defined after loading auth.js');
+      }
+    </script>
 
 </body>
 
