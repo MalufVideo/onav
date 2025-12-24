@@ -2417,7 +2417,14 @@ app.post('/api/check-availability', async (req, res) => {
       return res.status(500).json({ available: false, error: 'Calendar credentials not configured' });
     }
 
-    const normalizedKey = private_key.replace(/\\n/g, '\n').trim();
+    let normalizedKey = private_key;
+    if (normalizedKey && normalizedKey.includes('\\n')) {
+      normalizedKey = normalizedKey.replace(/\\n/g, '\n');
+    }
+    normalizedKey = normalizedKey.trim();
+    if (normalizedKey.startsWith('"') && normalizedKey.endsWith('"')) {
+      normalizedKey = normalizedKey.substring(1, normalizedKey.length - 1);
+    }
 
     const jwtClient = new JWT({
       email: client_email,
