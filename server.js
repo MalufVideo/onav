@@ -12,6 +12,14 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+// Load Google Credentials (fallback for local)
+let googleCreds = null;
+try {
+  googleCreds = require('./google-credentials.json');
+} catch (e) {
+  // Ignore, will use env variables
+}
+
 // Google Calendar Configuration
 const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID || 'd0be053c3b4590597dbffe0b1b08fb68bfcce6d060901d2bfc1574fb7e515c1f@group.calendar.google.com';
 
@@ -23,48 +31,41 @@ async function getGoogleAuth(scopes) {
   const private_key = process.env.GOOGLE_PRIVATE_KEY || (googleCreds && googleCreds.private_key);
 
   if (!client_email || !private_key) {
-    throw new Error('Google Calendar credentials not configured');
+    throw new Error('Google Calendar credentials not configured. Email or Key missing.');
   }
 
-  // Robust private key normalization
-  let normalizedKey = private_key;
+  // Robust private key normalization - foolproof for Vercel dashboard pastes
+  let base64Content = private_key
+    .replace(/-----BEGIN PRIVATE KEY-----/g, '')
+    .replace(/-----END PRIVATE KEY-----/g, '')
+    .replace(/\\n/g, '') // Remove escaped \n
+    .replace(/\s/g, ''); // Remove all literal whitespace (newlines, spaces, etc)
 
-  // Handle literal newlines and escaped newlines
-  normalizedKey = normalizedKey.replace(/\\n/g, '\n');
+  // Strip any accidental surrounding quotes or hidden characters (like BOM)
+  base64Content = base64Content.replace(/[^A-Za-z0-9+/=]/g, '');
 
-  // Remove leading/trailing quotes if the user pasted them
-  normalizedKey = normalizedKey.trim();
-  if (normalizedKey.startsWith('"') && normalizedKey.endsWith('"')) {
-    normalizedKey = normalizedKey.substring(1, normalizedKey.length - 1);
+  if (!base64Content) {
+    throw new Error('Invalid private key: content is empty after cleaning');
   }
 
-  // Ensure the key has the correct PEM structure and newlines
-  if (normalizedKey.includes('-----BEGIN PRIVATE KEY-----')) {
-    const header = '-----BEGIN PRIVATE KEY-----';
-    const footer = '-----END PRIVATE KEY-----';
+  // Reconstruct standard PEM with 64-character lines
+  const lines = base64Content.match(/.{1,64}/g) || [];
+  const normalizedKey = `-----BEGIN PRIVATE KEY-----\n${lines.join('\n')}\n-----END PRIVATE KEY-----`;
 
-    let content = normalizedKey
-      .replace(header, '')
-      .replace(footer, '')
-      .replace(/\s/g, ''); // Remove all whitespace
-
-    // Split into 64-character lines (standard PEM)
-    const lines = content.match(/.{1,64}/g) || [];
-    normalizedKey = `${header}\n${lines.join('\n')}\n${footer}`;
-  } else {
-    // If it's just the base64 string
-    const lines = normalizedKey.replace(/\s/g, '').match(/.{1,64}/g) || [];
-    normalizedKey = `-----BEGIN PRIVATE KEY-----\n${lines.join('\n')}\n-----END PRIVATE KEY-----`;
-  }
+  console.log(`Auth attempt for ${client_email} (Key Length: ${base64Content.length})`);
 
   const jwtClient = new JWT({
     email: client_email,
     key: normalizedKey,
     scopes: scopes,
   });
+  email: client_email,
+    key: normalizedKey,
+      scopes: scopes,
+  });
 
-  const tokens = await jwtClient.authorize();
-  return tokens;
+const tokens = await jwtClient.authorize();
+return tokens;
 }
 
 // Initialize Supabase client
