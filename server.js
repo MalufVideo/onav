@@ -5,7 +5,8 @@ const { Server } = require('socket.io');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
 const cors = require('cors'); // Import CORS middleware
-const { google } = require('googleapis'); // Import Google APIs
+const { JWT } = require('google-auth-library');
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 const app = express();
 const server = http.createServer(app);
@@ -2411,27 +2412,36 @@ app.post('/api/check-availability', async (req, res) => {
       return res.status(500).json({ available: false, error: 'Calendar credentials not configured' });
     }
 
-    const jwtClient = new google.auth.JWT(
-      client_email,
-      null,
-      private_key.replace(/\\n/g, '\n'),
-      ['https://www.googleapis.com/auth/calendar.readonly']
-    );
+    const jwtClient = new JWT({
+      email: client_email,
+      key: private_key.replace(/\\n/g, '\n'),
+      scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
+    });
 
-    await jwtClient.authorize();
+    const tokens = await jwtClient.authorize();
 
-    const calendar = google.calendar({ version: 'v3', auth: jwtClient });
-
-    // Query FreeBusy
-    const freeBusyRes = await calendar.freebusy.query({
-      resource: {
+    // Query FreeBusy via REST API
+    const freeBusyUrl = 'https://www.googleapis.com/calendar/v3/freeBusy/query';
+    const freeBusyRes = await fetch(freeBusyUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${tokens.access_token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
         timeMin: start.toISOString(),
         timeMax: end.toISOString(),
         items: [{ id: CALENDAR_ID }]
-      }
+      })
     });
 
-    const busySlots = freeBusyRes.data.calendars[CALENDAR_ID].busy;
+    if (!freeBusyRes.ok) {
+      const errorText = await freeBusyRes.text();
+      throw new Error(`Google API Error: ${errorText}`);
+    }
+
+    const freeBusyData = await freeBusyRes.json();
+    const busySlots = freeBusyData.calendars[CALENDAR_ID].busy;
 
     // Simplistic check: if ANY busy slot overlaps or exists in this range, it's unavailable.
     // Since we queried the exact range, any result means conflict.
