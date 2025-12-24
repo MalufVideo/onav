@@ -251,19 +251,38 @@ async function createConfirmedBookingEvent(proposal) {
 
     // Parse total_price - handle both number and Brazilian currency format (R$ 1.234,56)
     let totalPriceDisplay = 'N/A';
+    console.log(`[createConfirmedBookingEvent] Raw total_price:`, proposal.total_price, `Type:`, typeof proposal.total_price);
+
     if (proposal.total_price) {
-      if (typeof proposal.total_price === 'string' && proposal.total_price.includes('R$')) {
-        // Already formatted, use as-is
-        totalPriceDisplay = proposal.total_price;
-      } else {
-        // Parse the value - remove R$, dots (thousands), and convert comma to dot
-        const priceStr = String(proposal.total_price).replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.');
-        const priceNum = parseFloat(priceStr);
-        if (!isNaN(priceNum)) {
-          totalPriceDisplay = `R$ ${priceNum.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      const priceValue = proposal.total_price;
+
+      if (typeof priceValue === 'string') {
+        if (priceValue.includes('R$')) {
+          // Already formatted as Brazilian currency, use as-is
+          totalPriceDisplay = priceValue;
+        } else {
+          // String but not formatted - try to parse
+          const cleanedPrice = priceValue.replace(/[^\d.,]/g, '').replace(/\./g, '').replace(',', '.');
+          const priceNum = parseFloat(cleanedPrice);
+          if (!isNaN(priceNum) && priceNum > 0) {
+            totalPriceDisplay = `R$ ${priceNum.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+          }
         }
+      } else if (typeof priceValue === 'number' && !isNaN(priceValue) && priceValue > 0) {
+        // Numeric value
+        totalPriceDisplay = `R$ ${priceValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       }
     }
+
+    // Fallback: try original_total_price if total_price failed
+    if (totalPriceDisplay === 'N/A' && proposal.original_total_price) {
+      const origPrice = parseFloat(proposal.original_total_price);
+      if (!isNaN(origPrice) && origPrice > 0) {
+        totalPriceDisplay = `R$ ${origPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+    }
+
+    console.log(`[createConfirmedBookingEvent] Final totalPriceDisplay:`, totalPriceDisplay);
 
     const eventData = {
       summary: `${CALENDAR_PREFIX_CONFIRMED} ${clientName} - ${projectName}`,
