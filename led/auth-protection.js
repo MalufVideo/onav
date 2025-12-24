@@ -25,14 +25,14 @@ const MAX_AUTH_WAIT_ATTEMPTS = 20;
  */
 async function protectRoute(destination = '/led/login.html') {
   console.log('[auth-protection.js] Starting route protection for:', window.location.pathname);
-  
+
   // Wait for auth module to initialize
   let authChecked = false;
   let attempts = 0;
-  
+
   while (!authChecked && attempts < MAX_AUTH_WAIT_ATTEMPTS) {
     attempts++;
-    
+
     if (window.auth && typeof window.auth.initAuth === 'function') {
       // Initialize auth if not already done
       try {
@@ -48,31 +48,32 @@ async function protectRoute(destination = '/led/login.html') {
       await new Promise(resolve => setTimeout(resolve, AUTH_INIT_DELAY));
     }
   }
-  
+
   // If auth module couldn't be loaded after maximum attempts
+  // DON'T redirect - just log and continue so users can still use the calculator
   if (!authChecked) {
-    console.error('[auth-protection.js] Auth module could not be loaded. Redirecting to safe page.');
-    redirectToSafePage(destination);
+    console.warn('[auth-protection.js] Auth module could not be loaded. Continuing without auth protection.');
+    // Do NOT redirect - allow guest access to calculator
     return;
   }
-  
+
   // Wait a bit more for session to be fully restored
   await new Promise(resolve => setTimeout(resolve, 500));
-  
+
   const isAuthenticated = window.auth.isAuthenticated();
   const currentUser = window.auth.getCurrentUser();
   const currentPath = window.location.pathname;
-  
+
   console.log('[auth-protection.js] Auth state - isAuthenticated:', isAuthenticated, 'user:', currentUser?.email || 'null');
-  
+
   // Check if route requires authentication
   const needsAuth = protectedRoutes.some(route => currentPath.endsWith(route));
-  
+
   // Check if route is guest-only
   const isGuestOnly = guestOnlyRoutes.some(route => currentPath.endsWith(route));
-  
+
   console.log('[auth-protection.js] Route check - needsAuth:', needsAuth, 'isGuestOnly:', isGuestOnly);
-  
+
   // Redirect logic - DISABLED FOR GUEST ACCESS
   // if (needsAuth && !isAuthenticated) {
   //   console.log('[auth-protection.js] Protected route accessed without authentication, redirecting to login');
