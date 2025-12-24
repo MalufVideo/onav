@@ -2437,34 +2437,10 @@ app.post('/api/check-availability', async (req, res) => {
 
     console.log(`Checking availability for ${start.toISOString()} to ${end.toISOString()}`);
 
-    // Auth with Google
-    const client_email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || (googleCreds && googleCreds.client_email);
-    const private_key = process.env.GOOGLE_PRIVATE_KEY || (googleCreds && googleCreds.private_key);
-
-    if (!client_email || !private_key) {
-      console.error('Google credentials missing from both env and JSON file');
-      return res.status(500).json({ available: false, error: 'Calendar credentials not configured' });
-    }
-
-    let normalizedKey = private_key;
-    if (normalizedKey && normalizedKey.includes('\\n')) {
-      normalizedKey = normalizedKey.replace(/\\n/g, '\n');
-    }
-    normalizedKey = normalizedKey.trim();
-    if (normalizedKey.startsWith('"') && normalizedKey.endsWith('"')) {
-      normalizedKey = normalizedKey.substring(1, normalizedKey.length - 1);
-    }
-
-    const jwtClient = new JWT({
-      email: client_email,
-      key: normalizedKey,
-      scopes: [
-        'https://www.googleapis.com/auth/calendar.readonly',
-        'https://www.googleapis.com/auth/calendar.events'
-      ],
-    });
-
-    const tokens = await jwtClient.authorize();
+    const tokens = await getGoogleAuth([
+      'https://www.googleapis.com/auth/calendar.readonly',
+      'https://www.googleapis.com/auth/calendar.events'
+    ]);
 
     // Query FreeBusy via REST API
     const freeBusyUrl = 'https://www.googleapis.com/calendar/v3/freeBusy';
@@ -2521,25 +2497,7 @@ app.post('/api/test-create-event', async (req, res) => {
   try {
     const { title, date } = req.body;
 
-    const client_email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || (googleCreds && googleCreds.client_email);
-    const private_key = process.env.GOOGLE_PRIVATE_KEY || (googleCreds && googleCreds.private_key);
-
-    let normalizedKey = private_key;
-    if (normalizedKey && normalizedKey.includes('\\n')) {
-      normalizedKey = normalizedKey.replace(/\\n/g, '\n');
-    }
-    normalizedKey = normalizedKey.trim();
-    if (normalizedKey.startsWith('"') && normalizedKey.endsWith('"')) {
-      normalizedKey = normalizedKey.substring(1, normalizedKey.length - 1);
-    }
-
-    const jwtClient = new JWT({
-      email: client_email,
-      key: normalizedKey,
-      scopes: ['https://www.googleapis.com/auth/calendar.events'],
-    });
-
-    const tokens = await jwtClient.authorize();
+    const tokens = await getGoogleAuth(['https://www.googleapis.com/auth/calendar.events']);
 
     // Create event via REST API
     const createUrl = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events`;
