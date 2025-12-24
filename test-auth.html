@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auth & Supabase Connection Test</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      color: #eee;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #888;
+      margin-bottom: 30px;
+    }
+
+    .info-box {
+      background: rgba(102, 126, 234, 0.1);
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+
+    .info-box h3 {
+      margin-top: 0;
+      color: #667eea;
+    }
+
+    #console-output {
+      background: #0d1117;
+      border-radius: 8px;
+      padding: 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      max-height: 500px;
+      overflow-y: auto;
+      border: 1px solid #30363d;
+    }
+
+    #console-output::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #console-output::-webkit-scrollbar-track {
+      background: #0d1117;
+    }
+
+    #console-output::-webkit-scrollbar-thumb {
+      background: #30363d;
+      border-radius: 4px;
+    }
+
+    .run-tests-btn {
+      display: block;
+      width: 200px;
+      margin: 20px auto;
+      padding: 15px 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .run-tests-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .loading-message {
+      text-align: center;
+      color: #667eea;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>🔐 Auth & Supabase Connection Test</h1>
+    <p class="subtitle">Verify that your authentication system is working correctly</p>
+
+    <div class="info-box">
+      <h3>ℹ️ What this test checks:</h3>
+      <ul>
+        <li>Supabase library loading</li>
+        <li>Supabase API key configuration</li>
+        <li>Auth module initialization</li>
+        <li>Connection to Supabase servers</li>
+        <li>Auth UI components</li>
+        <li>API endpoint availability</li>
+      </ul>
+    </div>
+
+    <div id="loading-msg" class="loading-message">🔄 Loading authentication modules...</div>
+
+    <button id="run-tests" class="run-tests-btn" disabled>🧪 Run Tests</button>
+
+    <div class="info-box">
+      <h3>🖼️ UI Testing Area</h3>
+      <p>The auth card will be injected below:</p>
+      <!-- Auth UI script expects an element with id="info-sidebar" -->
+      <div id="info-sidebar"
+        style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; border: 1px dashed #667eea; min-height: 100px;">
+        <!-- Auth card will appear here -->
+      </div>
+    </div>
+
+    <div class="info-box">
+      <h3>📋 Console Output</h3>
+      <div id="console-output">
+        <div style="color: #888;">Waiting for modules to load...</div>
+      </div>
+    </div>
+
+    <div id="test-summary" style="display: none; margin-top: 20px;"></div>
+  </div>
+
+  <!-- Load Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Load Auth Configuration -->
+  <script src="/led/auth-config.js"></script>
+
+  <!-- Load Auth Module -->
+  <script src="/led/auth.js"></script>
+
+  <!-- Load Auth UI Module -->
+  <script src="/led/auth-ui.js"></script>
+
+  <!-- Console redirection and test logic -->
+  <script>
+    // Redirect console.log to the page AFTER all scripts are loaded
+    const consoleOutput = document.getElementById('console-output');
+    const originalLog = console.log;
+    const originalError = console.error;
+    const originalWarn = console.warn;
+
+    function formatOutput(args) {
+      return args.map(arg => {
+        if (typeof arg === 'object') {
+          return JSON.stringify(arg, null, 2);
+        }
+        return String(arg);
+      }).join(' ');
+    }
+
+    // Only redirect console after DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', function () {
+      setTimeout(function () {
+        console.log = function (...args) {
+          const div = document.createElement('div');
+          div.textContent = formatOutput(args);
+          div.style.color = '#e6edf3';
+          consoleOutput.appendChild(div);
+          consoleOutput.scrollTop = consoleOutput.scrollHeight;
+          originalLog.apply(console, args);
+        };
+
+        console.error = function (...args) {
+          const div = document.createElement('div');
+          div.textContent = formatOutput(args);
+          div.style.color = '#ef4444';
+          consoleOutput.appendChild(div);
+          consoleOutput.scrollTop = consoleOutput.scrollHeight;
+          originalError.apply(console, args);
+        };
+
+        console.warn = function (...args) {
+          const div = document.createElement('div');
+          div.textContent = formatOutput(args);
+          div.style.color = '#f59e0b';
+          consoleOutput.appendChild(div);
+          consoleOutput.scrollTop = consoleOutput.scrollHeight;
+          originalWarn.apply(console, args);
+        };
+
+        // Check if auth module loaded
+        console.log('Checking auth module status...');
+        console.log('typeof window.auth:', typeof window.auth);
+
+        if (typeof window.auth !== 'undefined') {
+          console.log('✅ Auth module loaded successfully!');
+          document.getElementById('loading-msg').innerHTML = '✅ All modules loaded successfully! Click "Run Tests" to begin.';
+          document.getElementById('run-tests').disabled = false;
+        } else {
+          console.error('❌ Auth module NOT loaded - window.auth is undefined');
+          document.getElementById('loading-msg').innerHTML = '❌ Failed to load auth module. Check browser console for details.';
+        }
+      }, 100);
+    });
+
+    // Run tests when button is clicked
+    document.getElementById('run-tests').addEventListener('click', async () => {
+      consoleOutput.innerHTML = '';
+      console.log('========================================');
+      console.log('AUTH & SUPABASE CONNECTION TEST');
+      console.log('========================================\n');
+
+      if (typeof window.auth === 'undefined') {
+        console.error('❌ CRITICAL: window.auth is not defined!');
+        console.log('Tests cannot run without auth module.');
+        console.log('\nDebug info:');
+        console.log('  - typeof window.supabase:', typeof window.supabase);
+        console.log('  - typeof window.SUPABASE_KEY:', typeof window.SUPABASE_KEY);
+        console.log('  - typeof window.auth:', typeof window.auth);
+        return;
+      }
+
+      // Load test script
+      const script = document.createElement('script');
+      script.src = '/test-auth-supabase.js';
+      script.onload = () => {
+        console.log('\n✅ Test script loaded successfully');
+      };
+      script.onerror = () => {
+        console.error('❌ Failed to load test script');
+      };
+      document.head.appendChild(script);
+    });
+  </script>
+</body>
+
+</html>

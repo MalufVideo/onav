@@ -4,27 +4,30 @@ console.log('[auth.js] Script execution started');
 // Initialize Supabase client
 const supabaseUrl = 'https://qhhjvpsxkfjcxitpnhxi.supabase.co';
 let supabaseKey = '';
-let supabase = null;
+let supabaseInstance = null;
 let currentUser = null;
 let authListeners = [];
 let authInitialized = false;
 
 // Export window.auth IMMEDIATELY so other scripts can check for it
 // Functions will work once initAuth is called
-window.auth = {
-  initAuth,
-  signUp,
-  signIn,
-  signOut,
-  getCurrentUser,
-  isAuthenticated,
-  onAuthStateChange,
-  getSupabaseClient,
-  getUserProfile,
-  isInitialized: () => authInitialized
-};
-
-console.log('[auth.js] window.auth exported immediately');
+try {
+  window.auth = {
+    initAuth,
+    signUp,
+    signIn,
+    signOut,
+    getCurrentUser,
+    isAuthenticated,
+    onAuthStateChange,
+    getSupabaseClient,
+    getUserProfile,
+    isInitialized: () => authInitialized
+  };
+  console.log('[auth.js] window.auth exported successfully');
+} catch (e) {
+  console.error('[auth.js] Error exporting window.auth:', e);
+}
 
 async function initAuth() {
   console.log('[auth.js] initAuth called');
@@ -54,18 +57,18 @@ async function initAuth() {
       supabaseKey = window.SUPABASE_KEY;
       console.log('[auth.js] Got SUPABASE_KEY');
 
-      if (!supabase) {
+      if (!supabaseInstance) {
         if (window.supabaseClient) {
-          supabase = window.supabaseClient.createClient(supabaseUrl, supabaseKey);
+          supabaseInstance = window.supabaseClient.createClient(supabaseUrl, supabaseKey);
         } else {
-          supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+          supabaseInstance = window.supabase.createClient(supabaseUrl, supabaseKey);
         }
         console.log('[auth.js] Supabase client created');
       }
 
       await restoreSession();
 
-      supabase.auth.onAuthStateChange((event, session) => {
+      supabaseInstance.auth.onAuthStateChange((event, session) => {
         console.log('[auth.js] Auth state changed:', event);
         currentUser = session?.user || null;
         if (session?.user) {
@@ -130,7 +133,7 @@ async function waitForConfig() {
 
 async function restoreSession() {
   try {
-    const { data, error } = await supabase.auth.getSession();
+    const { data, error } = await supabaseInstance.auth.getSession();
     if (data?.session?.user) {
       currentUser = data.session.user;
       console.log('[auth.js] Session restored for:', currentUser.email);
@@ -142,32 +145,35 @@ async function restoreSession() {
 }
 
 async function signUp(email, password, userData) {
-  if (!supabase) await initAuth();
-  return supabase.auth.signUp({
+  if (!supabaseInstance) await initAuth();
+  const { data, error } = await supabaseInstance.auth.signUp({
     email, password, options: { data: userData }
   });
+  return { success: !error, error: error?.message, data };
 }
 
 async function signIn(email, password) {
-  if (!supabase) await initAuth();
-  return supabase.auth.signInWithPassword({ email, password });
+  if (!supabaseInstance) await initAuth();
+  const { data, error } = await supabaseInstance.auth.signInWithPassword({ email, password });
+  return { success: !error, error: error?.message, data };
 }
 
 async function signOut() {
-  if (!supabase) await initAuth();
-  return supabase.auth.signOut();
+  if (!supabaseInstance) await initAuth();
+  const { error } = await supabaseInstance.auth.signOut();
+  return { success: !error, error: error?.message };
 }
 
 function getCurrentUser() { return currentUser; }
 function isAuthenticated() { return !!currentUser; }
 function onAuthStateChange(cb) { authListeners.push(cb); if (cb) cb(currentUser); }
 function notifyListeners() { authListeners.forEach(l => l && l(currentUser)); }
-function getSupabaseClient() { return supabase; }
+function getSupabaseClient() { return supabaseInstance; }
 
 async function getUserProfile() {
-  if (!currentUser || !supabase) return null;
+  if (!currentUser || !supabaseInstance) return null;
   try {
-    const { data } = await supabase.from('user_profiles').select('*').eq('id', currentUser.id).single();
+    const { data } = await supabaseInstance.from('user_profiles').select('*').eq('id', currentUser.id).single();
     return data;
   } catch (e) { return null; }
 }
