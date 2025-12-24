@@ -211,10 +211,18 @@ async function checkConfirmedBookingConflict(startDate, endDate) {
       throw new Error(data.error?.message || 'Failed to check calendar');
     }
 
-    // Filter for confirmed bookings only
+    // Debug: log all events found
+    console.log(`[Calendar] Found ${(data.items || []).length} events in date range`);
+    (data.items || []).forEach(event => {
+      console.log(`[Calendar] Event: "${event.summary}" starts: ${event.start?.date || event.start?.dateTime}`);
+    });
+
+    // Filter for confirmed bookings only (must start with the CONFIRMADO prefix)
     const confirmedEvents = (data.items || []).filter(event =>
       event.summary && event.summary.startsWith(CALENDAR_PREFIX_CONFIRMED)
     );
+
+    console.log(`[Calendar] Found ${confirmedEvents.length} CONFIRMED bookings (prefix: "${CALENDAR_PREFIX_CONFIRMED}")`);
 
     return {
       hasConflict: confirmedEvents.length > 0,
@@ -347,8 +355,8 @@ async function deleteCalendarEvent(eventId) {
 }
 
 // --- WhatsApp Notification Configuration ---
-const WHATSAPP_API_URL = 'http://72.60.142.28:3000/send';
-const WHATSAPP_NOTIFICATION_PHONE = '5519981454647';
+const WHATSAPP_API_URL = process.env.WHATSAPP_API_URL || 'http://72.60.142.28:3000/send';
+const WHATSAPP_NOTIFICATION_PHONE = process.env.WHATSAPP_NOTIFICATION_PHONE || '5519981454647';
 
 /**
  * Send a WhatsApp notification message
