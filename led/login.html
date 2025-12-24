@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Calculadora de Painel de LED</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Authentication modules -->
+  <script src="auth-config.js" defer></script>
+  <script src="auth.js" defer></script>
+  
+  <style>
+    /* On+Av Dark Theme Styling */
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: radial-gradient(circle at 20% 20%, rgba(249, 115, 22, 0.18), transparent 45%),
+        radial-gradient(circle at 80% 0%, rgba(251, 191, 36, 0.22), transparent 40%),
+        linear-gradient(135deg, #01040c 0%, #0b1222 100%);
+      background-attachment: fixed;
+    }
+    
+    .login-container {
+      width: 100%;
+      max-width: 420px;
+      padding: 40px;
+      background: rgba(9, 15, 30, 0.9);
+      border: 1px solid rgba(249, 115, 22, 0.35);
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    
+    .login-container:hover {
+      border-color: rgba(251, 191, 36, 0.6);
+      box-shadow: 0 25px 60px rgba(249, 115, 22, 0.25);
+      transition: all 0.3s ease;
+    }
+    
+    h1 {
+      text-align: center;
+      margin: 0 0 30px 0;
+      color: #f8fafc;
+      font-size: 1.8rem;
+      font-weight: 600;
+      text-shadow: 0 0 20px rgba(249, 115, 22, 0.35);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #e0e0e0;
+      font-size: 14px;
+    }
+    
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+      backdrop-filter: blur(5px);
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: rgba(251, 191, 36, 0.5);
+      box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+    
+    .form-submit {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(120deg, #f97316 0%, #fbbf24 100%);
+      color: #0f172a;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 12px 30px rgba(249, 115, 22, 0.35);
+    }
+    
+    .form-submit:hover {
+      box-shadow: 0 18px 40px rgba(249, 115, 22, 0.45);
+      transform: translateY(-2px);
+    }
+    
+    .form-submit:active {
+      transform: translateY(0);
+    }
+    
+    .form-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .toggle-form {
+      text-align: center;
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .toggle-form {
+      color: #cdd6f6;
+    }
+    
+    .toggle-form a {
+      color: rgba(249, 115, 22, 0.85);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    
+    .toggle-form a:hover {
+      color: rgba(251, 191, 36, 1);
+      text-shadow: 0 0 12px rgba(249, 115, 22, 0.45);
+    }
+    
+    .auth-error {
+      color: #ff6b6b;
+      font-size: 14px;
+      margin-bottom: 15px;
+      padding: 10px;
+      background: rgba(255, 107, 107, 0.1);
+      border: 1px solid rgba(255, 107, 107, 0.2);
+      border-radius: 6px;
+      backdrop-filter: blur(5px);
+    }
+    
+    .auth-success {
+      color: rgba(251, 191, 36, 1);
+      font-size: 14px;
+      margin-bottom: 15px;
+      padding: 10px;
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(249, 115, 22, 0.2);
+      border-radius: 6px;
+      backdrop-filter: blur(5px);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 480px) {
+      .login-container {
+        margin: 20px;
+        padding: 30px;
+        max-width: none;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+    
+    /* Loading Animation */
+    .form-submit.loading {
+      position: relative;
+      color: transparent;
+    }
+    
+    .form-submit.loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 20px;
+      height: 20px;
+      border: 2px solid transparent;
+      border-top: 2px solid #000000;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+  </style>
+  <!-- Light theme overrides -->
+  <style>
+    /* On+Av Light Theme Styling (blue-purple gradient + white card) */
+    body {
+      background: linear-gradient(135deg, #fde68a 0%, #f97316 100%);
+      color: #333333;
+    }
+
+    .login-container {
+      background: #ffffff;
+      border: 1px solid rgba(249, 115, 22, 0.25);
+      border-radius: 12px;
+      box-shadow: 0 15px 40px rgba(249, 115, 22, 0.15);
+    }
+
+    h1 {
+      color: #1f2937;
+      text-shadow: none;
+    }
+
+    label {
+      color: #555555;
+    }
+
+    input {
+      background: #f7f9ff;
+      color: #111111;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    input:focus {
+      border-color: rgba(249, 115, 22, 0.5);
+      box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.25);
+      background: #ffffff;
+    }
+
+    .form-submit {
+      background: linear-gradient(120deg, #f97316 0%, #fbbf24 100%);
+      color: #0f172a;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+
+    .form-submit:hover {
+      background: linear-gradient(120deg, #fb923c 0%, #fcd34d 100%);
+      box-shadow: 0 6px 22px rgba(249, 115, 22, 0.35);
+    }
+
+    .toggle-form a {
+      color: #dd6b20;
+    }
+
+    .toggle-form a:hover {
+      color: #f97316;
+      text-shadow: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1>Calculadora de Painel de LED</h1>
+    
+    <!-- Login Form -->
+    <div id="login-section">
+      <form id="login-form" class="auth-form">
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="login-password">Senha</label>
+          <input type="password" id="login-password" name="password" required>
+        </div>
+        <div id="login-error" class="auth-error"></div>
+        <div id="login-success" class="auth-success"></div>
+        <button type="submit" class="form-submit">Entrar</button>
+      </form>
+      <div class="toggle-form">
+        Não tem uma conta? <a id="show-register">Cadastre-se</a>
+      </div>
+    </div>
+    
+    <!-- Register Form -->
+    <div id="register-section" style="display: none;">
+      <form id="register-form" class="auth-form">
+        <div class="form-group">
+          <label for="register-name">Nome</label>
+          <input type="text" id="register-name" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="register-company">Empresa</label>
+          <input type="text" id="register-company" name="company" required>
+        </div>
+        <div class="form-group">
+          <label for="register-email">Email</label>
+          <input type="email" id="register-email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="register-phone">Telefone</label>
+          <input type="tel" id="register-phone" name="phone" required>
+        </div>
+        <div class="form-group">
+          <label for="register-password">Senha</label>
+          <input type="password" id="register-password" name="password" required>
+        </div>
+        <div class="form-group">
+          <label for="register-password-confirm">Confirmar Senha</label>
+          <input type="password" id="register-password-confirm" name="confirm-password" required>
+        </div>
+        <div id="register-error" class="auth-error"></div>
+        <div id="register-success" class="auth-success"></div>
+        <button type="submit" class="form-submit">Cadastrar</button>
+      </form>
+      <div class="toggle-form">
+        Já tem uma conta? <a id="show-login">Faça login</a>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Wait for auth to be available
+      const waitForAuth = () => {
+        return new Promise((resolve) => {
+          const checkAuth = () => {
+            if (window.auth) {
+              resolve();
+            } else {
+              console.log('Waiting for auth to be available...');
+              setTimeout(checkAuth, 500);
+            }
+          };
+          checkAuth();
+        });
+      };
+      
+      await waitForAuth();
+      
+      // Initialize authentication
+      await window.auth.initAuth();
+      
+      // Toggle between login and register forms
+      document.getElementById('show-register').addEventListener('click', () => {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('register-section').style.display = 'block';
+      });
+      
+      document.getElementById('show-login').addEventListener('click', () => {
+        document.getElementById('register-section').style.display = 'none';
+        document.getElementById('login-section').style.display = 'block';
+      });
+      
+      // Handle redirect after successful login
+      const handleSuccessfulAuth = function() {
+        const savedRedirect = sessionStorage.getItem('auth_redirect');
+        if (savedRedirect) {
+          sessionStorage.removeItem('auth_redirect');
+          window.location.href = savedRedirect;
+        } else {
+          window.location.href = '/led/index.html';
+        }
+      };
+      
+      // Handle login form submission
+      document.getElementById('login-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const errorElement = document.getElementById('login-error');
+        const successElement = document.getElementById('login-success');
+        
+        // Clear previous messages
+        errorElement.textContent = '';
+        errorElement.style.display = 'none';
+        successElement.textContent = '';
+        successElement.style.display = 'none';
+        
+        // Validate fields
+        if (!email || !password) {
+          errorElement.textContent = 'Por favor, preencha email e senha.';
+          errorElement.style.display = 'block';
+          return;
+        }
+        
+        try {
+          // Show loading state
+          const submitButton = document.querySelector('#login-form button[type="submit"]');
+          submitButton.disabled = true;
+          submitButton.textContent = 'Entrando...';
+          
+          // Attempt login
+          const result = await window.auth.signIn(email, password);
+          
+          if (result.success) {
+            successElement.textContent = 'Login realizado com sucesso! Redirecionando...';
+            successElement.style.display = 'block';
+            handleSuccessfulAuth();
+          } else {
+            errorElement.textContent = result.error || 'Erro ao fazer login. Verifique suas credenciais.';
+            errorElement.style.display = 'block';
+          }
+        } catch (error) {
+          errorElement.textContent = error.message || 'Erro ao fazer login. Tente novamente mais tarde.';
+          errorElement.style.display = 'block';
+          console.error('Login error:', error);
+        } finally {
+          // Reset button state
+          const submitButton = document.querySelector('#login-form button[type="submit"]');
+          submitButton.disabled = false;
+          submitButton.textContent = 'Entrar';
+        }
+      });
+      
+      // Register form handling
+      document.getElementById('register-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const name = document.getElementById('register-name').value;
+        const company = document.getElementById('register-company').value;
+        const email = document.getElementById('register-email').value;
+        const phone = document.getElementById('register-phone').value;
+        const password = document.getElementById('register-password').value;
+        const confirmPassword = document.getElementById('register-password-confirm').value;
+        const errorElement = document.getElementById('register-error');
+        const successElement = document.getElementById('register-success');
+        
+        // Clear previous messages
+        errorElement.textContent = '';
+        errorElement.style.display = 'none';
+        successElement.textContent = '';
+        successElement.style.display = 'none';
+        
+        // Validate fields
+        if (!name || !company || !email || !phone || !password || !confirmPassword) {
+          errorElement.textContent = 'Por favor, preencha todos os campos.';
+          errorElement.style.display = 'block';
+          return;
+        }
+        
+        if (password !== confirmPassword) {
+          errorElement.textContent = 'As senhas não correspondem.';
+          errorElement.style.display = 'block';
+          return;
+        }
+        
+        try {
+          // Show loading state
+          const submitButton = document.querySelector('#register-form button[type="submit"]');
+          submitButton.disabled = true;
+          submitButton.textContent = 'Cadastrando...';
+          
+          // Attempt registration
+          const result = await window.auth.signUp(email, password, { name, company, phone });
+          
+          if (result.success) {
+            successElement.textContent = 'Cadastro realizado com sucesso!';
+            successElement.style.display = 'block';
+            
+            // Switch to login tab after 2 seconds
+            setTimeout(() => {
+              document.getElementById('show-login').click();
+            }, 2000);
+          } else {
+            errorElement.textContent = result.error || 'Erro ao criar conta. Tente novamente.';
+            errorElement.style.display = 'block';
+          }
+        } catch (error) {
+          errorElement.textContent = error.message || 'Erro ao criar conta. Tente novamente mais tarde.';
+          errorElement.style.display = 'block';
+          console.error('Registration error:', error);
+        } finally {
+          // Reset button state
+          const submitButton = document.querySelector('#register-form button[type="submit"]');
+          submitButton.disabled = false;
+          submitButton.textContent = 'Cadastrar';
+        }
+      });
+      
+      // Check if user is already authenticated
+      if (window.auth.isAuthenticated()) {
+        handleSuccessfulAuth();
+      }
+      
+      // Check for redirect parameter in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectUrl = urlParams.get('redirect');
+      
+      // Store redirect URL if present
+      if (redirectUrl) {
+        sessionStorage.setItem('auth_redirect', redirectUrl);
+      }
+    });
+  </script>
+</body>
+</html>
