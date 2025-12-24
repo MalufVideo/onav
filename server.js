@@ -3,6 +3,7 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
+const crypto = require('crypto');
 const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
 const cors = require('cors'); // Import CORS middleware
 const { JWT } = require('google-auth-library');
@@ -43,7 +44,7 @@ async function getGoogleAuth(scopes) {
     base64Content = markerMatch[1];
   }
 
-  // 2. Remove ANY non-base64 characters remaining
+  // 2. Remove ANY non-base64 characters remaining (including BOM, zero-width chars, etc.)
   base64Content = base64Content.replace(/[^A-Za-z0-9+/=]/g, '');
 
   if (!base64Content || base64Content.length < 500) {
@@ -52,7 +53,36 @@ async function getGoogleAuth(scopes) {
 
   // 3. Reconstruct standard PEM with 64-character lines
   const lines = base64Content.match(/.{1,64}/g) || [];
-  const normalizedKey = `-----BEGIN PRIVATE KEY-----\n${lines.join('\n')}\n-----END PRIVATE KEY-----`;
+  const normalizedKey = `-----BEGIN PRIVATE KEY-----\n${lines.join('\n')}\n-----END PRIVATE KEY-----\n`;
+
+  // 4. Verify the key can be parsed by Node's crypto module before passing to JWT
+  try {
+    crypto.createPrivateKey({
+      key: normalizedKey,
+      format: 'pem'
+    });
+    console.log('[getGoogleAuth] Private key verified successfully by crypto module');
+  } catch (cryptoError) {
+    // If standard PEM fails, try as PKCS#8 with explicit type
+    console.log('[getGoogleAuth] Standard PEM failed, trying alternative formats...');
+
+    // Try decoding the base64 to check if it's valid
+    try {
+      const keyBuffer = Buffer.from(base64Content, 'base64');
+      console.log(`[getGoogleAuth] Key buffer length: ${keyBuffer.length} bytes`);
+
+      // Check if it looks like a valid PKCS#8 structure (should start with 0x30 for SEQUENCE)
+      if (keyBuffer[0] !== 0x30) {
+        throw new Error(`Invalid key structure: first byte is 0x${keyBuffer[0].toString(16)}, expected 0x30 (SEQUENCE)`);
+      }
+    } catch (bufferError) {
+      throw new Error(`Key base64 decode failed: ${bufferError.message}. CleanedLen: ${base64Content.length}`);
+    }
+
+    // If we got here, base64 is valid but crypto can't parse it
+    // This likely means the key content itself is malformed
+    throw new Error(`Key verification failed: ${cryptoError.message}. This usually means the key content is corrupted or incomplete. CleanedLen: ${base64Content.length}, Start: ${base64Content.substring(0, 20)}, End: ${base64Content.substring(base64Content.length - 20)}`);
+  }
 
   const jwtClient = new JWT({
     email: client_email,
@@ -2315,6 +2345,84 @@ app.get('/api/debug/table-structure', async (req, res) => {
   } catch (error) {
     console.error('Error checking table structure:', error.message);
     res.status(500).json({ error: 'Failed to check table structure', details: error.message });
+  }
+});
+
+// Debug endpoint to verify Google Calendar private key processing
+app.get('/api/debug/google-key', async (req, res) => {
+  try {
+    const client_email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || (googleCreds && googleCreds.client_email);
+    const private_key = process.env.GOOGLE_PRIVATE_KEY || (googleCreds && googleCreds.private_key);
+
+    if (!client_email || !private_key) {
+      return res.json({
+        success: false,
+        error: 'Missing credentials',
+        hasEmail: !!client_email,
+        hasKey: !!private_key
+      });
+    }
+
+    // Check for common issues
+    const rawKeyLength = private_key.length;
+    const hasBeginMarker = private_key.includes('-----BEGIN');
+    const hasEndMarker = private_key.includes('-----END');
+    const hasNewlines = private_key.includes('\n') || private_key.includes('\\n');
+
+    // Extract base64 content
+    let base64Content = private_key;
+    const markerMatch = private_key.match(/-----BEGIN[^-]*-----([A-Za-z0-9+/=\s\n\r]+)-----END[^-]*-----/i);
+    if (markerMatch) {
+      base64Content = markerMatch[1];
+    }
+    base64Content = base64Content.replace(/[^A-Za-z0-9+/=]/g, '');
+
+    // Try to decode and verify key structure
+    let keyValid = false;
+    let keyError = null;
+    let cryptoVerified = false;
+
+    try {
+      const keyBuffer = Buffer.from(base64Content, 'base64');
+      keyValid = keyBuffer.length > 0 && keyBuffer[0] === 0x30; // Should start with SEQUENCE
+
+      // Try to parse with crypto module
+      const lines = base64Content.match(/.{1,64}/g) || [];
+      const normalizedKey = `-----BEGIN PRIVATE KEY-----\n${lines.join('\n')}\n-----END PRIVATE KEY-----\n`;
+
+      try {
+        crypto.createPrivateKey({
+          key: normalizedKey,
+          format: 'pem'
+        });
+        cryptoVerified = true;
+      } catch (cryptoErr) {
+        keyError = cryptoErr.message;
+      }
+    } catch (e) {
+      keyError = e.message;
+    }
+
+    res.json({
+      success: true,
+      diagnostics: {
+        email: client_email.substring(0, 20) + '...',
+        rawKeyLength,
+        hasBeginMarker,
+        hasEndMarker,
+        hasNewlines,
+        base64Length: base64Content.length,
+        base64Start: base64Content.substring(0, 30),
+        base64End: base64Content.substring(base64Content.length - 30),
+        keyStructureValid: keyValid,
+        cryptoModuleVerified: cryptoVerified,
+        cryptoError: keyError,
+        nodeVersion: process.version,
+        opensslVersion: process.versions.openssl
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
