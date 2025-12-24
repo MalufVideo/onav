@@ -2,10 +2,10 @@
 
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('[my-quotes.js] DOM loaded, waiting for authentication...');
-  
+
   // Wait for authentication to be fully ready
   await waitForAuthenticationReady();
-  
+
   // Set up authentication state listener
   if (window.auth && typeof window.auth.onAuthStateChange === 'function') {
     window.auth.onAuthStateChange((user) => {
@@ -84,33 +84,33 @@ async function waitForAuthenticationReady() {
  */
 async function setupQuotesUI() {
   console.log('[my-quotes.js] Setting up quotes UI...');
-  
+
   // Check if user is authenticated
   const isAuthenticated = window.auth && window.auth.isAuthenticated();
   const currentUser = window.auth && window.auth.getCurrentUser();
-  
+
   console.log('[my-quotes.js] Auth check - isAuthenticated:', isAuthenticated, 'user:', currentUser?.email || 'null');
-  
+
   if (!isAuthenticated) {
     console.log('[my-quotes.js] User not authenticated, showing login prompt');
     showLoginPrompt();
     return;
   }
-  
+
   console.log('[my-quotes.js] User authenticated, loading quotes...');
-  
+
   // Ensure the modal structure exists ONCE on page load
-  setupQuoteDetailsModal(); 
+  setupQuoteDetailsModal();
 
   // Load and display quotes
   await loadUserQuotes();
-  
+
   // Add logout button functionality
   const logoutButton = document.getElementById('logout-button');
   if (logoutButton) {
     logoutButton.addEventListener('click', async () => {
       await window.auth.signOut();
-      window.location.href = 'login.html';
+      window.location.href = 'index.html';
     });
   }
 }
@@ -122,26 +122,26 @@ async function loadUserQuotes() {
   try {
     const quotesList = document.getElementById('quotes-list');
     if (!quotesList) return;
-    
+
     // Show loading indicator
     quotesList.innerHTML = '<div class="loading">Carregando propostas...</div>';
-    
+
     // Get Supabase client
     const supabase = window.auth.getSupabaseClient();
     if (!supabase) {
       throw new Error('Supabase client not available');
     }
-    
+
     // Use quoteService to fetch proposals from the new table
     if (window.quoteService && typeof window.quoteService.getProposals === 'function') {
       const result = await window.quoteService.getProposals();
-      
+
       if (!result.success) {
         throw new Error(result.error || 'Failed to load proposals');
       }
-      
+
       const proposals = result.data;
-      
+
       // Display proposals or show empty message
       if (proposals && proposals.length > 0) {
         displayQuotes(proposals, quotesList);
@@ -154,9 +154,9 @@ async function loadUserQuotes() {
         .from('proposals')
         .select('*')
         .order('created_at', { ascending: false });
-        
+
       if (error) throw error;
-      
+
       // Display quotes or show empty message
       if (quotes && quotes.length > 0) {
         displayQuotes(quotes, quotesList);
@@ -166,7 +166,7 @@ async function loadUserQuotes() {
     }
   } catch (error) {
     // console.error('Error loading quotes:', error);
-    document.getElementById('quotes-list').innerHTML = 
+    document.getElementById('quotes-list').innerHTML =
       `<div class="error">Erro ao carregar propostas: ${error.message}</div>`;
   }
 }
@@ -178,17 +178,17 @@ async function loadUserQuotes() {
  */
 function formatDate(dateStr) {
   if (!dateStr) return '-';
-  
+
   try {
     // Handle ISO date strings and date-only strings
     const date = new Date(dateStr);
-    
+
     // Check if date is valid
     if (isNaN(date.getTime())) {
       // console.error('Invalid date:', dateStr);
       return 'Data inválida';
     }
-    
+
     // Format to Brazilian date format (DD/MM/YYYY)
     return date.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
   } catch (e) {
@@ -217,23 +217,23 @@ function formatNumber(value) {
  */
 function displayQuotes(quotes, container) {
   container.innerHTML = '';
-  
+
   quotes.forEach(quote => {
     const quoteCard = document.createElement('div');
     quoteCard.className = 'quote-card';
-    
+
     // Format date
     const formattedDate = formatDate(quote.created_at);
-    
+
     // Format the shooting dates
     const shootingStart = formatDate(quote.shooting_dates_start);
     const shootingEnd = formatDate(quote.shooting_dates_end);
-    const shootingPeriod = (shootingStart !== '-' && shootingEnd !== '-') ? 
+    const shootingPeriod = (shootingStart !== '-' && shootingEnd !== '-') ?
       `${shootingStart} a ${shootingEnd}` : '-';
-    
+
     // Use the stored total_price which should now be the final discounted price
     const listFinalPrice = quote.total_price || 'R$ 0,00';
-    
+
     quoteCard.innerHTML = `
       <div class="quote-header">
         <h3>${quote.project_name || 'Sem título'}</h3>
@@ -256,7 +256,7 @@ function displayQuotes(quotes, container) {
         </div>
       </div>
     `;
-    
+
     // Add click handler for view details button
     const viewButton = quoteCard.querySelector('.view-details-btn');
     if (viewButton) {
@@ -264,7 +264,7 @@ function displayQuotes(quotes, container) {
         showQuoteDetails(quote);
       });
     }
-    
+
     container.appendChild(quoteCard);
   });
 }
@@ -276,7 +276,7 @@ function displayQuotes(quotes, container) {
 async function showQuoteDetails(quote) {
   // Ensure the modal exists (create it if not)
   const detailsModal = document.getElementById('quote-details-modal');
-  const modalContent = document.getElementById('quote-details-content'); 
+  const modalContent = document.getElementById('quote-details-content');
 
   if (!detailsModal || !modalContent) {
     // console.error('Quote details modal or content container not found');
@@ -294,33 +294,33 @@ async function showQuoteDetails(quote) {
       return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
     } catch (e) {
       // console.error("Error formatting date:", dateString, e);
-      return dateString; 
+      return dateString;
     }
   };
 
   // --- Process selected_services for the table ---
-  let serviceTableRowsHtml = '<tr><td colspan="4" style="padding: 10px; text-align: center; border-bottom: 1px solid #dee2e6;">Nenhum serviço adicionado</td></tr>'; 
+  let serviceTableRowsHtml = '<tr><td colspan="4" style="padding: 10px; text-align: center; border-bottom: 1px solid #dee2e6;">Nenhum serviço adicionado</td></tr>';
   let serviceItems = [];
   let dailySubtotalSum = 0; // To calculate daily total if needed
 
   const processServicesForTable = (services) => {
-    serviceItems = []; 
+    serviceItems = [];
     dailySubtotalSum = 0;
     // console.log('Raw services data received:', services); 
     if (Array.isArray(services)) {
       services.forEach(service => {
         // console.log('Processing service item:', service); 
         const name = service.name || 'Serviço sem nome';
-        const quantity = service.quantity || 0; 
-        const unit_price = service.unit_price || 0; 
-        const subtotal = quantity * unit_price; 
-        dailySubtotalSum += subtotal; 
-        
-        serviceItems.push({ 
-            name: name, 
-            quantity: quantity, 
-            unit_price: unit_price, 
-            subtotal: subtotal 
+        const quantity = service.quantity || 0;
+        const unit_price = service.unit_price || 0;
+        const subtotal = quantity * unit_price;
+        dailySubtotalSum += subtotal;
+
+        serviceItems.push({
+          name: name,
+          quantity: quantity,
+          unit_price: unit_price,
+          subtotal: subtotal
         });
       });
 
@@ -340,31 +340,31 @@ async function showQuoteDetails(quote) {
   // Helper function to extract extended quote data from JSON (same as dashboard)
   const getExtendedQuoteData = (quote) => {
     const defaultData = {
-        principal_power_max: null,
-        principal_power_avg: null,
-        principal_weight: null,
-        teto_power_max: null,
-        teto_power_avg: null,
-        teto_weight: null,
-        led_principal_pixels_width: null,
-        led_principal_pixels_height: null,
-        led_principal_total_pixels: null,
-        led_teto_pixels_width: null,
-        led_teto_pixels_height: null,
-        led_teto_total_pixels: null,
-        led_teto_resolution: null,
-        services: null
+      principal_power_max: null,
+      principal_power_avg: null,
+      principal_weight: null,
+      teto_power_max: null,
+      teto_power_avg: null,
+      teto_weight: null,
+      led_principal_pixels_width: null,
+      led_principal_pixels_height: null,
+      led_principal_total_pixels: null,
+      led_teto_pixels_width: null,
+      led_teto_pixels_height: null,
+      led_teto_total_pixels: null,
+      led_teto_resolution: null,
+      services: null
     };
-    
+
     try {
-        if (quote.discount_description) {
-            const data = JSON.parse(quote.discount_description);
-            return { ...defaultData, ...data };
-        }
+      if (quote.discount_description) {
+        const data = JSON.parse(quote.discount_description);
+        return { ...defaultData, ...data };
+      }
     } catch (e) {
-        console.log('Error parsing extended quote data:', e);
+      console.log('Error parsing extended quote data:', e);
     }
-    
+
     return defaultData;
   };
 
@@ -373,36 +373,36 @@ async function showQuoteDetails(quote) {
 
   // Safely parse and process services
   let servicesProcessed = false;
-  
+
   // First try the direct field
   if (quote.selected_services) {
-      if (typeof quote.selected_services === 'string') {
-          try {
-              const parsedServices = JSON.parse(quote.selected_services);
-              processServicesForTable(parsedServices);
-              servicesProcessed = true;
-          } catch (e) {
-              console.log('Error parsing selected_services:', e);
-          }
-      } else if (Array.isArray(quote.selected_services)) {
-          processServicesForTable(quote.selected_services);
-          servicesProcessed = true;
+    if (typeof quote.selected_services === 'string') {
+      try {
+        const parsedServices = JSON.parse(quote.selected_services);
+        processServicesForTable(parsedServices);
+        servicesProcessed = true;
+      } catch (e) {
+        console.log('Error parsing selected_services:', e);
       }
+    } else if (Array.isArray(quote.selected_services)) {
+      processServicesForTable(quote.selected_services);
+      servicesProcessed = true;
+    }
   }
-  
+
   // If not found, try to get services from discount_description JSON
   if (!servicesProcessed && extendedData.services && Array.isArray(extendedData.services)) {
-      processServicesForTable(extendedData.services);
-      servicesProcessed = true;
+    processServicesForTable(extendedData.services);
+    servicesProcessed = true;
   }
-  
+
   // If still no services found, show empty message
   if (!servicesProcessed) {
-      serviceTableRowsHtml = '<tr><td colspan="4" style="padding: 10px; text-align: center; border-bottom: 1px solid #dee2e6;">Nenhum serviço adicionado</td></tr>';
+    serviceTableRowsHtml = '<tr><td colspan="4" style="padding: 10px; text-align: center; border-bottom: 1px solid #dee2e6;">Nenhum serviço adicionado</td></tr>';
   }
 
   // --- Format other data safely (Remains the same) ---
-  const proposalId = quote.id || 'N/A'; 
+  const proposalId = quote.id || 'N/A';
   const projectName = quote.project_name || 'Projeto sem nome';
   const clientName = quote.client_name || 'N/A';
   const clientCompany = quote.client_company || 'N/A';
@@ -411,10 +411,10 @@ async function showQuoteDetails(quote) {
   const createdDate = formatDate(quote.created_at);
   const shootingStart = formatDate(quote.shooting_dates_start);
   const shootingEnd = formatDate(quote.shooting_dates_end);
-  const daysCount = quote.days_count || 1; 
-  
+  const daysCount = quote.days_count || 1;
+
   // Use the stored total_price which should now be the final discounted price  
-  const totalPrice = quote.total_price || formatCurrency(dailySubtotalSum * daysCount); 
+  const totalPrice = quote.total_price || formatCurrency(dailySubtotalSum * daysCount);
 
   // LED Principal Data (Updated to use extended data)
   const ledPWidth = quote.led_principal_width || 'N/A';
@@ -425,12 +425,12 @@ async function showQuoteDetails(quote) {
   const ledPPixelsW = quote.led_principal_pixels_width || extendedData.led_principal_pixels_width || 'N/A';
   const ledPPixelsH = quote.led_principal_pixels_height || extendedData.led_principal_pixels_height || 'N/A';
   const ledPTotalPixels = (quote.led_principal_total_pixels || extendedData.led_principal_total_pixels) ? Number(quote.led_principal_total_pixels || extendedData.led_principal_total_pixels).toLocaleString('pt-BR') : 'N/A';
-  const ledPPowerMax = (quote.principal_power_max || extendedData.principal_power_max) ? `${formatNumber(quote.principal_power_max || extendedData.principal_power_max)} W` : 'N/A'; 
-  const ledPPowerAvg = (quote.principal_power_avg || extendedData.principal_power_avg) ? `${formatNumber(quote.principal_power_avg || extendedData.principal_power_avg)} W` : 'N/A'; 
-  const ledPWeight = (quote.principal_weight || extendedData.principal_weight) ? `${formatNumber(quote.principal_weight || extendedData.principal_weight)} kg` : 'N/A';   
+  const ledPPowerMax = (quote.principal_power_max || extendedData.principal_power_max) ? `${formatNumber(quote.principal_power_max || extendedData.principal_power_max)} W` : 'N/A';
+  const ledPPowerAvg = (quote.principal_power_avg || extendedData.principal_power_avg) ? `${formatNumber(quote.principal_power_avg || extendedData.principal_power_avg)} W` : 'N/A';
+  const ledPWeight = (quote.principal_weight || extendedData.principal_weight) ? `${formatNumber(quote.principal_weight || extendedData.principal_weight)} kg` : 'N/A';
 
   // LED Teto Data (Updated to use extended data)
-  const hasTetoLed = !!quote.led_teto_width; 
+  const hasTetoLed = !!quote.led_teto_width;
   const ledTWidth = quote.led_teto_width || 'N/A';
   const ledTHeight = quote.led_teto_height || 'N/A';
   const ledTModules = quote.led_teto_modules || 'N/A';
@@ -439,8 +439,8 @@ async function showQuoteDetails(quote) {
   const ledTPixelsH = quote.led_teto_pixels_height || extendedData.led_teto_pixels_height || 'N/A';
   const ledTTotalPixels = (quote.led_teto_total_pixels || extendedData.led_teto_total_pixels) ? Number(quote.led_teto_total_pixels || extendedData.led_teto_total_pixels).toLocaleString('pt-BR') : 'N/A';
   const ledTPowerMax = (quote.teto_power_max || extendedData.teto_power_max) ? `${formatNumber(quote.teto_power_max || extendedData.teto_power_max)} W` : 'N/A';
-  const ledTPowerAvg = (quote.teto_power_avg || extendedData.teto_power_avg) ? `${formatNumber(quote.teto_power_avg || extendedData.teto_power_avg)} W` : 'N/A'; 
-  const ledTWeight = (quote.teto_weight || extendedData.teto_weight) ? `${formatNumber(quote.teto_weight || extendedData.teto_weight)} kg` : 'N/A';   
+  const ledTPowerAvg = (quote.teto_power_avg || extendedData.teto_power_avg) ? `${formatNumber(quote.teto_power_avg || extendedData.teto_power_avg)} W` : 'N/A';
+  const ledTWeight = (quote.teto_weight || extendedData.teto_weight) ? `${formatNumber(quote.teto_weight || extendedData.teto_weight)} kg` : 'N/A';
 
   // --- Build Modal HTML - RESTORING ORIGINAL STRUCTURE WITH UPDATED TABLE/TOTAL ---
   modalContent.innerHTML = `
@@ -568,8 +568,8 @@ async function showQuoteDetails(quote) {
   const closeButton = modalContent.querySelector('#quote-details-close-btn');
   if (closeButton) {
     // Clone and replace to ensure no duplicate listeners
-     const newCloseBtn = closeButton.cloneNode(true);
-     closeButton.parentNode.replaceChild(newCloseBtn, closeButton);
+    const newCloseBtn = closeButton.cloneNode(true);
+    closeButton.parentNode.replaceChild(newCloseBtn, closeButton);
 
     newCloseBtn.addEventListener('click', () => {
       detailsModal.style.display = 'none';
@@ -580,120 +580,120 @@ async function showQuoteDetails(quote) {
   // Add approval button functionality (if needed/exists)
   const approveButton = modalContent.querySelector('#approve-quote-btn');
   if (approveButton) {
-      // Clone and replace to ensure no duplicate listeners
-      const newApproveBtn = approveButton.cloneNode(true);
-      approveButton.parentNode.replaceChild(newApproveBtn, approveButton);
-      
-      newApproveBtn.addEventListener('click', async (event) => {
-          const proposalIdToApprove = event.target.dataset.proposalId;
-          
-          // Disable button and show loading state
-          newApproveBtn.disabled = true;
-          newApproveBtn.textContent = 'Aprovando...';
-          
-          try {
-              // Call the quote approval API
-              const response = await fetch(`/api/quotes/approve/quote-${proposalIdToApprove}`, {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json'
-                  }
-              });
-              
-              const data = await response.json();
-              
-              if (!response.ok) {
-                  if (response.status === 400 && data.error === 'Quote has already been approved') {
-                      // Handle already approved case gracefully
-                      createConfetti();
-                      alert('Este orçamento já foi aprovado! Redirecionando...');
-                      setTimeout(() => {
-                          window.location.href = `/obrigado?quote=quote-${proposalIdToApprove}`;
-                      }, 2000);
-                      return;
-                  }
-                  throw new Error(data.error || 'Failed to approve quote');
-              }
-              
-              // Trigger confetti animation
-              createConfetti();
-              
-              // Check calendar availability
-              newApproveBtn.textContent = 'Verificando disponibilidade...';
-              const availabilityResult = await checkCalendarAvailability(data.quote);
-              
-              // Close modal first
-              const modal = document.getElementById('quote-details-modal');
-              if (modal) {
-                  modal.style.display = 'none';
-                  document.body.style.overflow = '';
-              }
-              
-              if (availabilityResult.available) {
-                  // Redirect to thank you page
-                  setTimeout(() => {
-                      window.location.href = `/obrigado?quote=quote-${proposalIdToApprove}`;
-                  }, 2000);
-              } else {
-                  // Redirect to alternative dates page
-                  setTimeout(() => {
-                      window.location.href = `/escolher-data?quote=quote-${proposalIdToApprove}&alternatives=${encodeURIComponent(JSON.stringify(availabilityResult.alternatives || []))}`;
-                  }, 2000);
-              }
-              
-          } catch (error) {
-              console.error('Error approving quote:', error);
-              alert('Erro ao aprovar proposta. Tente novamente.');
-              newApproveBtn.disabled = false;
-              newApproveBtn.textContent = 'Aprovar Orçamento';
+    // Clone and replace to ensure no duplicate listeners
+    const newApproveBtn = approveButton.cloneNode(true);
+    approveButton.parentNode.replaceChild(newApproveBtn, approveButton);
+
+    newApproveBtn.addEventListener('click', async (event) => {
+      const proposalIdToApprove = event.target.dataset.proposalId;
+
+      // Disable button and show loading state
+      newApproveBtn.disabled = true;
+      newApproveBtn.textContent = 'Aprovando...';
+
+      try {
+        // Call the quote approval API
+        const response = await fetch(`/api/quotes/approve/quote-${proposalIdToApprove}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
           }
-      });
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          if (response.status === 400 && data.error === 'Quote has already been approved') {
+            // Handle already approved case gracefully
+            createConfetti();
+            alert('Este orçamento já foi aprovado! Redirecionando...');
+            setTimeout(() => {
+              window.location.href = `/obrigado?quote=quote-${proposalIdToApprove}`;
+            }, 2000);
+            return;
+          }
+          throw new Error(data.error || 'Failed to approve quote');
+        }
+
+        // Trigger confetti animation
+        createConfetti();
+
+        // Check calendar availability
+        newApproveBtn.textContent = 'Verificando disponibilidade...';
+        const availabilityResult = await checkCalendarAvailability(data.quote);
+
+        // Close modal first
+        const modal = document.getElementById('quote-details-modal');
+        if (modal) {
+          modal.style.display = 'none';
+          document.body.style.overflow = '';
+        }
+
+        if (availabilityResult.available) {
+          // Redirect to thank you page
+          setTimeout(() => {
+            window.location.href = `/obrigado?quote=quote-${proposalIdToApprove}`;
+          }, 2000);
+        } else {
+          // Redirect to alternative dates page
+          setTimeout(() => {
+            window.location.href = `/escolher-data?quote=quote-${proposalIdToApprove}&alternatives=${encodeURIComponent(JSON.stringify(availabilityResult.alternatives || []))}`;
+          }, 2000);
+        }
+
+      } catch (error) {
+        console.error('Error approving quote:', error);
+        alert('Erro ao aprovar proposta. Tente novamente.');
+        newApproveBtn.disabled = false;
+        newApproveBtn.textContent = 'Aprovar Orçamento';
+      }
+    });
   }
 }
 
 // Make sure setupQuoteDetailsModal exists and correctly sets up the #quote-details-modal container
 // Added checks and ensure the content div is correctly targeted/created.
 function setupQuoteDetailsModal() {
-    let modal = document.getElementById('quote-details-modal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'quote-details-modal';
-        // Basic modal styling (should ideally be in CSS)
-        modal.style.position = 'fixed';
-        modal.style.zIndex = '1000';
-        modal.style.left = '0';
-        modal.style.top = '0';
-        modal.style.width = '100%';
-        modal.style.height = '100%';
-        modal.style.overflow = 'hidden';
-        modal.style.backgroundColor = 'rgba(0,0,0,0.6)';
-        modal.style.justifyContent = 'center';
-        modal.style.alignItems = 'center';
-        modal.style.padding = '20px';
-        modal.style.boxSizing = 'border-box';
-        modal.style.display = 'none'; // Hide modal by default
+  let modal = document.getElementById('quote-details-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'quote-details-modal';
+    // Basic modal styling (should ideally be in CSS)
+    modal.style.position = 'fixed';
+    modal.style.zIndex = '1000';
+    modal.style.left = '0';
+    modal.style.top = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.overflow = 'hidden';
+    modal.style.backgroundColor = 'rgba(0,0,0,0.6)';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.style.padding = '20px';
+    modal.style.boxSizing = 'border-box';
+    modal.style.display = 'none'; // Hide modal by default
 
-        // Create the content container *inside* the modal overlay
-        const contentDiv = document.createElement('div');
-        contentDiv.id = 'quote-details-content'; 
-        // Styles for the content container itself (like max-width, background) should be handled by the CSS
-        // for #quote-details-content-wrapper which is *inside* this innerHTML
-        contentDiv.style.width = '100%'; 
-        contentDiv.style.maxHeight = '100%'; 
-        contentDiv.style.overflowY = 'auto'; 
+    // Create the content container *inside* the modal overlay
+    const contentDiv = document.createElement('div');
+    contentDiv.id = 'quote-details-content';
+    // Styles for the content container itself (like max-width, background) should be handled by the CSS
+    // for #quote-details-content-wrapper which is *inside* this innerHTML
+    contentDiv.style.width = '100%';
+    contentDiv.style.maxHeight = '100%';
+    contentDiv.style.overflowY = 'auto';
 
-        modal.appendChild(contentDiv);
-        document.body.appendChild(modal);
+    modal.appendChild(contentDiv);
+    document.body.appendChild(modal);
 
-        // Close modal if clicked on the overlay (outside the content wrapper)
-        modal.addEventListener('click', (event) => {
-            // Check if the click target is the modal overlay itself
-            if (event.target === modal) {
-                modal.style.display = 'none';
-                document.body.style.overflow = ''; 
-            }
-        });
-    }
+    // Close modal if clicked on the overlay (outside the content wrapper)
+    modal.addEventListener('click', (event) => {
+      // Check if the click target is the modal overlay itself
+      if (event.target === modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    });
+  }
 }
 
 /**
@@ -704,7 +704,7 @@ function setupQuoteDetailsModal() {
 function formatCurrency(value) {
   // Ensure the value is a number and default to 0 if not
   let numberValue;
-  
+
   // If the value already has the R$ prefix, extract the number
   if (typeof value === 'string' && value.trim().startsWith('R$')) {
     const numStr = value.replace('R$', '').trim();
@@ -712,12 +712,12 @@ function formatCurrency(value) {
   } else {
     numberValue = Number(value);
   }
-  
+
   if (isNaN(numberValue)) {
     // console.warn('Invalid currency value:', value);
     return 'R$ 0,00';
   }
-  
+
   // Use proper Brazilian Portuguese format
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -732,12 +732,12 @@ function formatCurrency(value) {
 function showLoginPrompt() {
   const container = document.getElementById('quotes-container');
   if (!container) return;
-  
+
   container.innerHTML = `
     <div class="login-prompt">
       <h2>Acesso Restrito</h2>
       <p>Você precisa estar logado para ver suas propostas.</p>
-      <a href="login.html" class="login-button">Fazer Login</a>
+      <a href="index.html" class="login-button">Fazer Login</a>
     </div>
   `;
 }
@@ -747,7 +747,7 @@ function showLoginPrompt() {
  */
 function createConfetti() {
   const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd'];
-  
+
   for (let i = 0; i < 50; i++) {
     const confetti = document.createElement('div');
     confetti.style.position = 'fixed';
@@ -759,9 +759,9 @@ function createConfetti() {
     confetti.style.zIndex = '9999';
     confetti.style.borderRadius = '50%';
     confetti.style.pointerEvents = 'none';
-    
+
     document.body.appendChild(confetti);
-    
+
     // Animate confetti
     confetti.animate([
       { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
@@ -779,161 +779,161 @@ function createConfetti() {
  * Check calendar availability
  */
 async function checkCalendarAvailability(quoteData) {
-    try {
-        const webhookUrl = 'https://n8n.avauto.fun/webhook/eab92d5a-c6ee-4c74-9b52-e89997dd4205';
-        
-        // Calculate comprehensive data
-        const originalPrice = parseFloat(quoteData.original_total_price) || 0;
-        const discountAmount = parseFloat(quoteData.discount_amount) || 0;
-        const finalPrice = originalPrice - discountAmount;
-        
-        // Calculate equipment totals
-        let dailyEquipmentTotal = 0;
-        let servicesWithCalculations = [];
-        
-        if (quoteData.selected_services && Array.isArray(quoteData.selected_services)) {
-            servicesWithCalculations = quoteData.selected_services.map(service => {
-                const quantity = service.quantity || 0;
-                const unitPrice = service.unit_price || 0;
-                const dailySubtotal = quantity * unitPrice;
-                const totalSubtotal = dailySubtotal * (quoteData.days_count || 1);
-                dailyEquipmentTotal += dailySubtotal;
-                
-                return {
-                    ...service,
-                    daily_subtotal: dailySubtotal,
-                    total_subtotal: totalSubtotal
-                };
-            });
-        }
-        
-        // Calculate LED totals
-        const ledTotalModules = (quoteData.led_principal_modules || 0) + (quoteData.led_teto_modules || 0);
-        const ledTotalPixels = (quoteData.led_principal_total_pixels || 0) + (quoteData.led_teto_total_pixels || 0);
-        const totalPowerMax = (parseInt(quoteData.principal_power_max) || 0) + (parseInt(quoteData.teto_power_max) || 0);
-        const totalPowerAvg = (parseInt(quoteData.principal_power_avg) || 0) + (parseInt(quoteData.teto_power_avg) || 0);
-        const totalWeight = (parseInt(quoteData.principal_weight) || 0) + (parseInt(quoteData.teto_weight) || 0);
-        
-        // Calculate areas
-        const principalArea = (parseFloat(quoteData.led_principal_width) || 0) * (parseFloat(quoteData.led_principal_height) || 0);
-        const tetoArea = (parseFloat(quoteData.led_teto_width) || 0) * (parseFloat(quoteData.led_teto_height) || 0);
-        
-        const comprehensivePayload = {
-            checkType: 'availability',
-            webhookUrl: webhookUrl,
-            requestTimestamp: new Date().toISOString(),
-            quoteId: quoteData.id,
-            clientName: quoteData.client_name,
-            clientEmail: quoteData.client_email,
-            projectName: quoteData.project_name,
-            shootingDate: quoteData.shooting_dates_start || quoteData.shooting_date,
-            quoteData: {
-                id: quoteData.id,
-                user_id: quoteData.user_id,
-                created_at: quoteData.created_at,
-                updated_at: quoteData.updated_at,
-                status: quoteData.status,
-                project_name: quoteData.project_name,
-                client_name: quoteData.client_name,
-                client_company: quoteData.client_company,
-                client_email: quoteData.client_email,
-                client_phone: quoteData.client_phone,
-                shooting_dates_start: quoteData.shooting_dates_start,
-                shooting_dates_end: quoteData.shooting_dates_end,
-                days_count: quoteData.days_count,
-                led_configuration: {
-                    principal: {
-                        width: quoteData.led_principal_width,
-                        height: quoteData.led_principal_height,
-                        curvature: quoteData.led_principal_curvature,
-                        modules: quoteData.led_principal_modules,
-                        resolution: quoteData.led_principal_resolution,
-                        pixels_width: quoteData.led_principal_pixels_width,
-                        pixels_height: quoteData.led_principal_pixels_height,
-                        total_pixels: quoteData.led_principal_total_pixels,
-                        power_max: quoteData.principal_power_max,
-                        power_avg: quoteData.principal_power_avg,
-                        weight: quoteData.principal_weight
-                    },
-                    teto: {
-                        width: quoteData.led_teto_width,
-                        height: quoteData.led_teto_height,
-                        modules: quoteData.led_teto_modules,
-                        pixels_width: quoteData.led_teto_pixels_width,
-                        pixels_height: quoteData.led_teto_pixels_height,
-                        total_pixels: quoteData.led_teto_total_pixels,
-                        power_max: quoteData.teto_power_max,
-                        power_avg: quoteData.teto_power_avg,
-                        weight: quoteData.teto_weight,
-                        resolution: quoteData.led_teto_resolution
-                    }
-                },
-                production_type: {
-                    selected_pod_type: quoteData.selected_pod_type,
-                    studio_size: quoteData.selected_studio_size
-                },
-                pricing: {
-                    daily_rate: quoteData.daily_rate,
-                    discounted_daily_rate: quoteData.discounted_daily_rate,
-                    total_price: quoteData.total_price,
-                    original_total_price: quoteData.original_total_price,
-                    discount_percentage: quoteData.discount_percentage,
-                    discount_amount: quoteData.discount_amount,
-                    discount_reason: quoteData.discount_reason
-                },
-                selected_services: servicesWithCalculations,
-                approval_details: {
-                    quote_approved: quoteData.quote_approved,
-                    quote_approved_at: quoteData.quote_approved_at,
-                    quote_approval_ip: quoteData.quote_approval_ip,
-                    approved_by: 'client'
-                }
-            },
-            calculated_totals: {
-                daily_equipment_total: dailyEquipmentTotal,
-                total_before_discount: originalPrice,
-                discount_amount: discountAmount,
-                final_total: finalPrice,
-                final_total_formatted: quoteData.total_price,
-                total_days: quoteData.days_count || 1,
-                discount_percentage: parseFloat(quoteData.discount_percentage) || 0
-            },
-            studio_requirements: {
-                led_total_modules: ledTotalModules,
-                led_total_pixels: ledTotalPixels,
-                total_power_consumption: {
-                    max_watts: totalPowerMax,
-                    avg_watts: totalPowerAvg
-                },
-                total_weight_kg: totalWeight,
-                space_requirements: {
-                    principal_area_sqm: principalArea,
-                    teto_area_sqm: tetoArea,
-                    total_led_area_sqm: principalArea + tetoArea
-                }
-            },
-            calendar_check: {
-                requested_start_date: quoteData.shooting_dates_start,
-                requested_end_date: quoteData.shooting_dates_end,
-                duration_days: quoteData.days_count || 1,
-                check_type: 'studio_availability',
-                timezone: 'America/Sao_Paulo'
-            }
-        };
-        
-        const response = await fetch(webhookUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(comprehensivePayload)
-        });
+  try {
+    const webhookUrl = 'https://n8n.avauto.fun/webhook/eab92d5a-c6ee-4c74-9b52-e89997dd4205';
 
-        const result = await response.json();
-        return result;
-    } catch (error) {
-        console.error('Error checking calendar availability:', error);
-        // Default to unavailable if webhook fails for safety
-        return { available: false };
+    // Calculate comprehensive data
+    const originalPrice = parseFloat(quoteData.original_total_price) || 0;
+    const discountAmount = parseFloat(quoteData.discount_amount) || 0;
+    const finalPrice = originalPrice - discountAmount;
+
+    // Calculate equipment totals
+    let dailyEquipmentTotal = 0;
+    let servicesWithCalculations = [];
+
+    if (quoteData.selected_services && Array.isArray(quoteData.selected_services)) {
+      servicesWithCalculations = quoteData.selected_services.map(service => {
+        const quantity = service.quantity || 0;
+        const unitPrice = service.unit_price || 0;
+        const dailySubtotal = quantity * unitPrice;
+        const totalSubtotal = dailySubtotal * (quoteData.days_count || 1);
+        dailyEquipmentTotal += dailySubtotal;
+
+        return {
+          ...service,
+          daily_subtotal: dailySubtotal,
+          total_subtotal: totalSubtotal
+        };
+      });
     }
+
+    // Calculate LED totals
+    const ledTotalModules = (quoteData.led_principal_modules || 0) + (quoteData.led_teto_modules || 0);
+    const ledTotalPixels = (quoteData.led_principal_total_pixels || 0) + (quoteData.led_teto_total_pixels || 0);
+    const totalPowerMax = (parseInt(quoteData.principal_power_max) || 0) + (parseInt(quoteData.teto_power_max) || 0);
+    const totalPowerAvg = (parseInt(quoteData.principal_power_avg) || 0) + (parseInt(quoteData.teto_power_avg) || 0);
+    const totalWeight = (parseInt(quoteData.principal_weight) || 0) + (parseInt(quoteData.teto_weight) || 0);
+
+    // Calculate areas
+    const principalArea = (parseFloat(quoteData.led_principal_width) || 0) * (parseFloat(quoteData.led_principal_height) || 0);
+    const tetoArea = (parseFloat(quoteData.led_teto_width) || 0) * (parseFloat(quoteData.led_teto_height) || 0);
+
+    const comprehensivePayload = {
+      checkType: 'availability',
+      webhookUrl: webhookUrl,
+      requestTimestamp: new Date().toISOString(),
+      quoteId: quoteData.id,
+      clientName: quoteData.client_name,
+      clientEmail: quoteData.client_email,
+      projectName: quoteData.project_name,
+      shootingDate: quoteData.shooting_dates_start || quoteData.shooting_date,
+      quoteData: {
+        id: quoteData.id,
+        user_id: quoteData.user_id,
+        created_at: quoteData.created_at,
+        updated_at: quoteData.updated_at,
+        status: quoteData.status,
+        project_name: quoteData.project_name,
+        client_name: quoteData.client_name,
+        client_company: quoteData.client_company,
+        client_email: quoteData.client_email,
+        client_phone: quoteData.client_phone,
+        shooting_dates_start: quoteData.shooting_dates_start,
+        shooting_dates_end: quoteData.shooting_dates_end,
+        days_count: quoteData.days_count,
+        led_configuration: {
+          principal: {
+            width: quoteData.led_principal_width,
+            height: quoteData.led_principal_height,
+            curvature: quoteData.led_principal_curvature,
+            modules: quoteData.led_principal_modules,
+            resolution: quoteData.led_principal_resolution,
+            pixels_width: quoteData.led_principal_pixels_width,
+            pixels_height: quoteData.led_principal_pixels_height,
+            total_pixels: quoteData.led_principal_total_pixels,
+            power_max: quoteData.principal_power_max,
+            power_avg: quoteData.principal_power_avg,
+            weight: quoteData.principal_weight
+          },
+          teto: {
+            width: quoteData.led_teto_width,
+            height: quoteData.led_teto_height,
+            modules: quoteData.led_teto_modules,
+            pixels_width: quoteData.led_teto_pixels_width,
+            pixels_height: quoteData.led_teto_pixels_height,
+            total_pixels: quoteData.led_teto_total_pixels,
+            power_max: quoteData.teto_power_max,
+            power_avg: quoteData.teto_power_avg,
+            weight: quoteData.teto_weight,
+            resolution: quoteData.led_teto_resolution
+          }
+        },
+        production_type: {
+          selected_pod_type: quoteData.selected_pod_type,
+          studio_size: quoteData.selected_studio_size
+        },
+        pricing: {
+          daily_rate: quoteData.daily_rate,
+          discounted_daily_rate: quoteData.discounted_daily_rate,
+          total_price: quoteData.total_price,
+          original_total_price: quoteData.original_total_price,
+          discount_percentage: quoteData.discount_percentage,
+          discount_amount: quoteData.discount_amount,
+          discount_reason: quoteData.discount_reason
+        },
+        selected_services: servicesWithCalculations,
+        approval_details: {
+          quote_approved: quoteData.quote_approved,
+          quote_approved_at: quoteData.quote_approved_at,
+          quote_approval_ip: quoteData.quote_approval_ip,
+          approved_by: 'client'
+        }
+      },
+      calculated_totals: {
+        daily_equipment_total: dailyEquipmentTotal,
+        total_before_discount: originalPrice,
+        discount_amount: discountAmount,
+        final_total: finalPrice,
+        final_total_formatted: quoteData.total_price,
+        total_days: quoteData.days_count || 1,
+        discount_percentage: parseFloat(quoteData.discount_percentage) || 0
+      },
+      studio_requirements: {
+        led_total_modules: ledTotalModules,
+        led_total_pixels: ledTotalPixels,
+        total_power_consumption: {
+          max_watts: totalPowerMax,
+          avg_watts: totalPowerAvg
+        },
+        total_weight_kg: totalWeight,
+        space_requirements: {
+          principal_area_sqm: principalArea,
+          teto_area_sqm: tetoArea,
+          total_led_area_sqm: principalArea + tetoArea
+        }
+      },
+      calendar_check: {
+        requested_start_date: quoteData.shooting_dates_start,
+        requested_end_date: quoteData.shooting_dates_end,
+        duration_days: quoteData.days_count || 1,
+        check_type: 'studio_availability',
+        timezone: 'America/Sao_Paulo'
+      }
+    };
+
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(comprehensivePayload)
+    });
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error checking calendar availability:', error);
+    // Default to unavailable if webhook fails for safety
+    return { available: false };
+  }
 }
