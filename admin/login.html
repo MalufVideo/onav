@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,10 +11,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+
     <style>
         :root {
-            --primary-color: #e50914; /* Netflix Red-ish */
+            --primary-color: #e50914;
+            /* Netflix Red-ish */
             --primary-hover: #b20710;
             --bg-color: #141414;
             --card-bg: #1f1f1f;
@@ -37,9 +39,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/img/hero-bg.jpg'); /* Assuming this exists, fallback to black if not */
-            background-size: cover;
-            background-position: center;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/img/hero_background.webp');
         }
 
         .login-container {
@@ -65,7 +65,8 @@
             font-size: 32px;
             font-weight: 700;
             margin-bottom: 28px;
-            text-align: inherit; /* Left aligned by default in container, but usually centered looks better for simple login? Netflix aligns left */
+            text-align: inherit;
+            /* Left aligned by default in container, but usually centered looks better for simple login? Netflix aligns left */
             color: #fff;
         }
 
@@ -131,9 +132,9 @@
             color: #737373;
             font-size: 13px;
         }
-
     </style>
 </head>
+
 <body>
 
     <div class="login-container">
@@ -141,9 +142,9 @@
             <!-- Adjust path if needed. Assuming /img/resized_logo.png exists as seen in file list -->
             <img src="/img/resized_logo.png" alt="ON+AV">
         </div>
-        
+
         <h1>Entrar</h1>
-        
+
         <form id="loginForm">
             <div class="form-group">
                 <input type="email" id="email" class="form-control" placeholder="Email ou número de telefone" required>
@@ -151,13 +152,13 @@
             <div class="form-group">
                 <input type="password" id="password" class="form-control" placeholder="Senha" required>
             </div>
-            
+
             <div id="errorArea" class="error-message">
                 <i class="fas fa-exclamation-circle"></i> <span id="errorText"></span>
             </div>
 
             <button type="submit" class="btn-primary" id="submitBtn">Entrar</button>
-            
+
             <div style="display: flex; justify-content: space-between; color: #b3b3b3; font-size: 13px;">
                 <label>
                     <input type="checkbox" checked> Lembrar de mim
@@ -172,11 +173,38 @@
     </div>
 
     <script>
-        // Supabase configuration - mimicking dashboard.js setup
+        // Supabase configuration
         const SUPABASE_URL = 'https://qhhjvpsxkfjcxitpnhxi.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1ODk4NzksImV4cCI6MjA1NTE2NTg3OX0.kAcBsHJnlr56fJ6qvXSLOWRiLTnQR7ilXUi_2Qzj4RE';
-        
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Fallback key, but will try to fetch from server first
+        let SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1ODk4NzksImV4cCI6MjA1NTE2NTg3OX0.kAcBsHJnlr56fJ6qvXSLOWRiLTnQR7ilXUi_2Qzj4RE';
+
+        let supabaseClient = null;
+
+        async function initSupabase() {
+            try {
+                console.log('Fetching Supabase key from server...');
+                const response = await fetch('/api/config/supabase-key');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.key) {
+                        SUPABASE_ANON_KEY = data.key;
+                        console.log('Supabase key loaded from server');
+                    }
+                }
+            } catch (e) {
+                console.warn('Failed to fetch Supabase key, using fallback:', e);
+            }
+
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            // Check if already logged in
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                window.location.href = '/dashboard';
+            }
+        }
+
+        initSupabase();
 
         const loginForm = document.getElementById('loginForm');
         const emailInput = document.getElementById('email');
@@ -185,26 +213,27 @@
         const errorArea = document.getElementById('errorArea');
         const errorText = document.getElementById('errorText');
 
-        // Check if already logged in
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            if (session) {
-                window.location.href = '/dashboard';
-            }
-        });
-
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
+            if (!supabaseClient) {
+                errorText.textContent = 'Sistema de autenticação carregando... Tente novamente em 2 segundos.';
+                errorArea.style.display = 'block';
+                return;
+            }
+
             // UI Loading state
             submitBtn.textContent = 'Carregando...';
             submitBtn.classList.add('loading');
             errorArea.style.display = 'none';
 
-            const email = emailInput.value;
+            const email = emailInput.value.trim();
             const password = passwordInput.value;
 
+            console.log('Attempting login for:', email);
+
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email: email,
                     password: password
                 });
@@ -213,15 +242,12 @@
                     throw error;
                 }
 
-                // Initial success check - verify if admin
-                // We'll let the dashboard handle the strict role check, 
-                // but we can do a quick check here if we wanted.
-                // For now, just redirect.
+                console.log('Login successful, redirecting...');
                 window.location.href = '/dashboard';
 
             } catch (error) {
                 console.error('Login error:', error);
-                errorText.textContent = 'Senha incorreta. Por favor, tente novamente.';
+                errorText.textContent = error.message || 'Erro ao entrar. Verifique suas credenciais.';
                 errorArea.style.display = 'block';
                 submitBtn.textContent = 'Entrar';
                 submitBtn.classList.remove('loading');
@@ -229,4 +255,5 @@
         });
     </script>
 </body>
+
 </html>

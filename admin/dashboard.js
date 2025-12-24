@@ -1,17 +1,33 @@
 // Dashboard JavaScript - Complete Admin Control System
 // Initialize Supabase with service role key for admin operations
 const SUPABASE_URL = 'https://qhhjvpsxkfjcxitpnhxi.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1ODk4NzksImV4cCI6MjA1NTE2NTg3OX0.kAcBsHJnlr56fJ6qvXSLOWRiLTnQR7ilXUi_2Qzj4RE';
+// Fallback keys (will try to fetch anon key from server)
+let SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1ODk4NzksImV4cCI6MjA1NTE2NTg3OX0.kAcBsHJnlr56fJ6qvXSLOWRiLTnQR7ilXUi_2Qzj4RE';
 const SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczOTU4OTg3OSwiZXhwIjoyMDU1MTY1ODc5fQ.z2VbGSyj6HCxtFyji69JX9uoBw1fRPWM74YSZisdDCU';
 
-// Create both clients: anon for regular operations, service role for admin operations
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-    auth: {
-        autoRefreshToken: false,
-        persistSession: false
+let supabase = null;
+let supabaseAdmin = null;
+
+async function initSupabase() {
+    try {
+        console.log('[Dashboard] Fetching Supabase key from server...');
+        const response = await fetch('/api/config/supabase-key');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.key) {
+                SUPABASE_ANON_KEY = data.key;
+                console.log('[Dashboard] Supabase anon key loaded from server');
+            }
+        }
+    } catch (e) {
+        console.warn('[Dashboard] Failed to fetch key, using fallback:', e);
     }
-});
+
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+        auth: { autoRefreshToken: false, persistSession: false }
+    });
+}
 
 // Global state
 let currentPage = 'overview';
@@ -34,6 +50,7 @@ const toast = document.getElementById('toast');
 
 // Initialize Dashboard
 document.addEventListener('DOMContentLoaded', async () => {
+    await initSupabase();
     await checkAuth();
     initializeEventListeners();
     loadPage('overview');
@@ -43,11 +60,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Authentication
 async function checkAuth() {
-    const { data: { user } } = await supabase.auth.getUser();
+    console.log('[Dashboard] Checking authentication...');
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError) {
+        console.error('[Dashboard] Auth error:', authError);
+    }
+
     if (!user) {
+        console.warn('[Dashboard] No user found, redirecting to login');
         window.location.href = '/admin/login';
         return;
     }
+
+    console.log('[Dashboard] Logged in as:', user.email);
     currentUser = user;
 
     // Get user profile
