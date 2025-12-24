@@ -44,18 +44,32 @@ async function getGoogleAuth(scopes) {
     base64Content = markerMatch[1];
   }
 
-  // 2. Remove ANY non-base64 characters remaining (including BOM, zero-width chars, etc.)
-  base64Content = base64Content.replace(/[^A-Za-z0-9+/=]/g, '');
+  // 2. Remove ANY non-base64 characters (keep only A-Za-z0-9+/) - remove padding first
+  base64Content = base64Content.replace(/[^A-Za-z0-9+/]/g, '');
 
   if (!base64Content || base64Content.length < 500) {
     throw new Error(`Invalid private key length: ${base64Content?.length || 0}. Check your GOOGLE_PRIVATE_KEY variable.`);
   }
 
-  // 3. Reconstruct standard PEM with 64-character lines
+  // 3. Fix base64 padding - must be divisible by 4
+  const remainder = base64Content.length % 4;
+  if (remainder === 1) {
+    // 1 extra char is invalid in base64, remove it (likely a stray character)
+    console.log(`[getGoogleAuth] Removing 1 extra character from base64 (length was ${base64Content.length})`);
+    base64Content = base64Content.slice(0, -1);
+  } else if (remainder === 2) {
+    base64Content += '==';
+  } else if (remainder === 3) {
+    base64Content += '=';
+  }
+
+  console.log(`[getGoogleAuth] Final base64 length: ${base64Content.length} (divisible by 4: ${base64Content.length % 4 === 0})`);
+
+  // 4. Reconstruct standard PEM with 64-character lines
   const lines = base64Content.match(/.{1,64}/g) || [];
   const normalizedKey = `-----BEGIN PRIVATE KEY-----\n${lines.join('\n')}\n-----END PRIVATE KEY-----\n`;
 
-  // 4. Verify the key can be parsed by Node's crypto module before passing to JWT
+  // 5. Verify the key can be parsed by Node's crypto module before passing to JWT
   try {
     crypto.createPrivateKey({
       key: normalizedKey,
@@ -63,10 +77,10 @@ async function getGoogleAuth(scopes) {
     });
     console.log('[getGoogleAuth] Private key verified successfully by crypto module');
   } catch (cryptoError) {
-    // If standard PEM fails, try as PKCS#8 with explicit type
-    console.log('[getGoogleAuth] Standard PEM failed, trying alternative formats...');
+    // If standard PEM fails, provide detailed diagnostics
+    console.log('[getGoogleAuth] Standard PEM failed:', cryptoError.message);
 
-    // Try decoding the base64 to check if it's valid
+    // Try decoding the base64 to check structure
     try {
       const keyBuffer = Buffer.from(base64Content, 'base64');
       console.log(`[getGoogleAuth] Key buffer length: ${keyBuffer.length} bytes`);
@@ -75,13 +89,24 @@ async function getGoogleAuth(scopes) {
       if (keyBuffer[0] !== 0x30) {
         throw new Error(`Invalid key structure: first byte is 0x${keyBuffer[0].toString(16)}, expected 0x30 (SEQUENCE)`);
       }
+
+      // Read the expected length from ASN.1 header
+      let expectedLength;
+      if (keyBuffer[1] < 0x80) {
+        expectedLength = keyBuffer[1] + 2;
+      } else if (keyBuffer[1] === 0x82) {
+        expectedLength = (keyBuffer[2] << 8) + keyBuffer[3] + 4;
+      }
+      console.log(`[getGoogleAuth] ASN.1 expected length: ${expectedLength}, actual: ${keyBuffer.length}`);
+
+      if (keyBuffer.length !== expectedLength) {
+        throw new Error(`Key length mismatch: ASN.1 header says ${expectedLength} bytes, but got ${keyBuffer.length} bytes. Key may be truncated or corrupted.`);
+      }
     } catch (bufferError) {
-      throw new Error(`Key base64 decode failed: ${bufferError.message}. CleanedLen: ${base64Content.length}`);
+      throw new Error(`Key validation failed: ${bufferError.message}. CleanedLen: ${base64Content.length}`);
     }
 
-    // If we got here, base64 is valid but crypto can't parse it
-    // This likely means the key content itself is malformed
-    throw new Error(`Key verification failed: ${cryptoError.message}. This usually means the key content is corrupted or incomplete. CleanedLen: ${base64Content.length}, Start: ${base64Content.substring(0, 20)}, End: ${base64Content.substring(base64Content.length - 20)}`);
+    throw new Error(`Key verification failed: ${cryptoError.message}. CleanedLen: ${base64Content.length}, Start: ${base64Content.substring(0, 20)}, End: ${base64Content.substring(base64Content.length - 20)}`);
   }
 
   const jwtClient = new JWT({
@@ -2369,22 +2394,49 @@ app.get('/api/debug/google-key', async (req, res) => {
     const hasEndMarker = private_key.includes('-----END');
     const hasNewlines = private_key.includes('\n') || private_key.includes('\\n');
 
-    // Extract base64 content
+    // Extract base64 content (same logic as getGoogleAuth)
     let base64Content = private_key;
     const markerMatch = private_key.match(/-----BEGIN[^-]*-----([A-Za-z0-9+/=\s\n\r]+)-----END[^-]*-----/i);
     if (markerMatch) {
       base64Content = markerMatch[1];
     }
-    base64Content = base64Content.replace(/[^A-Za-z0-9+/=]/g, '');
+    // Remove all non-base64 chars including padding
+    base64Content = base64Content.replace(/[^A-Za-z0-9+/]/g, '');
+    const originalBase64Length = base64Content.length;
+
+    // Fix padding - must be divisible by 4
+    const remainder = base64Content.length % 4;
+    let paddingFix = 'none';
+    if (remainder === 1) {
+      base64Content = base64Content.slice(0, -1);
+      paddingFix = 'removed 1 extra char';
+    } else if (remainder === 2) {
+      base64Content += '==';
+      paddingFix = 'added ==';
+    } else if (remainder === 3) {
+      base64Content += '=';
+      paddingFix = 'added =';
+    }
 
     // Try to decode and verify key structure
     let keyValid = false;
     let keyError = null;
     let cryptoVerified = false;
+    let asn1Info = null;
 
     try {
       const keyBuffer = Buffer.from(base64Content, 'base64');
       keyValid = keyBuffer.length > 0 && keyBuffer[0] === 0x30; // Should start with SEQUENCE
+
+      // Parse ASN.1 header
+      if (keyBuffer[1] === 0x82) {
+        const expectedLength = (keyBuffer[2] << 8) + keyBuffer[3] + 4;
+        asn1Info = {
+          expectedLength,
+          actualLength: keyBuffer.length,
+          match: expectedLength === keyBuffer.length
+        };
+      }
 
       // Try to parse with crypto module
       const lines = base64Content.match(/.{1,64}/g) || [];
@@ -2411,10 +2463,14 @@ app.get('/api/debug/google-key', async (req, res) => {
         hasBeginMarker,
         hasEndMarker,
         hasNewlines,
-        base64Length: base64Content.length,
+        originalBase64Length,
+        base64LengthAfterFix: base64Content.length,
+        paddingFix,
+        isDivisibleBy4: base64Content.length % 4 === 0,
         base64Start: base64Content.substring(0, 30),
         base64End: base64Content.substring(base64Content.length - 30),
         keyStructureValid: keyValid,
+        asn1Info,
         cryptoModuleVerified: cryptoVerified,
         cryptoError: keyError,
         nodeVersion: process.version,
