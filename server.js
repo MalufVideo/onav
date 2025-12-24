@@ -69,10 +69,6 @@ async function getGoogleAuth(scopes) {
   }
 }
 
-const tokens = await jwtClient.authorize();
-return tokens;
-}
-
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
