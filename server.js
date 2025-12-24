@@ -5,10 +5,23 @@ const { Server } = require('socket.io');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
 const cors = require('cors'); // Import CORS middleware
+const { google } = require('googleapis'); // Import Google APIs
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
+// Load Google Credentials
+let googleCreds = null;
+try {
+  googleCreds = require('./google-credentials.json');
+  console.log('✅ Loaded google-credentials.json');
+} catch (e) {
+  console.warn('⚠️ google-credentials.json not found. Google Calendar features will not work.');
+}
+
+// Google Calendar Configuration
+const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID || 'd0be053c3b4590597dbffe0b1b08fb68bfcce6d060901d2bfc1574fb7e515c1f@group.calendar.google.com';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -2361,7 +2374,90 @@ app.get('/api/quotes/public/:slug', async (req, res) => {
 
 
 
-// --- Email API Route ---
+// --- Google Calendar Availability Route ---
+
+app.post('/api/check-availability', async (req, res) => {
+  try {
+    if (!googleCreds) {
+      console.error('Google credentials not configured');
+      return res.status(500).json({ available: false, error: 'Calendar configuration missing' });
+    }
+
+    const { quoteId, startDate, endDate } = req.body;
+
+    // Default to start=end if end is missing (single day)
+    const start = new Date(startDate);
+    let end = new Date(endDate || startDate);
+
+    // If dates are invalid
+    if (isNaN(start.getTime())) {
+      return res.status(400).json({ available: false, error: 'Invalid start date' });
+    }
+
+    // Adjust end date to ensure it covers the full day or range
+    // Google FreeBusy is exclusive of the end time, so add 1 day or set to end of day if same day
+    // Assuming full day bookings for studio
+    end.setHours(23, 59, 59, 999);
+    start.setHours(0, 0, 0, 0);
+
+    console.log(`Checking availability for ${start.toISOString()} to ${end.toISOString()}`);
+
+    // Auth with Google
+    const client_email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || (googleCreds && googleCreds.client_email);
+    const private_key = process.env.GOOGLE_PRIVATE_KEY || (googleCreds && googleCreds.private_key);
+
+    if (!client_email || !private_key) {
+      console.error('Google credentials missing from both env and JSON file');
+      return res.status(500).json({ available: false, error: 'Calendar credentials not configured' });
+    }
+
+    const jwtClient = new google.auth.JWT(
+      client_email,
+      null,
+      private_key.replace(/\\n/g, '\n'),
+      ['https://www.googleapis.com/auth/calendar.readonly']
+    );
+
+    await jwtClient.authorize();
+
+    const calendar = google.calendar({ version: 'v3', auth: jwtClient });
+
+    // Query FreeBusy
+    const freeBusyRes = await calendar.freebusy.query({
+      resource: {
+        timeMin: start.toISOString(),
+        timeMax: end.toISOString(),
+        items: [{ id: CALENDAR_ID }]
+      }
+    });
+
+    const busySlots = freeBusyRes.data.calendars[CALENDAR_ID].busy;
+
+    // Simplistic check: if ANY busy slot overlaps or exists in this range, it's unavailable.
+    // Since we queried the exact range, any result means conflict.
+    const isBusy = busySlots.length > 0;
+
+    if (isBusy) {
+      // Generate some alternatives (example: next 7 days)
+      // This is a basic implementation, can be improved to search for actual gaps
+      const alternatives = []; // Populate if needed
+      return res.json({
+        available: false,
+        busySlots: busySlots,
+        message: 'Data indisponível',
+        alternatives: alternatives
+      });
+    }
+
+    return res.json({ available: true, message: 'Data disponível' });
+
+  } catch (error) {
+    console.error('Calendar check error:', error);
+    res.status(500).json({ available: false, error: error.message });
+  }
+});
+
+// --- End Google Calendar Routes ---
 
 // Import Resend
 const { Resend } = require('resend');
