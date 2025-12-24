@@ -2415,7 +2415,10 @@ app.post('/api/check-availability', async (req, res) => {
     const jwtClient = new JWT({
       email: client_email,
       key: private_key.replace(/\\n/g, '\n'),
-      scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
+      scopes: [
+        'https://www.googleapis.com/auth/calendar.readonly',
+        'https://www.googleapis.com/auth/calendar.events' // Added for testing write access
+      ],
     });
 
     const tokens = await jwtClient.authorize();
@@ -2467,6 +2470,53 @@ app.post('/api/check-availability', async (req, res) => {
   }
 });
 
+// --- Test Endpoint to Create Event ---
+app.post('/api/test-create-event', async (req, res) => {
+  try {
+    const { title, date } = req.body;
+
+    const client_email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || (googleCreds && googleCreds.client_email);
+    const private_key = process.env.GOOGLE_PRIVATE_KEY || (googleCreds && googleCreds.private_key);
+
+    const jwtClient = new JWT({
+      email: client_email,
+      key: private_key.replace(/\\n/g, '\n'),
+      scopes: ['https://www.googleapis.com/auth/calendar.events'],
+    });
+
+    const tokens = await jwtClient.authorize();
+
+    // Create event via REST API
+    const createUrl = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events`;
+
+    const start = new Date(date);
+    start.setHours(10, 0, 0, 0); // 10:00 AM
+    const end = new Date(date);
+    end.setHours(11, 0, 0, 0); // 11:00 AM
+
+    const response = await fetch(createUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${tokens.access_token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        summary: title,
+        description: 'Evento de teste criado via Onav API',
+        start: { dateTime: start.toISOString(), timeZone: 'America/Sao_Paulo' },
+        end: { dateTime: end.toISOString(), timeZone: 'America/Sao_Paulo' }
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error?.message || 'Failed to create event');
+
+    res.json({ success: true, id: data.id, htmlLink: data.htmlLink });
+  } catch (error) {
+    console.error('Create event error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
 // --- End Google Calendar Routes ---
 
 // Import Resend
