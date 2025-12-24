@@ -39,20 +39,18 @@ async function getGoogleAuth(scopes) {
     .replace(/-----BEGIN PRIVATE KEY-----/g, '')
     .replace(/-----END PRIVATE KEY-----/g, '')
     .replace(/\\n/g, '') // Remove escaped \n
-    .replace(/\s/g, ''); // Remove all literal whitespace (newlines, spaces, etc)
+    .replace(/\s/g, ''); // Remove all literal whitespace
 
-  // Strip any accidental surrounding quotes or hidden characters (like BOM)
+  // Strip anything not base64
   base64Content = base64Content.replace(/[^A-Za-z0-9+/=]/g, '');
 
-  if (!base64Content) {
-    throw new Error('Invalid private key: content is empty after cleaning');
+  if (!base64Content || base64Content.length < 500) {
+    throw new Error(`Invalid private key: length too short (${base64Content?.length || 0})`);
   }
 
-  // Reconstruct standard PEM with 64-character lines
+  // Reconstruct PEM
   const lines = base64Content.match(/.{1,64}/g) || [];
   const normalizedKey = `-----BEGIN PRIVATE KEY-----\n${lines.join('\n')}\n-----END PRIVATE KEY-----`;
-
-  console.log(`Auth attempt for ${client_email} (Key Length: ${base64Content.length})`);
 
   const jwtClient = new JWT({
     email: client_email,
@@ -60,8 +58,19 @@ async function getGoogleAuth(scopes) {
     scopes: scopes,
   });
 
-  const tokens = await jwtClient.authorize();
-  return tokens;
+  try {
+    const tokens = await jwtClient.authorize();
+    return tokens;
+  } catch (authError) {
+    // Add helpful diagnostics to the error message (safe parts only)
+    const diag = ` (Email: ${client_email.substring(0, 5)}... CleanedLen: ${base64Content.length} Start: ${base64Content.substring(0, 10)} End: ${base64Content.substring(base64Content.length - 10)})`;
+    authError.message = `${authError.message}${diag}`;
+    throw authError;
+  }
+}
+
+const tokens = await jwtClient.authorize();
+return tokens;
 }
 
 // Initialize Supabase client
