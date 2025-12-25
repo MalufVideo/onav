@@ -3543,7 +3543,8 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
       }
       return projectName
         .toLowerCase()
-        .replace(/[^\w\s-]/g, '') // Remove special characters
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, "") // Remove accents (ç -> c, ã -> a, etc)
+        .replace(/[^\w\s-]/g, '') // Remove remaining special characters
         .replace(/\s+/g, '-')     // Replace spaces with hyphens
         .replace(/-+/g, '-')      // Replace multiple hyphens with single
         .trim('-') || 'quote-' + Date.now(); // Fallback if empty
