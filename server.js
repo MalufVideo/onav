@@ -3183,23 +3183,28 @@ app.get('/api/quotes/public/:slug', async (req, res) => {
 
     console.log('Looking up quote with slug:', slug);
 
-    // Check if this is a temporary slug format (quote-{id})
-    if (slug.startsWith('quote-')) {
-      const id = slug.replace('quote-', '');
-      console.log('Detected temporary slug format, looking up by ID:', id);
+    // Check if this is a UUID
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+    const isTemporary = slug.startsWith('quote-');
 
-      // Try ID-based lookup for temporary slugs
+    if (isUUID || isTemporary) {
+      const id = isTemporary ? slug.replace('quote-', '') : slug;
+      console.log('Detected ID format, looking up by ID:', id);
+
       const { data, error: idError } = await supabaseAdmin
         .from('proposals')
         .select('*')
         .eq('id', id)
         .single();
 
-      quote = data;
-      error = idError;
-    } else {
-      // Try regular slug-based lookup
-      console.log('Using regular slug lookup');
+      if (!idError && data) {
+        quote = data;
+      }
+    }
+
+    // If not found by ID, try slug-based lookup
+    if (!quote) {
+      console.log('Trying regular slug lookup for:', slug);
       const { data, error: slugError } = await supabaseAdmin
         .from('proposals')
         .select('*')
@@ -3302,23 +3307,36 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
     let existingQuote = null;
     let fetchError = null;
 
-    if (slug.startsWith('quote-')) {
-      const id = slug.replace('quote-', '');
-      const { data, error } = await supabaseAdmin
+    // Check if this is a UUID
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+    const isTemporary = slug.startsWith('quote-');
+
+    if (isUUID || isTemporary) {
+      const id = isTemporary ? slug.replace('quote-', '') : slug;
+      console.log('Detected ID format for approval, looking up by ID:', id);
+
+      const { data, error: idError } = await supabaseAdmin
         .from('proposals')
         .select('*')
         .eq('id', id)
         .single();
-      existingQuote = data;
-      fetchError = error;
-    } else {
-      const { data, error } = await supabaseAdmin
+
+      if (!idError && data) {
+        existingQuote = data;
+      }
+    }
+
+    // If not found by ID, try slug-based lookup
+    if (!existingQuote) {
+      console.log('Trying regular slug lookup for approval:', slug);
+      const { data, error: slugError } = await supabaseAdmin
         .from('proposals')
         .select('*')
         .eq('quote_url_slug', slug)
         .single();
+
       existingQuote = data;
-      fetchError = error;
+      fetchError = slugError;
     }
 
     if (fetchError || !existingQuote) {
@@ -3402,16 +3420,18 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
 
     // Get the updated quote data for the response
     let completeQuote = null;
-    if (slug.startsWith('quote-')) {
-      const id = slug.replace('quote-', '');
-      const { data, error } = await supabaseAdmin
+    if (isUUID || isTemporary) {
+      const id = isTemporary ? slug.replace('quote-', '') : slug;
+      const { data } = await supabaseAdmin
         .from('proposals')
         .select('*')
         .eq('id', id)
         .single();
       completeQuote = data;
-    } else {
-      const { data, error } = await supabaseAdmin
+    }
+
+    if (!completeQuote) {
+      const { data } = await supabaseAdmin
         .from('proposals')
         .select('*')
         .eq('quote_url_slug', slug)
