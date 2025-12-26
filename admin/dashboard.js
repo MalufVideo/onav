@@ -2636,10 +2636,10 @@ function generateUsersTable(users) {
             '<span style="color: gray;" title="Sem perfil"><i class="fas fa-user-plus"></i></span>';
 
         return `
-            <tr data-status="${user.is_active ? "active" : "inactive"}" ${!user.has_profile ? 'style="background-color: #fff3cd;"' : ''}>
+            <tr data-status="${user.is_active ? "active" : "inactive"}" ${!user.has_profile ? 'style="background-color: rgba(234, 179, 8, 0.15);"' : ''}>
                 <td>
                     ${user.full_name || user.raw_user_meta_data?.name || user.raw_user_meta_data?.full_name || "N/A"}
-                    ${!user.has_profile ? '<br><small style="color: #856404;"><i class="fas fa-exclamation-triangle"></i> Sem perfil</small>' : ''}
+                    ${!user.has_profile ? '<br><small style="color: #facc15;"><i class="fas fa-exclamation-triangle"></i> Sem perfil</small>' : ''}
                 </td>
                 <td>
                     ${user.email || "N/A"}
