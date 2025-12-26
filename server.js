@@ -447,6 +447,14 @@ app.use('/js', express.static(path.join(__dirname, 'js')));
 // Serve static files from 'tours' directory under the /tours path
 app.use('/tours', express.static(path.join(__dirname, 'tours')));
 
+// Serve static files from 'equipamentos-on' directory under the /equipamentos-on path
+app.use('/equipamentos-on', express.static(path.join(__dirname, 'equipamentos-on')));
+
+// Route to serve equipamentos-on index page
+app.get('/equipamentos-on', (req, res) => {
+  res.sendFile(path.join(__dirname, 'equipamentos-on', 'index.html'));
+});
+
 // Route to serve the admin HTML page (old product admin)
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'admin.html'));
