@@ -2704,7 +2704,7 @@ async function openUserModal(userId = null) {
     if (userId) {
         try {
             // First try to get from user_profiles table
-            const { data: userData, error } = await supabase
+            const { data: userData, error } = await supabaseClient
                 .from("user_profiles")
                 .select("*")
                 .eq("id", userId)
@@ -2723,7 +2723,7 @@ async function openUserModal(userId = null) {
                 const response = await fetch('/api/users/auth-data', {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session.access_token}`,
+                        'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session.access_token}`,
                         'Content-Type': 'application/json'
                     }
                 });
