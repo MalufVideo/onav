@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos Atacado - ON AV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Header -->
+    <header class="bg-gray-800 p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold">Produtos Atacado - Preços de Locação</h1>
+                <p class="text-gray-400 text-sm mt-1">Gestão de preços de locação por dia</p>
+            </div>
+            <div id="auth-container" class="flex items-center gap-3">
+                <!-- Login button (shown when not authenticated) -->
+                <button id="login-btn" class="hidden bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition-colors">
+                    Login
+                </button>
+                <!-- User info (shown when authenticated) -->
+                <div id="user-info" class="hidden flex items-center gap-3">
+                    <div class="text-right">
+                        <p id="user-email" class="text-sm font-medium"></p>
+                        <p id="user-role" class="text-xs text-gray-400"></p>
+                    </div>
+                    <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm transition-colors">
+                        Sair
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-6">
+        <!-- Action Buttons (only visible to authenticated users) -->
+        <div id="action-buttons" class="mb-6 flex gap-3 hidden">
+            <button id="add-product-btn" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors">
+                + Adicionar Produto
+            </button>
+            <button id="add-category-btn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition-colors">
+                + Adicionar Categoria
+            </button>
+        </div>
+
+        <!-- Unauthorized message -->
+        <div id="unauthorized-message" class="hidden mb-6 bg-yellow-900 border border-yellow-700 text-yellow-200 px-4 py-3 rounded">
+            <p class="font-bold">Acesso Restrito</p>
+            <p class="text-sm">Você precisa fazer login com uma conta autorizada para editar os preços.</p>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="text-center py-8">
+            <svg class="animate-spin h-8 w-8 text-blue-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-gray-400 mt-2">Carregando produtos...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error-message" class="hidden bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded mb-6">
+            <p class="font-bold">Erro ao carregar produtos</p>
+            <p class="text-sm" id="error-text"></p>
+        </div>
+
+        <!-- Category Sections (dynamically populated) -->
+        <div id="products-container" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Categories will be rendered here dynamically -->
+        </div>
+    </main>
+
+    <!-- Add Product Modal -->
+    <div id="add-product-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+            <h2 class="text-xl font-bold mb-4">Adicionar Novo Produto</h2>
+
+            <form id="add-product-form">
+                <div class="mb-4">
+                    <label for="product-name" class="block text-sm font-medium mb-2">Nome do Produto</label>
+                    <input
+                        type="text"
+                        id="product-name"
+                        class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                        placeholder="Ex: Panasonic PT-RZ120"
+                        required
+                    >
+                </div>
+
+                <div class="mb-4">
+                    <label for="product-category" class="block text-sm font-medium mb-2">Categoria</label>
+                    <select
+                        id="product-category"
+                        class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                        required
+                    >
+                        <option value="">Selecione uma categoria</option>
+                        <option value="LED">LED</option>
+                        <option value="Processamento">Processamento</option>
+                        <option value="Projetores">Projetores</option>
+                    </select>
+                </div>
+
+                <div class="mb-6">
+                    <label for="product-price" class="block text-sm font-medium mb-2">Preço de Locação por Dia (R$)</label>
+                    <input
+                        type="text"
+                        id="product-price"
+                        class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                        placeholder="0,00"
+                    >
+                </div>
+
+                <div class="flex gap-2">
+                    <button
+                        type="submit"
+                        class="flex-1 bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors"
+                    >
+                        Adicionar
+                    </button>
+                    <button
+                        type="button"
+                        id="cancel-add-btn"
+                        class="flex-1 bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded transition-colors"
+                    >
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+
+            <div id="add-product-error" class="hidden mt-4 bg-red-900 border border-red-700 text-red-200 px-3 py-2 rounded text-sm"></div>
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div id="add-category-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+            <h2 class="text-xl font-bold mb-4">Adicionar Nova Categoria</h2>
+
+            <form id="add-category-form">
+                <div class="mb-6">
+                    <label for="category-name" class="block text-sm font-medium mb-2">Nome da Categoria</label>
+                    <input
+                        type="text"
+                        id="category-name"
+                        class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                        placeholder="Ex: Câmeras"
+                        required
+                    >
+                </div>
+
+                <div class="flex gap-2">
+                    <button
+                        type="submit"
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition-colors"
+                    >
+                        Adicionar
+                    </button>
+                    <button
+                        type="button"
+                        id="cancel-category-btn"
+                        class="flex-1 bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded transition-colors"
+                    >
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+
+            <div id="add-category-error" class="hidden mt-4 bg-red-900 border border-red-700 text-red-200 px-3 py-2 rounded text-sm"></div>
+        </div>
+    </div>
+
+    <!-- Audit History Modal -->
+    <div id="audit-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-3xl mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Histórico de Edições</h2>
+                <button id="close-audit-btn" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <p id="audit-product-name" class="text-gray-400 text-sm mb-4"></p>
+
+            <div id="audit-loading" class="text-center py-8">
+                <svg class="animate-spin h-8 w-8 text-blue-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p class="text-gray-400 mt-2">Carregando histórico...</p>
+            </div>
+
+            <div id="audit-content" class="hidden">
+                <div id="audit-list" class="space-y-3"></div>
+                <p id="audit-empty" class="hidden text-gray-400 text-center py-8">Nenhuma edição registrada ainda.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+            <h2 class="text-xl font-bold mb-4">Login - Área Restrita</h2>
+            <p class="text-gray-400 text-sm mb-4">Apenas usuários autorizados podem editar preços.</p>
+
+            <form id="login-form">
+                <div class="mb-4">
+                    <label for="login-email" class="block text-sm font-medium mb-2">Email</label>
+                    <input
+                        type="email"
+                        id="login-email"
+                        class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                        placeholder="seu@email.com"
+                        required
+                    >
+                </div>
+
+                <div class="mb-6">
+                    <label for="login-password" class="block text-sm font-medium mb-2">Senha</label>
+                    <input
+                        type="password"
+                        id="login-password"
+                        class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                        placeholder="••••••••"
+                        required
+                    >
+                </div>
+
+                <div class="flex gap-2">
+                    <button
+                        type="submit"
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition-colors"
+                    >
+                        Entrar
+                    </button>
+                    <button
+                        type="button"
+                        id="cancel-login-btn"
+                        class="flex-1 bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded transition-colors"
+                    >
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+
+            <div id="login-error" class="hidden mt-4 bg-red-900 border border-red-700 text-red-200 px-3 py-2 rounded text-sm"></div>
+        </div>
+    </div>
+
+    <script src="produtos-atacado.js"></script>
+</body>
+</html>
