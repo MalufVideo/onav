@@ -130,10 +130,10 @@ async function checkAuth() {
         window.syncMissingProfiles = async () => {
             try {
                 // Find users in auth.users that don't have profiles
-                const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+                const { data: authUsers, error: authError } = await supabaseAdmin.auth.admin.listUsers();
                 if (authError) throw authError;
 
-                const { data: profiles, error: profileError } = await supabase
+                const { data: profiles, error: profileError } = await supabaseAdmin
                     .from('user_profiles')
                     .select('id');
                 if (profileError) throw profileError;
@@ -590,8 +590,10 @@ async function loadUsersPage() {
                 openUserModal(userId);
             } else if (button.classList.contains('create-profile-btn')) {
                 createUserProfile(userId);
-            } else if (button.classList.contains('toggle-user-btn')) {
+            } else if (button.classList.contains('toggle-status-btn')) {
                 toggleUserStatus(userId);
+            } else if (button.classList.contains('delete-user-btn')) {
+                deleteUser(userId);
             }
         });
     }
@@ -2600,152 +2602,8 @@ function sendWhatsApp(phone) {
     }
 }
 
-// Users Page
-async function loadUsersPage() {
-    pageTitle.textContent = "Gerenciamento de Usuários";
+// Duplicate loadUsersPage removed to fix supabase initialization error
 
-    try {
-        // Get user profiles
-        const { data: users, error } = await supabase
-            .from("user_profiles")
-            .select("*")
-            .order("created_at", { ascending: false });
-
-        if (error) throw error;
-
-        // Get auth data for last sign-in information via server API
-        let usersWithAuthData = users;
-        try {
-            // Get current session token for authentication
-            const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-            console.log('Session available for auth API:', !!sessionData?.session?.access_token);
-
-            if (!sessionData?.session?.access_token) {
-                console.warn('No session token available for auth API call, showing only users with profiles');
-                // Continue with just the users from profiles table
-            } else {
-
-                const response = await fetch('/api/users/auth-data', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${sessionData.session.access_token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                console.log('Auth API response status:', response.status);
-
-                if (response.ok) {
-                    const authData = await response.json();
-                    console.log('Auth data received:', authData.length, 'auth users');
-
-                    // Merge user profiles with auth data AND include auth-only users
-                    const mergedUsers = users.map(user => {
-                        const authUser = authData.find(auth => auth.id === user.id);
-                        return {
-                            ...user,
-                            last_sign_in_at: authUser?.last_sign_in_at,
-                            raw_user_meta_data: authUser?.raw_user_meta_data || authUser?.user_metadata
-                        };
-                    });
-
-                    // Add auth users who don't have profiles yet
-                    const authOnlyUsers = authData.filter(authUser =>
-                        !users.find(user => user.id === authUser.id)
-                    ).map(authUser => ({
-                        id: authUser.id,
-                        email: authUser.email,
-                        full_name: authUser.raw_user_meta_data?.full_name || authUser.user_metadata?.full_name || null,
-                        role: 'end_user', // Default role for new users
-                        is_active: true,
-                        created_at: authUser.created_at,
-                        last_sign_in_at: authUser.last_sign_in_at,
-                        raw_user_meta_data: authUser.raw_user_meta_data || authUser.user_metadata,
-                        hasProfile: false // Flag to indicate this user needs a profile
-                    }));
-
-                    usersWithAuthData = [...mergedUsers, ...authOnlyUsers];
-                    console.log('Total users after merge:', usersWithAuthData.length, 'profiles +', authOnlyUsers.length, 'auth-only');
-                } else {
-                    const errorText = await response.text();
-                    console.warn('Could not fetch auth data from server:', response.status, errorText);
-                }
-            }
-        } catch (authError) {
-            console.warn('Error fetching auth data:', authError);
-        }
-
-        pageContent.innerHTML = `
-            <div class="data-table">
-                <div class="table-header">
-                    <h3 class="table-title">Usuários do Sistema</h3>
-                    <div class="table-actions">
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" placeholder="Buscar usuários..." id="searchUsers">
-                        </div>
-                        <button class="btn btn-secondary" id="syncPhoneBtn" style="margin-right: 10px;">
-                            <i class="fas fa-sync"></i> Sincronizar Telefones
-                        </button>
-                        <button class="btn btn-primary" id="addUserBtn">
-                            <i class="fas fa-plus"></i> Novo Usuário
-                        </button>
-                    </div>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Email</th>
-                            <th>Telefone</th>
-                            <th>Função</th>
-                            <th>Criado em</th>
-                            <th>Último Login</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usersTableBody">
-                        ${generateUsersTable(usersWithAuthData)}
-                    </tbody>
-                </table>
-            </div>`;
-
-        // Add event listeners
-        document.getElementById("searchUsers").addEventListener("input", (e) =>
-            filterTable("usersTableBody", e.target.value));
-
-        document.getElementById("addUserBtn").addEventListener("click", () =>
-            openUserModal());
-
-        document.getElementById("syncPhoneBtn").addEventListener("click", () =>
-            syncPhoneNumbers());
-
-        // Add event listeners for user action buttons
-        const tableBody = document.getElementById("usersTableBody");
-        if (tableBody) {
-            tableBody.addEventListener("click", (e) => {
-                const button = e.target.closest("button");
-                if (!button) return;
-
-                const userId = button.getAttribute("data-user-id");
-                if (!userId) return;
-
-                if (button.classList.contains("edit-user-btn")) {
-                    openUserModal(userId);
-                } else if (button.classList.contains("delete-user-btn")) {
-                    deleteUser(userId);
-                } else if (button.classList.contains("toggle-status-btn")) {
-                    toggleUserStatus(userId);
-                }
-            });
-        }
-
-    } catch (error) {
-        console.error("Error loading users:", error);
-        showToast("Erro ao carregar usuários", "error");
-        pageContent.innerHTML = "<div class=\"empty-state\"><p>Erro ao carregar usuários</p></div>";
-    }
-}
 
 function generateUsersTable(users) {
     if (!users || users.length === 0) {
