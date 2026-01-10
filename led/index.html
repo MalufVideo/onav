@@ -456,13 +456,17 @@
     <!-- Flatpickr initialization -->
     <script>
       document.addEventListener('DOMContentLoaded', function () {
+        // Calculate today's date for minDate (more reliable than "today" string)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time to start of day
+
         // Initialize date pickers
         flatpickr("#shooting-dates-start", {
           dateFormat: "d/m/Y",
           locale: "pt",
           allowInput: false,
           disableMobile: true,
-          minDate: "today", // Prevent selecting past dates
+          minDate: today, // Prevent selecting past dates
           onChange: function (selectedDates, dateStr, instance) {
             // Enable the end date picker after selecting a start date
             const endDatePicker = flatpickr("#shooting-dates-end");
@@ -485,7 +489,7 @@
           locale: "pt",
           allowInput: false,
           disableMobile: true,
-          minDate: "today", // Prevent selecting past dates
+          minDate: today, // Prevent selecting past dates
           onReady: function (selectedDates, dateStr, instance) {
             // Force format to d/m/Y for any pre-existing value
             const input = instance.input;
@@ -520,7 +524,7 @@
           locale: "pt",
           allowInput: false, // Prevent manual input
           disableMobile: true,
-          minDate: "today", // Prevent selecting past dates
+          minDate: today, // Prevent selecting past dates
           onChange: function (selectedDates, dateStr, instance) {
             // Set minDate for the end date picker
             const cartEndDatePickerInstance = document.querySelector("#cart-shooting-dates-end")._flatpickr;
@@ -540,7 +544,7 @@
           locale: "pt",
           allowInput: false,
           disableMobile: true,
-          minDate: "today", // Prevent selecting past dates
+          minDate: today, // Prevent selecting past dates
           onChange: function (selectedDates, dateStr, instance) {
             // Update cart total when date changes (if start date is also selected)
             if (document.getElementById('cart-shooting-dates-start').value && window.quoteCartModal) {
