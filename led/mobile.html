@@ -270,14 +270,18 @@
   <!-- Flatpickr initialization -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // Calculate today's date for minDate (more reliable than "today" string)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time to start of day
+
       flatpickr("#shooting-dates-start", {
         dateFormat: "d/m/Y",
         locale: "pt",
         allowInput: false,
         disableMobile: false,
-        minDate: "today", // Prevent selecting past dates
+        minDate: today, // Prevent selecting past dates
         onChange: function(selectedDates, dateStr, instance) {
-          const endDatePicker = flatpickr("#shooting-dates-end");
+          const endDatePicker = document.querySelector("#shooting-dates-end")._flatpickr;
           if (endDatePicker) {
             endDatePicker.set("minDate", selectedDates[0]);
           }
@@ -289,7 +293,7 @@
         locale: "pt",
         allowInput: false,
         disableMobile: false,
-        minDate: "today" // Prevent selecting past dates
+        minDate: today // Prevent selecting past dates
       });
     });
   </script>

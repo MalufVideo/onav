@@ -1164,19 +1164,24 @@ class QuoteCartModal {
             console.error('[QuoteCartModal] flatpickr is not loaded!');
             return;
         }
-        // Get today's date in YYYY-MM-DD format (required by flatpickr)
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        const todayStr = `${yyyy}-${mm}-${dd}`;
 
-        if (this.startDateInput) {
+        // Get today's date as a Date object for minDate
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time to start of day
+
+        // Check if flatpickr is already initialized (from index.html inline script)
+        // If so, just store references and add our custom onChange handlers
+        if (this.startDateInput && this.startDateInput._flatpickr) {
+            console.log('[QuoteCartModal] Flatpickr already initialized on startDateInput, using existing instance');
+            this.startPicker = this.startDateInput._flatpickr;
+            // Update minDate to ensure it's set to today
+            this.startPicker.set('minDate', today);
+        } else if (this.startDateInput) {
             this.startPicker = flatpickr(this.startDateInput, {
                 dateFormat: 'd/m/Y',
                 locale: 'pt',
-                allowInput: true,
-                minDate: todayStr,
+                allowInput: false,
+                minDate: today,
                 onChange: (selectedDates, dateStr, instance) => {
                     // Save selected start date
                     if (selectedDates && selectedDates[0]) {
@@ -1202,12 +1207,18 @@ class QuoteCartModal {
                 },
             });
         }
-        if (this.endDateInput) {
+
+        if (this.endDateInput && this.endDateInput._flatpickr) {
+            console.log('[QuoteCartModal] Flatpickr already initialized on endDateInput, using existing instance');
+            this.endPicker = this.endDateInput._flatpickr;
+            // Update minDate to ensure it's set to today
+            this.endPicker.set('minDate', today);
+        } else if (this.endDateInput) {
             this.endPicker = flatpickr(this.endDateInput, {
                 dateFormat: 'd/m/Y',
                 locale: 'pt',
-                allowInput: true,
-                minDate: todayStr,
+                allowInput: false,
+                minDate: today,
                 onChange: (selectedDates, dateStr, instance) => {
                     if (selectedDates && selectedDates[0]) {
                         const d = selectedDates[0];

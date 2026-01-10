@@ -424,14 +424,15 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Initialize date pickers for the modal
+      // Use Date object directly for minDate (more reliable than string conversion)
       const today = new Date();
-      const todayStr = today.toISOString().split('T')[0];
-      
+      today.setHours(0, 0, 0, 0); // Reset time to start of day
+
       flatpickr("#cart-shooting-dates-start", {
         dateFormat: "d/m/Y",
         locale: "pt",
         allowInput: false,
-        minDate: todayStr,
+        minDate: today,
         onChange: function(selectedDates, dateStr, instance) {
           const endPicker = document.querySelector("#cart-shooting-dates-end")._flatpickr;
           if (endPicker) {
@@ -442,12 +443,12 @@
           }
         }
       });
-      
+
       flatpickr("#cart-shooting-dates-end", {
         dateFormat: "d/m/Y",
         locale: "pt",
         allowInput: false,
-        minDate: todayStr,
+        minDate: today,
         onChange: function(selectedDates, dateStr, instance) {
           if (window.multicameraCalculator) {
             window.multicameraCalculator.updateCart();
