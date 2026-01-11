@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "build": "echo 'No build step required for Express app'",
-    "vercel-build": "echo 'No build step required'"
+    "build": "cd pipeline && npm install && npm run build",
+    "vercel-build": "cd pipeline && npm install && npm run build"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.3",
