@@ -4,25 +4,9 @@
     {
       "src": "server.js",
       "use": "@vercel/node"
-    },
-    {
-      "src": "pipeline/dist/**",
-      "use": "@vercel/static"
     }
   ],
   "routes": [
-    {
-      "src": "/pipeline/assets/(.*)",
-      "dest": "/pipeline/dist/assets/$1"
-    },
-    {
-      "src": "/pipeline$",
-      "dest": "/pipeline/dist/index.html"
-    },
-    {
-      "src": "/pipeline/(.*)",
-      "dest": "/pipeline/dist/$1"
-    },
     {
       "src": "/(.*)",
       "dest": "/server.js"
