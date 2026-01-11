@@ -3,13 +3,26 @@
   "builds": [
     {
       "src": "server.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["pipeline/dist/**"]
-      }
+      "use": "@vercel/node"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
+    {
+      "src": "/pipeline/assets/(.*)",
+      "dest": "/public/pipeline/assets/$1"
+    },
+    {
+      "src": "/pipeline$",
+      "dest": "/public/pipeline/index.html"
+    },
+    {
+      "src": "/pipeline/(.*)",
+      "dest": "/public/pipeline/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "/server.js"

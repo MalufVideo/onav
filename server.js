@@ -455,12 +455,12 @@ app.use('/tours', express.static(path.join(__dirname, 'tours')));
 // Serve static files from 'equipamentos-on' directory under the /equipamentos-on path
 app.use('/equipamentos-on', express.static(path.join(__dirname, 'equipamentos-on')));
 
-// Serve Pipeline React app static files
-app.use('/pipeline', express.static(path.join(__dirname, 'pipeline/dist')));
+// Serve Pipeline React app static files (from public/pipeline after build)
+app.use('/pipeline', express.static(path.join(__dirname, 'public/pipeline')));
 
 // Pipeline SPA fallback - serve index.html for all /pipeline routes
 app.get('/pipeline/*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pipeline/dist/index.html'));
+  res.sendFile(path.join(__dirname, 'public/pipeline/index.html'));
 });
 
 // Route to serve equipamentos-on index page
