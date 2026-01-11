@@ -28,10 +28,13 @@ quotes/
 # Auto Claude data directory
 .auto-claude/
 
-# Pipeline
+# Pipeline-specific
 pipeline/node_modules/
 pipeline/dist/
 pipeline/.env
+
+# Pipeline build output (built by Vercel)
+public/pipeline/
 
 # Backup files
 backup-*.json
