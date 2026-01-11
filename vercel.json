@@ -1,12 +1,25 @@
 {
   "version": 2,
+  "buildCommand": "cd pipeline && npm install && npm run build",
   "builds": [
     {
       "src": "server.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "pipeline/dist/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
+    {
+      "src": "/pipeline/(.*)",
+      "dest": "/pipeline/dist/$1"
+    },
+    {
+      "src": "/pipeline",
+      "dest": "/pipeline/dist/index.html"
+    },
     {
       "src": "/(.*)",
       "dest": "/server.js"

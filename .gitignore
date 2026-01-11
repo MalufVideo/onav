@@ -27,3 +27,12 @@ quotes/
 
 # Auto Claude data directory
 .auto-claude/
+
+# Pipeline
+pipeline/node_modules/
+pipeline/dist/
+pipeline/.env
+
+# Backup files
+backup-*.json
+backup.sql

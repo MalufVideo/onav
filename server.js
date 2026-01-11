@@ -8,6 +8,7 @@ const { createClient } = require('@supabase/supabase-js'); // Import Supabase cl
 const cors = require('cors'); // Import CORS middleware
 const { JWT } = require('google-auth-library');
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+const PipelineIntegration = require('./pipeline-integration'); // Import pipeline integration module
 
 const app = express();
 const server = http.createServer(app);
@@ -407,6 +408,10 @@ if (!supabaseServiceKey) {
   console.warn('WARNING: SUPABASE_SERVICE_ROLE_KEY not found. Admin functions (user creation from dashboard) will not work.');
   console.warn('Please add SUPABASE_SERVICE_ROLE_KEY to your .env file for full functionality.');
 }
+
+// Initialize Pipeline Integration
+const pipelineIntegration = new PipelineIntegration(supabaseAdmin);
+console.log('[pipeline] Pipeline integration module initialized');
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -1990,11 +1995,23 @@ app.post('/api/save-proposal', async (req, res) => {
       }
     }
 
+    // PIPELINE INTEGRATION: Create a lead/client in the pipeline
+    let pipelineResult = null;
+    try {
+      pipelineResult = await pipelineIntegration.createPipelineClient(data);
+      if (pipelineResult) {
+        console.log(`[save-proposal] Pipeline client created: ${pipelineResult.id}`);
+      }
+    } catch (pipelineError) {
+      console.warn('Pipeline client creation failed but proposal was saved:', pipelineError.message);
+    }
+
     res.status(201).json({
       success: true,
       message: 'Proposal saved successfully',
       data: data,
-      calendar: calendarResult
+      calendar: calendarResult,
+      pipeline: pipelineResult ? { clientId: pipelineResult.id } : null
     });
 
   } catch (error) {
@@ -3062,9 +3079,10 @@ app.post('/api/calendar/pre-reserve', async (req, res) => {
 });
 // --- End Google Calendar Routes ---
 
-// Import Resend
+// Import Resend (optional - email features disabled without API key)
 const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+if (!resend) console.warn('WARNING: RESEND_API_KEY not set - email sending features will be disabled');
 
 // Handle contact form submissions
 app.post('/api/send-email', async (req, res) => {
@@ -3091,6 +3109,12 @@ app.post('/api/send-email', async (req, res) => {
     // Prepare email content
     const emailContent = message || project || '';
     const emailSubject = subject || `On+Av Site: Nova Mensagem de Contato de ${name}`;
+
+    // Check if Resend is configured
+    if (!resend) {
+      console.log('Email would be sent (Resend not configured):', { name, email, subject: emailSubject });
+      return res.status(503).json({ error: 'Email service not configured', message: 'Serviço de email não disponível no momento.' });
+    }
 
     // Send email using Resend
     const { data, error } = await resend.emails.send({
@@ -3450,12 +3474,24 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
     // TODO: Send approval notification email to admin/sales team
     console.log(`Quote approved: ${existingQuote.project_name} by client at ${clientIP}`);
 
+    // PIPELINE INTEGRATION: Update client stage and create job
+    let pipelineResult = null;
+    try {
+      pipelineResult = await pipelineIntegration.updateClientAndCreateJob(completeQuote || existingQuote);
+      if (pipelineResult.success) {
+        console.log(`[quote-approval] Pipeline updated - Client: ${pipelineResult.client?.id}, Job: ${pipelineResult.job?.id}`);
+      }
+    } catch (pipelineError) {
+      console.warn('Pipeline integration failed but quote was approved:', pipelineError.message);
+    }
+
     res.json({
       success: true,
       message: 'Quote approved successfully',
       approvedAt: approvedAt,
       quote: completeQuote,
-      calendar: calendarResult
+      calendar: calendarResult,
+      pipeline: pipelineResult
     });
 
   } catch (error) {
