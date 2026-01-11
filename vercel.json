@@ -8,18 +8,6 @@
   ],
   "routes": [
     {
-      "src": "/pipeline/assets/(.*)",
-      "dest": "/pipeline/assets/$1"
-    },
-    {
-      "src": "/pipeline/?$",
-      "dest": "/pipeline/index.html"
-    },
-    {
-      "src": "/pipeline/(.*)",
-      "dest": "/pipeline/$1"
-    },
-    {
       "src": "/(.*)",
       "dest": "/server.js"
     }

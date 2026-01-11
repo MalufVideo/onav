@@ -33,8 +33,8 @@ pipeline/node_modules/
 pipeline/dist/
 pipeline/.env
 
-# Pipeline build output (built by Vercel)
-public/pipeline/
+# Pipeline build output - committed for Vercel deployment
+# public/pipeline/
 
 # Backup files
 backup-*.json
