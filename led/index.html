@@ -531,6 +531,12 @@
             if (cartEndDatePickerInstance) {
               cartEndDatePickerInstance.set("minDate", selectedDates[0]);
             }
+            // Store the selected start date on the quoteCartModal instance for discount calculation
+            if (window.quoteCartModal && selectedDates && selectedDates[0]) {
+              const d = selectedDates[0];
+              window.quoteCartModal.selectedStartDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+              console.log("[Flatpickr Cart Start] Set selectedStartDate:", window.quoteCartModal.selectedStartDate);
+            }
             // Update cart total when date changes (if end date is also selected)
             if (document.getElementById('cart-shooting-dates-end').value && window.quoteCartModal) {
               console.log("[Flatpickr Cart Start] Date changed, updating cart.");
@@ -546,6 +552,12 @@
           disableMobile: true,
           minDate: today, // Prevent selecting past dates
           onChange: function (selectedDates, dateStr, instance) {
+            // Store the selected end date on the quoteCartModal instance for discount calculation
+            if (window.quoteCartModal && selectedDates && selectedDates[0]) {
+              const d = selectedDates[0];
+              window.quoteCartModal.selectedEndDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+              console.log("[Flatpickr Cart End] Set selectedEndDate:", window.quoteCartModal.selectedEndDate);
+            }
             // Update cart total when date changes (if start date is also selected)
             if (document.getElementById('cart-shooting-dates-start').value && window.quoteCartModal) {
               console.log("[Flatpickr Cart End] Date changed, updating cart.");
