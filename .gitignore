@@ -39,3 +39,4 @@ pipeline/.env
 # Backup files
 backup-*.json
 backup.sql
+.env*.local
