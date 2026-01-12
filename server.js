@@ -481,6 +481,11 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'admin', 'dashboard.html'));
 });
 
+// Route to serve the dashboard at /admin/dashboard (alias)
+app.get('/admin/dashboard', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'admin', 'dashboard.html'));
+});
+
 // Route to serve the admin login page
 app.get('/admin/login', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'admin', 'login.html'));
