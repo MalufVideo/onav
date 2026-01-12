@@ -423,7 +423,8 @@ app.use(cors());
 app.set('trust proxy', true);
 
 // Serve static files from root directory
-app.use(express.static(path.join(__dirname), {
+// Use process.cwd() for Vercel serverless compatibility
+app.use(express.static(path.join(process.cwd()), {
   setHeaders: (res, path) => {
     if (path.endsWith('.css')) {
       res.setHeader('Content-Type', 'text/css');
@@ -435,25 +436,25 @@ app.use(express.static(path.join(__dirname), {
 }));
 
 // Serve static files from 'admin' directory under the /admin path
-app.use('/admin', express.static(path.join(__dirname, 'admin')));
+app.use('/admin', express.static(path.join(process.cwd(), 'admin')));
 
 // Serve static files from 'led' directory under the /led path
-app.use('/led', express.static(path.join(__dirname, 'led')));
+app.use('/led', express.static(path.join(process.cwd(), 'led')));
 
 // Serve static files from 'img' directory under the /img path
-app.use('/img', express.static(path.join(__dirname, 'img')));
+app.use('/img', express.static(path.join(process.cwd(), 'img')));
 
 // Serve static files from 'css' directory under the /css path
-app.use('/css', express.static(path.join(__dirname, 'css')));
+app.use('/css', express.static(path.join(process.cwd(), 'css')));
 
 // Serve static files from 'js' directory under the /js path
-app.use('/js', express.static(path.join(__dirname, 'js')));
+app.use('/js', express.static(path.join(process.cwd(), 'js')));
 
 // Serve static files from 'tours' directory under the /tours path
-app.use('/tours', express.static(path.join(__dirname, 'tours')));
+app.use('/tours', express.static(path.join(process.cwd(), 'tours')));
 
 // Serve static files from 'equipamentos-on' directory under the /equipamentos-on path
-app.use('/equipamentos-on', express.static(path.join(__dirname, 'equipamentos-on')));
+app.use('/equipamentos-on', express.static(path.join(process.cwd(), 'equipamentos-on')));
 
 // Serve Pipeline React app static files (from public/pipeline after build)
 // Use process.cwd() for Vercel serverless compatibility
@@ -467,121 +468,121 @@ app.get('/pipeline/*', (req, res) => {
 
 // Route to serve equipamentos-on index page
 app.get('/equipamentos-on', (req, res) => {
-  res.sendFile(path.join(__dirname, 'equipamentos-on', 'index.html'));
+  res.sendFile(path.join(process.cwd(), 'equipamentos-on', 'index.html'));
 });
 
 // Route to serve the admin HTML page (old product admin)
 app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin', 'admin.html'));
+  res.sendFile(path.join(process.cwd(), 'admin', 'admin.html'));
 });
 
 // Route to serve the dashboard HTML page (new comprehensive dashboard)
 app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin', 'dashboard.html'));
+  res.sendFile(path.join(process.cwd(), 'admin', 'dashboard.html'));
 });
 
 // Route to serve the admin login page
 app.get('/admin/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin', 'login.html'));
+  res.sendFile(path.join(process.cwd(), 'admin', 'login.html'));
 });
 
 // Route to serve the main index.html page for root path
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(process.cwd(), 'index.html'));
 });
 
 // Routes for all HTML pages
 app.get('/produtos.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'produtos.html'));
+  res.sendFile(path.join(process.cwd(), 'produtos.html'));
 });
 
 app.get('/producao-virtual-xr.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'producao-virtual-xr.html'));
+  res.sendFile(path.join(process.cwd(), 'producao-virtual-xr.html'));
 });
 
 app.get('/consultoria-suporte.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'consultoria-suporte.html'));
+  res.sendFile(path.join(process.cwd(), 'consultoria-suporte.html'));
 });
 
 app.get('/projecao-mapeada.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'projecao-mapeada.html'));
+  res.sendFile(path.join(process.cwd(), 'projecao-mapeada.html'));
 });
 
 app.get('/shows.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'shows.html'));
+  res.sendFile(path.join(process.cwd(), 'shows.html'));
 });
 
 app.get('/criacao-conteudo.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'criacao-conteudo.html'));
+  res.sendFile(path.join(process.cwd(), 'criacao-conteudo.html'));
 });
 
 app.get('/estudio.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'estudio.html'));
+  res.sendFile(path.join(process.cwd(), 'estudio.html'));
 });
 
 app.get('/sitemap.xml', (req, res) => {
-  res.sendFile(path.join(__dirname, 'sitemap.xml'));
+  res.sendFile(path.join(process.cwd(), 'sitemap.xml'));
 });
 
 app.get('/BingSiteAuth.xml', (req, res) => {
-  res.sendFile(path.join(__dirname, 'BingSiteAuth.xml'));
+  res.sendFile(path.join(process.cwd(), 'BingSiteAuth.xml'));
 });
 
 // Routes for tours pages
 app.get('/tours/adele_munich.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tours', 'adele_munich.html'));
+  res.sendFile(path.join(process.cwd(), 'tours', 'adele_munich.html'));
 });
 
 app.get('/tours/adele_vegas.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tours', 'adele_vegas.html'));
+  res.sendFile(path.join(process.cwd(), 'tours', 'adele_vegas.html'));
 });
 
 app.get('/tours/adele_weekends.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tours', 'adele_weekends.html'));
+  res.sendFile(path.join(process.cwd(), 'tours', 'adele_weekends.html'));
 });
 
 app.get('/tours/beyonce_formation.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tours', 'beyonce_formation.html'));
+  res.sendFile(path.join(process.cwd(), 'tours', 'beyonce_formation.html'));
 });
 
 app.get('/tours/coldplay_musicofthespheres.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tours', 'coldplay_musicofthespheres.html'));
+  res.sendFile(path.join(process.cwd(), 'tours', 'coldplay_musicofthespheres.html'));
 });
 
 app.get('/tours/ed_sheeran_mathematics.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tours', 'ed_sheeran_mathematics.html'));
+  res.sendFile(path.join(process.cwd(), 'tours', 'ed_sheeran_mathematics.html'));
 });
 
 app.get('/tours/envie_seu_projeto.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tours', 'envie_seu_projeto.html'));
+  res.sendFile(path.join(process.cwd(), 'tours', 'envie_seu_projeto.html'));
 });
 
 app.get('/tours/justin_timberlake_manofthewoods.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tours', 'justin_timberlake_manofthewoods.html'));
+  res.sendFile(path.join(process.cwd(), 'tours', 'justin_timberlake_manofthewoods.html'));
 });
 
 app.get('/tours/kiss_endoftheroad.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tours', 'kiss_endoftheroad.html'));
+  res.sendFile(path.join(process.cwd(), 'tours', 'kiss_endoftheroad.html'));
 });
 
 app.get('/tours/phish_sphere.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tours', 'phish_sphere.html'));
+  res.sendFile(path.join(process.cwd(), 'tours', 'phish_sphere.html'));
 });
 
 app.get('/tours/proximo_caso.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tours', 'proximo_caso.html'));
+  res.sendFile(path.join(process.cwd(), 'tours', 'proximo_caso.html'));
 });
 
 app.get('/tours/u2_joshuatree.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tours', 'u2_joshuatree.html'));
+  res.sendFile(path.join(process.cwd(), 'tours', 'u2_joshuatree.html'));
 });
 
 app.get('/tours/u2_sphere.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tours', 'u2_sphere.html'));
+  res.sendFile(path.join(process.cwd(), 'tours', 'u2_sphere.html'));
 });
 
 // Serve static files from 'tours' directory under the /tours path
-app.use('/tours', express.static(path.join(__dirname, 'tours')));
+app.use('/tours', express.static(path.join(process.cwd(), 'tours')));
 
 // --- API Routes for Products ---
 
@@ -2872,12 +2873,12 @@ app.post('/api/setup-database', async (req, res) => {
 
 // Serve the quote viewer page
 app.get('/quote/:slug', (req, res) => {
-  res.sendFile(path.join(__dirname, 'quote.html'));
+  res.sendFile(path.join(process.cwd(), 'quote.html'));
 });
 
 // Serve the calendar test page
 app.get('/test-calendar.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'test-calendar.html'));
+  res.sendFile(path.join(process.cwd(), 'test-calendar.html'));
 });
 
 // Public API to fetch quote data by ID (or slug)
@@ -3178,22 +3179,22 @@ app.post('/api/send-email', async (req, res) => {
 
 // Serve public quote page
 app.get('/quote/:slug', (req, res) => {
-  res.sendFile(path.join(__dirname, 'quote.html'));
+  res.sendFile(path.join(process.cwd(), 'quote.html'));
 });
 
 // Serve thank you page
 app.get('/obrigado', (req, res) => {
-  res.sendFile(path.join(__dirname, 'obrigado.html'));
+  res.sendFile(path.join(process.cwd(), 'obrigado.html'));
 });
 
 // Serve alternative date selection page
 app.get('/escolher-data', (req, res) => {
-  res.sendFile(path.join(__dirname, 'escolher-data.html'));
+  res.sendFile(path.join(process.cwd(), 'escolher-data.html'));
 });
 
 // Serve test webhook page
 app.get('/test-webhook', (req, res) => {
-  res.sendFile(path.join(__dirname, 'test-webhook-local.html'));
+  res.sendFile(path.join(process.cwd(), 'test-webhook-local.html'));
 });
 
 // Debug endpoint to test slug parsing
