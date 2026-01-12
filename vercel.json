@@ -5,7 +5,18 @@
       "src": "server.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["public/**/*"]
+        "includeFiles": [
+          "public/**/*",
+          "admin/**/*",
+          "led/**/*",
+          "img/**/*",
+          "css/**/*",
+          "js/**/*",
+          "tours/**/*",
+          "equipamentos-on/**/*",
+          "*.html",
+          "*.xml"
+        ]
       }
     }
   ],
