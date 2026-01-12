@@ -456,11 +456,13 @@ app.use('/tours', express.static(path.join(__dirname, 'tours')));
 app.use('/equipamentos-on', express.static(path.join(__dirname, 'equipamentos-on')));
 
 // Serve Pipeline React app static files (from public/pipeline after build)
-app.use('/pipeline', express.static(path.join(__dirname, 'public/pipeline')));
+// Use process.cwd() for Vercel serverless compatibility
+const pipelinePath = path.join(process.cwd(), 'public/pipeline');
+app.use('/pipeline', express.static(pipelinePath));
 
 // Pipeline SPA fallback - serve index.html for all /pipeline routes
 app.get('/pipeline/*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/pipeline/index.html'));
+  res.sendFile(path.join(pipelinePath, 'index.html'));
 });
 
 // Route to serve equipamentos-on index page
