@@ -11,7 +11,7 @@ import { ProtectedRoute, AdminRoute, PublicRoute, RouteGuard } from './component
 
 export const AppRouter: React.FC = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/pipeline">
       <AuthProvider>
         <AppProvider>
           <Routes>

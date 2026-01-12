@@ -577,14 +577,23 @@ const JobModal: React.FC<JobModalProps> = ({ isOpen, job, projects, onClose, onS
         .select()
         .single();
 
-      if (projectError) throw projectError;
+      if (projectError) {
+        console.error('Error creating project for service:', projectError);
+        alert('Erro ao criar projeto para o serviço: ' + (projectError.message || 'Erro desconhecido'));
+        setCreatingService(false);
+        return;
+      }
 
       // Add creator as admin to the project
-      await supabase.from('project_members').insert({
+      const { error: memberError } = await supabase.from('project_members').insert({
         project_id: project.id,
         user_id: user.id,
         role: 'admin'
       });
+
+      if (memberError) {
+        console.error('Error adding project member:', memberError);
+      }
 
       // Create default columns for the project
       const defaultColumns = [
@@ -608,13 +617,21 @@ const JobModal: React.FC<JobModalProps> = ({ isOpen, job, projects, onClose, onS
         .select()
         .single();
 
-      if (!serviceError && service) {
+      if (serviceError) {
+        console.error('Error creating service:', serviceError);
+        alert('Erro ao criar serviço: ' + (serviceError.message || 'Erro desconhecido'));
+        setCreatingService(false);
+        return;
+      }
+
+      if (service) {
         setServices([...services, { ...service, project_name: project.name }]);
         setNewServiceName('');
         setShowNewService(false);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error creating service:', err);
+      alert('Erro ao criar serviço: ' + (err.message || 'Erro desconhecido'));
     }
     setCreatingService(false);
   };
@@ -1568,7 +1585,7 @@ export const JobsPipelinePage: React.FC = () => {
         const activeIndex = prevJobs.findIndex((j) => j.id === activeId);
         const activeJobObj = prevJobs[activeIndex];
         if (activeJobObj.stage !== overId) {
-          const updatedJob = { ...activeJobObj, stage: overId as string };
+          const updatedJob: JobData = { ...activeJobObj, stage: overId as JobData['stage'] };
           const newJobs = [...prevJobs];
           newJobs[activeIndex] = updatedJob;
           return newJobs;

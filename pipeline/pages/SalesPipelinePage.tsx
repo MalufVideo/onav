@@ -514,15 +514,23 @@ const ClientModal: React.FC<ClientModalProps> = ({ isOpen, client, onClose, onSa
         .select()
         .single();
 
-      if (!error && job) {
+      if (error) {
+        console.error('Error creating job:', error);
+        alert('Erro ao criar job: ' + (error.message || 'Erro desconhecido'));
+        setCreatingJob(false);
+        return;
+      }
+
+      if (job) {
         setJobs([job, ...jobs]);
         setNewJobTitle('');
         setNewJobValue('');
         setShowNewJob(false);
         onJobCreated?.();
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error creating job:', err);
+      alert('Erro ao criar job: ' + (err.message || 'Erro desconhecido'));
     }
     setCreatingJob(false);
   };
