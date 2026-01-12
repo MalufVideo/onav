@@ -1,89 +1,13 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
 import { AppProvider } from './contexts/AppContext';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ProjectPage } from './pages/ProjectPage';
 import { SalesPipelinePage } from './pages/SalesPipelinePage';
 import { JobsPipelinePage } from './pages/JobsPipelinePage';
-import { Loader2 } from 'lucide-react';
-
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <>{children}</>;
-};
-
-const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, loading, isMasterAdmin } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (!isMasterAdmin) {
-    return <Navigate to="/leads" replace />;
-  }
-
-  return <>{children}</>;
-};
-
-const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, loading, isMasterAdmin } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-      </div>
-    );
-  }
-
-  if (user) {
-    return <Navigate to={isMasterAdmin ? "/dashboard" : "/leads"} replace />;
-  }
-
-  return <>{children}</>;
-};
-
-const RootRedirect: React.FC = () => {
-  const { user, loading, isMasterAdmin } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <Navigate to={isMasterAdmin ? "/dashboard" : "/leads"} replace />;
-};
+import { ProtectedRoute, AdminRoute, PublicRoute, RouteGuard } from './components/RouteGuard';
 
 export const AppRouter: React.FC = () => {
   return (
@@ -131,8 +55,8 @@ export const AppRouter: React.FC = () => {
                 </ProtectedRoute>
               } 
             />
-            <Route path="/" element={<RootRedirect />} />
-            <Route path="*" element={<RootRedirect />} />
+            <Route path="/" element={<RouteGuard requireAuth redirectAuthenticatedTo="/leads"><SalesPipelinePage /></RouteGuard>} />
+            <Route path="*" element={<RouteGuard requireAuth redirectAuthenticatedTo="/leads"><SalesPipelinePage /></RouteGuard>} />
           </Routes>
         </AppProvider>
       </AuthProvider>

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
+import { MASTER_ADMIN_EMAIL } from '../config';
 import type { User, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
@@ -21,7 +22,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isMasterAdmin, setIsMasterAdmin] = useState(false);
 
   const fetchAdminStatus = async (userId: string, userEmail?: string) => {
-    const MASTER_ADMIN_EMAIL = 'nelsonhdvideo@gmail.com';
     
     if (userEmail?.toLowerCase() === MASTER_ADMIN_EMAIL) {
       setIsMasterAdmin(true);
