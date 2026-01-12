@@ -229,5 +229,114 @@ CREATE TRIGGER on_project_created_add_member
   FOR EACH ROW EXECUTE PROCEDURE public.auto_add_project_creator_as_member();
 
 -- ============================================
+-- FIX COLUMNS TABLE RLS POLICIES
+-- ============================================
+
+-- Drop existing policies if any
+DROP POLICY IF EXISTS "Members can view columns" ON public.columns;
+DROP POLICY IF EXISTS "Admins can modify columns" ON public.columns;
+DROP POLICY IF EXISTS "Project members can insert columns" ON public.columns;
+DROP POLICY IF EXISTS "Project members can update columns" ON public.columns;
+DROP POLICY IF EXISTS "Project members can delete columns" ON public.columns;
+
+-- SELECT: Project members can view columns
+CREATE POLICY "Members can view columns" ON public.columns FOR SELECT
+  USING (
+    project_id IS NULL
+    OR public.is_master_admin()
+    OR public.is_project_member(project_id)
+  );
+
+-- INSERT: Project members can insert columns
+CREATE POLICY "Project members can insert columns" ON public.columns FOR INSERT
+  WITH CHECK (
+    project_id IS NULL
+    OR public.is_master_admin()
+    OR public.is_project_member(project_id)
+  );
+
+-- UPDATE: Project members can update columns
+CREATE POLICY "Project members can update columns" ON public.columns FOR UPDATE
+  USING (
+    project_id IS NULL
+    OR public.is_master_admin()
+    OR public.is_project_member(project_id)
+  );
+
+-- DELETE: Project admins can delete columns
+CREATE POLICY "Project admins can delete columns" ON public.columns FOR DELETE
+  USING (
+    project_id IS NULL
+    OR public.is_master_admin()
+    OR public.is_project_admin(project_id)
+  );
+
+-- ============================================
+-- FIX CARDS TABLE RLS POLICIES
+-- ============================================
+
+-- Helper function to check if user has access to a column's project
+CREATE OR REPLACE FUNCTION public.can_access_column(col_id text)
+RETURNS boolean AS $$
+DECLARE
+  proj_id uuid;
+BEGIN
+  SELECT project_id INTO proj_id FROM public.columns WHERE id = col_id;
+  
+  -- If column has no project (legacy), allow access
+  IF proj_id IS NULL THEN
+    RETURN true;
+  END IF;
+  
+  -- Check if user is project member or master admin
+  RETURN public.is_master_admin() OR public.is_project_member(proj_id);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Drop existing policies if any
+DROP POLICY IF EXISTS "Members can manage cards" ON public.cards;
+DROP POLICY IF EXISTS "Members can view cards" ON public.cards;
+DROP POLICY IF EXISTS "Members can insert cards" ON public.cards;
+DROP POLICY IF EXISTS "Members can update cards" ON public.cards;
+DROP POLICY IF EXISTS "Members can delete cards" ON public.cards;
+
+-- SELECT: Allow access to cards in accessible columns
+CREATE POLICY "Members can view cards" ON public.cards FOR SELECT
+  USING (public.can_access_column(column_id));
+
+-- INSERT: Allow inserting cards in accessible columns
+CREATE POLICY "Members can insert cards" ON public.cards FOR INSERT
+  WITH CHECK (public.can_access_column(column_id));
+
+-- UPDATE: Allow updating cards in accessible columns
+CREATE POLICY "Members can update cards" ON public.cards FOR UPDATE
+  USING (public.can_access_column(column_id));
+
+-- DELETE: Allow deleting cards in accessible columns
+CREATE POLICY "Members can delete cards" ON public.cards FOR DELETE
+  USING (public.can_access_column(column_id));
+
+-- ============================================
+-- CREATE DEFAULT COLUMNS FOR NEW PROJECTS
+-- ============================================
+CREATE OR REPLACE FUNCTION public.auto_create_project_columns()
+RETURNS trigger AS $$
+BEGIN
+  -- Insert default Kanban columns for the new project
+  INSERT INTO public.columns (id, title, "order", project_id) VALUES
+    ('col-' || NEW.id || '-todo', 'To Do', 0, NEW.id),
+    ('col-' || NEW.id || '-inprogress', 'In Progress', 1, NEW.id),
+    ('col-' || NEW.id || '-review', 'Review', 2, NEW.id),
+    ('col-' || NEW.id || '-done', 'Done', 3, NEW.id);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+DROP TRIGGER IF EXISTS on_project_created_add_columns ON public.projects;
+CREATE TRIGGER on_project_created_add_columns
+  AFTER INSERT ON public.projects
+  FOR EACH ROW EXECUTE PROCEDURE public.auto_create_project_columns();
+
+-- ============================================
 -- END OF FIX
 -- ============================================
