@@ -43,17 +43,34 @@ app.use(cors());
 // Trust proxy for proper IP detection
 app.set('trust proxy', true);
 
+// SEO: Cache headers for static assets
+const cacheControl = (res, filePath) => {
+  // Set content types
+  if (filePath.endsWith('.css')) {
+    res.setHeader('Content-Type', 'text/css');
+  }
+  if (filePath.endsWith('.js')) {
+    res.setHeader('Content-Type', 'application/javascript');
+  }
+
+  // Cache images, fonts, and static assets for 1 year
+  if (filePath.match(/\.(webp|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  }
+  // Cache CSS and JS for 1 week
+  else if (filePath.match(/\.(css|js)$/)) {
+    res.setHeader('Cache-Control', 'public, max-age=604800');
+  }
+  // HTML pages: short cache for freshness
+  else if (filePath.endsWith('.html')) {
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+  }
+};
+
 // Serve static files from root directory
 // Use process.cwd() for Vercel serverless compatibility
 app.use(express.static(path.join(process.cwd()), {
-  setHeaders: (res, path) => {
-    if (path.endsWith('.css')) {
-      res.setHeader('Content-Type', 'text/css');
-    }
-    if (path.endsWith('.js')) {
-      res.setHeader('Content-Type', 'application/javascript');
-    }
-  }
+  setHeaders: cacheControl
 }));
 
 // Serve static files from 'admin' directory under the /admin path
@@ -116,6 +133,57 @@ app.get('/admin/login', (req, res) => {
 app.get('/', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'index.html'));
 });
+
+// --- Clean URL Routes (SEO-friendly URLs without .html extension) ---
+// These routes serve HTML pages without the .html extension for better SEO
+
+// Main service pages
+app.get('/produtos', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'produtos.html'));
+});
+
+app.get('/estudio', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'estudio.html'));
+});
+
+app.get('/shows', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'shows.html'));
+});
+
+app.get('/projecao-mapeada', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'projecao-mapeada.html'));
+});
+
+app.get('/producao-virtual-xr', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'producao-virtual-xr.html'));
+});
+
+app.get('/criacao-conteudo', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'criacao-conteudo.html'));
+});
+
+app.get('/consultoria-suporte', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'consultoria-suporte.html'));
+});
+
+// LED calculator clean URLs
+app.get('/led/mobile', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'led', 'mobile.html'));
+});
+
+app.get('/led/multicamera', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'led', 'multicamera.html'));
+});
+
+// 301 Redirects from old .html URLs to clean URLs for SEO
+app.get('/produtos.html', (req, res) => res.redirect(301, '/produtos'));
+app.get('/estudio.html', (req, res) => res.redirect(301, '/estudio'));
+app.get('/shows.html', (req, res) => res.redirect(301, '/shows'));
+app.get('/projecao-mapeada.html', (req, res) => res.redirect(301, '/projecao-mapeada'));
+app.get('/producao-virtual-xr.html', (req, res) => res.redirect(301, '/producao-virtual-xr'));
+app.get('/criacao-conteudo.html', (req, res) => res.redirect(301, '/criacao-conteudo'));
+app.get('/consultoria-suporte.html', (req, res) => res.redirect(301, '/consultoria-suporte'));
+app.get('/index.html', (req, res) => res.redirect(301, '/'));
 
 // Note: HTML files are served by express.static middleware above
 // Only explicit routes needed for SPA fallbacks and directory index files

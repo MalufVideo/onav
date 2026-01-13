@@ -1,20 +1,49 @@
+# On + Av - Produção Virtual e Painéis LED
+# https://onav.com.br
+
 User-agent: *
 
-# Directories
+# Allow all main pages
+Allow: /
+Allow: /produtos
+Allow: /estudio
+Allow: /shows
+Allow: /projecao-mapeada
+Allow: /producao-virtual-xr
+Allow: /criacao-conteudo
+Allow: /consultoria-suporte
+Allow: /led/
+
+# Disallow admin and internal areas
 Disallow: /admin/
+Disallow: /dashboard
+Disallow: /pipeline/
+Disallow: /equipamentos-on/
 Disallow: /node_modules/
 Disallow: /.git/
 Disallow: /quotes/
 Disallow: /supabase/
 
-# Private/Template HTML files
+# Disallow private/template files
 Disallow: /auth.html
 Disallow: /quote.html
+Disallow: /test-auth.html
+Disallow: /test-calendar.html
 
-# Config files
+# Disallow config files
 Disallow: /server.js
 Disallow: /config.js
 Disallow: /vercel.json
+Disallow: /.env
 Disallow: /.env.production
+Disallow: /package.json
+Disallow: /package-lock.json
 
+# Disallow API endpoints from indexing
+Disallow: /api/
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Sitemap location
 Sitemap: https://onav.com.br/sitemap.xml

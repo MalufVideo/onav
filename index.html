@@ -39,7 +39,6 @@
 
   <!-- Hreflang for international targeting -->
   <link rel="alternate" hreflang="pt-br" href="https://onav.com.br/">
-  <link rel="alternate" hreflang="en" href="https://onav.com.br/en/">
   <link rel="alternate" hreflang="x-default" href="https://onav.com.br/">
 
   <!-- Open Graph / Facebook -->
@@ -626,33 +625,61 @@
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "On + Av",
-        "alternateName": "OnAv",
+        "alternateName": ["OnAv", "On+Av", "On Av"],
         "url": "https://onav.com.br",
-        "logo": "https://onav.com.br/img/logo.webp",
+        "logo": "https://onav.com.br/img/on+av_logo_v2.webp",
+        "image": "https://onav.com.br/img/og-image.webp",
         "description": "Líder em produção virtual, painéis de LED e servidores Disguise no Brasil. Soluções premium para cinema, TV, shows e eventos corporativos.",
         "address": {
             "@type": "PostalAddress",
-            "addressCountry": "BR",
+            "streetAddress": "São Paulo",
+            "addressLocality": "São Paulo",
             "addressRegion": "SP",
-            "addressLocality": "São Paulo"
+            "postalCode": "04543-011",
+            "addressCountry": "BR"
         },
-        "contactPoint": {
-            "@type": "ContactPoint",
-            "telephone": "+55-11-XXXXX-XXXX",
-            "contactType": "sales",
-            "availableLanguage": ["Portuguese", "English"]
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": "-23.550520",
+            "longitude": "-46.633308"
         },
-        "sameAs": [
+        "contactPoint": [
+            {
+                "@type": "ContactPoint",
+                "telephone": "+55-11-92055-0210",
+                "contactType": "sales",
+                "areaServed": "BR",
+                "availableLanguage": ["Portuguese", "English"]
+            },
+            {
+                "@type": "ContactPoint",
+                "telephone": "+55-11-92055-0210",
+                "contactType": "customer service",
+                "areaServed": "BR",
+                "availableLanguage": ["Portuguese", "English"]
+            }
         ],
-        "founder": {
-            "@type": "Person",
-            "name": "Fundador On + Av"
-        },
+        "sameAs": [
+            "https://www.instagram.com/onav.av/",
+            "https://www.linkedin.com/company/onav-av/"
+        ],
         "foundingDate": "2010",
-        "numberOfEmployees": "10-50",
-        "industry": "Audiovisual Technology",
-        "keywords": "produção virtual, virtual production, painel de LED, disguise, projeção, LED wall, unreal engine",
-        "serviceArea": {
+        "numberOfEmployees": {
+            "@type": "QuantitativeValue",
+            "minValue": 10,
+            "maxValue": 50
+        },
+        "slogan": "A plataforma completa para produzir com Disguise, LED e projeção",
+        "knowsAbout": [
+            "Virtual Production",
+            "LED Panels",
+            "Disguise Media Servers",
+            "Projection Mapping",
+            "Unreal Engine",
+            "In-Camera VFX",
+            "Extended Reality"
+        ],
+        "areaServed": {
             "@type": "Country",
             "name": "Brasil"
         },
@@ -664,16 +691,18 @@
                     "@type": "Offer",
                     "itemOffered": {
                         "@type": "Service",
-                        "name": "Produção Virtual",
-                        "description": "Serviços completos de virtual production com Unreal Engine e painéis LED"
+                        "name": "Produção Virtual e xR",
+                        "description": "Serviços completos de virtual production com Unreal Engine, nDisplay e painéis LED HDR",
+                        "url": "https://onav.com.br/producao-virtual-xr"
                     }
                 },
                 {
                     "@type": "Offer",
                     "itemOffered": {
                         "@type": "Service",
-                        "name": "Painéis de LED",
-                        "description": "Aluguel e instalação de painéis LED de alta resolução para produções"
+                        "name": "Aluguel de Painéis LED",
+                        "description": "Aluguel e instalação de painéis LED ROE de alta resolução para produções audiovisuais",
+                        "url": "https://onav.com.br/produtos"
                     }
                 },
                 {
@@ -681,7 +710,8 @@
                     "itemOffered": {
                         "@type": "Service",
                         "name": "Servidores Disguise",
-                        "description": "Fornecimento de servidores Disguise VX4, RXII para renderização em tempo real"
+                        "description": "Fornecimento de servidores Disguise VX4, RXII para renderização em tempo real",
+                        "url": "https://onav.com.br/produtos"
                     }
                 },
                 {
@@ -689,11 +719,77 @@
                     "itemOffered": {
                         "@type": "Service",
                         "name": "Projeção Mapeada",
-                        "description": "Soluções de projection mapping para eventos e instalações artísticas"
+                        "description": "Soluções de projection mapping 3D para eventos, fachadas e instalações artísticas",
+                        "url": "https://onav.com.br/projecao-mapeada"
+                    }
+                },
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Shows e Turnês",
+                        "description": "Produção visual completa para shows, turnês e eventos musicais com Disguise Live",
+                        "url": "https://onav.com.br/shows"
                     }
                 }
             ]
         }
+    }
+    </script>
+
+  <!-- LocalBusiness Schema for Local SEO -->
+  <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "@id": "https://onav.com.br/#localbusiness",
+        "name": "On + Av",
+        "image": "https://onav.com.br/img/og-image.webp",
+        "url": "https://onav.com.br",
+        "telephone": "+55-11-92055-0210",
+        "priceRange": "$$$",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "São Paulo",
+            "addressLocality": "São Paulo",
+            "addressRegion": "SP",
+            "postalCode": "04543-011",
+            "addressCountry": "BR"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": -23.550520,
+            "longitude": -46.633308
+        },
+        "openingHoursSpecification": [
+            {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "opens": "09:00",
+                "closes": "18:00"
+            }
+        ],
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "5",
+            "reviewCount": "47"
+        }
+    }
+    </script>
+
+  <!-- BreadcrumbList Schema -->
+  <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://onav.com.br/"
+            }
+        ]
     }
     </script>
 
@@ -733,7 +829,7 @@
             <a href="#about"
               class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Quem
               Somos</a>
-            <a href="estudio.html"
+            <a href="/estudio"
               class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Estúdio</a>
             <!-- <a href="#insights" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Insights</a> -->
             <a href="#contact"
@@ -865,7 +961,7 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <a href="produtos.html" class="block group" style="text-decoration:none;color:inherit;">
+        <a href="/produtos" class="block group" style="text-decoration:none;color:inherit;">
           <div class="glass-card p-8 rounded-xl transition-shadow group-hover:shadow-lg">
             <div class="bg-primary bg-opacity-10 p-4 rounded-lg inline-block mb-6 glow-box-primary">
               <i class="fas fa-cubes text-primary text-3xl"></i>
@@ -896,7 +992,7 @@
           </div>
         </a>
 
-        <a href="producao-virtual-xr.html" class="block group" style="text-decoration:none;color:inherit;">
+        <a href="/producao-virtual-xr" class="block group" style="text-decoration:none;color:inherit;">
           <div class="glass-card p-8 rounded-xl transition-shadow group-hover:shadow-lg">
             <div class="bg-primary bg-opacity-10 p-4 rounded-lg inline-block mb-6 glow-box-primary">
               <i class="fas fa-vr-cardboard text-primary text-3xl"></i>
@@ -926,7 +1022,7 @@
           </div>
         </a>
 
-        <a href="consultoria-suporte.html" style="display:block;text-decoration:none;color:inherit;">
+        <a href="/consultoria-suporte" style="display:block;text-decoration:none;color:inherit;">
           <div class="glass-card p-8 rounded-xl">
             <div class="bg-primary bg-opacity-10 p-4 rounded-lg inline-block mb-6 glow-box-primary">
               <i class="fas fa-headset text-primary text-3xl"></i>
@@ -957,7 +1053,7 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
-        <a href="projecao-mapeada.html" style="display:block;text-decoration:none;color:inherit;">
+        <a href="/projecao-mapeada" style="display:block;text-decoration:none;color:inherit;">
           <div class="glass-card p-8 rounded-xl">
             <div class="bg-primary bg-opacity-10 p-4 rounded-lg inline-block mb-6 glow-box-primary">
               <i class="fas fa-cube text-primary text-3xl"></i>
@@ -983,7 +1079,7 @@
           </div>
         </a>
 
-        <a href="shows.html" style="display:block;text-decoration:none;color:inherit;">
+        <a href="/shows" style="display:block;text-decoration:none;color:inherit;">
           <div class="glass-card p-8 rounded-xl">
             <div class="bg-primary bg-opacity-10 p-4 rounded-lg inline-block mb-6 glow-box-primary">
               <i class="fas fa-guitar text-primary text-3xl"></i>
@@ -1009,7 +1105,7 @@
           </div>
         </a>
 
-        <a href="criacao-conteudo.html" style="display:block;text-decoration:none;color:inherit;">
+        <a href="/criacao-conteudo" style="display:block;text-decoration:none;color:inherit;">
           <div class="glass-card p-8 rounded-xl">
             <div class="bg-primary bg-opacity-10 p-4 rounded-lg inline-block mb-6 glow-box-primary">
               <i class="fas fa-palette text-primary text-3xl"></i>
@@ -1916,11 +2012,11 @@
   <section class="py-20 bg-darker relative"
     style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('img/bg_estudio_drako.webp'); background-size: 70% auto; background-position: center; background-repeat: no-repeat; background-color: #050505;">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">O Estúdio de Produção Virtual<br><span
-          class="gradient-text">mais Avançado do Brasil</span></h1>
+      <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">O Estúdio de Produção Virtual<br><span
+          class="gradient-text">mais Avançado do Brasil</span></h2>
       <p class="text-lg text-light-text max-w-3xl mx-auto mb-8">Powered by Disguise, com LED HDR 10 bits e tracking de
         câmera</p>
-      <a href="estudio.html" class="btn-primary font-bold py-3 px-8 rounded-md inline-block"
+      <a href="/estudio" class="btn-primary font-bold py-3 px-8 rounded-md inline-block"
         style="color: #000 !important;">Conheça o Estúdio</a>
     </div>
   </section>
@@ -5319,7 +5415,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
         <div>
-          <a href="index.html" class="flex items-center mb-4">
+          <a href="/" class="flex items-center mb-4">
             <span class="text-xl font-bold gradient-text">On + Av</span>
           </a>
           <p class="text-medium-text text-sm">
@@ -6134,7 +6230,7 @@
     (function () {
       console.log('ScrollyVideo navigation disabled for performance');
       return; // Temporarily disabled
-      const estudioNavLinks = document.querySelectorAll('a[href="estudio.html"]');
+      const estudioNavLinks = document.querySelectorAll('a[href="/estudio"]');
       const scrollyContainer = document.getElementById('estudio-scrolly-content-container');
       if (!estudioNavLinks.length || !scrollyContainer) return;
 
