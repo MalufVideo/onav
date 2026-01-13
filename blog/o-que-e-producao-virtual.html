@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary SEO Meta Tags -->
+    <title>O Que é Produção Virtual: Guia Completo 2026 | On + Av</title>
+    <meta name="title" content="O Que é Produção Virtual: Guia Completo 2026 | On + Av">
+    <meta name="description" content="Entenda o que é produção virtual (virtual production), como funciona com LED walls e Unreal Engine, vantagens sobre chroma key, e por que Hollywood está adotando esta tecnologia revolucionária.">
+    <meta name="keywords" content="o que é produção virtual, virtual production, como funciona produção virtual, LED wall produção, Unreal Engine virtual production, ICVFX, In-Camera VFX, cenário virtual, The Mandalorian tecnologia">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Portuguese">
+    <meta name="author" content="On + Av">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://onav.com.br/blog/o-que-e-producao-virtual">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://onav.com.br/blog/o-que-e-producao-virtual">
+    <meta property="og:title" content="O Que é Produção Virtual: Guia Completo 2026">
+    <meta property="og:description" content="Entenda o que é produção virtual, como funciona com LED walls e Unreal Engine, e por que Hollywood está adotando esta tecnologia.">
+    <meta property="og:image" content="https://onav.com.br/img/og-image.webp">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:site_name" content="On + Av">
+    <meta property="article:published_time" content="2026-01-12T10:00:00-03:00">
+    <meta property="article:author" content="On + Av">
+    <meta property="article:section" content="Tecnologia">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://onav.com.br/blog/o-que-e-producao-virtual">
+    <meta name="twitter:title" content="O Que é Produção Virtual: Guia Completo 2026">
+    <meta name="twitter:description" content="Entenda o que é produção virtual, como funciona com LED walls e Unreal Engine.">
+    <meta name="twitter:image" content="https://onav.com.br/img/og-image.webp">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/fontawesome-minimal.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00ff9d',
+                        secondary: '#0066ff',
+                        dark: '#0a0a0a',
+                        darker: '#020202',
+                        'light-text': '#e0e0e0',
+                        'medium-text': '#a0a0a0',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020202;
+            color: #e0e0e0;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, #00ff9d, #0066ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #00ff9d, #0066ff);
+            color: #050505;
+        }
+
+        .prose h2 {
+            color: #00ff9d;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .prose h3 {
+            color: #e0e0e0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .prose p {
+            color: #a0a0a0;
+            line-height: 1.8;
+            margin-bottom: 1.25rem;
+        }
+
+        .prose ul, .prose ol {
+            color: #a0a0a0;
+            margin-bottom: 1.25rem;
+            padding-left: 1.5rem;
+        }
+
+        .prose li {
+            margin-bottom: 0.5rem;
+        }
+
+        .prose strong {
+            color: #e0e0e0;
+        }
+
+        .prose a {
+            color: #00ff9d;
+            text-decoration: underline;
+        }
+
+        .prose blockquote {
+            border-left: 4px solid #00ff9d;
+            padding-left: 1rem;
+            margin: 1.5rem 0;
+            font-style: italic;
+            color: #e0e0e0;
+        }
+
+        .info-box {
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .toc {
+            background: rgba(15, 15, 15, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+        }
+
+        .toc a {
+            color: #a0a0a0;
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            color: #00ff9d;
+        }
+    </style>
+
+    <!-- Article Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "O Que é Produção Virtual: Guia Completo 2026",
+        "description": "Entenda o que é produção virtual (virtual production), como funciona com LED walls e Unreal Engine, vantagens sobre chroma key, e por que Hollywood está adotando esta tecnologia.",
+        "image": "https://onav.com.br/img/og-image.webp",
+        "author": {
+            "@type": "Organization",
+            "name": "On + Av",
+            "url": "https://onav.com.br"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "On + Av",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://onav.com.br/img/on+av_logo_v2.webp"
+            }
+        },
+        "datePublished": "2026-01-12",
+        "dateModified": "2026-01-12",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://onav.com.br/blog/o-que-e-producao-virtual"
+        },
+        "keywords": ["produção virtual", "virtual production", "LED wall", "Unreal Engine", "ICVFX"]
+    }
+    </script>
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://onav.com.br/"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Blog",
+                "item": "https://onav.com.br/blog"
+            },
+            {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "O Que é Produção Virtual",
+                "item": "https://onav.com.br/blog/o-que-e-producao-virtual"
+            }
+        ]
+    }
+    </script>
+
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "O que é produção virtual?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Produção virtual (virtual production) é uma técnica cinematográfica que utiliza painéis de LED para exibir cenários digitais em tempo real durante as filmagens, permitindo que atores interajam com ambientes virtuais fotorrealistas sem necessidade de pós-produção extensiva."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Qual a diferença entre produção virtual e chroma key?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Na produção virtual, os cenários são exibidos em tempo real em painéis LED, proporcionando iluminação natural e reflexos realistas. No chroma key, usa-se uma tela verde que é substituída na pós-produção, exigindo mais trabalho de VFX e sem interação visual em tempo real."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Quanto custa uma produção virtual no Brasil?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "O custo varia conforme o tamanho do projeto. Uma diária em estúdio de produção virtual no Brasil pode variar de R$ 15.000 a R$ 80.000, dependendo do tamanho do LED volume, equipamentos utilizados e complexidade dos cenários virtuais."
+                }
+            }
+        ]
+    }
+    </script>
+</head>
+<body class="antialiased">
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-opacity-90 backdrop-blur-md z-50 border-b border-gray-800" style="background-color: rgba(2, 2, 2, 0.9);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center">
+                    <a href="/" class="flex-shrink-0 flex items-center">
+                        <img src="/img/on+av_logo_v2.webp" alt="On + Av Logo" style="height:40px;">
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-6">
+                        <a href="/#services" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium">Serviços</a>
+                        <a href="/estudio" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium">Estúdio</a>
+                        <a href="/produtos" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium">Equipamentos</a>
+                        <a href="/blog" class="text-primary px-3 py-2 text-sm font-medium">Blog</a>
+                        <a href="/#contact" class="btn-primary text-sm font-bold px-5 py-2 rounded-md">Contato</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="pt-32 pb-12 px-4">
+        <div class="max-w-4xl mx-auto">
+            <!-- Breadcrumb -->
+            <nav class="text-sm mb-6">
+                <a href="/" class="text-medium-text hover:text-primary">Home</a>
+                <span class="text-medium-text mx-2">/</span>
+                <a href="/blog" class="text-medium-text hover:text-primary">Blog</a>
+                <span class="text-medium-text mx-2">/</span>
+                <span class="text-primary">O Que é Produção Virtual</span>
+            </nav>
+
+            <div class="flex items-center gap-2 mb-4">
+                <span class="text-xs text-primary font-semibold uppercase bg-primary/10 px-3 py-1 rounded-full">Guia Completo</span>
+                <span class="text-xs text-medium-text">• 15 min de leitura</span>
+            </div>
+
+            <h1 class="text-4xl md:text-5xl font-bold mb-6 text-light-text leading-tight">
+                O Que é Produção Virtual: Guia Completo 2026
+            </h1>
+
+            <p class="text-xl text-medium-text mb-8">
+                Entenda como funciona a tecnologia que revolucionou Hollywood e está transformando produções audiovisuais no Brasil.
+            </p>
+
+            <div class="flex items-center gap-4 text-sm text-medium-text">
+                <span>Por <strong class="text-light-text">Equipe On + Av</strong></span>
+                <span>•</span>
+                <time datetime="2026-01-12">12 de Janeiro, 2026</time>
+                <span>•</span>
+                <span>Atualizado hoje</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Article Content -->
+    <article class="px-4 pb-20">
+        <div class="max-w-4xl mx-auto">
+
+            <!-- Table of Contents -->
+            <div class="toc mb-12">
+                <h2 class="text-lg font-bold text-light-text mb-4">Neste artigo:</h2>
+                <ol class="space-y-2 text-sm">
+                    <li><a href="#o-que-e">1. O que é Produção Virtual?</a></li>
+                    <li><a href="#como-funciona">2. Como Funciona na Prática</a></li>
+                    <li><a href="#tecnologias">3. Tecnologias Envolvidas</a></li>
+                    <li><a href="#vantagens">4. Vantagens sobre Chroma Key</a></li>
+                    <li><a href="#casos-de-uso">5. Casos de Uso e Exemplos</a></li>
+                    <li><a href="#brasil">6. Produção Virtual no Brasil</a></li>
+                    <li><a href="#custos">7. Custos e Investimento</a></li>
+                    <li><a href="#faq">8. Perguntas Frequentes</a></li>
+                </ol>
+            </div>
+
+            <div class="prose max-w-none">
+
+                <h2 id="o-que-e">O que é Produção Virtual?</h2>
+
+                <p>
+                    <strong>Produção virtual</strong> (em inglês, <em>virtual production</em>) é uma técnica revolucionária de produção audiovisual que combina filmagem tradicional com ambientes digitais renderizados em tempo real. Em vez de usar telas verdes (chroma key) que são substituídas na pós-produção, a produção virtual utiliza <strong>painéis de LED de alta resolução</strong> que exibem cenários virtuais fotorrealistas durante a própria filmagem.
+                </p>
+
+                <p>
+                    Esta tecnologia ganhou fama mundial com a série <strong>The Mandalorian</strong> da Disney+, que utilizou o sistema "The Volume" - um estúdio cercado por painéis LED curvos que exibem cenários criados no <strong>Unreal Engine</strong>. O resultado são cenas incrivelmente realistas onde atores interagem naturalmente com ambientes virtuais.
+                </p>
+
+                <div class="info-box">
+                    <p class="text-light-text mb-0"><strong>Definição técnica:</strong> Produção virtual é o processo de combinar captura de performance física com ambientes gerados por computador em tempo real, permitindo que diretores, atores e equipe visualizem o resultado final durante as filmagens.</p>
+                </div>
+
+                <h2 id="como-funciona">Como Funciona na Prática</h2>
+
+                <p>
+                    O processo de produção virtual envolve várias etapas e tecnologias trabalhando em sincronia:
+                </p>
+
+                <h3>1. O LED Volume</h3>
+                <p>
+                    O coração da produção virtual é o <strong>LED Volume</strong> - uma estrutura de painéis LED que pode ter formato curvo (270° ou 360°) ou em configuração de parede com teto. Estes painéis utilizam tecnologia de <strong>pixel pitch</strong> reduzido (geralmente 2.8mm ou menor) para garantir alta resolução mesmo em close-ups.
+                </p>
+
+                <h3>2. Renderização em Tempo Real</h3>
+                <p>
+                    Motores gráficos como <strong>Unreal Engine</strong> renderizam os cenários virtuais em tempo real, com taxas de atualização sincronizadas com a câmera. Isso significa que quando a câmera se move, a perspectiva do cenário virtual muda correspondentemente, criando um efeito de paralaxe realista.
+                </p>
+
+                <h3>3. Tracking de Câmera</h3>
+                <p>
+                    Sistemas de <strong>tracking como Stype e Mo-Sys</strong> rastreiam a posição exata da câmera no espaço 3D. Essas informações são enviadas em tempo real para o motor gráfico, que ajusta a perspectiva do cenário virtual para corresponder perfeitamente ao ângulo da câmera.
+                </p>
+
+                <h3>4. Media Server</h3>
+                <p>
+                    <strong>Servidores Disguise</strong> (como VX4 e RXII) gerenciam todo o fluxo de vídeo, recebendo o conteúdo do Unreal Engine, processando-o e distribuindo para os painéis LED com sincronização perfeita e latência mínima.
+                </p>
+
+                <h2 id="tecnologias">Tecnologias Envolvidas</h2>
+
+                <p>
+                    Uma produção virtual de qualidade profissional requer a integração de várias tecnologias especializadas:
+                </p>
+
+                <ul>
+                    <li><strong>Painéis LED:</strong> ROE Visual Black Pearl, Absen, Unilumin - com pixel pitch de 1.5mm a 2.9mm</li>
+                    <li><strong>Media Servers:</strong> Disguise VX4, RXII, GX3 - para gerenciamento de vídeo</li>
+                    <li><strong>Game Engine:</strong> Unreal Engine 5 com nDisplay para renderização distribuída</li>
+                    <li><strong>Camera Tracking:</strong> Stype, Mo-Sys StarTracker, OptiTrack</li>
+                    <li><strong>Processadores de Vídeo:</strong> Brompton Tessera, Novastar para controle dos LEDs</li>
+                    <li><strong>Software de Composição:</strong> Notch para efeitos em tempo real</li>
+                </ul>
+
+                <h2 id="vantagens">Vantagens sobre Chroma Key</h2>
+
+                <p>
+                    A produção virtual oferece diversas vantagens significativas em comparação com o tradicional chroma key:
+                </p>
+
+                <h3>Iluminação Natural</h3>
+                <p>
+                    Os painéis LED emitem luz que ilumina naturalmente os atores e objetos em cena. Se o cenário virtual mostra um pôr do sol, a luz laranja dos LEDs banha o ator criando reflexos e sombras realistas automaticamente. Com chroma key, toda essa iluminação precisa ser simulada artificialmente.
+                </p>
+
+                <h3>Reflexos Realistas</h3>
+                <p>
+                    Superfícies reflexivas como vidros, metais e olhos capturam naturalmente o ambiente virtual. Em produções com chroma key, adicionar reflexos convincentes em pós-produção é extremamente trabalhoso e caro.
+                </p>
+
+                <h3>Visualização Imediata</h3>
+                <p>
+                    Diretores e atores veem o resultado final em tempo real. Não há "imaginação" sobre como o cenário ficará - ele está ali, visível para toda a equipe. Isso permite ajustes criativos imediatos e melhora significativamente as performances dos atores.
+                </p>
+
+                <h3>Redução de Pós-Produção</h3>
+                <p>
+                    Grande parte do trabalho de VFX é eliminado. As cenas saem praticamente prontas da filmagem, reduzindo custos e tempo de pós-produção em até 50%.
+                </p>
+
+                <h2 id="casos-de-uso">Casos de Uso e Exemplos</h2>
+
+                <p>
+                    A produção virtual é versátil e pode ser aplicada em diversos tipos de produções:
+                </p>
+
+                <h3>Cinema e Séries</h3>
+                <p>
+                    Além de The Mandalorian, produções como <strong>The Batman, Thor: Love and Thunder</strong> e <strong>House of the Dragon</strong> utilizaram produção virtual extensivamente para criar mundos fantásticos com realismo impressionante.
+                </p>
+
+                <h3>Publicidade</h3>
+                <p>
+                    Comerciais de automóveis são um caso de uso perfeito. Em vez de filmar um carro em diversas locações, o veículo é colocado no LED Volume e cenários virtuais são trocados instantaneamente - de uma estrada costeira para uma cidade noturna em segundos.
+                </p>
+
+                <h3>Música e Shows</h3>
+                <p>
+                    Videoclipes e performances ao vivo utilizam produção virtual para criar experiências visuais impossíveis. Artistas como <strong>The Weeknd e Billie Eilish</strong> já incorporaram a tecnologia em suas produções.
+                </p>
+
+                <h3>Corporativo e Eventos</h3>
+                <p>
+                    Transmissões corporativas, lançamentos de produtos e eventos híbridos ganham uma nova dimensão com cenários virtuais dinâmicos e interativos.
+                </p>
+
+                <h2 id="brasil">Produção Virtual no Brasil</h2>
+
+                <p>
+                    O Brasil está acompanhando a revolução da produção virtual, com investimentos significativos em infraestrutura e capacitação. <a href="/estudio">O estúdio da On + Av em São Paulo</a> é um dos mais avançados da América Latina, oferecendo:
+                </p>
+
+                <ul>
+                    <li>LED Volume com painéis ROE de alta resolução</li>
+                    <li>Servidores Disguise certificados</li>
+                    <li>Sistema de tracking Stype</li>
+                    <li>Renderização com Unreal Engine 5</li>
+                    <li>Equipe técnica especializada</li>
+                </ul>
+
+                <p>
+                    Grandes produções brasileiras já estão adotando a tecnologia. A <strong>TV Globo</strong> foi pioneira no uso de produção virtual em novelas e programas ao vivo, elevando o padrão visual das produções nacionais.
+                </p>
+
+                <h2 id="custos">Custos e Investimento</h2>
+
+                <p>
+                    O investimento em produção virtual pode parecer alto inicialmente, mas oferece economia significativa no longo prazo:
+                </p>
+
+                <div class="info-box">
+                    <h3 class="text-light-text text-lg font-semibold mb-3">Comparativo de Custos (Estimativa)</h3>
+                    <ul class="mb-0">
+                        <li><strong>Diária de estúdio VP no Brasil:</strong> R$ 15.000 a R$ 80.000</li>
+                        <li><strong>Criação de cenário virtual:</strong> R$ 20.000 a R$ 150.000</li>
+                        <li><strong>Economia em pós-produção:</strong> 30% a 50%</li>
+                        <li><strong>Economia em locações:</strong> 60% a 80%</li>
+                    </ul>
+                </div>
+
+                <p>
+                    Para um orçamento personalizado para seu projeto, <a href="/#contact">entre em contato com nossa equipe</a>.
+                </p>
+
+                <h2 id="faq">Perguntas Frequentes</h2>
+
+                <h3>Produção virtual funciona para qualquer tipo de projeto?</h3>
+                <p>
+                    A produção virtual é mais vantajosa para projetos que envolvem cenários complexos, múltiplas locações ou ambientes impossíveis de filmar tradicionalmente. Para projetos simples com locações reais acessíveis, o método tradicional ainda pode ser mais econômico.
+                </p>
+
+                <h3>Preciso de equipe especializada?</h3>
+                <p>
+                    Sim. A produção virtual requer profissionais especializados em LED, Disguise, Unreal Engine e tracking de câmera. Na <a href="/consultoria-suporte">On + Av, oferecemos equipe completa</a> junto com o aluguel do estúdio.
+                </p>
+
+                <h3>Quanto tempo leva para criar um cenário virtual?</h3>
+                <p>
+                    Depende da complexidade. Um cenário simples pode ficar pronto em 1-2 semanas. Ambientes complexos com múltiplos elementos e iluminação elaborada podem levar 4-8 semanas de desenvolvimento.
+                </p>
+
+                <h3>Posso usar meus próprios assets 3D?</h3>
+                <p>
+                    Sim. Assets existentes podem ser importados e otimizados para renderização em tempo real no Unreal Engine. Nossa <a href="/criacao-conteudo">equipe de criação de conteúdo</a> pode adaptar seus materiais.
+                </p>
+
+            </div>
+
+            <!-- CTA -->
+            <div class="mt-16 p-8 rounded-xl text-center" style="background: linear-gradient(135deg, rgba(0, 255, 157, 0.1), rgba(0, 102, 255, 0.1)); border: 1px solid rgba(0, 255, 157, 0.3);">
+                <h2 class="text-2xl font-bold text-light-text mb-4">Pronto para sua primeira produção virtual?</h2>
+                <p class="text-medium-text mb-6">Conheça nosso estúdio e descubra como podemos transformar seu projeto.</p>
+                <a href="/estudio" class="btn-primary font-bold py-3 px-8 rounded-md inline-block mr-4">Conhecer o Estúdio</a>
+                <a href="https://wa.me/5511920550210?text=Olá%2C%20li%20o%20artigo%20sobre%20produção%20virtual%20e%20gostaria%20de%20saber%20mais." class="text-primary font-semibold hover:underline">Falar com Especialista</a>
+            </div>
+
+            <!-- Related Articles -->
+            <div class="mt-16">
+                <h2 class="text-2xl font-bold text-light-text mb-6">Artigos Relacionados</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <a href="/blog/quanto-custa-alugar-painel-led" class="block p-6 rounded-xl border border-gray-800 hover:border-primary transition-colors">
+                        <h3 class="text-lg font-semibold text-light-text mb-2">Quanto Custa Alugar um Painel LED</h3>
+                        <p class="text-medium-text text-sm">Guia completo de preços para aluguel de painéis LED no Brasil.</p>
+                    </a>
+                    <a href="/blog/led-wall-vs-chroma-key" class="block p-6 rounded-xl border border-gray-800 hover:border-primary transition-colors">
+                        <h3 class="text-lg font-semibold text-light-text mb-2">LED Wall vs Chroma Key</h3>
+                        <p class="text-medium-text text-sm">Comparação detalhada entre as duas tecnologias.</p>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="bg-dark py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <a href="/" class="inline-block mb-4">
+                <span class="text-xl font-bold gradient-text">On + Av</span>
+            </a>
+            <p class="text-medium-text text-sm mb-4">
+                A principal referência em produção virtual e tecnologia Disguise no Brasil.
+            </p>
+            <p class="text-medium-text text-xs">
+                © 2026 On + Av. Todos os direitos reservados.
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

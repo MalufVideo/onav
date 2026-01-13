@@ -166,6 +166,23 @@ app.get('/consultoria-suporte', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'consultoria-suporte.html'));
 });
 
+// Blog clean URLs
+app.get('/blog', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'blog', 'index.html'));
+});
+
+app.get('/blog/o-que-e-producao-virtual', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'blog', 'o-que-e-producao-virtual.html'));
+});
+
+app.get('/blog/quanto-custa-alugar-painel-led', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'blog', 'quanto-custa-alugar-painel-led.html'));
+});
+
+app.get('/blog/led-wall-vs-chroma-key', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'blog', 'led-wall-vs-chroma-key.html'));
+});
+
 // LED calculator clean URLs
 app.get('/led/mobile', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'led', 'mobile.html'));

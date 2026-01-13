@@ -64,6 +64,47 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Blog Section -->
+  <url>
+    <loc>https://onav.com.br/blog</loc>
+    <lastmod>2026-01-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://onav.com.br/blog/o-que-e-producao-virtual</loc>
+    <lastmod>2026-01-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://onav.com.br/img/producao-virtual-hero.webp</image:loc>
+      <image:title>O Que é Produção Virtual - Guia Completo 2026</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://onav.com.br/blog/quanto-custa-alugar-painel-led</loc>
+    <lastmod>2026-01-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://onav.com.br/img/led-panels-hero.webp</image:loc>
+      <image:title>Quanto Custa Alugar Painel LED para Eventos</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://onav.com.br/blog/led-wall-vs-chroma-key</loc>
+    <lastmod>2026-01-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://onav.com.br/img/led-vs-chroma-hero.webp</image:loc>
+      <image:title>LED Wall vs Chroma Key - Comparativo Completo</image:title>
+    </image:image>
+  </url>
+
   <!-- LED Calculator Tool -->
   <url>
     <loc>https://onav.com.br/led/</loc>
