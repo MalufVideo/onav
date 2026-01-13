@@ -1,17 +1,156 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
 
-  <!-- Homepage -->
+  <!-- Homepage with Case Study Videos -->
   <url>
     <loc>https://onav.com.br/</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
       <image:loc>https://onav.com.br/img/og-image.webp</image:loc>
       <image:title>On + Av - Produção Virtual e Painéis LED</image:title>
     </image:image>
+
+    <!-- Case Study Videos -->
+    <video:video>
+      <video:thumbnail_loc>https://img.youtube.com/vi/OzOQQSURvu4/maxresdefault.jpg</video:thumbnail_loc>
+      <video:title>Olimpíadas Paris 2024 - Produção Virtual Globo</video:title>
+      <video:description>Case de produção virtual para a cobertura das Olimpíadas Paris 2024 pela Globo. LED Wall e tecnologia Disguise.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/OzOQQSURvu4</video:player_loc>
+      <video:duration>180</video:duration>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+
+    <video:video>
+      <video:thumbnail_loc>https://img.youtube.com/vi/O9XJVbup43M/maxresdefault.jpg</video:thumbnail_loc>
+      <video:title>Hyundai CRETA - Comercial com LED Wall</video:title>
+      <video:description>Produção publicitária para Hyundai CRETA utilizando LED Wall e produção virtual.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/O9XJVbup43M</video:player_loc>
+      <video:duration>60</video:duration>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+
+    <video:video>
+      <video:thumbnail_loc>https://img.youtube.com/vi/mJVcf-VkZSs/maxresdefault.jpg</video:thumbnail_loc>
+      <video:title>Globo Promo Day - Produção Virtual</video:title>
+      <video:description>Case de produção virtual para o Globo Promo Day com painéis LED.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/mJVcf-VkZSs</video:player_loc>
+      <video:duration>120</video:duration>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+
+    <video:video>
+      <video:thumbnail_loc>https://img.youtube.com/vi/5InWksj7aNk/maxresdefault.jpg</video:thumbnail_loc>
+      <video:title>Volkswagen T-Cross - Uma Aventura SUVW</video:title>
+      <video:description>Comercial Volkswagen T-Cross produzido com tecnologia de LED Wall e produção virtual.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/5InWksj7aNk</video:player_loc>
+      <video:duration>60</video:duration>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+
+    <video:video>
+      <video:thumbnail_loc>https://img.youtube.com/vi/eEbOU0eygQk/maxresdefault.jpg</video:thumbnail_loc>
+      <video:title>Primo Rico Ultra Black Friday Infinita</video:title>
+      <video:description>Live do Primo Rico com produção virtual e painéis LED para a Black Friday.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/eEbOU0eygQk</video:player_loc>
+      <video:duration>3600</video:duration>
+      <video:family_friendly>yes</video:family_friendly>
+      <video:live>yes</video:live>
+    </video:video>
+
+    <video:video>
+      <video:thumbnail_loc>https://img.youtube.com/vi/zX1ZCcnWPwc/maxresdefault.jpg</video:thumbnail_loc>
+      <video:title>A Década Milionária - Produção Virtual</video:title>
+      <video:description>Programa A Década Milionária com produção virtual e LED Wall.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/zX1ZCcnWPwc</video:player_loc>
+      <video:duration>3600</video:duration>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+
+    <video:video>
+      <video:thumbnail_loc>https://img.youtube.com/vi/NMcVgcy_m7c/maxresdefault.jpg</video:thumbnail_loc>
+      <video:title>Campanha Claro Flamingo - Anitta</video:title>
+      <video:description>Comercial Claro com Anitta produzido com tecnologia de LED Wall.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/NMcVgcy_m7c</video:player_loc>
+      <video:duration>60</video:duration>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+
+    <video:video>
+      <video:thumbnail_loc>https://img.youtube.com/vi/jVAMWTCITVA/maxresdefault.jpg</video:thumbnail_loc>
+      <video:title>Manowar Europe Tour 2022</video:title>
+      <video:description>Turnê Manowar Europa 2022 com painéis LED e sistema Disguise.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/jVAMWTCITVA</video:player_loc>
+      <video:duration>300</video:duration>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+
+    <video:video>
+      <video:thumbnail_loc>https://img.youtube.com/vi/U9NumXGdxv0/maxresdefault.jpg</video:thumbnail_loc>
+      <video:title>Ponto Final - Documentário Temporada 1</video:title>
+      <video:description>Documentário Ponto Final produzido com tecnologia de produção virtual.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/U9NumXGdxv0</video:player_loc>
+      <video:duration>2700</video:duration>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+
+    <video:video>
+      <video:thumbnail_loc>https://img.youtube.com/vi/LZIRmhu6Yc8/maxresdefault.jpg</video:thumbnail_loc>
+      <video:title>Lacta - Comercial com LED Wall</video:title>
+      <video:description>Produção publicitária Lacta com tecnologia de LED Wall e produção virtual.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/LZIRmhu6Yc8</video:player_loc>
+      <video:duration>60</video:duration>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+
+    <video:video>
+      <video:thumbnail_loc>https://img.youtube.com/vi/YA3WOyQboWA/maxresdefault.jpg</video:thumbnail_loc>
+      <video:title>C&amp;A Encontro - Produção Virtual</video:title>
+      <video:description>Evento C&amp;A produzido com painéis LED e tecnologia de produção virtual.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/YA3WOyQboWA</video:player_loc>
+      <video:duration>180</video:duration>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+
+    <video:video>
+      <video:thumbnail_loc>https://img.youtube.com/vi/1A9PslUFGWE/maxresdefault.jpg</video:thumbnail_loc>
+      <video:title>Bradesco Seguros - Comercial LED Wall</video:title>
+      <video:description>Produção publicitária Bradesco Seguros com LED Wall.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/1A9PslUFGWE</video:player_loc>
+      <video:duration>60</video:duration>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+
+    <video:video>
+      <video:thumbnail_loc>https://img.youtube.com/vi/2JM1C4Paovg/maxresdefault.jpg</video:thumbnail_loc>
+      <video:title>Avon - Campanha com Produção Virtual</video:title>
+      <video:description>Comercial Avon produzido com tecnologia de LED Wall.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/2JM1C4Paovg</video:player_loc>
+      <video:duration>60</video:duration>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+
+    <video:video>
+      <video:thumbnail_loc>https://img.youtube.com/vi/G6T20ZAvOgA/maxresdefault.jpg</video:thumbnail_loc>
+      <video:title>Lupo - Comercial com LED Wall</video:title>
+      <video:description>Produção publicitária Lupo com painéis LED e produção virtual.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/G6T20ZAvOgA</video:player_loc>
+      <video:duration>60</video:duration>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+
+    <video:video>
+      <video:thumbnail_loc>https://img.youtube.com/vi/NS7ivNPzvXg/maxresdefault.jpg</video:thumbnail_loc>
+      <video:title>Gloob - Produção Virtual Infantil</video:title>
+      <video:description>Produção para canal Gloob com tecnologia de LED Wall.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/NS7ivNPzvXg</video:player_loc>
+      <video:duration>120</video:duration>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+
   </url>
 
   <!-- Main Service Pages -->

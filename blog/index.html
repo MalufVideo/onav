@@ -1,282 +1,389 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Primary SEO Meta Tags -->
-    <title>Blog | Artigos sobre Produção Virtual, LED e Tecnologia AV | On + Av</title>
-    <meta name="title" content="Blog | Artigos sobre Produção Virtual, LED e Tecnologia AV | On + Av">
-    <meta name="description" content="Artigos, tutoriais e guias sobre produção virtual, painéis LED, servidores Disguise, projeção mapeada e tecnologias audiovisuais. Aprenda com os especialistas da On + Av.">
-    <meta name="keywords" content="blog produção virtual, artigos LED, tutoriais Disguise, guia virtual production, tecnologia audiovisual brasil">
-    <meta name="robots" content="index, follow">
-    <meta name="language" content="Portuguese">
-    <meta name="author" content="On + Av">
+    <title>
+      Blog | Artigos sobre Produção Virtual, LED e Tecnologia AV | On + Av
+    </title>
+    <meta
+      name="title"
+      content="Blog | Artigos sobre Produção Virtual, LED e Tecnologia AV | On + Av"
+    />
+    <meta
+      name="description"
+      content="Artigos, tutoriais e guias sobre produção virtual, painéis LED, servidores Disguise, projeção mapeada e tecnologias audiovisuais. Aprenda com os especialistas da On + Av."
+    />
+    <meta
+      name="keywords"
+      content="blog produção virtual, artigos LED, tutoriais Disguise, guia virtual production, tecnologia audiovisual brasil"
+    />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="Portuguese" />
+    <meta name="author" content="On + Av" />
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://onav.com.br/blog">
+    <link rel="canonical" href="https://onav.com.br/blog" />
 
     <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://onav.com.br/blog">
-    <meta property="og:title" content="Blog | Artigos sobre Produção Virtual e LED | On + Av">
-    <meta property="og:description" content="Artigos, tutoriais e guias sobre produção virtual, painéis LED e tecnologias audiovisuais.">
-    <meta property="og:image" content="https://onav.com.br/img/og-image.webp">
-    <meta property="og:locale" content="pt_BR">
-    <meta property="og:site_name" content="On + Av">
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://onav.com.br/blog" />
+    <meta
+      property="og:title"
+      content="Blog | Artigos sobre Produção Virtual e LED | On + Av"
+    />
+    <meta
+      property="og:description"
+      content="Artigos, tutoriais e guias sobre produção virtual, painéis LED e tecnologias audiovisuais."
+    />
+    <meta property="og:image" content="https://onav.com.br/img/og-image.webp" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content="On + Av" />
 
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://onav.com.br/blog">
-    <meta name="twitter:title" content="Blog | Artigos sobre Produção Virtual e LED | On + Av">
-    <meta name="twitter:description" content="Artigos, tutoriais e guias sobre produção virtual, painéis LED e tecnologias audiovisuais.">
-    <meta name="twitter:image" content="https://onav.com.br/img/og-image.webp">
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://onav.com.br/blog" />
+    <meta
+      name="twitter:title"
+      content="Blog | Artigos sobre Produção Virtual e LED | On + Av"
+    />
+    <meta
+      name="twitter:description"
+      content="Artigos, tutoriais e guias sobre produção virtual, painéis LED e tecnologias audiovisuais."
+    />
+    <meta
+      name="twitter:image"
+      content="https://onav.com.br/img/og-image.webp"
+    />
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/css/fontawesome-minimal.css">
+    <link rel="stylesheet" href="/css/fontawesome-minimal.css" />
 
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#00ff9d',
-                        secondary: '#0066ff',
-                        dark: '#0a0a0a',
-                        darker: '#020202',
-                        'light-text': '#e0e0e0',
-                        'medium-text': '#a0a0a0',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#00ff9d",
+              secondary: "#0066ff",
+              dark: "#0a0a0a",
+              darker: "#020202",
+              "light-text": "#e0e0e0",
+              "medium-text": "#a0a0a0",
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #020202;
-            background-image:
-                radial-gradient(circle at 10% 20%, rgba(0, 255, 157, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 85% 80%, rgba(0, 102, 255, 0.12) 0%, transparent 45%);
-            background-attachment: fixed;
-            color: #e0e0e0;
-        }
+          body {
+              font-family: 'Inter', sans-serif;
+              background-color: #020202;
+              color: #e0e0e0;
+          }
 
-        .gradient-text {
-            background: linear-gradient(90deg, #00ff9d, #0066ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
+          .blog-hero-section {
+              background-image: linear-gradient(rgba(2, 2, 2, 0.85), rgba(2, 2, 2, 0.85)), url('/img/blog/blog-hero.webp');
+              background-size: cover;
+              background-position: center;
+              background-attachment: fixed;
+          }
 
-        .article-card {
-            background: rgba(15, 15, 15, 0.65);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
+          .gradient-text {
+              background: linear-gradient(90deg, #00ff9d, #0066ff);
+              -webkit-background-clip: text;
+              background-clip: text;
+              color: transparent;
+          }
 
-        .article-card:hover {
-            border-color: rgba(0, 255, 157, 0.6);
-            transform: translateY(-5px);
-        }
+          .article-card {
+              background: rgba(15, 15, 15, 0.65);
+              backdrop-filter: blur(12px);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              transition: all 0.3s ease;
+          }
 
-        .btn-primary {
-            background: linear-gradient(90deg, #00ff9d, #0066ff);
-            color: #050505;
-        }
+          .article-card:hover {
+              border-color: rgba(0, 255, 157, 0.6);
+              transform: translateY(-5px);
+          }
+
+          .btn-primary {
+              background: linear-gradient(90deg, #00ff9d, #0066ff);
+              color: #050505;
+          }
     </style>
 
     <!-- Blog Schema -->
     <script type="application/ld+json">
-    {
+      {
         "@context": "https://schema.org",
         "@type": "Blog",
         "name": "Blog On + Av",
         "description": "Artigos sobre produção virtual, painéis LED e tecnologias audiovisuais",
         "url": "https://onav.com.br/blog",
         "publisher": {
-            "@type": "Organization",
-            "name": "On + Av",
-            "logo": {
-                "@type": "ImageObject",
-                "url": "https://onav.com.br/img/on+av_logo_v2.webp"
-            }
+          "@type": "Organization",
+          "name": "On + Av",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://onav.com.br/img/on+av_logo_v2.webp"
+          }
         },
         "blogPost": [
-            {
-                "@type": "BlogPosting",
-                "headline": "O Que é Produção Virtual: Guia Completo 2026",
-                "url": "https://onav.com.br/blog/o-que-e-producao-virtual"
-            },
-            {
-                "@type": "BlogPosting",
-                "headline": "Quanto Custa Alugar um Painel LED para Eventos",
-                "url": "https://onav.com.br/blog/quanto-custa-alugar-painel-led"
-            },
-            {
-                "@type": "BlogPosting",
-                "headline": "LED Wall vs Chroma Key: Qual Escolher para Sua Produção?",
-                "url": "https://onav.com.br/blog/led-wall-vs-chroma-key"
-            }
+          {
+            "@type": "BlogPosting",
+            "headline": "O Que é Produção Virtual: Guia Completo 2026",
+            "url": "https://onav.com.br/blog/o-que-e-producao-virtual"
+          },
+          {
+            "@type": "BlogPosting",
+            "headline": "Quanto Custa Alugar um Painel LED para Eventos",
+            "url": "https://onav.com.br/blog/quanto-custa-alugar-painel-led"
+          },
+          {
+            "@type": "BlogPosting",
+            "headline": "LED Wall vs Chroma Key: Qual Escolher para Sua Produção?",
+            "url": "https://onav.com.br/blog/led-wall-vs-chroma-key"
+          }
         ]
-    }
+      }
     </script>
-</head>
-<body class="antialiased">
+  </head>
+  <body class="antialiased">
     <!-- Navigation -->
-    <nav class="fixed w-full bg-opacity-90 backdrop-blur-md z-50 border-b border-gray-800" style="background-color: rgba(2, 2, 2, 0.9);">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-20 items-center">
-                <div class="flex items-center">
-                    <a href="/" class="flex-shrink-0 flex items-center">
-                        <img src="/img/on+av_logo_v2.webp" alt="On + Av Logo" style="height:40px;">
-                    </a>
-                </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-center space-x-6">
-                        <a href="/#services" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium">Serviços</a>
-                        <a href="/estudio" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium">Estúdio</a>
-                        <a href="/produtos" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium">Equipamentos</a>
-                        <a href="/blog" class="text-primary px-3 py-2 text-sm font-medium">Blog</a>
-                        <a href="/#contact" class="btn-primary text-sm font-bold px-5 py-2 rounded-md">Contato</a>
-                    </div>
-                </div>
+    <nav
+      class="fixed w-full bg-opacity-90 backdrop-blur-md z-50 border-b border-gray-800"
+      style="background-color: rgba(2, 2, 2, 0.9)"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-20 items-center">
+          <div class="flex items-center">
+            <a href="/" class="flex-shrink-0 flex items-center">
+              <img
+                src="/img/on+av_logo_v2.webp"
+                alt="On + Av Logo"
+                style="height: 40px"
+              />
+            </a>
+          </div>
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-center space-x-6">
+              <a
+                href="/#services"
+                class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium"
+                >Serviços</a
+              >
+              <a
+                href="/estudio"
+                class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium"
+                >Estúdio</a
+              >
+              <a
+                href="/produtos"
+                class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium"
+                >Equipamentos</a
+              >
+              <a href="/blog" class="text-primary px-3 py-2 text-sm font-medium"
+                >Blog</a
+              >
+              <a
+                href="/#contact"
+                class="btn-primary text-sm font-bold px-5 py-2 rounded-md"
+                >Contato</a
+              >
             </div>
+          </div>
         </div>
+      </div>
     </nav>
-
     <!-- Hero Section -->
-    <section class="pt-32 pb-16 px-4">
-        <div class="max-w-7xl mx-auto text-center">
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                Blog <span class="gradient-text">On + Av</span>
-            </h1>
-            <p class="text-xl text-medium-text max-w-3xl mx-auto">
-                Artigos, tutoriais e guias sobre produção virtual, painéis LED, servidores Disguise e as últimas tendências em tecnologia audiovisual.
-            </p>
-        </div>
+    <section class="pt-32 pb-16 px-4 blog-hero-section">
+      <div class="max-w-7xl mx-auto text-center">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+          Blog <span class="gradient-text">On + Av</span>
+        </h1>
+        <p class="text-xl text-medium-text max-w-3xl mx-auto">
+          Artigos, tutoriais e guias sobre produção virtual, painéis LED,
+          servidores Disguise e as últimas tendências em tecnologia audiovisual.
+        </p>
+      </div>
     </section>
 
     <!-- Articles Grid -->
     <section class="py-12 px-4">
-        <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-                <!-- Article 1 -->
-                <article class="article-card rounded-xl overflow-hidden">
-                    <a href="/blog/o-que-e-producao-virtual">
-                        <img src="/img/producao-virtual-hero.webp" alt="O que é Produção Virtual" class="w-full h-48 object-cover" loading="lazy" onerror="this.src='/img/hero_background.webp'">
-                    </a>
-                    <div class="p-6">
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="text-xs text-primary font-semibold uppercase">Guia Completo</span>
-                            <span class="text-xs text-medium-text">• 15 min de leitura</span>
-                        </div>
-                        <h2 class="text-xl font-bold mb-3 text-light-text">
-                            <a href="/blog/o-que-e-producao-virtual" class="hover:text-primary transition-colors">
-                                O Que é Produção Virtual: Guia Completo 2026
-                            </a>
-                        </h2>
-                        <p class="text-medium-text text-sm mb-4">
-                            Entenda como funciona a produção virtual, suas vantagens sobre o chroma key tradicional, e por que grandes produções estão adotando esta tecnologia.
-                        </p>
-                        <a href="/blog/o-que-e-producao-virtual" class="text-primary text-sm font-semibold hover:underline">
-                            Ler artigo completo →
-                        </a>
-                    </div>
-                </article>
-
-                <!-- Article 2 -->
-                <article class="article-card rounded-xl overflow-hidden">
-                    <a href="/blog/quanto-custa-alugar-painel-led">
-                        <img src="/img/led-panels-hero.webp" alt="Quanto custa alugar painel LED" class="w-full h-48 object-cover" loading="lazy" onerror="this.src='/img/hero_background.webp'">
-                    </a>
-                    <div class="p-6">
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="text-xs text-primary font-semibold uppercase">Guia de Preços</span>
-                            <span class="text-xs text-medium-text">• 12 min de leitura</span>
-                        </div>
-                        <h2 class="text-xl font-bold mb-3 text-light-text">
-                            <a href="/blog/quanto-custa-alugar-painel-led" class="hover:text-primary transition-colors">
-                                Quanto Custa Alugar um Painel LED para Eventos
-                            </a>
-                        </h2>
-                        <p class="text-medium-text text-sm mb-4">
-                            Guia completo de preços para aluguel de painéis LED no Brasil. Fatores que influenciam o custo, tipos de painéis e como calcular seu orçamento.
-                        </p>
-                        <a href="/blog/quanto-custa-alugar-painel-led" class="text-primary text-sm font-semibold hover:underline">
-                            Ler artigo completo →
-                        </a>
-                    </div>
-                </article>
-
-                <!-- Article 3 -->
-                <article class="article-card rounded-xl overflow-hidden">
-                    <a href="/blog/led-wall-vs-chroma-key">
-                        <img src="/img/led-vs-chroma-hero.webp" alt="LED Wall vs Chroma Key" class="w-full h-48 object-cover" loading="lazy" onerror="this.src='/img/hero_background.webp'">
-                    </a>
-                    <div class="p-6">
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="text-xs text-primary font-semibold uppercase">Comparativo</span>
-                            <span class="text-xs text-medium-text">• 10 min de leitura</span>
-                        </div>
-                        <h2 class="text-xl font-bold mb-3 text-light-text">
-                            <a href="/blog/led-wall-vs-chroma-key" class="hover:text-primary transition-colors">
-                                LED Wall vs Chroma Key: Qual Escolher para Sua Produção?
-                            </a>
-                        </h2>
-                        <p class="text-medium-text text-sm mb-4">
-                            Comparação detalhada entre LED Wall e Chroma Key. Vantagens, desvantagens, custos e quando usar cada tecnologia em suas produções.
-                        </p>
-                        <a href="/blog/led-wall-vs-chroma-key" class="text-primary text-sm font-semibold hover:underline">
-                            Ler artigo completo →
-                        </a>
-                    </div>
-                </article>
-
+      <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Article 1 -->
+          <article class="article-card rounded-xl overflow-hidden">
+            <a href="/blog/o-que-e-producao-virtual">
+              <img
+                src="/img/blog/virtual-production.webp"
+                alt="O que é Produção Virtual"
+                class="w-full h-48 object-cover"
+                loading="lazy"
+              />
+            </a>
+            <div class="p-6">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-xs text-primary font-semibold uppercase"
+                  >Guia Completo</span
+                >
+                <span class="text-xs text-medium-text"
+                  >• 15 min de leitura</span
+                >
+              </div>
+              <h2 class="text-xl font-bold mb-3 text-light-text">
+                <a
+                  href="/blog/o-que-e-producao-virtual"
+                  class="hover:text-primary transition-colors"
+                >
+                  O Que é Produção Virtual: Guia Completo 2026
+                </a>
+              </h2>
+              <p class="text-medium-text text-sm mb-4">
+                Entenda como funciona a produção virtual, suas vantagens sobre o
+                chroma key tradicional, e por que grandes produções estão
+                adotando esta tecnologia.
+              </p>
+              <a
+                href="/blog/o-que-e-producao-virtual"
+                class="text-primary text-sm font-semibold hover:underline"
+              >
+                Ler artigo completo →
+              </a>
             </div>
+          </article>
+
+          <!-- Article 2 -->
+          <article class="article-card rounded-xl overflow-hidden">
+            <a href="/blog/quanto-custa-alugar-painel-led">
+              <img
+                src="/img/blog/led-rental-cost.webp"
+                alt="Quanto custa alugar painel LED"
+                class="w-full h-48 object-cover"
+                loading="lazy"
+              />
+            </a>
+            <div class="p-6">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-xs text-primary font-semibold uppercase"
+                  >Guia de Preços</span
+                >
+                <span class="text-xs text-medium-text"
+                  >• 12 min de leitura</span
+                >
+              </div>
+              <h2 class="text-xl font-bold mb-3 text-light-text">
+                <a
+                  href="/blog/quanto-custa-alugar-painel-led"
+                  class="hover:text-primary transition-colors"
+                >
+                  Quanto Custa Alugar um Painel LED para Eventos
+                </a>
+              </h2>
+              <p class="text-medium-text text-sm mb-4">
+                Guia completo de preços para aluguel de painéis LED no Brasil.
+                Fatores que influenciam o custo, tipos de painéis e como
+                calcular seu orçamento.
+              </p>
+              <a
+                href="/blog/quanto-custa-alugar-painel-led"
+                class="text-primary text-sm font-semibold hover:underline"
+              >
+                Ler artigo completo →
+              </a>
+            </div>
+          </article>
+
+          <!-- Article 3 -->
+          <article class="article-card rounded-xl overflow-hidden">
+            <a href="/blog/led-wall-vs-chroma-key">
+              <img
+                src="/img/blog/led-vs-chroma.webp"
+                alt="LED Wall vs Chroma Key"
+                class="w-full h-48 object-cover"
+                loading="lazy"
+              />
+            </a>
+            <div class="p-6">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-xs text-primary font-semibold uppercase"
+                  >Comparativo</span
+                >
+                <span class="text-xs text-medium-text"
+                  >• 10 min de leitura</span
+                >
+              </div>
+              <h2 class="text-xl font-bold mb-3 text-light-text">
+                <a
+                  href="/blog/led-wall-vs-chroma-key"
+                  class="hover:text-primary transition-colors"
+                >
+                  LED Wall vs Chroma Key: Qual Escolher para Sua Produção?
+                </a>
+              </h2>
+              <p class="text-medium-text text-sm mb-4">
+                Comparação detalhada entre LED Wall e Chroma Key. Vantagens,
+                desvantagens, custos e quando usar cada tecnologia em suas
+                produções.
+              </p>
+              <a
+                href="/blog/led-wall-vs-chroma-key"
+                class="text-primary text-sm font-semibold hover:underline"
+              >
+                Ler artigo completo →
+              </a>
+            </div>
+          </article>
         </div>
+      </div>
     </section>
 
     <!-- CTA Section -->
     <section class="py-20 px-4">
-        <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-3xl md:text-4xl font-bold mb-6 text-light-text">
-                Pronto para Sua <span class="gradient-text">Produção Virtual</span>?
-            </h2>
-            <p class="text-xl text-medium-text mb-10">
-                Nossa equipe de especialistas está pronta para transformar sua visão em realidade.
-            </p>
-            <a href="https://wa.me/5511920550210?text=Olá%2C%20vim%20pelo%20blog%20e%20gostaria%20de%20saber%20mais%20sobre%20produção%20virtual."
-               class="btn-primary font-bold py-4 px-10 rounded-md text-lg inline-flex items-center">
-                <i class="fab fa-whatsapp mr-2"></i> Fale Conosco
-            </a>
-        </div>
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6 text-light-text">
+          Pronto para Sua <span class="gradient-text">Produção Virtual</span>?
+        </h2>
+        <p class="text-xl text-medium-text mb-10">
+          Nossa equipe de especialistas está pronta para transformar sua visão
+          em realidade.
+        </p>
+        <a
+          href="https://wa.me/5511920550210?text=Olá%2C%20vim%20pelo%20blog%20e%20gostaria%20de%20saber%20mais%20sobre%20produção%20virtual."
+          class="btn-primary font-bold py-4 px-10 rounded-md text-lg inline-flex items-center"
+        >
+          <i class="fab fa-whatsapp mr-2"></i> Fale Conosco
+        </a>
+      </div>
     </section>
 
     <!-- Footer -->
     <footer class="bg-dark py-12 border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <a href="/" class="inline-block mb-4">
-                <span class="text-xl font-bold gradient-text">On + Av</span>
-            </a>
-            <p class="text-medium-text text-sm mb-4">
-                A principal referência em produção virtual e tecnologia Disguise no Brasil.
-            </p>
-            <p class="text-medium-text text-xs">
-                © 2026 On + Av. Todos os direitos reservados.
-            </p>
-        </div>
+      <div class="max-w-7xl mx-auto px-4 text-center">
+        <a href="/" class="inline-block mb-4">
+          <span class="text-xl font-bold gradient-text">On + Av</span>
+        </a>
+        <p class="text-medium-text text-sm mb-4">
+          A principal referência em produção virtual e tecnologia Disguise no
+          Brasil.
+        </p>
+        <p class="text-medium-text text-xs">
+          © 2026 On + Av. Todos os direitos reservados.
+        </p>
+      </div>
     </footer>
-</body>
+  </body>
 </html>
