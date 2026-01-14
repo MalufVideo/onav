@@ -183,6 +183,30 @@ app.get('/blog/led-wall-vs-chroma-key', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'blog', 'led-wall-vs-chroma-key.html'));
 });
 
+app.get('/blog/como-funciona-producao-virtual', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'blog', 'como-funciona-producao-virtual.html'));
+});
+
+app.get('/blog/disguise-vs-outros-media-servers', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'blog', 'disguise-vs-outros-media-servers.html'));
+});
+
+app.get('/blog/como-escolher-pixel-pitch-led', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'blog', 'como-escolher-pixel-pitch-led.html'));
+});
+
+app.get('/blog/estudio-virtual-sao-paulo', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'blog', 'estudio-virtual-sao-paulo.html'));
+});
+
+app.get('/blog/erros-comuns-aluguel-led', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'blog', 'erros-comuns-aluguel-led.html'));
+});
+
+app.get('/blog/in-camera-vfx-vs-pos-producao', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'blog', 'in-camera-vfx-vs-pos-producao.html'));
+});
+
 // LED calculator clean URLs
 app.get('/led/mobile', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'led', 'mobile.html'));

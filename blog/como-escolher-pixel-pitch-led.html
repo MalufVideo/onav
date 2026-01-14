@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary SEO Meta Tags -->
+    <title>Como Escolher o Pixel Pitch do Painel LED: Guia Definitivo 2026 | On + Av</title>
+    <meta name="title" content="Como Escolher o Pixel Pitch do Painel LED: Guia Definitivo 2026 | On + Av">
+    <meta name="description" content="Aprenda a escolher o pixel pitch correto para seu painel LED: fórmulas, distância de visualização, diferença entre P1.5, P2.6, P3.9 e mais. Guia completo com calculadora.">
+    <meta name="keywords" content="pixel pitch led, como escolher pixel pitch, P1.5 vs P2.6, distância visualização led, resolução painel led, dot pitch">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Portuguese">
+    <meta name="author" content="On + Av">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://onav.com.br/blog/como-escolher-pixel-pitch-led">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://onav.com.br/blog/como-escolher-pixel-pitch-led">
+    <meta property="og:title" content="Como Escolher o Pixel Pitch do Painel LED: Guia Definitivo 2026">
+    <meta property="og:description" content="Guia completo para escolher o pixel pitch correto do painel LED baseado em distância de visualização e aplicação.">
+    <meta property="og:image" content="https://onav.com.br/img/blog/pixel-pitch-hero.webp">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="article:published_time" content="2026-01-27T10:00:00-03:00">
+    <meta property="article:author" content="On + Av">
+    <meta property="article:section" content="Guia Técnico">
+    <meta property="article:tag" content="LED">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://onav.com.br/blog/como-escolher-pixel-pitch-led">
+    <meta name="twitter:title" content="Como Escolher o Pixel Pitch do Painel LED: Guia Definitivo 2026">
+    <meta name="twitter:description" content="Aprenda a calcular o pixel pitch ideal para seu projeto LED.">
+    <meta name="twitter:image" content="https://onav.com.br/img/blog/pixel-pitch-hero.webp">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/fontawesome-minimal.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00ff9d',
+                        secondary: '#0066ff',
+                        dark: '#0a0a0a',
+                        darker: '#020202',
+                        'light-text': '#e0e0e0',
+                        'medium-text': '#a0a0a0',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020202;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 157, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 85% 80%, rgba(0, 102, 255, 0.12) 0%, transparent 45%);
+            background-attachment: fixed;
+            color: #e0e0e0;
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #00ff9d, #0066ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .article-content h2 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            color: #00ff9d;
+        }
+        .article-content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+            color: #e0e0e0;
+        }
+        .article-content p {
+            margin-bottom: 1.25rem;
+            line-height: 1.75;
+        }
+        .article-content ul, .article-content ol {
+            margin-bottom: 1.25rem;
+            padding-left: 2rem;
+        }
+        .article-content li {
+            margin-bottom: 0.5rem;
+            line-height: 1.75;
+        }
+        .article-content strong {
+            color: #00ff9d;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #00ff9d, #0066ff);
+            color: #050505;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+        }
+        th, td {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            text-align: left;
+        }
+        th {
+            background: rgba(0, 255, 157, 0.1);
+            color: #00ff9d;
+            font-weight: 600;
+        }
+        tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .calculator-box {
+            background: rgba(0, 255, 157, 0.05);
+            border: 2px solid rgba(0, 255, 157, 0.3);
+            padding: 2rem;
+            border-radius: 1rem;
+            margin: 2rem 0;
+        }
+    </style>
+
+    <!-- Article Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "Como Escolher o Pixel Pitch do Painel LED: Guia Definitivo 2026",
+        "description": "Aprenda a escolher o pixel pitch correto para seu painel LED baseado em distância de visualização e aplicação.",
+        "image": "https://onav.com.br/img/blog/pixel-pitch-hero.webp",
+        "datePublished": "2026-01-27T10:00:00-03:00",
+        "dateModified": "2026-01-27T10:00:00-03:00",
+        "author": {
+            "@type": "Organization",
+            "name": "On + Av",
+            "url": "https://onav.com.br"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "On + Av",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://onav.com.br/img/on+av_logo_v2.webp"
+            }
+        },
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://onav.com.br/blog/como-escolher-pixel-pitch-led"
+        }
+    }
+    </script>
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [{
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://onav.com.br"
+        },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Blog",
+            "item": "https://onav.com.br/blog"
+        },{
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Como Escolher Pixel Pitch LED",
+            "item": "https://onav.com.br/blog/como-escolher-pixel-pitch-led"
+        }]
+    }
+    </script>
+
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{
+            "@type": "Question",
+            "name": "O que é pixel pitch?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Pixel pitch (ou dot pitch) é a distância em milímetros entre o centro de um LED e o centro do LED adjacente. P2.6 significa 2.6mm de distância. Quanto menor o número, maior a densidade de pixels e melhor a resolução."
+            }
+        },{
+            "@type": "Question",
+            "name": "Como calcular o pixel pitch ideal?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Use a fórmula: Distância de Visualização Mínima (metros) = Pixel Pitch (mm) ÷ 1.0. Exemplo: P3.9 pode ser visto de 3.9m+ sem ver pixels. Para produção virtual, use P1.5-P2.6 para close-ups."
+            }
+        },{
+            "@type": "Question",
+            "name": "P1.5 é sempre melhor que P3.9?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Não necessariamente. P1.5 custa 3-4x mais que P3.9 e só faz diferença em close-ups. Para plateia a 10m+, P3.9 oferece melhor custo-benefício. Escolha baseado na distância de visualização real."
+            }
+        }]
+    }
+    </script>
+</head>
+<body class="antialiased">
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-opacity-90 backdrop-blur-md z-50 border-b border-gray-800" style="background-color: rgba(2, 2, 2, 0.9);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center">
+                    <a href="/" class="flex-shrink-0 flex items-center">
+                        <img src="/img/on+av_logo_v2.webp" alt="On + Av Logo" style="height:40px;">
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-6">
+                        <a href="/#services" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium">Serviços</a>
+                        <a href="/estudio" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium">Estúdio</a>
+                        <a href="/produtos" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium">Equipamentos</a>
+                        <a href="/blog" class="text-primary px-3 py-2 text-sm font-medium">Blog</a>
+                        <a href="/#contact" class="btn-primary text-sm font-bold px-5 py-2 rounded-md">Contato</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Article Header -->
+    <article class="pt-32 pb-16">
+        <div class="max-w-4xl mx-auto px-4">
+            <!-- Breadcrumb -->
+            <nav class="mb-8 text-sm">
+                <a href="/" class="text-medium-text hover:text-primary">Home</a>
+                <span class="text-medium-text mx-2">/</span>
+                <a href="/blog" class="text-medium-text hover:text-primary">Blog</a>
+                <span class="text-medium-text mx-2">/</span>
+                <span class="text-light-text">Como Escolher Pixel Pitch LED</span>
+            </nav>
+
+            <!-- Title -->
+            <h1 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+                Como Escolher o <span class="gradient-text">Pixel Pitch</span> do Painel LED: Guia Definitivo 2026
+            </h1>
+
+            <!-- Meta Info -->
+            <div class="flex items-center gap-6 mb-8 text-medium-text text-sm">
+                <span><i class="far fa-calendar mr-2"></i>27 de Janeiro, 2026</span>
+                <span><i class="far fa-clock mr-2"></i>14 min de leitura</span>
+                <span><i class="far fa-folder mr-2"></i>Guia Técnico</span>
+            </div>
+
+            <!-- Featured Image -->
+            <div class="mb-12 rounded-xl overflow-hidden">
+                <img src="/img/blog/pixel-pitch-hero.webp" alt="Como escolher pixel pitch de painel LED" class="w-full h-auto" onerror="this.src='/img/hero_background.webp'">
+            </div>
+
+            <!-- Article Content -->
+            <div class="article-content text-light-text">
+                <p class="text-xl mb-8 text-medium-text">
+                    Escolher o pixel pitch errado pode arruinar seu projeto e desperdiçar orçamento. Um P1.5 de R$ 150 mil pode ser overkill para uma plateia a 20 metros, enquanto um P3.9 barato vai mostrar pixels em close-ups. Neste guia, você aprenderá a <strong>calcular o pixel pitch ideal</strong> para cada aplicação.
+                </p>
+
+                <h2>O Que É Pixel Pitch?</h2>
+
+                <p>
+                    <strong>Pixel pitch</strong> (também chamado de <strong>dot pitch</strong>) é a distância em milímetros entre o centro de um LED e o centro do LED adjacente.
+                </p>
+
+                <ul>
+                    <li><strong>P1.5:</strong> 1.5mm entre LEDs</li>
+                    <li><strong>P2.6:</strong> 2.6mm entre LEDs</li>
+                    <li><strong>P3.9:</strong> 3.9mm entre LEDs</li>
+                    <li><strong>P10:</strong> 10mm entre LEDs</li>
+                </ul>
+
+                <p>
+                    <strong>Regra de Ouro:</strong> Quanto menor o número, maior a densidade de pixels e melhor a resolução — mas também mais caro.
+                </p>
+
+                <h2>A Fórmula da Distância Mínima de Visualização</h2>
+
+                <p>
+                    A indústria usa uma fórmula simples para calcular a distância mínima onde os pixels se tornam invisíveis ao olho humano:
+                </p>
+
+                <div class="calculator-box">
+                    <p style="font-size: 1.25rem; text-align: center; margin: 0; color: #00ff9d; font-weight: 600;">
+                        Distância Mínima (metros) = Pixel Pitch (mm) ÷ 1.0
+                    </p>
+                </div>
+
+                <p>
+                    <strong>Exemplos práticos:</strong>
+                </p>
+
+                <ul>
+                    <li><strong>P1.5:</strong> 1.5mm ÷ 1.0 = <strong>1.5 metros</strong> mínimo</li>
+                    <li><strong>P2.6:</strong> 2.6mm ÷ 1.0 = <strong>2.6 metros</strong> mínimo</li>
+                    <li><strong>P3.9:</strong> 3.9mm ÷ 1.0 = <strong>3.9 metros</strong> mínimo</li>
+                    <li><strong>P10:</strong> 10mm ÷ 1.0 = <strong>10 metros</strong> mínimo</li>
+                </ul>
+
+                <p>
+                    A partir dessa distância, o olho humano funde os pixels em uma imagem contínua.
+                </p>
+
+                <h2>Tabela: Pixel Pitch por Aplicação</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pixel Pitch</th>
+                            <th>Distância Ideal</th>
+                            <th>Aplicação</th>
+                            <th>Custo Relativo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>P0.9 - P1.2</strong></td>
+                            <td>0.9m - 1.2m</td>
+                            <td>Produção virtual ultra close-up, broadcast 4K/8K</td>
+                            <td>💰💰💰💰💰</td>
+                        </tr>
+                        <tr>
+                            <td><strong>P1.5 - P1.9</strong></td>
+                            <td>1.5m - 2m</td>
+                            <td>Virtual production, estúdios de TV, close-ups</td>
+                            <td>💰💰💰💰</td>
+                        </tr>
+                        <tr>
+                            <td><strong>P2.6 - P2.9</strong></td>
+                            <td>2.6m - 3m</td>
+                            <td>Eventos corporativos, conferências, palcos indoor</td>
+                            <td>💰💰💰</td>
+                        </tr>
+                        <tr>
+                            <td><strong>P3.9 - P4.8</strong></td>
+                            <td>4m - 5m</td>
+                            <td>Shows, festivais, feiras, stands</td>
+                            <td>💰💰</td>
+                        </tr>
+                        <tr>
+                            <td><strong>P5 - P6</strong></td>
+                            <td>5m - 6m</td>
+                            <td>Outdoor indoor, ginásios, grandes eventos</td>
+                            <td>💰</td>
+                        </tr>
+                        <tr>
+                            <td><strong>P10+</strong></td>
+                            <td>10m+</td>
+                            <td>Outdoor externo, fachadas, telões gigantes</td>
+                            <td>💰</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Pixel Pitch e Resolução: A Matemática</h2>
+
+                <p>
+                    O pixel pitch determina quantos pixels cabem em uma área. Vamos comparar um painel de <strong>1m x 1m</strong>:
+                </p>
+
+                <h3>P1.5 (1.5mm de pixel pitch)</h3>
+                <ul>
+                    <li>Pixels horizontais: 1000mm ÷ 1.5mm = <strong>666 pixels</strong></li>
+                    <li>Pixels verticais: 1000mm ÷ 1.5mm = <strong>666 pixels</strong></li>
+                    <li><strong>Total: 666 x 666 = 443,556 pixels/m²</strong></li>
+                </ul>
+
+                <h3>P2.6 (2.6mm de pixel pitch)</h3>
+                <ul>
+                    <li>Pixels horizontais: 1000mm ÷ 2.6mm = <strong>384 pixels</strong></li>
+                    <li>Pixels verticais: 1000mm ÷ 2.6mm = <strong>384 pixels</strong></li>
+                    <li><strong>Total: 384 x 384 = 147,456 pixels/m²</strong></li>
+                </ul>
+
+                <h3>P3.9 (3.9mm de pixel pitch)</h3>
+                <ul>
+                    <li>Pixels horizontais: 1000mm ÷ 3.9mm = <strong>256 pixels</strong></li>
+                    <li>Pixels verticais: 1000mm ÷ 3.9mm = <strong>256 pixels</strong></li>
+                    <li><strong>Total: 256 x 256 = 65,536 pixels/m²</strong></li>
+                </ul>
+
+                <p>
+                    <strong>Conclusão:</strong> P1.5 tem <strong>6.7x mais pixels</strong> que P3.9 na mesma área — por isso custa 3-4x mais.
+                </p>
+
+                <h2>Quando Vale a Pena Pagar por Pixel Pitch Menor?</h2>
+
+                <h3>✅ Use P1.5 - P1.9 Se:</h3>
+                <ul>
+                    <li>Câmera chega a <strong>menos de 2 metros</strong> do LED Wall</li>
+                    <li>Produção para <strong>broadcast ou cinema</strong> (4K/8K)</li>
+                    <li>Você precisa de <strong>close-ups perfeitos</strong> em rostos</li>
+                    <li>Orçamento permite investimento premium</li>
+                </ul>
+
+                <h3>✅ Use P2.6 - P2.9 Se:</h3>
+                <ul>
+                    <li>Eventos corporativos com <strong>plateia a 3-10 metros</strong></li>
+                    <li>Palcos indoor de médio porte</li>
+                    <li>Balanço entre qualidade e custo</li>
+                    <li>Algumas filmagens de médio alcance</li>
+                </ul>
+
+                <h3>✅ Use P3.9 - P4.8 Se:</h3>
+                <ul>
+                    <li>Plateia está a <strong>5+ metros</strong></li>
+                    <li>Festivais, shows, grandes eventos</li>
+                    <li>Orçamento limitado mas precisa de boa qualidade</li>
+                    <li><strong>Melhor custo-benefício</strong> para maioria dos eventos</li>
+                </ul>
+
+                <h3>❌ Não Desperdice Dinheiro Com:</h3>
+                <ul>
+                    <li>P1.5 para plateia a 15+ metros (overkill absurdo)</li>
+                    <li>P10 para produção virtual (vai ver cada pixel individual)</li>
+                    <li>Pixel pitch menor que o necessário para impressionar o cliente (ele não vai notar)</li>
+                </ul>
+
+                <h2>Produção Virtual: Requisitos Especiais</h2>
+
+                <p>
+                    Para produção virtual (ICVFX), o pixel pitch precisa atender requisitos técnicos específicos além da distância de visualização:
+                </p>
+
+                <h3>Recomendações por Tipo de Shot</h3>
+
+                <ul>
+                    <li><strong>Extreme Close-ups (ECU):</strong> P0.9 - P1.2 (ROI Panels)</li>
+                    <li><strong>Close-ups (CU):</strong> P1.5 - P1.9</li>
+                    <li><strong>Medium Shots (MS):</strong> P2.6 - P2.9</li>
+                    <li><strong>Wide Shots (WS):</strong> P3.9 (apenas para background distante)</li>
+                </ul>
+
+                <h3>Taxa de Refresh e Moiré</h3>
+
+                <p>
+                    Além do pixel pitch, considere:
+                </p>
+
+                <ul>
+                    <li><strong>Refresh Rate:</strong> Mínimo 3840 Hz para evitar flickering na câmera</li>
+                    <li><strong>Scan Mode:</strong> Preferir 1:8 ou superior para reduzir scan lines</li>
+                    <li><strong>Moiré Pattern:</strong> Pixel pitch muito pequeno pode causar moiré em lentes wide. Teste sempre.</li>
+                </ul>
+
+                <h2>Impacto no Orçamento: Comparação Real</h2>
+
+                <p>
+                    Preços aproximados para <strong>aluguel de 50m² de LED Wall</strong> (3 dias):
+                </p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pixel Pitch</th>
+                            <th>Preço Aluguel 3 Dias</th>
+                            <th>Diferença vs P3.9</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>P1.5</strong></td>
+                            <td>R$ 120.000 - R$ 180.000</td>
+                            <td>+400%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>P2.6</strong></td>
+                            <td>R$ 60.000 - R$ 90.000</td>
+                            <td>+200%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>P3.9</strong></td>
+                            <td>R$ 30.000 - R$ 45.000</td>
+                            <td>Base</td>
+                        </tr>
+                        <tr>
+                            <td><strong>P4.8</strong></td>
+                            <td>R$ 20.000 - R$ 30.000</td>
+                            <td>-33%</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>
+                    <em>*Valores aproximados. Varia por fornecedor, região, e configuração.</em>
+                </p>
+
+                <h2>Erros Comuns ao Escolher Pixel Pitch</h2>
+
+                <h3>❌ Erro 1: "Menor é Sempre Melhor"</h3>
+                <p>
+                    Não. P1.5 para um show com plateia a 20 metros é desperdício de 60-80% do orçamento. Use a fórmula de distância.
+                </p>
+
+                <h3>❌ Erro 2: "P3.9 Serve para Tudo"</h3>
+                <p>
+                    P3.9 é versátil, mas não serve para produção virtual com close-ups. Você verá pixels individuais na gravação.
+                </p>
+
+                <h3>❌ Erro 3: Ignorar a Taxa de Refresh</h3>
+                <p>
+                    Um P1.5 com refresh de 240 Hz vai dar flickering na câmera. Pixel pitch pequeno não garante qualidade broadcast.
+                </p>
+
+                <h3>❌ Erro 4: Não Considerar Ângulo de Visão</h3>
+                <p>
+                    LED com ângulo de visão de 120° vai perder cor e brilho em shots laterais. Para virtual production, prefira 160°+.
+                </p>
+
+                <h2>Perguntas Frequentes</h2>
+
+                <div style="background: rgba(15, 15, 15, 0.6); border-left: 4px solid #00ff9d; padding: 1.5rem; margin: 2rem 0; border-radius: 0.5rem;">
+                    <h3 style="margin-top: 0;">O que é pixel pitch?</h3>
+                    <p style="margin-bottom: 0;">Pixel pitch (ou dot pitch) é a distância em milímetros entre o centro de um LED e o centro do LED adjacente. P2.6 significa 2.6mm de distância. Quanto menor o número, maior a densidade de pixels e melhor a resolução.</p>
+                </div>
+
+                <div style="background: rgba(15, 15, 15, 0.6); border-left: 4px solid #00ff9d; padding: 1.5rem; margin: 2rem 0; border-radius: 0.5rem;">
+                    <h3 style="margin-top: 0;">Como calcular o pixel pitch ideal?</h3>
+                    <p style="margin-bottom: 0;">Use a fórmula: Distância de Visualização Mínima (metros) = Pixel Pitch (mm) ÷ 1.0. Exemplo: P3.9 pode ser visto de 3.9m+ sem ver pixels. Para produção virtual, use P1.5-P2.6 para close-ups.</p>
+                </div>
+
+                <div style="background: rgba(15, 15, 15, 0.6); border-left: 4px solid #00ff9d; padding: 1.5rem; margin: 2rem 0; border-radius: 0.5rem;">
+                    <h3 style="margin-top: 0;">P1.5 é sempre melhor que P3.9?</h3>
+                    <p style="margin-bottom: 0;">Não necessariamente. P1.5 custa 3-4x mais que P3.9 e só faz diferença em close-ups. Para plateia a 10m+, P3.9 oferece melhor custo-benefício. Escolha baseado na distância de visualização real.</p>
+                </div>
+
+                <h2>Calculadora Online de Pixel Pitch</h2>
+
+                <p>
+                    Use nossa <a href="/led" class="text-primary hover:underline">calculadora interativa de LED</a> para calcular:
+                </p>
+
+                <ul>
+                    <li>Pixel pitch ideal para sua distância de visualização</li>
+                    <li>Resolução total do LED Wall</li>
+                    <li>Quantidade de painéis necessários</li>
+                    <li>Estimativa de orçamento</li>
+                </ul>
+
+                <h2>Conclusão: A Escolha Certa Para Seu Projeto</h2>
+
+                <p>
+                    Não existe pixel pitch "perfeito" — existe o pixel pitch <strong>correto para sua aplicação</strong>:
+                </p>
+
+                <ul>
+                    <li><strong>Produção Virtual / Cinema:</strong> P1.5 - P1.9</li>
+                    <li><strong>Eventos Corporativos:</strong> P2.6 - P2.9</li>
+                    <li><strong>Shows / Festivais:</strong> P3.9 - P4.8</li>
+                    <li><strong>Outdoor / Grandes Distâncias:</strong> P6 - P10</li>
+                </ul>
+
+                <p>
+                    A <strong>On + Av</strong> possui painéis LED de <a href="/produtos" class="text-primary hover:underline">P1.5, P2.6, P3.9 e P4.8</a> para atender qualquer projeto. Nossa equipe técnica ajuda você a escolher o pixel pitch ideal para seu orçamento e necessidade.
+                </p>
+
+                <!-- CTA -->
+                <div style="background: linear-gradient(135deg, rgba(0, 255, 157, 0.1), rgba(0, 102, 255, 0.1)); border: 1px solid rgba(0, 255, 157, 0.3); padding: 2rem; margin: 3rem 0; border-radius: 1rem; text-align: center;">
+                    <h3 style="margin-top: 0; font-size: 1.5rem;">Consultoria Gratuita de Pixel Pitch</h3>
+                    <p style="margin-bottom: 1.5rem;">Envie as specs do seu projeto e receba recomendação técnica + orçamento em 24h.</p>
+                    <a href="https://wa.me/5511920550210?text=Olá%2C%20vim%20pelo%20blog%20e%20gostaria%20de%20consultoria%20sobre%20pixel%20pitch." class="btn-primary font-bold py-3 px-8 rounded-md inline-block text-base" style="text-decoration: none;">
+                        <i class="fab fa-whatsapp mr-2"></i>Fale com Especialista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="bg-dark py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <a href="/" class="inline-block mb-4">
+                <span class="text-xl font-bold gradient-text">On + Av</span>
+            </a>
+            <p class="text-medium-text text-sm mb-4">
+                A principal referência em produção virtual e tecnologia Disguise no Brasil.
+            </p>
+            <p class="text-medium-text text-xs">
+                © 2026 On + Av. Todos os direitos reservados.
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

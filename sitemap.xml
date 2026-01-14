@@ -244,6 +244,72 @@
     </image:image>
   </url>
 
+  <url>
+    <loc>https://onav.com.br/blog/como-funciona-producao-virtual</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://onav.com.br/img/blog/como-funciona-hero.webp</image:loc>
+      <image:title>Como Funciona a Produção Virtual - Guia Técnico 2026</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://onav.com.br/blog/disguise-vs-outros-media-servers</loc>
+    <lastmod>2026-01-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://onav.com.br/img/blog/disguise-comparison-hero.webp</image:loc>
+      <image:title>Disguise vs Outros Media Servers - Comparação Completa 2026</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://onav.com.br/blog/como-escolher-pixel-pitch-led</loc>
+    <lastmod>2026-01-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://onav.com.br/img/blog/pixel-pitch-hero.webp</image:loc>
+      <image:title>Como Escolher o Pixel Pitch do Painel LED - Guia Definitivo 2026</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://onav.com.br/blog/estudio-virtual-sao-paulo</loc>
+    <lastmod>2026-01-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://onav.com.br/img/blog/estudio-sp-hero.webp</image:loc>
+      <image:title>Estúdio de Produção Virtual em São Paulo - Guia Completo 2026</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://onav.com.br/blog/erros-comuns-aluguel-led</loc>
+    <lastmod>2026-02-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://onav.com.br/img/blog/erros-led-hero.webp</image:loc>
+      <image:title>7 Erros Comuns ao Alugar Painel LED (E Como Evitar)</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://onav.com.br/blog/in-camera-vfx-vs-pos-producao</loc>
+    <lastmod>2026-02-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://onav.com.br/img/blog/icvfx-vs-pos-hero.webp</image:loc>
+      <image:title>In-Camera VFX vs Pós-Produção - Quando Usar Cada Um?</image:title>
+    </image:image>
+  </url>
+
   <!-- LED Calculator Tool -->
   <url>
     <loc>https://onav.com.br/led/</loc>
