@@ -38,6 +38,9 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/css/fontawesome-minimal.css">
@@ -307,6 +310,11 @@
                     <li><strong>Moiré:</strong> Padrões de interferência</li>
                 </ul>
 
+                <div class="my-8 rounded-xl overflow-hidden shadow-lg border border-gray-800">
+                    <img src="/img/blog/led-scan-lines-moire.webp" alt="Diferença visual entre LED com alta taxa de refresh (imagem limpa) e baixa taxa de refresh (scan lines)" class="w-full h-auto">
+                    <p class="text-sm text-medium-text text-center mt-2 italic">Exemplo real do efeito de scan lines em LEDs com refresh rate baixo.</p>
+                </div>
+
                 <p>
                     <strong>Resultado:</strong> Footage inutilizável, prejuízo total.
                 </p>
@@ -367,8 +375,12 @@
                 <ul>
                     <li>Módulo queimado (linha preta ou pixels mortos)</li>
                     <li>Cabo solto (seção do LED apaga)</li>
-                    <li>Problema de calibração (cor diferente)</li>
                 </ul>
+
+                <div class="my-8 rounded-xl overflow-hidden shadow-lg border border-gray-800">
+                    <img src="/img/blog/led-dead-pixels.webp" alt="Close-up de painel LED com dead pixels" class="w-full h-auto">
+                    <p class="text-sm text-medium-text text-center mt-2 italic">Atenção aos detalhes: Dead pixels podem ser visíveis em câmeras e fotos.</p>
+                </div>
 
                 <p>
                     <strong>Sem backup:</strong> Você fica com LED parcialmente defeituoso durante todo o evento.

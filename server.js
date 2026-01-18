@@ -4,6 +4,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
 const cors = require('cors');
+const compression = require('compression');
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const PipelineIntegration = require('./pipeline-integration');
 
@@ -39,6 +40,20 @@ app.use(express.json());
 
 // Enable CORS for all origins (adjust for production later if needed)
 app.use(cors());
+
+// Enable gzip/brotli compression for all responses (reduces bandwidth by 60-80%)
+app.use(compression({
+  filter: (req, res) => {
+    // Don't compress if client doesn't accept it
+    if (req.headers['x-no-compression']) {
+      return false;
+    }
+    // Use compression for all compressible content types
+    return compression.filter(req, res);
+  },
+  level: 6, // Balanced compression level (1-9)
+  threshold: 1024 // Only compress responses larger than 1KB
+}));
 
 // Trust proxy for proper IP detection
 app.set('trust proxy', true);

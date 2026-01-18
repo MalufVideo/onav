@@ -38,6 +38,9 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/css/fontawesome-minimal.css">
@@ -260,6 +263,11 @@
                 </p>
 
                 <h3>1. LED Wall (Volume LED)</h3>
+
+                <div class="my-8 rounded-xl overflow-hidden shadow-lg border border-gray-800">
+                    <img src="/img/blog/vp-workflow-schematic.webp" alt="Diagrama esquemático do fluxo de produção virtual" class="w-full h-auto">
+                    <p class="text-sm text-medium-text text-center mt-2 italic">Fluxo de dados entre LED, Câmera, Unreal e Disguise.</p>
+                </div>
                 <p>
                     O LED Wall é o "palco digital" onde os cenários virtuais ganham vida. Diferente de uma tela comum, um LED Wall para produção virtual precisa de especificações técnicas muito específicas:
                 </p>
@@ -303,6 +311,11 @@
                     <li><strong>Laser Tracking:</strong> Lasers medem distância até refletores na câmera. (Ex: Mo-Sys StarTracker)</li>
                     <li><strong>Hybrid Systems:</strong> Combinam múltiplas tecnologias para cobertura total. (Ex: ncam, Stype RedSpy)</li>
                 </ul>
+
+                <div class="my-8 rounded-xl overflow-hidden shadow-lg border border-gray-800">
+                    <img src="/img/blog/vp-tracking-markers.webp" alt="Marcadores de tracking infravermelho em câmera de cinema" class="w-full h-auto">
+                    <p class="text-sm text-medium-text text-center mt-2 italic">Detalhe de marcadores (silver balls) usados para rastreamento preciso.</p>
+                </div>
 
                 <p>
                     Os dados de tracking são enviados via <strong>FreeD protocol</strong> ou <strong>Antilatency</strong> para o media server em menos de 1 frame de latência (16ms @ 60fps).

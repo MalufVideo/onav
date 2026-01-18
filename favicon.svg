@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <style>
+      .brand-text {
+        font-family: Arial, sans-serif;
+        font-weight: bold;
+        font-style: italic;
+      }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100" height="100" fill="#000000"/>
+
+  <!-- ON text -->
+  <text x="15" y="45" class="brand-text" font-size="28" fill="#FFFFFF">ON</text>
+
+  <!-- Plus sign -->
+  <g transform="translate(50, 32)">
+    <rect x="-2" y="-10" width="4" height="20" fill="#FFFFFF"/>
+    <rect x="-10" y="-2" width="20" height="4" fill="#FFFFFF"/>
+  </g>
+
+  <!-- AV text -->
+  <text x="15" y="75" class="brand-text" font-size="28" fill="#FFFFFF">AV</text>
+</svg>
