@@ -6,8 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "build": "npm install --prefix pipeline && npm run build --prefix pipeline",
-    "vercel-build": "echo 'Pipeline pre-built and committed'"
+    "build:css": "node ./node_modules/tailwindcss/lib/cli.js -i ./css/tailwind-input.css -o ./css/tailwind.css --minify",
+    "build": "npm run build:css && npm install --prefix pipeline && npm run build --prefix pipeline",
+    "vercel-build": "npm run build:css"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.3",
@@ -22,8 +23,11 @@
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
+    "autoprefixer": "^10.4.23",
     "playwright": "^1.51.1",
-    "supabase": "^2.22.6"
+    "postcss": "^8.5.6",
+    "supabase": "^2.22.6",
+    "tailwindcss": "^3.4.0"
   },
   "engines": {
     "node": ">=18.0.0"
