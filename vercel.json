@@ -12,6 +12,7 @@
           "img/**/*",
           "css/**/*",
           "js/**/*",
+          "modals/**/*",
           "tours/**/*",
           "equipamentos-on/**/*",
           "blog/**/*",
@@ -44,6 +45,12 @@
       "source": "/js/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=604800" }
+      ]
+    },
+    {
+      "source": "/modals/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
       ]
     },
     {
