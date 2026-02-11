@@ -1,0 +1,177 @@
+<h3 class="text-xl font-bold mb-2 text-light-text"
+        style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.5rem; color: #f0f0f0;">
+        Globo Agro</h3>
+
+      <!-- Video Player -->
+      <div
+        style="position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden; margin-bottom: 20px;">
+        <div id="globoAgroVideoContainer"
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('img/globo_agro_thumb.webp'); background-size: cover; background-position: center;">
+          <!-- Custom play button overlay -->
+          <div id="globoAgroPlayOverlay"
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.4); cursor: pointer; z-index: 2;">
+            <div
+              style="width: 80px; height: 80px; border-radius: 50%; background-color: #00ffaa; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,255,170,0.5);">
+              <div
+                style="width: 0; height: 0; border-top: 20px solid transparent; border-left: 35px solid #121212; border-bottom: 20px solid transparent; margin-left: 8px;">
+              </div>
+            </div>
+          </div>
+          <!-- Video element (will be loaded on demand) -->
+          <video id="globoAgroVideo"
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;" controls
+            controlsList="nodownload">
+            <source data-src="img/videos/globo_agro_acai_720p.mp4" type="video/mp4">
+            Seu navegador não suporta a tag de vídeo.
+          </video>
+        </div>
+      </div>
+
+      <!-- Case Study Content -->
+      <div id="new1CaseStudyContent">
+        <p class="text-medium-text text-sm mb-4"
+          style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">Do Amazonas ao Rio Grande do
+          Sul: percorrendo todo o Brasil agrícola sem sair do estúdio através de produção virtual revolucionária.</p>
+
+        <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono"
+            style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Disguise
+            VX4</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono"
+            style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">RXII</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono"
+            style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Unreal
+            Engine</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono"
+            style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">LED
+            HDR 2.6mm</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono"
+            style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">iPad
+            Control</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono"
+            style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Virtual
+            Production</span>
+        </div>
+
+        <!-- Image Gallery - First Row -->
+        <div class="flex flex-wrap -mx-2" style="display: flex; flex-wrap: wrap; margin: 0 -8px;">
+          <div class="w-1/2 px-2 mb-4" style="width: 50%; padding: 0 8px; margin-bottom: 16px;">
+            <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+              <img src="img/globo_agro_000.webp" alt="Estúdio de produção virtual com painéis LED para o Globo Agro"
+                style="width: 100%; display: block;" loading="lazy">
+            </div>
+          </div>
+          <div class="w-1/2 px-2 mb-4" style="width: 50%; padding: 0 8px; margin-bottom: 16px;">
+            <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+              <img src="img/globo_agro_001.webp"
+                alt="Painel LED HDR mostrando paisagem agrícola brasileira para gravação"
+                style="width: 100%; display: block;" loading="lazy">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap -mx-2" style="display: flex; flex-wrap: wrap; margin: 0 -8px;">
+          <div class="w-1/2 px-2 mb-4" style="width: 50%; padding: 0 8px; margin-bottom: 16px;">
+            <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+              <img src="img/globo_agro_002.webp"
+                alt="Apresentadora do Globo Agro em frente ao painel virtual com cenário rural"
+                style="width: 100%; display: block;" loading="lazy">
+            </div>
+          </div>
+          <div class="w-1/2 px-2 mb-4" style="width: 50%; padding: 0 8px; margin-bottom: 16px;">
+            <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+              <img src="img/globo_agro_003.webp"
+                alt="Equipe técnica durante a gravação do Globo Agro com cenário virtual"
+                style="width: 100%; display: block;" loading="lazy">
+            </div>
+          </div>
+        </div>
+
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Desafio do Projeto
+        </h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">
+          A produtora Piloto nos trouxe um caso clássico onde a produção virtual absolutamente brilha: filmar uma
+          quantidade imensa de locações em poucos dias. Viajar com toda a equipe para diferentes regiões do Brasil - da
+          Amazônia ao Rio Grande do Sul - seria caríssimo e levaria semanas só de deslocamento.
+        </p>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">
+          A demanda era registrar todos os lugares onde o agronegócio brasileiro é forte, criando um panorama visual
+          completo do campo nacional.
+        </p>
+
+        <!-- Image Gallery - Second Row -->
+        <div class="flex flex-wrap -mx-2" style="display: flex; flex-wrap: wrap; margin: 0 -8px;">
+          <div class="w-1/2 px-2 mb-4" style="width: 50%; padding: 0 8px; margin-bottom: 16px;">
+            <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+              <img src="img/globo_agro_004.webp" alt="Cenário virtual com iluminação dramática para o Globo Agro"
+                style="width: 100%; display: block;" loading="lazy">
+            </div>
+          </div>
+          <div class="w-1/2 px-2 mb-4" style="width: 50%; padding: 0 8px; margin-bottom: 16px;">
+            <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+              <img src="img/globo_agro_005.webp" alt="Equipamento Disguise e controle técnico da produção virtual"
+                style="width: 100%; display: block;" loading="lazy">
+            </div>
+          </div>
+        </div>
+
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Nossa Solução</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">
+          Em parceria com a <strong>Rube</strong>, implementamos a magia da produção virtual onde, com um clique de
+          botão, colocamos o talento em qualquer lugar do Brasil:
+        </p>
+
+        <ul style="list-style-type: disc; padding-left: 20px; color: #cccccc; font-size: 0.9em; margin: 15px 0;">
+          <li style="margin-bottom: 8px;"><strong>Painéis LED HDR 10-bit 2.6mm</strong> para realismo visual total</li>
+          <li style="margin-bottom: 8px;"><strong>Servidores Disguise VX4 e RXII</strong> processando conteúdo em tempo
+            real</li>
+          <li style="margin-bottom: 8px;"><strong>Mix de conteúdo</strong>: plates 2D de locações reais + ambientes 100%
+            3D no Unreal Engine</li>
+          <li style="margin-bottom: 8px;"><strong>Controle via iPad</strong>: diretores manipulando cores, iluminação,
+            posição do sol e todos os parâmetros da cena durante a filmagem</li>
+        </ul>
+
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">
+          O diferencial foi dar controle total aos diretores - tudo que podia ser ajustado em tempo real ficou nas mãos
+          deles através de uma interface intuitiva.
+        </p>
+
+        <!-- Image Gallery - Third Row -->
+        <div class="flex flex-wrap -mx-2" style="display: flex; flex-wrap: wrap; margin: 0 -8px;">
+          <div class="w-1/2 px-2 mb-4" style="width: 50%; padding: 0 8px; margin-bottom: 16px;">
+            <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+              <img src="img/globo_agro_006.webp"
+                alt="Estúdio com câmeras e equipe técnica durante a produção do Globo Agro"
+                style="width: 100%; display: block;" loading="lazy">
+            </div>
+          </div>
+          <div class="w-1/2 px-2 mb-4" style="width: 50%; padding: 0 8px; margin-bottom: 16px;">
+            <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+              <img src="img/globo_agro_007.webp"
+                alt="Monitores mostrando diferentes ambientes virtuais para o Globo Agro"
+                style="width: 100%; display: block;" loading="lazy">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap -mx-2" style="display: flex; flex-wrap: wrap; margin: 0 -8px;">
+          <div class="w-full px-2 mb-4" style="width: 100%; padding: 0 8px; margin-bottom: 16px;">
+            <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+              <img src="img/globo_agro_008.webp"
+                alt="Resultado final com apresentadora em ambiente virtual de plantação brasileira"
+                style="width: 100%; display: block;" loading="lazy">
+            </div>
+          </div>
+        </div>
+
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Resultados</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">
+          Transformamos semanas de viagem em poucos dias de estúdio, economizando tempo e recursos enquanto mantivemos
+          total controle criativo. A produção virtual permitiu capturar a essência do agronegócio brasileiro com
+          flexibilidade impossível em filmagens tradicionais.
+        </p>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">
+          Mais um projeto fantástico que demonstra como a tecnologia Disguise revoluciona a produção audiovisual,
+          tornando o impossível cotidiano.
+        </p>
+      </div>
