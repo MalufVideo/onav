@@ -1,6 +1,35 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <!-- Google Analytics 4 + Google Tag Manager -->
+  <script>
+    window.addEventListener('load', function () {
+      // Google Analytics 4 - Deferred
+      setTimeout(function () {
+        var ga = document.createElement('script');
+        ga.async = true;
+        ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-HPLPNWR5LS';
+        document.head.appendChild(ga);
+
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-HPLPNWR5LS');
+      }, 1000);
+
+      // Google Tag Manager - Deferred
+      setTimeout(function () {
+        (function (w, d, s, l, i) {
+          w[l] = w[l] || []; w[l].push({
+            'gtm.start': new Date().getTime(), event: 'gtm.js'
+          }); var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+              'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-TJR6PHP8');
+      }, 1500);
+    });
+  </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -183,6 +212,9 @@
     </script>
 </head>
 <body class="antialiased">
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TJR6PHP8" height="0" width="0"
+      style="display:none;visibility:hidden"></iframe></noscript>
+
     <!-- Navigation -->
     <nav class="fixed w-full bg-opacity-90 backdrop-blur-md z-50 border-b border-gray-800" style="background-color: rgba(2, 2, 2, 0.9);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
