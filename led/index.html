@@ -495,7 +495,6 @@
               window.setTimeout(() => {
                 if (typeof updateProposalSummary === 'function') {
                   updateProposalSummary();
-                  console.log('Updated proposal summary from start date change');
                 }
               }, 100);
             }
@@ -529,7 +528,6 @@
               window.setTimeout(() => {
                 if (typeof updateProposalSummary === 'function') {
                   updateProposalSummary();
-                  console.log('Updated proposal summary from end date change');
                 }
               }, 100);
             }
@@ -553,11 +551,11 @@
             if (window.quoteCartModal && selectedDates && selectedDates[0]) {
               const d = selectedDates[0];
               window.quoteCartModal.selectedStartDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
-              console.log("[Flatpickr Cart Start] Set selectedStartDate:", window.quoteCartModal.selectedStartDate);
+              ledLog("[Flatpickr Cart Start] Set selectedStartDate:", window.quoteCartModal.selectedStartDate);
             }
             // Update cart total when date changes (if end date is also selected)
             if (document.getElementById('cart-shooting-dates-end').value && window.quoteCartModal) {
-              console.log("[Flatpickr Cart Start] Date changed, updating cart.");
+              ledLog("[Flatpickr Cart Start] Date changed, updating cart.");
               window.quoteCartModal.updateCart();
             }
           }
@@ -574,50 +572,17 @@
             if (window.quoteCartModal && selectedDates && selectedDates[0]) {
               const d = selectedDates[0];
               window.quoteCartModal.selectedEndDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
-              console.log("[Flatpickr Cart End] Set selectedEndDate:", window.quoteCartModal.selectedEndDate);
+              ledLog("[Flatpickr Cart End] Set selectedEndDate:", window.quoteCartModal.selectedEndDate);
             }
             // Update cart total when date changes (if start date is also selected)
             if (document.getElementById('cart-shooting-dates-start').value && window.quoteCartModal) {
-              console.log("[Flatpickr Cart End] Date changed, updating cart.");
+              ledLog("[Flatpickr Cart End] Date changed, updating cart.");
               window.quoteCartModal.updateCart();
             }
           }
         });
 
-        // Format any existing date values to ensure consistent display
-        const formatExistingDates = () => {
-          const endDateInput = document.getElementById('shooting-dates-end');
-          if (endDateInput && endDateInput.value && endDateInput.value.includes('-')) {
-            try {
-              // Convert YYYY-MM-DD to DD/MM/YYYY
-              const date = new Date(endDateInput.value);
-              if (!isNaN(date)) {
-                const day = date.getDate().toString().padStart(2, '0');
-                const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                const year = date.getFullYear();
-                const formattedDate = `${day}/${month}/${year}`;
-
-                // Update the input value directly
-                endDateInput.value = formattedDate;
-
-                console.log('Fixed end date format:', formattedDate);
-
-                // Also update the flatpickr instance if it exists
-                if (endDateInput._flatpickr) {
-                  endDateInput._flatpickr.setDate(date);
-                }
-              }
-            } catch (error) {
-              console.error('Error formatting date:', error);
-            }
-          }
-        };
-
-        // Call once on page load and also after a short delay to catch any async updates
-        formatExistingDates();
-        setTimeout(formatExistingDates, 500);
-        // Also add a second timeout in case the first one runs too early
-        setTimeout(formatExistingDates, 1500);
+        // Date format conversion is handled by Flatpickr onReady handler above
 
         // Old modal initialization logic removed (modalSummary object and init call)
         // The new modal (#quote-cart-modal) is handled by QuoteCartModal class and modal-summary.js listener.
@@ -663,21 +628,20 @@
       // Instantiate the Quote Cart Modal globally after DOM ready
       // Ensure this runs after the QuoteCartModal class definition is loaded
       document.addEventListener('DOMContentLoaded', () => {
-        console.log('[index.optimized.html] DOMContentLoaded fired for modal instantiation.'); // Log listener start
+        ledLog('[index.html] DOMContentLoaded fired for modal instantiation.');
         if (typeof QuoteCartModal !== 'undefined') {
-          console.log('[index.optimized.html] QuoteCartModal class found. Instantiating...'); // Log class found
           window.quoteCartModal = new QuoteCartModal();
-          console.log("[index.optimized.html] Global quoteCartModal instance created:", window.quoteCartModal); // Log instance creation
+          ledLog('[index.html] QuoteCartModal instance created.');
         } else {
-          console.error("[index.optimized.html] QuoteCartModal class not found. Check script loading order.");
+          console.error('[index.html] QuoteCartModal class not found. Check script loading order.');
         }
 
         // Find the button and attach the listener here, ensuring both button and modal instance exist
         const proposalBtn = document.getElementById('proposta-btn');
         if (proposalBtn) {
-          console.log('[index.optimized.html] Found #proposta-btn, adding listener.');
+          ledLog('[index.html] Found #proposta-btn, adding listener.');
           proposalBtn.addEventListener('click', () => {
-            console.log('[index.optimized.html] #proposta-btn clicked!');
+            ledLog('[index.html] #proposta-btn clicked!');
             // Check authentication status
             if (window.auth && window.auth.isAuthenticated()) {
               // User is logged in, show the cart modal
@@ -688,24 +652,24 @@
                 const startValue = startInput ? startInput.value : '';
                 const endValue = endInput ? endInput.value : '';
                 window.quoteCartModal.setSelectedDates(startValue, endValue);
-                console.log('[index.optimized.html] User authenticated. Set selected dates:', startValue, endValue);
+                ledLog('[index.html] User authenticated. Set dates:', startValue, endValue);
                 window.quoteCartModal.show(); // Show the new cart modal
               } else {
-                console.error("[index.optimized.html] Quote Cart Modal instance not found on button click!");
+                console.error('[index.html] Quote Cart Modal instance not found on button click!');
               }
             } else {
               // User is not logged in, show the login modal
-              console.log('[index.optimized.html] User not authenticated. Opening login modal.');
+              ledLog('[index.html] User not authenticated. Opening login modal.');
               if (window.authUI && typeof window.authUI.openModal === 'function') {
                 window.authUI.openModal('login-modal'); // Use the function from auth-ui.js
               } else {
-                console.error("[index.optimized.html] Auth UI or openModal function not found!");
+                console.error('[index.html] Auth UI or openModal function not found!');
                 alert('Por favor, faça login ou cadastre-se para gerar uma proposta.'); // Fallback alert
               }
             }
           });
         } else {
-          console.error('[index.optimized.html] #proposta-btn not found!');
+          console.error('[index.html] #proposta-btn not found!');
         }
       });
     </script>
@@ -717,35 +681,10 @@
     </script>
 
     <!-- Authentication modules (Loaded synchronously at end of body to ensure order) -->
-    <script>
-      // Track auth script loading for debugging
-      window._authScriptStatus = { config: false, auth: false, ui: false, protection: false };
-    </script>
-    <script src="auth-config.js"
-            onload="window._authScriptStatus.config = true; console.log('[index.html] auth-config.js loaded');"
-            onerror="console.error('[index.html] Failed to load auth-config.js');"></script>
-    <script src="auth.js"
-            onload="window._authScriptStatus.auth = true; console.log('[index.html] auth.js loaded, window.auth:', !!window.auth);"
-            onerror="console.error('[index.html] Failed to load auth.js');"></script>
-    <script src="auth-ui.js"
-            onload="window._authScriptStatus.ui = true; console.log('[index.html] auth-ui.js loaded');"
-            onerror="console.error('[index.html] Failed to load auth-ui.js');"></script>
-    <script src="auth-protection.js"
-            onload="window._authScriptStatus.protection = true; console.log('[index.html] auth-protection.js loaded');"
-            onerror="console.error('[index.html] Failed to load auth-protection.js');"></script>
-    <script>
-      // Final check after all auth scripts are loaded
-      console.log('[index.html] Auth scripts status:', JSON.stringify(window._authScriptStatus));
-      if (window.auth && typeof window.auth.initAuth === 'function') {
-        console.log('[index.html] window.auth available and ready');
-        // Don't dispatch additional event - auth.js already dispatches it
-      } else {
-        console.warn('[index.html] window.auth not fully available after loading auth.js');
-        console.warn('[index.html] This may indicate auth.js script failed to execute');
-        // Try to dispatch event anyway in case listeners need to proceed
-        window.dispatchEvent(new CustomEvent('authLoadComplete'));
-      }
-    </script>
+    <script src="auth-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="auth-ui.js"></script>
+    <script src="auth-protection.js"></script>
 
 </body>
 

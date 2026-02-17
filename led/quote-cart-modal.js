@@ -1,73 +1,10 @@
 // led/quote-cart-modal.js
-
-// Helper function for Brazilian currency formatting
-function formatCurrency(value) {
-    if (typeof value !== 'number') {
-        value = parseFloat(value) || 0;
-    }
-    // Use 'pt-BR' locale for correct decimal/thousands separators
-    return `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
-
-// Helper function to parse Brazilian currency string back to number
-function parseCurrency(value) {
-    if (typeof value !== 'string') return 0;
-    // Remove 'R$', whitespace, thousands separator (.), replace comma with dot for decimal
-    const cleanedValue = value.replace(/R\$\s?/g, '').replace(/\./g, '').replace(',', '.');
-    const number = parseFloat(cleanedValue);
-    return isNaN(number) ? 0 : number;
-}
-
-// Helper function to safely get text content from an element by ID
-function getTextContentById(elementId) {
-    const element = document.getElementById(elementId);
-    return element ? element.textContent?.trim() : null;
-}
-
-// Import formatCurrency if not already available globally
-// import { formatCurrency } from './utils.js';
-
-// --- Helper Functions ---
-function getValueOrTextById(id) {
-    const element = document.getElementById(id);
-    if (!element) {
-        console.warn(`Element with ID '${id}' not found.`);
-        return ''; // Return empty string if element not found
-    }
-    // Prefer input/textarea value, fallback to textContent
-    const value = (element.value !== undefined ? element.value : element.textContent) || '';
-    return value.trim();
-}
-
-function getNumberById(id) {
-    const value = getValueOrTextById(id);
-    // Improved cleaning: handle potential currency symbols, thousands separators (.), and use comma as decimal
-    const cleanedValue = value.replace(/R\$\s?/g, '').replace(/\./g, '').replace(',', '.');
-    const number = parseFloat(cleanedValue);
-    if (isNaN(number)) {
-        console.warn(`Could not parse number from element '${id}', value: '${value}'`);
-        return 0;
-    }
-    return number;
-}
-
-function getIntegerById(id) {
-    const value = getValueOrTextById(id);
-    const integer = parseInt(value.replace(/\D/g, ''), 10); // Remove all non-digits
-    if (isNaN(integer)) {
-        console.warn(`Could not parse integer from element '${id}', value: '${value}'`);
-        return 0;
-    }
-    return integer;
-}
-
-// Placeholder for Supabase client initialization if needed directly,
-// otherwise rely on quote-service.js or similar
-// import { supabase } from './supabaseClient'; // Example import
+// Uses shared-utils.js: formatCurrencyDetailed, parseCurrencyString, getTextContentById,
+//   getValueOrTextById, getNumberById, getIntegerById, ledLog, ProductPriceCache
 
 class QuoteCartModal {
     constructor() {
-        console.log('[QuoteCartModal] Constructor started.'); // Log constructor start
+        ledLog('[QuoteCartModal] Constructor started.'); // Log constructor start
         this.modalElement = document.getElementById('quote-cart-modal');
         this.cartItemsContainer = document.getElementById('cart-items-container');
         this.totalPriceElement = document.getElementById('cart-total-price');
@@ -86,7 +23,7 @@ class QuoteCartModal {
         if (!this.modalElement) {
             console.error('[QuoteCartModal] Constructor: Modal element #quote-cart-modal not found!'); // Log if modal element missing
         } else {
-            console.log('[QuoteCartModal] Constructor: Modal element found:', this.modalElement); // Log if modal element found
+            ledLog('[QuoteCartModal] Constructor: Modal element found:', this.modalElement); // Log if modal element found
         }
 
         this.cartItems = []; // Array to hold selected items { id, name, quantity, price, details... }
@@ -95,7 +32,7 @@ class QuoteCartModal {
         this.initFlatpickr(); // Initialize date pickers
         this.fetchProductPrices(); // Fetch prices on initialization
 
-        console.log("[QuoteCartModal] Constructor finished, events bound."); // Log constructor end
+        ledLog("[QuoteCartModal] Constructor finished, events bound."); // Log constructor end
 
         // Remove event listeners for main page date pickers if they don't affect the modal directly
         // var startDateInput = document.getElementById('shooting-dates-start');
@@ -111,7 +48,7 @@ class QuoteCartModal {
 
         // *** Add event listener for pod updates ***
         document.addEventListener('podPricesUpdated', (event) => {
-            console.log('[QuoteCartModal] Received podPricesUpdated event. Triggering cart update.');
+            ledLog('[QuoteCartModal] Received podPricesUpdated event. Triggering cart update.');
             // The event detail could potentially be used directly, but calling
             // updateCart() ensures the standard flow (getSelectedItems, fetchDetails, render) is used.
             this.updateCart();
@@ -135,40 +72,40 @@ class QuoteCartModal {
 
         // Listen for custom events when items are added/updated/removed from the main page
         document.addEventListener('cartUpdated', (event) => {
-            console.log("Cart update event received:", event.detail);
+            ledLog("Cart update event received:", event.detail);
             this.updateCart(event.detail.items); // Assuming event detail contains the full list of items
         });
     }
 
     async updateCart() {
-        console.log('[updateCart] Starting update...');
+        ledLog('[updateCart] Starting update...');
         // Always fetch product prices before updating the cart
         await this.fetchProductPrices();
         // Get items from the single pod
         this.cartItems = await this.getSelectedItemsFromPods();
-        console.log('[updateCart] Items retrieved:', this.cartItems);
+        ledLog('[updateCart] Items retrieved:', this.cartItems);
 
         // Fetch details if necessary (or skip if not needed)
         await this.fetchItemDetailsAndPrices();
-        console.log('[updateCart] Fetching complete (or skipped). Cart items after fetch:', this.cartItems);
+        ledLog('[updateCart] Fetching complete (or skipped). Cart items after fetch:', this.cartItems);
 
         // Now render the cart with the potentially updated items
         this.renderCart();
-        console.log('[updateCart] Cart rendering triggered.');
+        ledLog('[updateCart] Cart rendering triggered.');
     }
 
     async getSelectedItemsFromPods() {
-        console.log("[getSelectedItemsFromPods] Starting - Single Pod Logic");
+        ledLog("[getSelectedItemsFromPods] Starting - Single Pod Logic");
         const items = [];
         const pricingPod = document.getElementById('sidebar-pricing'); // Corrected ID to match the actual pricing pod
 
         if (pricingPod) {
-            console.log("[getSelectedItemsFromPods] Found pricing pod #sidebar-pricing");
+            ledLog("[getSelectedItemsFromPods] Found pricing pod #sidebar-pricing");
             try {
                 const podItemsData = pricingPod.dataset.items;
                 if (podItemsData) {
                     const parsedItems = JSON.parse(podItemsData);
-                    console.log("[getSelectedItemsFromPods] Parsed items from data-items:", parsedItems);
+                    ledLog("[getSelectedItemsFromPods] Parsed items from data-items:", parsedItems);
 
                     // Add parsed items directly (they should already have id, name, quantity, price)
                     parsedItems.forEach(item => {
@@ -186,14 +123,14 @@ class QuoteCartModal {
                         }
                     });
                 } else {
-                    console.log("[getSelectedItemsFromPods] data-items attribute is empty or missing on #sidebar-pricing.");
+                    ledLog("[getSelectedItemsFromPods] data-items attribute is empty or missing on #sidebar-pricing.");
                 }
             } catch (e) {
                 console.error("[getSelectedItemsFromPods] Error parsing data-items from #sidebar-pricing:", e);
                 console.error("[getSelectedItemsFromPods] Raw data-items:", pricingPod.dataset.items);
             }
         } else {
-            console.log("[getSelectedItemsFromPods] Pricing pod #sidebar-pricing not found.");
+            ledLog("[getSelectedItemsFromPods] Pricing pod #sidebar-pricing not found.");
         }
 
         // --- Add LED Configuration Info (Keep this part) ---
@@ -219,7 +156,7 @@ class QuoteCartModal {
             });
         }
 
-        console.log("[getSelectedItemsFromPods] Final items prepared for cart rendering:", items);
+        ledLog("[getSelectedItemsFromPods] Final items prepared for cart rendering:", items);
 
         // Note: Estúdio is already added by pricing-pods.js in the data-items attribute
         // No need to add it here again to avoid duplication
@@ -230,7 +167,7 @@ class QuoteCartModal {
     }
 
     async fetchItemDetailsAndPrices() {
-        console.log('[fetchItemDetailsAndPrices] Starting. Current cart items:', this.cartItems);
+        ledLog('[fetchItemDetailsAndPrices] Starting. Current cart items:', this.cartItems);
         // If items already have prices (from data-items), we might not need to fetch again unless
         // we need more details like images or descriptions not stored in data-items.
         // For now, assume the price from data-items is sufficient.
@@ -239,12 +176,12 @@ class QuoteCartModal {
         const itemsToFetchDetailsFor = this.cartItems.filter(item => !item.detailsFetched); // Example filter
 
         if (itemsToFetchDetailsFor.length === 0) {
-            console.log('[fetchItemDetailsAndPrices] No new item details needed.');
+            ledLog('[fetchItemDetailsAndPrices] No new item details needed.');
             // Removed direct call to renderCart() here; updateCart should call it after fetching.
             return; // Indicate fetching is done (or wasn't needed)
         }
 
-        console.log('[fetchItemDetailsAndPrices] Items needing details:', itemsToFetchDetailsFor);
+        ledLog('[fetchItemDetailsAndPrices] Items needing details:', itemsToFetchDetailsFor);
 
         // Placeholder for actual fetch logic if needed in the future
         // try {
@@ -258,7 +195,7 @@ class QuoteCartModal {
         //        const detail = details.find(d => d.id === item.id);
         //        return detail ? { ...item, ...detail, detailsFetched: true } : item;
         //    });
-        //    console.log('[fetchItemDetailsAndPrices] Item details fetched and merged.');
+        //    ledLog('[fetchItemDetailsAndPrices] Item details fetched and merged.');
         // } catch (error) {
         //     console.error('[fetchItemDetailsAndPrices] Error fetching item details:', error);
         // }
@@ -267,15 +204,15 @@ class QuoteCartModal {
         this.cartItems = this.cartItems.map(item => ({ ...item, detailsFetched: true }));
 
         // Removed direct call to renderCart() here; updateCart should call it after fetching.
-        console.log('[fetchItemDetailsAndPrices] Fetching process complete (or skipped).');
+        ledLog('[fetchItemDetailsAndPrices] Fetching process complete (or skipped).');
     }
 
     async fetchProductPrices() {
-        console.log('[QuoteCartModal] Fetching product prices...');
+        ledLog('[QuoteCartModal] Fetching product prices...');
         const pricesResult = await window.quoteService.getProductPrices();
         if (pricesResult.success) {
             this.productPrices = pricesResult.data;
-            console.log('[QuoteCartModal] Product prices fetched successfully:', this.productPrices);
+            ledLog('[QuoteCartModal] Product prices fetched successfully:', this.productPrices);
         } else {
             console.error('[QuoteCartModal] Failed to fetch product prices:', pricesResult.error);
             this.productPrices = {}; // Ensure it's an empty object on failure
@@ -285,8 +222,8 @@ class QuoteCartModal {
     }
 
     renderCart() {
-        console.log('[renderCart] Starting render. Full cartItems array:', JSON.stringify(this.cartItems, null, 2));
-        console.log('[renderCart] Product prices available:', JSON.stringify(this.productPrices, null, 2));
+        ledLog('[renderCart] Starting render. Full cartItems array:', JSON.stringify(this.cartItems, null, 2));
+        ledLog('[renderCart] Product prices available:', JSON.stringify(this.productPrices, null, 2));
 
         if (!this.cartItemsContainer || !this.totalPriceElement) {
             console.error("[renderCart] Cart items container or total price element not found!");
@@ -332,9 +269,9 @@ class QuoteCartModal {
             debugEnd = this.selectedEndDate || '(not set)';
             numberOfDays = 1; // Default if dates aren't fully selected
         }
-        console.log(`[renderCart] Date Range: Start=${debugStart}, End=${debugEnd}, Calculated Days=${numberOfDays}`);
-        console.log(`[renderCart] DiscountCalculator available:`, !!window.DiscountCalculator);
-        console.log(`[renderCart] Daily total before discount:`, dailyTotalPrice);
+        ledLog(`[renderCart] Date Range: Start=${debugStart}, End=${debugEnd}, Calculated Days=${numberOfDays}`);
+        ledLog(`[renderCart] DiscountCalculator available:`, !!window.DiscountCalculator);
+        ledLog(`[renderCart] Daily total before discount:`, dailyTotalPrice);
 
         // --- Render Items ---
         const expected3DItems = [
@@ -369,7 +306,7 @@ class QuoteCartModal {
         // Detect current mode from the pricing pod or mode selector
         const activeButton = document.querySelector('#card-disguise-selector .selector-btn.active');
         const currentMode = activeButton?.dataset.mode || '3d';
-        console.log(`[renderCart] Detected mode: ${currentMode}`);
+        ledLog(`[renderCart] Detected mode: ${currentMode}`);
 
         // Filter items based on mode - only show RXII and Tracking in 3D mode
         const itemsToRender = this.cartItems.filter(item => {
@@ -391,7 +328,7 @@ class QuoteCartModal {
             return true;
         });
 
-        console.log(`[renderCart] Items to render (${itemsToRender.length}):`, itemsToRender.map(i => i.name));
+        ledLog(`[renderCart] Items to render (${itemsToRender.length}):`, itemsToRender.map(i => i.name));
 
         // Render items from cartItems array
         itemsToRender.forEach(item => {
@@ -401,14 +338,14 @@ class QuoteCartModal {
 
             // Skip items with 0 quantity
             if (quantity === 0) {
-                console.log(`[renderCart] Skipping item with 0 quantity: ${item.name}`);
+                ledLog(`[renderCart] Skipping item with 0 quantity: ${item.name}`);
                 return;
             }
 
             // Add to daily total
             dailyTotalPrice += itemSubtotal;
 
-            console.log(`[renderCart Debug] Item: ${item.name} | Unit Price: ${formatCurrency(unitPrice)} | Qty: ${quantity} | Subtotal: ${formatCurrency(itemSubtotal)}`);
+            ledLog(`[renderCart Debug] Item: ${item.name} | Unit Price: ${formatCurrencyDetailed(unitPrice)} | Qty: ${quantity} | Subtotal: ${formatCurrencyDetailed(itemSubtotal)}`);
 
             // Render the item row
             const itemElement = document.createElement('div');
@@ -416,21 +353,21 @@ class QuoteCartModal {
             itemElement.innerHTML = `
                 <span class="cart-item-name">${item.name}</span>
                 <span class="cart-item-qty">${quantity}</span>
-                <span class="cart-item-price">${formatCurrency(unitPrice)}</span>
-                <span class="cart-item-subtotal">${formatCurrency(itemSubtotal)}</span>
+                <span class="cart-item-price">${formatCurrencyDetailed(unitPrice)}</span>
+                <span class="cart-item-subtotal">${formatCurrencyDetailed(itemSubtotal)}</span>
             `;
             this.cartItemsContainer.appendChild(itemElement);
         });
 
-        console.log(`[renderCart Debug] Equipment Daily Total: ${formatCurrency(dailyTotalPrice)}`);
+        ledLog(`[renderCart Debug] Equipment Daily Total: ${formatCurrencyDetailed(dailyTotalPrice)}`);
 
         // Calculate combined daily total (all items already in dailyTotalPrice)
         const combinedDailyTotal = dailyTotalPrice;
         const originalTotalPrice = combinedDailyTotal * numberOfDays;
 
-        console.log(`[renderCart Debug] Combined Daily Total: ${formatCurrency(combinedDailyTotal)}`);
-        console.log(`[renderCart Debug] Number of Days: ${numberOfDays}`);
-        console.log(`[renderCart Debug] Original Total Price (before discount): ${formatCurrency(originalTotalPrice)}`);
+        ledLog(`[renderCart Debug] Combined Daily Total: ${formatCurrencyDetailed(combinedDailyTotal)}`);
+        ledLog(`[renderCart Debug] Number of Days: ${numberOfDays}`);
+        ledLog(`[renderCart Debug] Original Total Price (before discount): ${formatCurrencyDetailed(originalTotalPrice)}`);
 
         // Apply progressive discount to the combined total
         let finalTotalPrice = originalTotalPrice;
@@ -439,9 +376,9 @@ class QuoteCartModal {
         if (window.DiscountCalculator && numberOfDays > 0 && combinedDailyTotal > 0) {
             discountInfo = window.DiscountCalculator.applyDayBasedDiscount(combinedDailyTotal, numberOfDays);
             finalTotalPrice = discountInfo.finalPrice;
-            console.log('[renderCart] Progressive discount applied:', discountInfo);
-            console.log(`[renderCart Debug] Discount Percentage: ${discountInfo.discountPercentage}%`);
-            console.log(`[renderCart Debug] Final Price After Discount: ${formatCurrency(finalTotalPrice)}`);
+            ledLog('[renderCart] Progressive discount applied:', discountInfo);
+            ledLog(`[renderCart Debug] Discount Percentage: ${discountInfo.discountPercentage}%`);
+            ledLog(`[renderCart Debug] Final Price After Discount: ${formatCurrencyDetailed(finalTotalPrice)}`);
         } else {
             console.warn('[renderCart] Discount calculator not available or no items, using original pricing');
         }
@@ -451,11 +388,11 @@ class QuoteCartModal {
             this.totalPriceElement.innerHTML = `
                 <div>
                     <span style="text-decoration: line-through; color: #999; font-size: 0.9em;">
-                        ${formatCurrency(originalTotalPrice)}
+                        ${formatCurrencyDetailed(originalTotalPrice)}
                     </span>
                     <br>
                     <span style="color: #e74c3c; font-weight: bold;">
-                        ${formatCurrency(finalTotalPrice)}
+                        ${formatCurrencyDetailed(finalTotalPrice)}
                     </span>
                     <span style="color: #27ae60; font-size: 0.9em; display: block;">
                         ${discountInfo.discountPercentage}% desconto progressivo - ${numberOfDays} dia${numberOfDays > 1 ? 's' : ''}
@@ -463,10 +400,10 @@ class QuoteCartModal {
                 </div>
             `;
         } else {
-            this.totalPriceElement.textContent = `${formatCurrency(finalTotalPrice)} (${numberOfDays} dia${numberOfDays > 1 ? 's' : ''})`;
+            this.totalPriceElement.textContent = `${formatCurrencyDetailed(finalTotalPrice)} (${numberOfDays} dia${numberOfDays > 1 ? 's' : ''})`;
         }
 
-        console.log(`[renderCart] Render complete. Original: ${formatCurrency(originalTotalPrice)}, Final: ${formatCurrency(finalTotalPrice)}`);
+        ledLog(`[renderCart] Render complete. Original: ${formatCurrencyDetailed(originalTotalPrice)}, Final: ${formatCurrencyDetailed(finalTotalPrice)}`);
     }
 
     show() {
@@ -488,16 +425,16 @@ class QuoteCartModal {
     hide() {
         if (this.modalElement) {
             this.modalElement.style.display = 'none'; // Or remove 'visible' class
-            console.log("QuoteCartModal hidden");
+            ledLog("QuoteCartModal hidden");
         }
     }
 
     async submitQuote() {
-        console.log('[QuoteCartModal] Starting submitQuote...');
+        ledLog('[QuoteCartModal] Starting submitQuote...');
 
         // Prevent multiple simultaneous submissions
         if (this.isSubmitting) {
-            console.log('[QuoteCartModal] Already submitting, ignoring duplicate call');
+            ledLog('[QuoteCartModal] Already submitting, ignoring duplicate call');
             return;
         }
         this.isSubmitting = true;
@@ -517,7 +454,7 @@ class QuoteCartModal {
 
         // Generate unique submission token
         const submissionToken = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        console.log('[QuoteCartModal] Submission token:', submissionToken);
+        ledLog('[QuoteCartModal] Submission token:', submissionToken);
 
         try {
             // --- Get User Info (Handle Guest or Authenticated Users) ---
@@ -558,11 +495,11 @@ class QuoteCartModal {
                 }
                 clientCompany = user.user_metadata?.company || '';
                 clientPhone = user.user_metadata?.phone || '';
-                console.log('[submitQuote] Using authenticated user:', userEmail);
+                ledLog('[submitQuote] Using authenticated user:', userEmail);
             } else {
                 // Guest user - read from inline guest info form
                 isGuestUser = true;
-                console.log('[submitQuote] Guest user detected - reading inline form');
+                ledLog('[submitQuote] Guest user detected - reading inline form');
 
                 const guestNameInput = document.getElementById('guest-name');
                 const guestEmailInput = document.getElementById('guest-email');
@@ -622,10 +559,10 @@ class QuoteCartModal {
                     if (checkResult.exists) {
                         // User exists - use their ID
                         userId = checkResult.userId;
-                        console.log('[submitQuote] Found existing user:', userId);
+                        ledLog('[submitQuote] Found existing user:', userId);
                     } else {
                         // Create new guest user account using public endpoint
-                        console.log('[submitQuote] Creating new guest user account...');
+                        ledLog('[submitQuote] Creating new guest user account...');
                         const createResponse = await fetch('/api/register-guest', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -642,7 +579,7 @@ class QuoteCartModal {
                         if (createResult.success) {
                             userId = createResult.userId;
                             guestUserCreated = true;
-                            console.log('[submitQuote] Guest user created successfully:', userId);
+                            ledLog('[submitQuote] Guest user created successfully:', userId);
                         } else {
                             throw new Error(createResult.error || 'Erro ao criar conta de usuário');
                         }
@@ -747,7 +684,7 @@ class QuoteCartModal {
             // Select only actual item rows, excluding header and info lines
             const cartItemElements = this.cartItemsContainer.querySelectorAll('.cart-item:not(.cart-header):not(.cart-info-item)');
 
-            console.log('[submitQuote] Processing rendered cart items:', cartItemElements);
+            ledLog('[submitQuote] Processing rendered cart items:', cartItemElements);
 
             // --- Calculate Daily Rate from Rendered Cart Items (MOVED HERE) ---
             let calculatedDailyRate = 0;
@@ -767,8 +704,8 @@ class QuoteCartModal {
                     const subtotalString = subtotalElement.textContent.trim(); // This IS the correct subtotal string
 
                     const quantity = parseInt(quantityString, 10) || 0; // Parse quantity, default to 0
-                    const unitPrice = parseCurrency(unitPriceString); // Use helper to parse unit price
-                    const subtotal = parseCurrency(subtotalString); // Parse subtotal (used for filtering)
+                    const unitPrice = parseCurrencyString(unitPriceString); // Use helper to parse unit price
+                    const subtotal = parseCurrencyString(subtotalString); // Parse subtotal (used for filtering)
 
                     // Add to daily rate calculation for ALL items (not just valid services)
                     if (!name.startsWith('Config:') && subtotal > 0) {
@@ -777,14 +714,14 @@ class QuoteCartModal {
 
                     // Filter out configuration lines and items with zero subtotal or zero quantity
                     if (!name.startsWith('Config:') && subtotal > 0 && quantity > 0) {
-                        console.log(`[submitQuote] Adding service: ${name} | Qty: ${quantity} | Unit Price: ${unitPrice} | Subtotal: ${subtotal}`);
+                        ledLog(`[submitQuote] Adding service: ${name} | Qty: ${quantity} | Unit Price: ${unitPrice} | Subtotal: ${subtotal}`);
                         selectedServices.push({
                             name: name, // Keep the name as rendered (may include units)
                             quantity: quantity, // Correct parsed quantity
                             unit_price: unitPrice // Correct parsed unit price (numeric)
                         });
                     } else {
-                        console.log(`[submitQuote] Skipping rendered item: ${name}`);
+                        ledLog(`[submitQuote] Skipping rendered item: ${name}`);
                     }
                 } else {
                     console.warn('[submitQuote] Could not find required elements (name, qty, price, subtotal) in a rendered cart item row:', element);
@@ -792,7 +729,7 @@ class QuoteCartModal {
             });
 
             // Log the final services array built from the DOM
-            console.log('[submitQuote] Final selected services FROM RENDERED CART:', JSON.stringify(selectedServices));
+            ledLog('[submitQuote] Final selected services FROM RENDERED CART:', JSON.stringify(selectedServices));
 
             if (selectedServices.length === 0) {
                 console.warn('[submitQuote] No valid services found in the rendered cart to save.');
@@ -807,7 +744,7 @@ class QuoteCartModal {
             const totalPriceMatch = rawTotalPriceString.match(/R\$\s?[\d.,]+/);
             const totalPrice = totalPriceMatch ? totalPriceMatch[0] : 'R$ 0,00';
 
-            console.log(`[submitQuote] Calculated daily rate from cart: ${dailyRate}`);
+            ledLog(`[submitQuote] Calculated daily rate from cart: ${dailyRate}`);
 
             // Calculate discount information for saving
             let discountPercentage = 0;
@@ -820,7 +757,7 @@ class QuoteCartModal {
                 discountPercentage = discountInfo.discountPercentage;
                 discountAmount = (originalTotalPrice - discountInfo.finalPrice);
                 finalTotalPrice = discountInfo.finalPrice; // Use the calculated final price
-                console.log(`[submitQuote] Discount info for saving:`, {
+                ledLog(`[submitQuote] Discount info for saving:`, {
                     days: daysCount,
                     originalTotal: originalTotalPrice,
                     discountPercentage: discountPercentage,
@@ -873,7 +810,7 @@ class QuoteCartModal {
                 selected_pod_type: selectedPodType,
                 selected_services: selectedServices, // Use the array built from the rendered cart
                 daily_rate: dailyRate,
-                total_price: formatCurrency(finalTotalPrice), // Save the calculated final price as formatted currency
+                total_price: formatCurrencyDetailed(finalTotalPrice), // Save the calculated final price as formatted currency
 
                 // Discount information
                 discount_percentage: discountPercentage,
@@ -881,7 +818,7 @@ class QuoteCartModal {
                 original_total_price: originalTotalPrice
             };
 
-            console.log('[QuoteCartModal] Data prepared for saving:', proposalDataToSave);
+            ledLog('[QuoteCartModal] Data prepared for saving:', proposalDataToSave);
 
             // --- Save Data to Supabase ---
             const { data: savedProposal, error: saveError } = await supabaseClient
@@ -901,11 +838,11 @@ class QuoteCartModal {
             }
 
             const proposalId = savedProposal.id;
-            console.log(`[QuoteCartModal] Quote saved successfully with ID: ${proposalId}`);
+            ledLog(`[QuoteCartModal] Quote saved successfully with ID: ${proposalId}`);
 
             // --- Create Pre-Reserve Calendar Event ---
             try {
-                console.log(`[QuoteCartModal] Creating pre-reserve calendar event for proposal ${proposalId}...`);
+                ledLog(`[QuoteCartModal] Creating pre-reserve calendar event for proposal ${proposalId}...`);
                 const calendarResponse = await fetch('/api/calendar/pre-reserve', {
                     method: 'POST',
                     headers: {
@@ -916,7 +853,7 @@ class QuoteCartModal {
 
                 const calendarResult = await calendarResponse.json();
                 if (calendarResponse.ok && calendarResult.success) {
-                    console.log('[QuoteCartModal] Pre-reserve calendar event created:', calendarResult.eventId);
+                    ledLog('[QuoteCartModal] Pre-reserve calendar event created:', calendarResult.eventId);
                 } else {
                     console.warn('[QuoteCartModal] Failed to create pre-reserve event:', calendarResult.error);
                     // Don't fail the quote submission if calendar fails
@@ -927,7 +864,7 @@ class QuoteCartModal {
             }
 
             // --- Invoke Edge Function to Generate and Email PDF ---
-            console.log(`[QuoteCartModal] Invoking Edge Function for proposalId: ${proposalId}...`);
+            ledLog(`[QuoteCartModal] Invoking Edge Function for proposalId: ${proposalId}...`);
             try {
                 const { data: functionData, error: functionError } = await supabaseClient.functions.invoke(
                     'generate-and-email-proposal-pdf',
@@ -942,7 +879,7 @@ class QuoteCartModal {
                     alert(`Proposta salva (ID: ${proposalId}), mas ocorreu um erro ao enviar o email: ${functionError.message}. Por favor, contate o suporte.`);
                     // Optionally, still show confirmation but with a warning
                 } else {
-                    console.log('[QuoteCartModal] Edge Function invoked successfully:', functionData);
+                    ledLog('[QuoteCartModal] Edge Function invoked successfully:', functionData);
                     // Email sending likely succeeded or is in progress
                 }
             } catch (invokeError) {
@@ -951,10 +888,10 @@ class QuoteCartModal {
             }
 
             // --- Success Handling ---
-            console.log('[QuoteCartModal] Resetting cart and showing confirmation...');
+            ledLog('[QuoteCartModal] Resetting cart and showing confirmation...');
             this.hide();
             this.showConfirmationModal(projectName, isGuestUser, guestUserCreated, savedProposal?.id);
-            console.log('[QuoteCartModal] Successfully called showConfirmationModal.');
+            ledLog('[QuoteCartModal] Successfully called showConfirmationModal.');
 
         } catch (error) {
             console.error('[QuoteCartModal] Caught error during submitQuote process:', error);
@@ -980,7 +917,7 @@ class QuoteCartModal {
     // ... (other methods like showCalEmbed, etc.) ...
 
     showConfirmationModal(projectName, isGuestUser = false, guestUserCreated = false, proposalId = null) {
-        console.log('[QuoteCartModal] Entering showConfirmationModal...');
+        ledLog('[QuoteCartModal] Entering showConfirmationModal...');
         const confirmationModal = document.getElementById('confirmation-modal');
         const confirmationHeader = document.getElementById('confirmation-header');
         const confirmationBody = document.getElementById('confirmation-body');
@@ -1097,7 +1034,7 @@ class QuoteCartModal {
     }
 
     showCalEmbed(targetElement) {
-        console.log("[QuoteCartModal] showCalEmbed called for target:", targetElement);
+        ledLog("[QuoteCartModal] showCalEmbed called for target:", targetElement);
         if (!targetElement) {
             console.error("[QuoteCartModal] Target element for Cal embed is missing.");
             return;
@@ -1131,7 +1068,7 @@ class QuoteCartModal {
             "layout":"month_view"
           });
 
-           console.log('Cal.com embed initialized for #my-cal-inline');
+           ledLog('Cal.com embed initialized for #my-cal-inline');
         `;
         // Append the script to the target element or body
         // Appending to body might be safer if targetElement gets cleared later
@@ -1142,7 +1079,7 @@ class QuoteCartModal {
         setTimeout(() => {
             if (calScript.parentNode) {
                 calScript.parentNode.removeChild(calScript);
-                console.log('Cleaned up Cal embed script tag.');
+                ledLog('Cleaned up Cal embed script tag.');
             }
         }, 5000); // Remove after 5 seconds
 
@@ -1161,7 +1098,7 @@ class QuoteCartModal {
         //   });
         //
         //   Cal.ns["30min"]("ui", {"hideEventTypeDetails":false,"layout":"month_view"});
-        //   console.log('Cal embed shown via innerHTML');
+        //   ledLog('Cal embed shown via innerHTML');
         // <\/script>
         // `;
     }

@@ -130,7 +130,7 @@ async function saveQuote(quoteData) {
         
         if (slugResponse.ok) {
           const slugData = await slugResponse.json();
-          console.log('URL slug generated:', slugData.slug);
+          ledLog('URL slug generated:', slugData.slug);
           // Add slug to the returned data
           data[0].quote_url_slug = slugData.slug;
         } else {
@@ -185,7 +185,7 @@ async function getProposals(context = 'my-quotes') {
     if (context === 'my-quotes') {
       if (userProfile?.role === 'sales_rep') {
         // Sales reps see quotes they created AND quotes from their clients
-        console.log('[DEBUG] Sales rep in my-quotes - fetching client relationships');
+        ledLog('[DEBUG] Sales rep in my-quotes - fetching client relationships');
         
         // Get client IDs for this sales rep
         const { data: clientRels, error: clientError } = await supabase
@@ -223,7 +223,7 @@ async function getProposals(context = 'my-quotes') {
       
       if (userProfile?.role === 'sales_rep') {
         // Sales reps see quotes they created AND quotes from their clients
-        console.log('[DEBUG] Sales rep in dashboard - fetching client relationships');
+        ledLog('[DEBUG] Sales rep in dashboard - fetching client relationships');
         
         // Get client IDs for this sales rep
         const { data: clientRels, error: clientError } = await supabase
