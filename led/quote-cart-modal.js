@@ -470,17 +470,18 @@ class QuoteCartModal {
     }
 
     show() {
-        console.log('[QuoteCartModal] show() method called.'); // Log show() start
+        ledLog('[QuoteCartModal] show() method called.');
         if (this.modalElement) {
-            console.log('[QuoteCartModal] Modal element exists. Updating cart and showing modal...'); // Log element check success
-            // Fetch current selections when showing the modal
-            // This depends on how selections are managed (e.g., global state, calling a function)
-            // Example: const currentSelections = getSelectedItemsFromPods();
-            this.modalElement.style.display = 'block'; // Or add a 'visible' class
-            console.log('[QuoteCartModal] Set modal display to block.'); // Log display change
-            this.updateCart(); // Update cart content after showing modal
+            this.modalElement.style.display = 'block';
+            // Show/hide guest info form based on auth status
+            const guestForm = document.getElementById('guest-info-form');
+            if (guestForm) {
+                const isAuthenticated = window.auth && window.auth.isAuthenticated && window.auth.isAuthenticated();
+                guestForm.style.display = isAuthenticated ? 'none' : 'block';
+            }
+            this.updateCart();
         } else {
-            console.error("[QuoteCartModal] show(): Modal element not found!"); // Log element check failure
+            console.error("[QuoteCartModal] show(): Modal element not found!");
         }
     }
 
@@ -559,14 +560,21 @@ class QuoteCartModal {
                 clientPhone = user.user_metadata?.phone || '';
                 console.log('[submitQuote] Using authenticated user:', userEmail);
             } else {
-                // Guest user - collect email/phone info
+                // Guest user - read from inline guest info form
                 isGuestUser = true;
-                console.log('[submitQuote] Guest user detected - collecting contact info');
+                console.log('[submitQuote] Guest user detected - reading inline form');
 
-                // Prompt for email and phone
-                const guestEmail = prompt('Para receber sua proposta, por favor insira seu email:');
+                const guestNameInput = document.getElementById('guest-name');
+                const guestEmailInput = document.getElementById('guest-email');
+                const guestPhoneInput = document.getElementById('guest-phone');
+
+                const guestEmail = guestEmailInput?.value?.trim() || '';
+                const guestPhone = guestPhoneInput?.value?.trim() || '';
+                const guestName = guestNameInput?.value?.trim() || '';
+
                 if (!guestEmail || !guestEmail.includes('@')) {
                     alert('Email válido é necessário para receber a proposta.');
+                    guestEmailInput?.focus();
                     if (this.submitButton) {
                         this.submitButton.disabled = false;
                         this.submitButton.textContent = 'Requisitar Proposta';
@@ -575,9 +583,9 @@ class QuoteCartModal {
                     return;
                 }
 
-                const guestPhone = prompt('Por favor insira seu telefone (com DDD):');
                 if (!guestPhone || guestPhone.length < 10) {
                     alert('Telefone válido é necessário para contato.');
+                    guestPhoneInput?.focus();
                     if (this.submitButton) {
                         this.submitButton.disabled = false;
                         this.submitButton.textContent = 'Requisitar Proposta';
@@ -586,9 +594,9 @@ class QuoteCartModal {
                     return;
                 }
 
-                const guestName = prompt('Por favor insira seu nome:');
-                if (!guestName || guestName.trim().length < 2) {
+                if (!guestName || guestName.length < 2) {
                     alert('Nome é necessário.');
+                    guestNameInput?.focus();
                     if (this.submitButton) {
                         this.submitButton.disabled = false;
                         this.submitButton.textContent = 'Requisitar Proposta';
@@ -597,9 +605,9 @@ class QuoteCartModal {
                     return;
                 }
 
-                userEmail = guestEmail.trim().toLowerCase();
-                clientPhone = guestPhone.trim();
-                clientName = guestName.trim();
+                userEmail = guestEmail.toLowerCase();
+                clientPhone = guestPhone;
+                clientName = guestName;
 
                 // Check if user already exists
                 try {
@@ -1158,76 +1166,17 @@ class QuoteCartModal {
         // `;
     }
 
-    // New: Initialize Flatpickr for modal date inputs
+    // Store references to Flatpickr instances initialized by index.html
     initFlatpickr() {
-        if (typeof flatpickr === 'undefined') {
-            console.error('[QuoteCartModal] flatpickr is not loaded!');
-            return;
-        }
-
-        // Get today's date as a Date object for minDate
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // Reset time to start of day
-
-        // Check if flatpickr is already initialized (from index.html inline script)
-        // If so, just store references and add our custom onChange handlers
+        // Flatpickr is initialized on the cart date inputs by the inline script in index.html.
+        // Here we just store references for use by this class.
         if (this.startDateInput && this.startDateInput._flatpickr) {
-            console.log('[QuoteCartModal] Flatpickr already initialized on startDateInput, using existing instance');
             this.startPicker = this.startDateInput._flatpickr;
-            // Update minDate to ensure it's set to today
-            this.startPicker.set('minDate', today);
-        } else if (this.startDateInput) {
-            this.startPicker = flatpickr(this.startDateInput, {
-                dateFormat: 'd/m/Y',
-                locale: 'pt',
-                allowInput: false,
-                minDate: today,
-                onChange: (selectedDates, dateStr, instance) => {
-                    // Save selected start date
-                    if (selectedDates && selectedDates[0]) {
-                        // Store as d/m/Y for parsing in renderCart
-                        const d = selectedDates[0];
-                        this.selectedStartDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
-                        // Optionally update endPicker's minDate
-                        if (this.endPicker) {
-                            this.endPicker.set('minDate', d);
-                        }
-                    }
-                    // When a date is selected in Início, open the Fim picker
-                    if (this.endDateInput) {
-                        this.endDateInput.focus();
-                        if (this.endPicker && this.endPicker.open) {
-                            this.endPicker.open();
-                        } else {
-                            this.endDateInput.click();
-                        }
-                    }
-                    // Re-render cart to update days count
-                    this.renderCart();
-                },
-            });
+            ledLog('[QuoteCartModal] Stored reference to existing start date Flatpickr instance');
         }
-
         if (this.endDateInput && this.endDateInput._flatpickr) {
-            console.log('[QuoteCartModal] Flatpickr already initialized on endDateInput, using existing instance');
             this.endPicker = this.endDateInput._flatpickr;
-            // Update minDate to ensure it's set to today
-            this.endPicker.set('minDate', today);
-        } else if (this.endDateInput) {
-            this.endPicker = flatpickr(this.endDateInput, {
-                dateFormat: 'd/m/Y',
-                locale: 'pt',
-                allowInput: false,
-                minDate: today,
-                onChange: (selectedDates, dateStr, instance) => {
-                    if (selectedDates && selectedDates[0]) {
-                        const d = selectedDates[0];
-                        this.selectedEndDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
-                    }
-                    // Re-render cart to update days count
-                    this.renderCart();
-                },
-            });
+            ledLog('[QuoteCartModal] Stored reference to existing end date Flatpickr instance');
         }
     }
 }

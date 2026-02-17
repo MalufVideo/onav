@@ -17,16 +17,18 @@
   <link rel="stylesheet" href="responsive-styles.css">
   <!-- Configuration -->
   <script src="../config.js"></script>
+  <!-- Shared utilities (must load before all calculator scripts) -->
+  <script src="shared-utils.js" defer></script>
 
   <script src="quote-service.js" defer></script>
   <script src="webhook-service.js" defer></script>
+  <script src="discount-calculator.js" defer></script>
   <script src="pricing-pods.js" defer></script>
   <script src="modal-summary.js" defer></script>
   <script src="led-wall.js" defer></script>
   <script src="mobile-calculator-adapter.js" defer></script>
-  <script src="quote-cart-modal.js"></script> <!-- Added Quote Cart Modal script (removed defer) -->
-  <script src="discount-calculator.js" defer></script> <!-- Discount calculator for multi-day pricing -->
-  <script src="dashboard-integration.js" defer></script> <!-- Dashboard integration script -->
+  <script src="quote-cart-modal.js" defer></script>
+  <script src="dashboard-integration.js" defer></script>
   <!-- Flatpickr for date selection -->
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
@@ -389,6 +391,23 @@
           <p>Seu carrinho de orçamento está vazio.</p>
         </div>
 
+        <!-- Guest Info Form (shown for unauthenticated users on submit) -->
+        <div id="guest-info-form" class="guest-info-form" style="display: none;">
+          <h4 style="margin:0 0 10px;font-size:1em;">Seus Dados de Contato</h4>
+          <div class="form-group" style="margin-bottom:8px;">
+            <label for="guest-name" style="display:block;font-size:0.9em;margin-bottom:4px;">Nome Completo</label>
+            <input type="text" id="guest-name" placeholder="Seu nome" style="width:100%;padding:6px;font-size:0.9em;">
+          </div>
+          <div class="form-group" style="margin-bottom:8px;">
+            <label for="guest-email" style="display:block;font-size:0.9em;margin-bottom:4px;">Email</label>
+            <input type="email" id="guest-email" placeholder="seu@email.com" style="width:100%;padding:6px;font-size:0.9em;">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="guest-phone" style="display:block;font-size:0.9em;margin-bottom:4px;">Telefone (com DDD)</label>
+            <input type="tel" id="guest-phone" placeholder="(11) 99999-9999" style="width:100%;padding:6px;font-size:0.9em;">
+          </div>
+        </div>
+
         <!-- Total Price Display -->
         <div class="cart-total">
           <strong>Total Estimado:</strong> <span id="cart-total-price">R$ 0.00</span>
@@ -453,7 +472,6 @@
       });
     </script>
 
-    <!-- Flatpickr initialization -->
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         // Calculate today's date for minDate (more reliable than "today" string)
@@ -606,227 +624,40 @@
       });
     </script>
 
+    <!-- Initialize authentication (single handler) -->
     <script>
-      // Continuously monitor and fix the date format for the end date
-      document.addEventListener('DOMContentLoaded', function () {
-        // Function to force the correct date format
-        function forceCorrectDateFormat() {
-          const endInput = document.getElementById('shooting-dates-end');
-          if (endInput && endInput.value && endInput.value.includes('-')) {
+      // Wait for auth module via event or check synchronously after scripts load
+      (function () {
+        let authInitDone = false;
+
+        async function initializeAuth() {
+          if (authInitDone) return;
+          authInitDone = true;
+
+          if (window.auth && typeof window.auth.initAuth === 'function') {
             try {
-              // Convert YYYY-MM-DD to DD/MM/YYYY
-              const parts = endInput.value.split('-');
-              if (parts.length === 3) {
-                // Use the date components directly without creating a Date object
-                // This avoids any timezone issues
-                const year = parts[0];
-                const month = parts[1];
-                const day = parts[2];
-
-                // Format as DD/MM/YYYY
-                const formattedDate = `${day}/${month}/${year}`;
-
-                // Update the input value directly
-                endInput.value = formattedDate;
-
-                console.log('Forced end date format:', formattedDate);
-
-                // If the flatpickr instance exists, also update it
-                if (endInput._flatpickr) {
-                  // Create a date object with the correct parts
-                  const dateObj = new Date(year, parseInt(month, 10) - 1, parseInt(day, 10));
-
-                  // Update flatpickr internal state without triggering onChange
-                  const fp = endInput._flatpickr;
-                  fp.selectedDates = [dateObj];
-                  fp.latestSelectedDateObj = dateObj;
-
-                  // Force the input to show our formatted value
-                  setTimeout(() => {
-                    // This ensures any other code doesn't override our format
-                    endInput.value = formattedDate;
-                  }, 0);
-                }
-              }
-            } catch (error) {
-              console.error('Error formatting date:', error);
+              await window.auth.initAuth();
+              ledLog('[index.html] Auth initialized');
+            } catch (err) {
+              console.error('[index.html] Auth init error:', err);
             }
+          }
+
+          if (window.authUI && typeof window.authUI.initAuthUI === 'function') {
+            window.authUI.initAuthUI();
+            ledLog('[index.html] Auth UI initialized');
           }
         }
 
-        // Run immediately and at intervals to ensure it always stays formatted correctly
-        forceCorrectDateFormat();
-        setTimeout(forceCorrectDateFormat, 500);
-
-        // Set up an observer to watch for changes to the input value
-        const endInput = document.getElementById('shooting-dates-end');
-        if (endInput) {
-          // Create a MutationObserver to watch for attribute changes, particularly the value
-          const observer = new MutationObserver((mutations) => {
-            forceCorrectDateFormat();
-          });
-
-          // Watch for attribute changes
-          observer.observe(endInput, { attributes: true });
-
-          // Also run the formatter after any input event
-          endInput.addEventListener('input', forceCorrectDateFormat);
-          endInput.addEventListener('change', forceCorrectDateFormat);
-        }
-
-        // Additionally, set an interval to continuously check and fix the format
-        // This is a fail-safe for any scenario where the other methods don't catch the change
-        const checkInterval = setInterval(forceCorrectDateFormat, 1000);
-
-        // Stop the interval after a reasonable amount of time (60 seconds)
-        setTimeout(() => {
-          clearInterval(checkInterval);
-        }, 60000);
-      });
+        // Auth scripts are loaded synchronously at end of body, so authReady
+        // fires before DOMContentLoaded completes. Listen for both as safety net.
+        window.addEventListener('authReady', initializeAuth);
+        window.addEventListener('authModuleReady', initializeAuth);
+        document.addEventListener('DOMContentLoaded', () => {
+          if (!authInitDone) initializeAuth();
+        });
+      })();
     </script>
-
-    <script>
-      function fixFlatpickrDateDisplay() {
-        // Get both flatpickr instances
-        const startPicker = document.getElementById('shooting-dates-start')?._flatpickr;
-        const endPicker = document.getElementById('shooting-dates-end')?._flatpickr;
-
-        if (endPicker) {
-          // Save original method
-          const originalFormat = endPicker.formatDate;
-
-          // Create our custom date formatter and parser
-          endPicker.formatDate = function (dateObj, formatStr) {
-            // Always use DD/MM/YYYY for display regardless of internal format
-            const day = dateObj.getDate().toString().padStart(2, '0');
-            const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-            const year = dateObj.getFullYear();
-            return `${day}/${month}/${year}`;
-          };
-
-          // Force refresh if there's a current date
-          if (endPicker.selectedDates && endPicker.selectedDates.length > 0) {
-            const currentDate = endPicker.selectedDates[0];
-            endPicker.clear();
-            endPicker.setDate(currentDate);
-          }
-
-          // Also handle direct value changes
-          const endInput = document.getElementById('shooting-dates-end');
-          if (endInput && endInput.value && endInput.value.includes('-')) {
-            try {
-              const date = new Date(endInput.value);
-              if (!isNaN(date)) {
-                endPicker.setDate(date);
-              }
-            } catch (e) {
-              console.error('Error setting end date:', e);
-            }
-          }
-        }
-      }
-
-      // Run immediately and after a delay
-      setTimeout(fixFlatpickrDateDisplay, 0);
-      setTimeout(fixFlatpickrDateDisplay, 1000);
-    </script>
-
-    <!-- Initialize authentication -->
-    <script>
-      // Track if initialization has already happened
-      let authInitStarted = false;
-
-      // Auth initialization function - will be called when auth is ready
-      async function initializeAuth() {
-        if (authInitStarted) {
-          console.log('[index.html] initializeAuth already started, skipping');
-          return;
-        }
-        authInitStarted = true;
-        console.log('[index.html] initializeAuth called');
-
-        if (window.auth && typeof window.auth.initAuth === 'function') {
-          console.log('[index.html] Initializing auth...');
-          try {
-            await window.auth.initAuth();
-            console.log('[index.html] Auth initialized successfully');
-          } catch (err) {
-            console.error('[index.html] Auth init error:', err);
-          }
-        } else {
-          console.warn('[index.html] window.auth not available or not ready');
-        }
-
-        // Initialize authentication UI
-        if (window.authUI && typeof window.authUI.initAuthUI === 'function') {
-          window.authUI.initAuthUI();
-          console.log('[index.html] Authentication UI initialized');
-        } else {
-          console.warn('[index.html] Auth UI module not available yet, verifying later...');
-          setTimeout(() => {
-            if (window.authUI && typeof window.authUI.initAuthUI === 'function') {
-              window.authUI.initAuthUI();
-              console.log('[index.html] Authentication UI initialized (delayed)');
-            } else {
-              console.error('[index.html] Auth UI module failed to load');
-            }
-          }, 1000);
-        }
-      }
-
-      // Listen for auth events (dispatched after auth.js loads)
-      window.addEventListener('authReady', function() {
-        console.log('[index.html] Received authReady event');
-        initializeAuth();
-      });
-
-      window.addEventListener('authModuleReady', function() {
-        console.log('[index.html] Received authModuleReady event');
-        initializeAuth();
-      });
-
-      // Fallback: Check on DOMContentLoaded in case auth loaded before this listener
-      document.addEventListener('DOMContentLoaded', function () {
-        console.log('[index.html] DOM loaded, checking auth status...');
-
-        // If auth is already available, initialize immediately
-        if (window.auth && typeof window.auth.initAuth === 'function') {
-          console.log('[index.html] Auth already available on DOMContentLoaded');
-          initializeAuth();
-        } else {
-          // Auth scripts are at end of body, so they should load after this
-          // Set up a short polling as fallback
-          console.log('[index.html] Auth not yet available, waiting...');
-          let attempts = 0;
-          const maxAttempts = 20;
-
-          const checkAuth = () => {
-            attempts++;
-            if (window.auth && typeof window.auth.initAuth === 'function') {
-              console.log('[index.html] Auth module found after ' + attempts + ' attempts');
-              initializeAuth();
-            } else if (attempts < maxAttempts) {
-              setTimeout(checkAuth, 300);
-            } else {
-              console.warn('[index.html] Auth module not found after ' + maxAttempts + ' attempts, continuing without auth');
-              console.warn('[index.html] Script status:', JSON.stringify(window._authScriptStatus || {}));
-              // Initialize UI anyway for guest access
-              if (window.authUI && typeof window.authUI.initAuthUI === 'function') {
-                window.authUI.initAuthUI();
-              }
-            }
-          };
-
-          // Give auth scripts a moment to load
-          setTimeout(checkAuth, 100);
-        }
-      });
-    </script>
-    <script>
-      // Auth button listeners are handled by auth-ui.js which injects the UI
-      // No extra script needed here for auth buttons
-    </script>
-    <!-- fix-rube-draco.js script removed -->
 
     <script>
       // Instantiate the Quote Cart Modal globally after DOM ready

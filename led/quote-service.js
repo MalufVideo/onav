@@ -310,137 +310,37 @@ async function getProposalById(proposalId) {
  */
 async function getEquipeTecnicaPrice() {
   try {
-    // Make sure auth is initialized
-    const supabase = window.auth?.getSupabaseClient();
-    if (!supabase) {
-      throw new Error('Supabase client not available');
+    // Use the shared price cache
+    const prices = await window.ProductPriceCache.get();
+    const price = prices[PRODUCT_NAMES.EQUIPE_TECNICA] || prices[PRODUCT_NAMES.EQUIPE_TECNICA_ALT];
+    if (price !== undefined) {
+      return { success: true, data: price };
     }
-    
-    // Fetch the price from the prices table
-    const { data, error } = await supabase
-      .from('prices')
-      .select('*')
-      .eq('name', 'Equipe Técnica da Diária')
-      .single();
-      
-    if (error) throw error;
-    
-    return { success: true, data: data?.price }; 
+    throw new Error('Equipe Técnica price not found in cache');
   } catch (error) {
     console.error('Error fetching Equipe Técnica price:', error.message);
-    return { success: false, error: error.message, data: undefined }; 
-  }
-   
-  /**
-   * Fetch the price for the MX-40 Pro processor from Supabase.
-   * @returns {Promise<number>} The price of the MX-40 Pro, or 0 if not found.
-   */
-  async function getProcessorPrice() {
-      const supabase = window.auth?.getSupabaseClient();
-      if (!supabase) throw new Error('Supabase client not available');
-      const { data, error } = await supabase
-          .from('prices') 
-          .select('price')
-          .eq('name', 'MX-40 Pro') 
-          .single();
-      if (error) {
-          console.error('Error fetching MX-40 Pro price:', error);
-          return 0; 
-      }
-      return data?.price || 0;
+    return { success: false, error: error.message, data: undefined };
   }
 }
 
 /**
  * Fetches all product prices from the 'products' table.
+ * Delegates to ProductPriceCache for single-fetch caching.
  * @returns {Promise<Object>} An object mapping product names to their prices, or an error object.
  */
 async function getProductPrices() {
   try {
-    console.log('[quote-service][getProductPrices] Starting price fetch...');
+    ledLog('[quote-service][getProductPrices] Fetching via ProductPriceCache...');
+    const prices = await window.ProductPriceCache.get();
 
-    // Try to get existing Supabase client first
-    let supabase = window.auth?.getSupabaseClient();
-    console.log('[quote-service][getProductPrices] Existing client from auth:', !!supabase);
-
-    // If not available (guest user), create a public client
-    if (!supabase) {
-      console.log('[quote-service][getProductPrices] Creating public Supabase client for product prices');
-
-      // Wait for both Supabase library and key to be loaded
-      let attempts = 0;
-      const maxAttempts = 50; // 5 seconds max wait (50 * 100ms)
-
-      while ((!window.supabase || !window.SUPABASE_KEY) && attempts < maxAttempts) {
-        console.log(`[quote-service][getProductPrices] Waiting for Supabase... attempt ${attempts + 1}/${maxAttempts}`);
-        console.log(`[quote-service][getProductPrices] - window.supabase: ${!!window.supabase}, window.SUPABASE_KEY: ${!!window.SUPABASE_KEY}`);
-        await new Promise(resolve => setTimeout(resolve, 100));
-        attempts++;
-      }
-
-      if (!window.supabase) {
-        console.error('[quote-service][getProductPrices] FAILED: Supabase library not loaded after waiting');
-        throw new Error('Supabase library not loaded');
-      }
-
-      if (!window.SUPABASE_KEY) {
-        console.error('[quote-service][getProductPrices] FAILED: Supabase key not loaded after waiting');
-        throw new Error('Supabase key not loaded');
-      }
-
-      // Create public client with anon key
-      // Safety check: if APP_CONFIG is not loaded, use fallback URL
-      let supabaseUrl = 'https://qhhjvpsxkfjcxitpnhxi.supabase.co'; // Fallback URL
-
-      try {
-        if (window.APP_CONFIG && window.APP_CONFIG.current && window.APP_CONFIG.current.supabaseUrl) {
-          supabaseUrl = window.APP_CONFIG.current.supabaseUrl;
-          console.log('[quote-service][getProductPrices] Using Supabase URL from APP_CONFIG:', supabaseUrl);
-        } else {
-          console.log('[quote-service][getProductPrices] APP_CONFIG not available, using fallback URL:', supabaseUrl);
-        }
-      } catch (configError) {
-        console.warn('[quote-service][getProductPrices] Error accessing APP_CONFIG:', configError);
-        console.log('[quote-service][getProductPrices] Using fallback URL:', supabaseUrl);
-      }
-
-      console.log('[quote-service][getProductPrices] Creating client with URL:', supabaseUrl);
-      console.log('[quote-service][getProductPrices] Using key (first 20 chars):', window.SUPABASE_KEY.substring(0, 20) + '...');
-
-      supabase = window.supabase.createClient(supabaseUrl, window.SUPABASE_KEY);
-      console.log('[quote-service][getProductPrices] Public Supabase client created successfully');
+    if (prices && Object.keys(prices).length > 0) {
+      ledLog('[quote-service][getProductPrices] Loaded', Object.keys(prices).length, 'products');
+      return { success: true, data: prices };
     }
 
-    console.log('[quote-service][getProductPrices] Querying products table...');
-    const { data, error } = await supabase
-      .from('products')
-      .select('name, price');
-
-    console.log('[quote-service][getProductPrices] Query result - data:', data, 'error:', error);
-
-    if (error) {
-      console.error('[quote-service][getProductPrices] Supabase query error:', error);
-      throw error;
-    }
-
-    if (!data || data.length === 0) {
-      console.error('[quote-service][getProductPrices] WARNING: No products found in database');
-      console.error('[quote-service][getProductPrices] This usually means the products table is empty or RLS is blocking access');
-      throw new Error('No products found in database');
-    }
-
-    console.log('[quote-service][getProductPrices] Found', data.length, 'products');
-
-    const prices = data.reduce((acc, product) => {
-      acc[product.name] = parseFloat(product.price); // Parse to number
-      return acc;
-    }, {});
-
-    console.log('[quote-service][getProductPrices] Fetched product prices:', prices);
-    return { success: true, data: prices };
+    throw new Error('No products found in database');
   } catch (error) {
-    console.error('[quote-service][getProductPrices] Error fetching product prices:', error.message);
-    console.error('[quote-service][getProductPrices] Error object:', error);
+    console.error('[quote-service][getProductPrices] Error:', error.message);
     return { success: false, error: error.message, data: {} };
   }
 }

@@ -146,8 +146,11 @@
       { overlay: 'tateSecondPlayOverlay', video: 'tateSecondVideo' },
       { overlay: 'beloPlayOverlay', video: 'beloCaseStudyVideo' },
       { overlay: 'globoAgroPlayOverlay', video: 'globoAgroVideo' },
+      { overlay: 'globoAgroFeijaoPlayOverlay', video: 'globoAgroFeijaoVideo' },
+      { overlay: 'oboticarioPlayOverlay', video: 'oboticarioVideo' },
       { overlay: 'antartidaClipPlayOverlay', video: 'antartidaClipVideo' },
-      { overlay: 'antartidaBrunoPlayOverlay', video: 'antartidaBrunoVideo' }
+      { overlay: 'antartidaBrunoPlayOverlay', video: 'antartidaBrunoVideo' },
+      { overlay: 'niveaBtsPlayOverlay', video: 'niveaBtsVideo' }
     ];
 
     videoConfigs.forEach(function (cfg) {

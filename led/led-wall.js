@@ -1,7 +1,7 @@
 class LEDWallCalculator {
   constructor() {
-    this.productPrices = {}; // To store fetched prices
-    this.pricesLoaded = false; // Flag to track if prices are loaded
+    this.productPrices = {};
+    this.pricesLoaded = false;
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.initialize());
@@ -12,12 +12,11 @@ class LEDWallCalculator {
 
   async initialize() {
     try {
-        await this.fetchProductPrices(); // Fetch prices first
-        this.pricesLoaded = true;
+        const prices = await window.ProductPriceCache.get();
+        this.productPrices = prices;
+        this.pricesLoaded = Object.keys(prices).length > 0;
     } catch (error) {
-        console.error("Failed to load product prices. Using default/hardcoded values.", error);
-        // We might still proceed with default values or stop initialization
-        // For now, let's proceed cautiously, calculations might be incorrect
+        console.error("Failed to load product prices.", error);
     }
 
     // Scene, camera and renderer settings
@@ -132,15 +131,6 @@ class LEDWallCalculator {
     this.scene.add(ground);
 
 
-    // Responsive handling
-    window.addEventListener('resize', () => {
-      const updatedContainerWidth = container ? container.offsetWidth : (window.innerWidth * widthPercent);
-      const updatedContainerHeight = container ? container.offsetHeight : window.innerHeight;
-      this.camera.aspect = updatedContainerWidth / updatedContainerHeight;
-      this.camera.updateProjectionMatrix();
-      this.renderer.setSize(updatedContainerWidth, updatedContainerHeight);
-    });
-
     // Update HTML elements with dynamic prices *after* fetching
     if (this.pricesLoaded) {
         this.updateDynamicHTMLPrices();
@@ -151,143 +141,28 @@ class LEDWallCalculator {
     this.animate();
   }
 
-  // --- Price Handling ---
-  async fetchProductPrices() {
-    // Use absolute URL pointing to the backend server (assuming port 3000)
-    const backendUrl = window.getApiUrl ? window.getApiUrl('/products') : '/api/products';
-    const response = await fetch(backendUrl);
-    if (!response.ok) {
-      // Log the response status and text for better debugging
-      const errorText = await response.text();
-      console.error(`Failed to fetch prices from ${backendUrl}. Status: ${response.status}, Response: ${errorText}`);
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const products = await response.json();
-    // Store prices in a key-value map for easy lookup
-    this.productPrices = products.reduce((acc, product) => {
-      acc[product.name] = parseFloat(product.price); // Store price as number
-      return acc;
-    }, {});
-  }
-
   getPrice(productName, defaultValue = 0) {
-    const price = this.productPrices[productName];
-    if (price === undefined) {
-      console.warn(`Price not found for product: "${productName}". Using default value: ${defaultValue}`);
-      return defaultValue;
-    }
-    return price;
+    return window.ProductPriceCache.getPrice(productName, defaultValue);
   }
 
-  // Update prices shown directly in HTML (e.g., Rube Draco, Estudios)
   updateDynamicHTMLPrices() {
-      const format = (price) => price.toLocaleString('pt-BR'); // Use pt-BR for formatting
-
-      // Rube Draco price updates removed
-
-      // Estudios SP price updates removed
-      // Trigger a custom event that pricing-pods.js can listen for
-      // This helps ensure pricing-pods.js recalculates totals after HTML is updated
       document.dispatchEvent(new CustomEvent('dynamicPricesUpdated'));
   }
 
 
-  // --- Controls Setup ---
   setupControls() {
-    // Recalculate wall on any change in the controls
     ['width', 'height', 'curvature', 'roof-width', 'roof-height', 'rxii-units'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
-        // Update the display value in real-time as the slider moves
         el.addEventListener('input', (event) => {
-          // Update the corresponding value display
-          const valueId = id + '-value';
-          const valueDisplay = document.getElementById(valueId);
+          const valueDisplay = document.getElementById(id + '-value');
           if (valueDisplay) {
             valueDisplay.textContent = event.target.value;
           }
-          // Then recalculate the wall
           this.createWall();
         });
       }
     });
-
-    // Setup backup buttons
-    const backupBtn2D = document.getElementById('backup-btn-2d');
-    const backupBtn3D = document.getElementById('backup-btn-3d');
-
-    if (backupBtn2D && backupBtn3D) {
-      backupBtn2D.addEventListener('click', () => {
-        backupBtn2D.classList.add('active');
-        backupBtn3D.classList.remove('active');
-        this.updateServerPrice('2d');
-        if (typeof updateDisguisePod === 'function') {
-          updateDisguisePod('2d');
-        }
-      });
-
-      backupBtn3D.addEventListener('click', () => {
-        backupBtn3D.classList.add('active');
-        backupBtn2D.classList.remove('active');
-        this.updateServerPrice('3d');
-        if (typeof updateDisguisePod === 'function') {
-          updateDisguisePod('3d');
-        }
-      });
-    }
-
-    // DISABLED: Duplicate RXII event handler - pricing-pods.js handles this now
-    // This was causing RXII and Tracking prices to show 0 because led-wall.js
-    // was overwriting the correct values from pricing-pods.js with 0 values
-    /*
-    const rxiiUnitsInput = document.getElementById('rxii-units');
-    if (rxiiUnitsInput) {
-      // Use an arrow function to maintain 'this' context
-      const updateRXIIValues = () => {
-        try {
-          const rxiiUnits = parseInt(rxiiUnitsInput.value) || 1;
-          // Use fetched prices
-          const rxiiUnitPrice = this.getPrice('Disguise RXII Unit'); // Removed fallback
-          const trackingPrice = this.getPrice('Stype Tracking'); // Removed fallback
-          const modulePrice = parseFloat(document.getElementById('modules-price')?.textContent.replace(/\./g, '').replace(',', '.') || '0');
-          const processorPrice = parseFloat(document.getElementById('processors-price')?.textContent.replace(/\./g, '').replace(',', '.') || '0');
-          const serverPrice = parseFloat(document.getElementById('server-price')?.textContent.replace(/\./g, '').replace(',', '.') || '0');
-
-
-          const rxiiPrice = rxiiUnitPrice * rxiiUnits;
-          // Recalculate total 3D price based on current components
-          const total3DPrice = modulePrice + processorPrice + serverPrice + rxiiPrice + trackingPrice;
-
-          document.getElementById('rxii-units-value').textContent = rxiiUnits;
-          document.getElementById('rxii-price').textContent = rxiiPrice.toLocaleString('pt-BR');
-          document.getElementById('tracking-price').textContent = trackingPrice.toLocaleString('pt-BR');
-          document.getElementById('total-price').textContent = total3DPrice.toLocaleString('pt-BR');
-
-          // Update the summary in the proposal modal
-          const summaryRxiiUnits = document.getElementById('summary-rxii-units');
-          if (summaryRxiiUnits) summaryRxiiUnits.textContent = rxiiUnits;
-
-          // Trigger the update of the proposal summary
-          document.dispatchEvent(new CustomEvent('updateProposalSummary'));
-
-          // Explicitly update the Equipamentos subtotal
-          if (typeof addEquipamentosSubtotal === 'function') {
-            addEquipamentosSubtotal();
-          }
-        } catch (e) {
-          console.error('Error updating RXII units:', e);
-        }
-      };
-
-      // Add multiple event listeners for real-time updates
-      rxiiUnitsInput.addEventListener('change', updateRXIIValues);
-      rxiiUnitsInput.addEventListener('input', updateRXIIValues);
-      rxiiUnitsInput.addEventListener('keyup', updateRXIIValues);
-
-      // Initial call to set values based on default slider position
-      updateRXIIValues();
-    }
-    */
   }
 
   // --- Mouse Controls ---
@@ -486,12 +361,8 @@ class LEDWallCalculator {
     return { modulesX, modulesY, totalModules: modulesX * modulesY };
   }
 
-  // --- Main Calculation Logic ---
   createWall() {
-    if (!this.pricesLoaded) {
-        console.warn('Prices not loaded yet, calculations might use defaults or be inaccurate.');
-    }
-    const format = (price) => price.toLocaleString('pt-BR');
+    const format = (price) => formatNumber(price);
 
     const physicalWidth = parseFloat(document.getElementById('width').value) || 0;
     const physicalHeight = parseFloat(document.getElementById('height').value) || 0;
@@ -579,100 +450,18 @@ class LEDWallCalculator {
     updateElement('led-teto-pixels-height', tetoPixelsHeight, true);
     updateElement('led-teto-total-pixels', tetoTotalPixels, true);
 
-    // --- Price Calculations using fetched prices ---
+    // Dispatch event with quantities for pricing pods
     const totalModulesCombined = principalModules + tetoModules;
-    const moduleDailyPrice = this.getPrice('LED Module', 0); 
-    const processorDailyPrice = this.getPrice('MX-40 Pro Processor', 0);
-    const serverBaseDailyPrice = this.getPrice('Disguise VX4n (Base)', 0);
-    const rxiiUnitDailyPrice = this.getPrice('Disguise RXII Unit', 0);
-    const trackingDailyPrice = this.getPrice('Stype Tracking', 0);
-
-    const modulePriceTotal = totalModulesCombined * moduleDailyPrice;
-    const processorPriceTotal = processorsNeeded * processorDailyPrice;
-
-    // Dispatch event with necessary data for pricing pods
-    // UPDATED: Send combined total (principal + teto) as requested
-    const eventData = {
+    document.dispatchEvent(new CustomEvent('ledWallDataCalculated', {
         detail: {
-            totalModules: totalModulesCombined, // Use combined total
-            moduleUnitPrice: moduleDailyPrice,
-            processorsNeeded: processorsNeeded, // Pass other relevant data if needed
-            processorUnitPrice: processorDailyPrice,
-            // Add other calculated values if pricing-pods needs them
-            // For now, let's assume pricing-pods reads other base prices from HTML data attributes
+            totalModules: totalModulesCombined,
+            processorsNeeded: processorsNeeded
         }
-    };
-    document.dispatchEvent(new CustomEvent('ledWallDataCalculated', eventData));
+    }));
 
-    // DISABLED: Price updates - pricing-pods.js handles ALL price displays now
-    // This was overwriting the correct R$ formatted prices from pricing-pods.js
-    /*
-    this.updateServerPrice('3d'); // Call this to set initial server price and total
-    document.getElementById('modules-price').textContent = format(modulePriceTotal);
-    document.getElementById('processors-price').textContent = format(processorPriceTotal);
-    */
-
-    // DISABLED: RXII and Tracking updates - pricing-pods.js handles this now
-    // This was overwriting the correct prices with potentially stale values
-    /*
-    try {
-        const rxiiUnits = parseInt(document.getElementById('rxii-units').value) || 1;
-        const rxiiPriceTotal = rxiiUnitDailyPrice * rxiiUnits;
-        document.getElementById('rxii-units-value').textContent = rxiiUnits;
-        document.getElementById('rxii-price').textContent = format(rxiiPriceTotal);
-        document.getElementById('tracking-price').textContent = format(trackingDailyPrice);
-
-        // Recalculate total 3D price based on current components
-        const currentServerPrice3D = parseFloat(document.getElementById('server-price')?.textContent.replace(/\./g, '').replace(',', '.') || '0');
-        const total3DPrice = modulePriceTotal + processorPriceTotal + currentServerPrice3D + rxiiPriceTotal + trackingDailyPrice;
-        document.getElementById('total-price').textContent = format(total3DPrice);
-
-    } catch (error) {
-      console.error('Error updating initial 3D cost values:', error);
-    }
-    */
-
-    // Trigger the update of the proposal summary
     document.dispatchEvent(new CustomEvent('updateProposalSummary'));
   }
 
-  // --- Update Server Price based on Backup ---
-  updateServerPrice(podType) {
-    const serverBasePrice = this.getPrice('Disguise VX4n (Base)'); // Removed fallback
-    const serverBackupPrice = this.getPrice('Disguise VX4n (Backup)'); // Removed fallback // Fetch backup price
-
-    const backupBtn = document.getElementById(`backup-btn-${podType}`);
-    const serverPriceElement = document.getElementById(podType === '2d' ? 'server-price' : 'server-price');
-
-    if (backupBtn && serverPriceElement) {
-      const hasBackup = backupBtn.classList.contains('active');
-      // Use specific backup price if active, otherwise just base price
-      const serverPrice = hasBackup ? serverBasePrice + serverBackupPrice : serverBasePrice;
-
-      const format = (price) => price.toLocaleString('pt-BR');
-      serverPriceElement.textContent = format(serverPrice);
-
-      // DISABLED: Total price calculation - pricing-pods.js handles complete total now
-      // This was causing conflicts with pricing-pods.js total calculation
-      /*
-      const totalPriceElement = document.getElementById(podType === '2d' ? 'total-price' : 'total-price');
-      if (totalPriceElement) {
-        // Need to parse current module/processor prices from the DOM as they are calculated in createWall
-        const modulePrice = parseFloat(document.getElementById(podType === '2d' ? 'modules-price' : 'modules-price')?.textContent.replace(/\./g, '').replace(',', '.') || '0');
-        const processorPrice = parseFloat(document.getElementById(podType === '2d' ? 'processors-price' : 'processors-price')?.textContent.replace(/\./g, '').replace(',', '.') || '0');
-
-        // For 3D pod, also include RXII and Tracking
-        const rxiiPrice = parseFloat(document.getElementById('rxii-price')?.textContent.replace(/\./g, '').replace(',', '.') || '0');
-        const trackingPrice = parseFloat(document.getElementById('tracking-price')?.textContent.replace(/\./g, '').replace(',', '.') || '0');
-        const total = modulePrice + processorPrice + serverPrice + rxiiPrice + trackingPrice;
-        totalPriceElement.textContent = format(total);
-      }
-      */
-
-      // Trigger proposal update after price change
-      document.dispatchEvent(new CustomEvent('updateProposalSummary'));
-    }
-  }
 
   // --- Animation Loop ---
   animate() {

@@ -1,5 +1,5 @@
 // Mobile LED Calculator Adapter for Responsive Layout
-// This adapter enables mobile functionality when viewport is mobile-sized
+// Uses shared-utils.js: ProductPriceCache, PRODUCT_NAMES, formatPrice, ledLog
 
 class MobileCalculatorAdapter {
   constructor() {
@@ -33,34 +33,28 @@ class MobileCalculatorAdapter {
     if (this.initialized) return;
     this.initialized = true;
 
-    console.log('[MobileCalculatorAdapter] Initializing mobile calculator...');
+    ledLog('[MobileCalculatorAdapter] Initializing...');
 
     this.setupElements();
 
-    // Fetch prices with retry
-    let pricesLoaded = false;
-    let attempts = 0;
-    const maxAttempts = 3;
-
-    while (!pricesLoaded && attempts < maxAttempts) {
-      attempts++;
-      await this.fetchProductPrices();
-      if (this.pricesLoaded && this.productPrices && Object.keys(this.productPrices).length > 0) {
-        pricesLoaded = true;
-      } else {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
+    // Use shared price cache
+    try {
+      this.productPrices = await window.ProductPriceCache.get();
+      this.pricesLoaded = Object.keys(this.productPrices).length > 0;
+    } catch (error) {
+      console.error('[MobileCalculatorAdapter] Failed to load prices:', error);
+      this.productPrices = {};
+      this.pricesLoaded = false;
     }
 
-    if (!pricesLoaded) {
-      console.error('[MobileCalculatorAdapter] Failed to load prices');
+    if (!this.pricesLoaded) {
       this.showPriceLoadError();
     }
 
     this.setupEventListeners();
     this.calculateAll();
 
-    console.log('[MobileCalculatorAdapter] Initialization complete');
+    ledLog('[MobileCalculatorAdapter] Initialization complete');
   }
 
   setupElements() {
@@ -175,44 +169,6 @@ class MobileCalculatorAdapter {
     }
   }
 
-  async fetchProductPrices() {
-    if (!window.SUPABASE_KEY) {
-      await new Promise((resolve) => {
-        if (window.SUPABASE_KEY) {
-          resolve();
-        } else {
-          const handler = () => {
-            window.removeEventListener('supabaseConfigReady', handler);
-            resolve();
-          };
-          window.addEventListener('supabaseConfigReady', handler);
-          setTimeout(() => {
-            window.removeEventListener('supabaseConfigReady', handler);
-            resolve();
-          }, 10000);
-        }
-      });
-    }
-
-    try {
-      if (!window.quoteService || typeof window.quoteService.getProductPrices !== 'function') {
-        throw new Error('Quote service not available');
-      }
-
-      const result = await window.quoteService.getProductPrices();
-
-      if (result.success && result.data) {
-        this.productPrices = result.data;
-        this.pricesLoaded = true;
-      } else {
-        throw new Error(result.error || 'No price data returned');
-      }
-    } catch (error) {
-      console.error('[MobileCalculatorAdapter] Error fetching prices:', error);
-      this.productPrices = {};
-      this.pricesLoaded = false;
-    }
-  }
 
   calculateModules(width, height) {
     const modulesX = Math.ceil(width / this.moduleSize);
@@ -332,15 +288,6 @@ class MobileCalculatorAdapter {
     this.calculatePrices();
   }
 
-  formatPrice(value) {
-    const numericValue = Number(value);
-    if (isNaN(numericValue)) return 'R$ 0';
-    return 'R$ ' + numericValue.toLocaleString('pt-BR', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    });
-  }
-
   calculatePrices() {
     if (!this.pricesLoaded || !this.productPrices || Object.keys(this.productPrices).length === 0) {
       this.displayPricePlaceholders();
@@ -349,14 +296,14 @@ class MobileCalculatorAdapter {
 
     let total = 0;
 
-    const modulePrice = this.productPrices['LED Module'] || 0;
-    const processorPrice = this.productPrices['MX-40 Pro Processor'] || 0;
-    const vx4nBasePrice = this.productPrices['Disguise VX4n (Base)'] || 0;
-    const vx4nBackupPrice = this.productPrices['Disguise VX4n (Backup)'] || vx4nBasePrice || 0;
-    const rxiiUnitPrice = this.productPrices['Disguise RXII Unit'] || 0;
-    const trackingPrice = this.productPrices['Stype Tracking'] || 0;
-    const studioPrice = this.productPrices['Estúdio'] || 6000;
-    const teamPrice = this.productPrices['Equipe Técnica da Diária'] || this.productPrices['Equipe Técnica Diária'] || 0;
+    const modulePrice = this.productPrices[PRODUCT_NAMES.LED_MODULE] || 0;
+    const processorPrice = this.productPrices[PRODUCT_NAMES.MX40_PROCESSOR] || 0;
+    const vx4nBasePrice = this.productPrices[PRODUCT_NAMES.DISGUISE_VX4N_BASE] || 0;
+    const vx4nBackupPrice = this.productPrices[PRODUCT_NAMES.DISGUISE_VX4N_BACKUP] || vx4nBasePrice || 0;
+    const rxiiUnitPrice = this.productPrices[PRODUCT_NAMES.DISGUISE_RXII] || 0;
+    const trackingPrice = this.productPrices[PRODUCT_NAMES.STYPE_TRACKING] || 0;
+    const studioPrice = this.productPrices[PRODUCT_NAMES.ESTUDIO] || 6000;
+    const teamPrice = this.productPrices[PRODUCT_NAMES.EQUIPE_TECNICA] || this.productPrices[PRODUCT_NAMES.EQUIPE_TECNICA_ALT] || 0;
 
     const principalModules = this.principalInfo?.total || 0;
     const tetoModules = this.tetoInfo?.total || 0;
@@ -366,40 +313,40 @@ class MobileCalculatorAdapter {
     // 1. LED Modules
     const modulesTotalCost = totalModules * modulePrice;
     total += modulesTotalCost;
-    if (this.modulesPriceEl) this.modulesPriceEl.textContent = this.formatPrice(modulesTotalCost);
+    if (this.modulesPriceEl) this.modulesPriceEl.textContent = formatPrice(modulesTotalCost);
 
     // 2. Processors
     const processorsCost = processorsNeeded * processorPrice;
     total += processorsCost;
-    if (this.processorsPriceEl) this.processorsPriceEl.textContent = this.formatPrice(processorsCost);
+    if (this.processorsPriceEl) this.processorsPriceEl.textContent = formatPrice(processorsCost);
 
     // 3. Server
     const serverCost = this.isBackupActive ? (vx4nBasePrice + vx4nBackupPrice) : vx4nBasePrice;
     total += serverCost;
-    if (this.serverPriceEl) this.serverPriceEl.textContent = this.formatPrice(serverCost);
+    if (this.serverPriceEl) this.serverPriceEl.textContent = formatPrice(serverCost);
 
     // 4. RXII (only in 3D mode)
     if (this.currentMode === '3d') {
       const rxiiUnits = parseInt(this.rxiiSlider?.value || 2);
       const rxiiTotalCost = rxiiUnits * rxiiUnitPrice;
       total += rxiiTotalCost;
-      if (this.rxiiPriceEl) this.rxiiPriceEl.textContent = this.formatPrice(rxiiTotalCost);
+      if (this.rxiiPriceEl) this.rxiiPriceEl.textContent = formatPrice(rxiiTotalCost);
 
       // 5. Tracking
       total += trackingPrice;
-      if (this.trackingPriceEl) this.trackingPriceEl.textContent = this.formatPrice(trackingPrice);
+      if (this.trackingPriceEl) this.trackingPriceEl.textContent = formatPrice(trackingPrice);
     }
 
     // 6. Studio
     total += studioPrice;
-    if (this.studioPriceEl) this.studioPriceEl.textContent = this.formatPrice(studioPrice);
+    if (this.studioPriceEl) this.studioPriceEl.textContent = formatPrice(studioPrice);
 
     // 7. Team
     total += teamPrice;
-    if (this.teamPriceEl) this.teamPriceEl.textContent = this.formatPrice(teamPrice);
+    if (this.teamPriceEl) this.teamPriceEl.textContent = formatPrice(teamPrice);
 
     // Update total
-    if (this.totalPriceEl) this.totalPriceEl.textContent = this.formatPrice(total);
+    if (this.totalPriceEl) this.totalPriceEl.textContent = formatPrice(total);
   }
 
   handlePropostaClick() {
