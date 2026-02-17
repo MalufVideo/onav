@@ -1,6 +1,9 @@
-img/videos/*
 img/efifa_extracted/*
-*.mp4
+img/videos/tate*.mp4
+img/videos/belo.mp4
+img/videos/globo_agro_acai_720p.mp4
+img/videos/globo_agro_2025.mp4
+img/videos/antartida*.mp4
 *.mov
 *.MOV
 STAGING-WORKFLOW.md
