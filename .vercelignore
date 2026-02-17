@@ -1,0 +1,9 @@
+img/videos/*
+img/efifa_extracted/*
+*.mp4
+*.mov
+*.MOV
+STAGING-WORKFLOW.md
+.vscode
+node_modules
+.env
