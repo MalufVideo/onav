@@ -1,118 +1,86 @@
-<h3 class="text-xl font-bold mb-2 text-light-text"
-        style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.5rem; color: #f0f0f0;">
-        BELO, PERTO DEMAIS DA LUZ</h3>
+<h3 class="text-xl font-bold mb-2 text-light-text" style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.5rem; color: #f0f0f0;">
+  BELO, TOO CLOSE TO THE LIGHT
+</h3>
 
-      <!-- Main Video Player -->
-      <div
-        style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 20px; border-radius: 10px; background: #000;">
-        <div id="beloVideoContainer"
-          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('img/belo_thumb.webp'); background-size: cover; background-position: center;">
-          <!-- Custom play button overlay -->
-          <div id="beloPlayOverlay"
-            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.4); cursor: pointer; z-index: 2;">
-            <div
-              style="width: 80px; height: 80px; border-radius: 50%; background-color: #00ffaa; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,255,170,0.5);">
-              <div
-                style="width: 0; height: 0; border-top: 20px solid transparent; border-left: 35px solid #121212; border-bottom: 20px solid transparent; margin-left: 8px;">
-              </div>
-            </div>
-          </div>
-          <!-- Video element (will be loaded on demand) -->
-          <video id="beloCaseStudyVideo"
-            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;" controls>
-            <source data-src="/img/videos/belo.mp4" type="video/mp4">
-            Seu navegador não suporta a reprodução de vídeo.
-          </video>
+<!-- Main Video Player -->
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 20px; border-radius: 10px; background: #000;">
+  <div id="beloVideoContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('img/belo_thumb.webp'); background-size: cover; background-position: center;">
+    <!-- Custom play button overlay -->
+    <div id="beloPlayOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.4); cursor: pointer; z-index: 2;">
+      <div style="width: 80px; height: 80px; border-radius: 50%; background-color: #00ffaa; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,255,170,0.5);">
+        <div style="width: 0; height: 0; border-top: 20px solid transparent; border-left: 35px solid #121212; border-bottom: 20px solid transparent; margin-left: 8px;">
         </div>
       </div>
+    </div>
+    <!-- Video element (will be loaded on demand) -->
+    <video id="beloCaseStudyVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;" controls>
+      <source data-src="/img/videos/belo.mp4" type="video/mp4">
+      Your browser does not support video playback.
+    </video>
+  </div>
+</div>
 
-      <!-- Case Study Content -->
-      <div id="beloCaseStudyContent">
-        <p class="text-medium-text text-sm mb-4"
-          style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">
-          Fornecimento de servidores Disguise VX4 e RXII para documentário sobre os 50 anos de carreira do cantor Belo
-          no estúdio Surreal.
-        </p>
+<!-- Case Study Content -->
+<div id="beloCaseStudyContent">
+  <p class="text-medium-text text-sm mb-4" style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">
+    Supply of Disguise VX4 and RXII servers for the documentary about singer Belo's 50-year career at Surreal studio.
+  </p>
 
-        <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
-          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono"
-            style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Disguise
-            VX4</span>
-          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono"
-            style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">RXII</span>
-          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono"
-            style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Documentário</span>
-          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono"
-            style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Unreal
-            Engine</span>
-          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono"
-            style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Surreal
-            Studio</span>
-          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono"
-            style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Biografia
-            Musical</span>
-        </div>
+  <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+    <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Disguise VX4</span>
+    <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">RXII</span>
+    <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Documentary</span>
+    <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Unreal Engine</span>
+    <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Surreal Studio</span>
+    <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono" style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Musical Biography</span>
+  </div>
 
-        <div class="mb-6">
-          <h4 class="font-bold text-light-text mb-2" style="font-size: 1.1rem; margin-bottom: 0.75rem; color: #f0f0f0;">
-            Project Challenge</h4>
-          <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">
-            Nossos parceiros <strong>Alexandre Arrabal</strong> e <strong>Césio Lima</strong> do estúdio
-            <strong>Surreal</strong> nos convidaram para um projeto especial: o documentário "Perto Demais da Luz", que
-            retrata os 50 anos de carreira do cantor Belo.
-          </p>
-          <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">
-            O desafio era criar ambientes visuais que complementassem uma narrativa complexa, passando por várias
-            polêmicas da carreira do artista, depoimentos de celebridades e momentos icônicos de sua trajetória musical.
-          </p>
-        </div>
+  <div class="mb-6">
+    <h4 class="font-bold text-light-text mb-2" style="font-size: 1.1rem; margin-bottom: 0.75rem; color: #f0f0f0;">
+      Project Challenge</h4>
+    <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">
+      Our partners <strong>Alexandre Arrabal</strong> and <strong>Césio Lima</strong> from <strong>Surreal</strong> studio invited us for a special project: the documentary "Too Close to the Light", which portrays singer Belo's 50-year career.
+    </p>
+    <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">
+      The challenge was to create visual environments that complemented a complex narrative, covering various controversies of the artist's career, celebrity testimonials, and iconic moments of his musical trajectory.
+    </p>
+  </div>
 
-        <div class="mb-6">
-          <h4 class="font-bold text-light-text mb-2" style="font-size: 1.1rem; margin-bottom: 0.75rem; color: #f0f0f0;">
-            Nossa Participação</h4>
-          <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">
-            Fornecemos servidores <strong>Disguise VX4 e RXII</strong> para renderizar em tempo real os projetos
-            desenvolvidos em Unreal Engine nos painéis LED do estúdio Surreal.
-          </p>
+  <div class="mb-6">
+    <h4 class="font-bold text-light-text mb-2" style="font-size: 1.1rem; margin-bottom: 0.75rem; color: #f0f0f0;">
+      Our Role</h4>
+    <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">
+      We provided <strong>Disguise VX4 and RXII</strong> servers to render Unreal Engine projects in real-time on Surreal studio's LED panels.
+    </p>
 
-          <!-- Backstage Image 1 -->
-          <div
-            style="width: 100%; margin: 20px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-            <img src="/img/belo_vp_3127.webp" alt="Belo - Bastidores da produção virtual"
-              style="width: 100%; display: block;">
-          </div>
+    <!-- Backstage Image 1 -->
+    <div style="width: 100%; margin: 20px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+      <img src="/img/belo_vp_3127.webp" alt="Belo - Virtual Production Backstage" style="width: 100%; display: block;">
+    </div>
 
-          <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 0.5rem;">
-            Our technology was specifically used for:
-          </p>
-          <ul class="list-disc pl-5 space-y-2" style="list-style-type: disc; padding-left: 1.25rem; margin: 0.5rem 0;">
-            <li style="font-size: 0.9em; line-height: 1.6; color: #cccccc;"><strong>Momentos de transição</strong> entre
-              depoimentos e arquivo histórico</li>
-            <li style="font-size: 0.9em; line-height: 1.6; color: #cccccc;"><strong>Cenários dinâmicos</strong> que
-              contextualizavam diferentes fases da carreira</li>
-            <li style="font-size: 0.9em; line-height: 1.6; color: #cccccc;"><strong>Ambientes imersivos</strong> que
-              transportavam espectadores através de 5 décadas de música brasileira</li>
-          </ul>
+    <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 0.5rem;">
+      Our technology was specifically used for:
+    </p>
+    <ul class="list-disc pl-5 space-y-2" style="list-style-type: disc; padding-left: 1.25rem; margin: 0.5rem 0;">
+      <li style="font-size: 0.9em; line-height: 1.6; color: #cccccc;"><strong>Transition moments</strong> between testimonials and historical archives</li>
+      <li style="font-size: 0.9em; line-height: 1.6; color: #cccccc;"><strong>Dynamic scenarios</strong> contextualizing different career phases</li>
+      <li style="font-size: 0.9em; line-height: 1.6; color: #cccccc;"><strong>Immersive environments</strong> transporting viewers through 5 decades of Brazilian music</li>
+    </ul>
 
-          <!-- Backstage Image 2 -->
-          <div
-            style="width: 100%; margin: 20px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-            <img src="/img/belo_vp_3129.webp" alt="Belo - Setup dos servidores Disguise"
-              style="width: 100%; display: block;">
-          </div>
-        </div>
+    <!-- Backstage Image 2 -->
+    <div style="width: 100%; margin: 20px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+      <img src="/img/belo_vp_3129.webp" alt="Belo - Disguise Server Setup" style="width: 100%; display: block;">
+    </div>
+  </div>
 
-        <div class="mb-6">
-          <h4 class="font-bold text-light-text mb-2" style="font-size: 1.1rem; margin-bottom: 0.75rem; color: #f0f0f0;">
-            Results</h4>
-          <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">
-            A parceria com a Surreal resultou em um documentário visualmente envolvente que honrou a complexa trajetória
-            de Belo. Os servidores Disguise permitiram transições fluidas entre realidade e memória, criando uma
-            narrativa visual que amplificou o impacto emocional dos depoimentos.
-          </p>
-          <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">
-            O projeto demonstra como a produção virtual pode elevar documentários biográficos, transformando entrevistas
-            convencionais em experiências cinematográficas imersivas.
-          </p>
-        </div>
-      </div>
+  <div class="mb-6">
+    <h4 class="font-bold text-light-text mb-2" style="font-size: 1.1rem; margin-bottom: 0.75rem; color: #f0f0f0;">
+      Results</h4>
+    <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">
+      The partnership with Surreal resulted in a visually engaging documentary that honored Belo's complex trajectory. Disguise servers allowed fluid transitions between reality and memory, creating a visual narrative that amplified the emotional impact of the testimonials.
+    </p>
+    <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">
+      The project demonstrates how virtual production can elevate biographical documentaries, transforming conventional interviews into immersive cinematic experiences.
+    </p>
+  </div>
+</div>
