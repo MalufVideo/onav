@@ -216,33 +216,39 @@
     var shell = ensureShell();
     var contentEl = document.getElementById(CONTENT_ID);
     currentModal = name;
+    
+    // Check if we are on an English page
+    var isEn = window.location.pathname.indexOf('/en') !== -1;
+    var modalPath = isEn ? '/en/modals/' + name + '.html' : '/modals/' + name + '.html';
+    var loadingMsg = isEn 
+      ? '<div style="text-align:center;padding:40px;"><i class="fas fa-spinner fa-spin" style="font-size:24px;color:#00ffaa;"></i></div>'
+      : '<div style="text-align:center;padding:40px;"><i class="fas fa-spinner fa-spin" style="font-size:24px;color:#00ffaa;"></i></div>';
 
     // Loading spinner
-    contentEl.innerHTML =
-      '<div style="text-align:center;padding:40px;">' +
-      '<i class="fas fa-spinner fa-spin" style="font-size:24px;color:#00ffaa;"></i></div>';
+    contentEl.innerHTML = loadingMsg;
     shell.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 
-    if (cache[name]) {
-      inject(name, cache[name], contentEl);
+    if (cache[name + (isEn ? '_en' : '_pt')]) {
+      inject(name, cache[name + (isEn ? '_en' : '_pt')], contentEl);
       return;
     }
 
-    fetch('/modals/' + name + '.html')
+    fetch(modalPath)
       .then(function (r) {
         if (!r.ok) throw new Error(r.status);
         return r.text();
       })
       .then(function (html) {
-        cache[name] = html;
+        cache[name + (isEn ? '_en' : '_pt')] = html;
         inject(name, html, contentEl);
       })
       .catch(function () {
         if (currentModal === name) {
-          contentEl.innerHTML =
-            '<div style="text-align:center;padding:40px;color:#ff4444;">' +
-            'Erro ao carregar conteúdo. Tente novamente.</div>';
+          var errorMsg = isEn 
+            ? '<div style="text-align:center;padding:40px;color:#ff4444;">Error loading content. Please try again.</div>'
+            : '<div style="text-align:center;padding:40px;color:#ff4444;">Erro ao carregar conteúdo. Tente novamente.</div>';
+          contentEl.innerHTML = errorMsg;
         }
       });
   }

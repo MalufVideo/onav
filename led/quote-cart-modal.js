@@ -887,6 +887,29 @@ class QuoteCartModal {
                 alert(`Proposta salva (ID: ${proposalId}), mas ocorreu um erro crítico ao tentar enviar o email: ${invokeError.message}. Por favor, contate o suporte.`);
             }
 
+            // --- GA4 Lead Tracking ---
+            try {
+                if (typeof gtag === 'function') {
+                    gtag('event', 'qualify_lead', {
+                        'event_category': 'led_calculator',
+                        'event_label': 'quote_submitted',
+                        'value': proposalDataToSave.total_price ? parseFloat(String(proposalDataToSave.total_price).replace(/[^0-9.]/g, '')) : 0,
+                        'currency': 'BRL',
+                        'user_type': isGuestUser ? 'guest' : 'authenticated',
+                        'led_size': `${proposalDataToSave.led_principal_width || 0}x${proposalDataToSave.led_principal_height || 0}m`,
+                        'num_services': proposalDataToSave.selected_services ? proposalDataToSave.selected_services.length : 0
+                    });
+                    gtag('event', 'generate_lead', {
+                        'event_category': 'led_calculator',
+                        'event_label': isGuestUser ? 'guest_quote' : 'auth_quote',
+                        'value': proposalDataToSave.total_price ? parseFloat(String(proposalDataToSave.total_price).replace(/[^0-9.]/g, '')) : 0,
+                        'currency': 'BRL'
+                    });
+                }
+            } catch (gaError) {
+                console.warn('[QuoteCartModal] GA event error:', gaError);
+            }
+
             // --- Success Handling ---
             ledLog('[QuoteCartModal] Resetting cart and showing confirmation...');
             this.hide();

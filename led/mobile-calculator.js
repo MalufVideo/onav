@@ -702,6 +702,22 @@ class MobileLEDCalculator {
 
       if (result.success) {
         console.log('[MobileLEDCalculator] Quote saved successfully');
+        // GA4 Lead Tracking
+        try {
+          if (typeof gtag === 'function') {
+            gtag('event', 'qualify_lead', {
+              'event_category': 'led_calculator_mobile',
+              'event_label': 'quote_submitted',
+              'value': proposalData.total_price ? parseFloat(String(proposalData.total_price).replace(/[^0-9.]/g, '')) : 0,
+              'currency': 'BRL'
+            });
+            gtag('event', 'generate_lead', {
+              'event_category': 'led_calculator_mobile',
+              'event_label': 'mobile_quote',
+              'currency': 'BRL'
+            });
+          }
+        } catch (gaError) { console.warn('[MobileLED] GA event error:', gaError); }
         this.closeModal();
         this.showConfirmationModal();
       } else {

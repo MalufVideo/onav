@@ -13,6 +13,15 @@ Allow: /producao-virtual-xr
 Allow: /criacao-conteudo
 Allow: /consultoria-suporte
 Allow: /led/
+Allow: /en/
+Allow: /en/virtual-production-xr
+Allow: /en/studio
+Allow: /en/products
+Allow: /en/shows
+Allow: /en/projection-mapping
+Allow: /en/content-creation
+Allow: /en/consulting-support
+Allow: /en/blog
 
 # Disallow admin and internal areas
 Disallow: /admin/

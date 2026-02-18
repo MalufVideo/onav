@@ -33,7 +33,73 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculadora de Painel de LED - Styled Version</title>
+  <title>Calculadora de Painel de LED | Simule seu Projeto — ONAV</title>
+  <meta name="description" content="Simule o tamanho, curvatura e preço estimado do seu painel de LED em 3D, gratuitamente. A calculadora mais completa do Brasil para aluguel de LED wall para eventos, shows e produção virtual.">
+  <meta name="keywords" content="calculadora painel LED, simulador LED wall, calculadora LED wall, preço painel LED, aluguel painel LED São Paulo, pixel pitch LED, LED wall produção virtual, calculadora painel de led">
+  <link rel="canonical" href="https://www.onav.com.br/led/">
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.onav.com.br/led/">
+  <meta property="og:title" content="Calculadora de Painel de LED 3D | ONAV — Simule e Cotar Online">
+  <meta property="og:description" content="Configure largura, altura e curvatura do seu LED wall e visualize em 3D. Veja o investimento estimado em tempo real. Gere uma proposta personalizada em minutos.">
+  <meta property="og:image" content="https://www.onav.com.br/img/resized_logo.png">
+  <meta property="og:locale" content="pt_BR">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Calculadora de Painel de LED 3D | ONAV">
+  <meta name="twitter:description" content="Simule tamanho, curvatura e preço do seu LED wall em 3D. Gere uma proposta em minutos.">
+  <!-- Schema.org FAQ + BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.onav.com.br/" },
+          { "@type": "ListItem", "position": 2, "name": "Calculadora de Painel de LED", "item": "https://www.onav.com.br/led/" }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Qual pixel pitch de painel LED devo escolher?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Para produção virtual e ICVFX (In-Camera VFX), recomendamos pixel pitch entre P1.5 e P2.6. Para shows e eventos em palco, P2.9 a P3.9 é ideal. Para auditórios e conferências com público mais distante, P4 a P6 oferecem ótimo custo-benefício. Nossa calculadora considera o pixel pitch recomendado automaticamente com base na aplicação escolhida."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Quanto custa alugar um painel de LED para evento?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "O custo de aluguel de painel de LED varia conforme o tamanho, pixel pitch, dias de locação e serviços incluídos (transporte, montagem, operador). Use nossa calculadora 3D acima para simular o investimento estimado com base nas dimensões do seu projeto. Geramos uma proposta personalizada com todos os detalhes em minutos."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "O que é LED wall para produção virtual?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Um LED wall para produção virtual (ou estúdio xR) é uma parede de painéis LED de alta resolução usada como fundo ativo em gravações. Em vez de chroma key, os cenários digitais são renderizados em tempo real no Unreal Engine e exibidos na tela LED — câmeras capturam o reflexo e a iluminação do ambiente diretamente, criando ICVFX (In-Camera Visual Effects) realistas. A ONAV é especialista nessa tecnologia no Brasil."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Qual a diferença entre LED wall e telão de LED?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Ambos são compostos de módulos de LED, mas com finalidades diferentes. O 'telão' é tipicamente usado em shows e eventos para exibição de conteúdo para o público. O 'LED wall' de produção virtual tem especificações mais exigentes (menor pixel pitch, maior taxa de atualização, calibração de cor) para garantir que câmeras de cinema capturem a imagem sem moiré ou flickering. Nossa calculadora cobre ambas as aplicações."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
   <!-- Three.js (r128) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- GLTFLoader for 3D model import -->
@@ -717,6 +783,314 @@
     <script src="auth.js"></script>
     <script src="auth-ui.js"></script>
     <script src="auth-protection.js"></script>
+
+
+  <!-- GA4 Newsletter Tracking -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Track newsletter form submissions
+      var nlForms = document.querySelectorAll('[id*="newsletter"]');
+      nlForms.forEach(function(form) {
+        form.addEventListener('submit', function() {
+          try {
+            if (typeof gtag === 'function') {
+              gtag('event', 'newsletter_signup', {
+                'event_category': 'engagement',
+                'event_label': window.location.pathname
+              });
+            }
+          } catch(e) {}
+        });
+      });
+      // Track all WhatsApp link clicks
+      var waLinks = document.querySelectorAll('a[href*="wa.me"]');
+      waLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          try {
+            if (typeof gtag === 'function') {
+              gtag('event', 'whatsapp_click', {
+                'event_category': 'engagement',
+                'event_label': window.location.pathname
+              });
+            }
+          } catch(e) {}
+        });
+      });
+    });
+  </script>
+
+  <!-- GA4 Calculator Interaction Tracking -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Debounce helper - only fire GA event after user stops interacting
+      function debounce(fn, delay) {
+        let timer; return function() { clearTimeout(timer); timer = setTimeout(() => fn.apply(this, arguments), delay); };
+      }
+
+      // Track LED dimension changes (debounced to avoid spam)
+      ['width', 'height', 'curvature', 'roof-width', 'roof-height'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('change', debounce(function() {
+            try {
+              if (typeof gtag === 'function') {
+                gtag('event', 'calculator_config', {
+                  'event_category': 'led_calculator',
+                  'event_label': id,
+                  'value': parseFloat(el.value)
+                });
+              }
+            } catch(e) {}
+          }, 1000));
+        }
+      });
+
+      // Track "Gerar Proposta" button click (opening the quote modal)
+      var propostaBtn = document.getElementById('proposta-btn');
+      if (propostaBtn) {
+        propostaBtn.addEventListener('click', function() {
+          try {
+            if (typeof gtag === 'function') {
+              var widthEl = document.getElementById('width');
+              var heightEl = document.getElementById('height');
+              gtag('event', 'begin_checkout', {
+                'event_category': 'led_calculator',
+                'event_label': 'gerar_proposta_clicked',
+                'led_size': (widthEl ? widthEl.value : '?') + 'x' + (heightEl ? heightEl.value : '?') + 'm'
+              });
+            }
+          } catch(e) {}
+        });
+      }
+
+      // Track production type selection (3D vs 2D)
+      document.querySelectorAll('.pod-option, .production-type-btn, [data-pod-type]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          try {
+            if (typeof gtag === 'function') {
+              gtag('event', 'select_content', {
+                'event_category': 'led_calculator',
+                'content_type': 'production_type',
+                'event_label': btn.textContent.trim().substring(0, 30)
+              });
+            }
+          } catch(e) {}
+        });
+      });
+
+      // Track calculator page engagement (time spent)
+      var startTime = Date.now();
+      window.addEventListener('beforeunload', function() {
+        var timeSpent = Math.round((Date.now() - startTime) / 1000);
+        try {
+          if (typeof gtag === 'function' && timeSpent > 10) {
+            gtag('event', 'calculator_engagement', {
+              'event_category': 'led_calculator',
+              'event_label': 'time_on_calculator',
+              'value': timeSpent
+            });
+          }
+        } catch(e) {}
+      });
+    });
+  </script>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SEO EDUCATIONAL CONTENT SECTION
+       Target keywords: calculadora painel LED, simulador LED wall,
+       pixel pitch LED, quanto custa aluguel painel LED, produção virtual
+  ════════════════════════════════════════════════════════════════ -->
+  <section id="seo-content" style="
+    background: #0a0e1a;
+    color: #c8d6e5;
+    padding: 60px 40px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.75;
+    max-width: 100%;
+    box-sizing: border-box;
+  ">
+    <div style="max-width: 900px; margin: 0 auto;">
+
+      <h1 style="
+        font-size: 2rem;
+        color: #ffffff;
+        margin-bottom: 8px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+      ">Calculadora de Painel de LED — Simule seu Projeto em 3D</h1>
+
+      <p style="color: #8fa8c0; margin-top: 0; margin-bottom: 40px; font-size: 1.05rem;">
+        A única calculadora de LED wall com visualização 3D em tempo real disponível no Brasil.
+        Configure as dimensões, curvatura e tipo de produção — e veja o investimento estimado em segundos.
+      </p>
+
+      <!-- ── O que é esta calculadora ── -->
+      <h2 style="font-size: 1.4rem; color: #d0e4f5; margin-top: 48px; margin-bottom: 12px; font-weight: 600;">
+        Como funciona a Calculadora de Painel de LED da ONAV
+      </h2>
+      <p>
+        Nossa calculadora de painel de LED foi desenvolvida para produtoras, agências de eventos e diretores
+        de arte que precisam simular rapidamente o custo e a aparência de um <strong style="color:#fff">LED wall</strong>
+        antes de fechar um orçamento. Diferente de formulários de contato tradicionais, aqui você configura
+        largura, altura e curvatura do painel e vê um modelo 3D atualizado em tempo real —
+        junto com o investimento estimado já calculado.
+      </p>
+      <p>
+        Também é possível simular painéis de teto (Rooftop LED), escolher o tipo de produção
+        (show ao vivo, evento corporativo, produção virtual xR ou ICVFX) e selecionar o
+        <a href="/led/" style="color: #5b9bd5;">pixel pitch</a> mais adequado para cada aplicação.
+        Ao finalizar, você gera uma <strong style="color:#fff">proposta personalizada</strong> diretamente
+        pela plataforma — sem precisar esperar dias por um retorno.
+      </p>
+
+      <!-- ── Pixel Pitch ── -->
+      <h2 style="font-size: 1.4rem; color: #d0e4f5; margin-top: 48px; margin-bottom: 12px; font-weight: 600;">
+        Qual pixel pitch de LED escolher? Guia rápido
+      </h2>
+      <p>
+        O <strong style="color:#fff">pixel pitch</strong> é a distância em milímetros entre os pixels do painel.
+        Quanto menor o número, maior a resolução e o custo. A escolha correta depende da distância mínima
+        do público (ou da câmera) até o painel:
+      </p>
+      <ul style="padding-left: 24px; margin: 16px 0;">
+        <li style="margin-bottom: 10px;"><strong style="color:#fff">P1.5 – P2.6</strong> — Produção virtual e ICVFX (In-Camera VFX). A câmera de cinema fica a menos de 3m do painel, então a resolução precisa ser máxima para evitar moiré. Recomendado para estúdios xR.</li>
+        <li style="margin-bottom: 10px;"><strong style="color:#fff">P2.9 – P3.9</strong> — Shows, concertos e eventos ao vivo. Ótima qualidade de imagem para transmissão e para o público no palco.</li>
+        <li style="margin-bottom: 10px;"><strong style="color:#fff">P4 – P6</strong> — Feiras, conferências, auditórios. O público está a 5m+ de distância, então pixels maiores são suficientes e mais econômicos.</li>
+      </ul>
+      <p>
+        A calculadora acima seleciona automaticamente o pixel pitch recomendado com base no tipo de produção
+        escolhido, mas você pode ajustar manualmente na configuração do painel.
+      </p>
+
+      <!-- ── Quanto custa ── -->
+      <h2 style="font-size: 1.4rem; color: #d0e4f5; margin-top: 48px; margin-bottom: 12px; font-weight: 600;">
+        Quanto custa alugar um painel de LED?
+      </h2>
+      <p>
+        O custo de aluguel de painel de LED varia conforme <strong style="color:#fff">tamanho total em m²</strong>,
+        <strong style="color:#fff">pixel pitch</strong>, <strong style="color:#fff">dias de locação</strong>,
+        e serviços incluídos como transporte, montagem, desmontagem e operador técnico.
+        Em linhas gerais, projetos de pequeno porte (até 20m²) têm investimentos diferentes de produções
+        com volumes LED de 80m²+ para estúdios de produção virtual.
+      </p>
+      <p>
+        Em vez de listar preços fixos que variam conforme disponibilidade e especificação,
+        a melhor abordagem é usar a calculadora acima: configure as dimensões reais do seu projeto
+        e clique em <strong style="color:#fff">"Gerar Proposta"</strong> para receber um orçamento detalhado
+        e personalizado, com todos os itens discriminados.
+      </p>
+
+      <!-- ── LED wall para produção virtual ── -->
+      <h2 style="font-size: 1.4rem; color: #d0e4f5; margin-top: 48px; margin-bottom: 12px; font-weight: 600;">
+        LED wall para Produção Virtual e ICVFX
+      </h2>
+      <p>
+        A ONAV é especialista em <a href="/producao-virtual-xr.html" style="color: #5b9bd5;">produção virtual</a>
+        — a tecnologia que usa volumes de LED wall de alta resolução para substituir o chroma key.
+        Com um LED wall P1.5 a P2.6 operado pelo software
+        <strong style="color:#fff">Disguise</strong> (certificado pela nossa equipe), cenários criados
+        no <strong style="color:#fff">Unreal Engine</strong> são renderizados em tempo real no painel,
+        e as câmeras capturam o ambiente, iluminação e reflexos diretamente na cena —
+        sem pós-produção complexa.
+      </p>
+      <p>
+        Essa tecnologia, conhecida como <strong style="color:#fff">ICVFX (In-Camera Visual Effects)</strong>,
+        foi usada em produções como The Mandalorian e está disponível agora no Brasil.
+        Nossa calculadora inclui a opção de simular um volume de LED wall para produção virtual,
+        com teto (rooftop) e curvatura configuráveis.
+        <a href="/estudio.html" style="color: #5b9bd5;">Conheça nosso estúdio de produção virtual →</a>
+      </p>
+
+      <!-- ── Por que ONAV ── -->
+      <h2 style="font-size: 1.4rem; color: #d0e4f5; margin-top: 48px; margin-bottom: 12px; font-weight: 600;">
+        Por que escolher a ONAV para seu projeto de LED
+      </h2>
+      <ul style="padding-left: 24px; margin: 16px 0;">
+        <li style="margin-bottom: 10px;"><strong style="color:#fff">Orçamento online em minutos</strong> — sem esperar dias por uma proposta, use a calculadora e receba tudo discriminado</li>
+        <li style="margin-bottom: 10px;"><strong style="color:#fff">Equipe certificada Disguise</strong> — um dos poucos operadores certificados do Brasil para produção virtual de alto nível</li>
+        <li style="margin-bottom: 10px;"><strong style="color:#fff">Solução completa</strong> — hardware, transporte, montagem, operação e suporte técnico em um único parceiro</li>
+        <li style="margin-bottom: 10px;"><strong style="color:#fff">Casos reais</strong> — Globo Agro 2025, shows, eventos corporativos, campanhas publicitárias</li>
+        <li style="margin-bottom: 10px;"><strong style="color:#fff">São Paulo e todo o Brasil</strong> — atendemos projetos em qualquer estado com logística própria</li>
+      </ul>
+      <p style="margin-top: 24px;">
+        Precisa de <a href="/consultoria-suporte.html" style="color: #5b9bd5;">consultoria técnica</a> antes de definir o tamanho do painel?
+        Nossa equipe pode ajudar a especificar o projeto correto para seu orçamento e resultado esperado.
+        Entre em contato via WhatsApp ou gere uma proposta diretamente pela calculadora acima.
+      </p>
+
+      <!-- ── FAQ ── -->
+      <h2 style="font-size: 1.4rem; color: #d0e4f5; margin-top: 48px; margin-bottom: 16px; font-weight: 600;">
+        Perguntas Frequentes sobre Aluguel de Painel de LED
+      </h2>
+
+      <details style="border-bottom: 1px solid #1e2d42; padding: 14px 0; cursor: pointer;">
+        <summary style="color: #fff; font-weight: 600; font-size: 1rem; list-style: none; display: flex; justify-content: space-between;">
+          Qual pixel pitch de painel LED devo escolher?
+        </summary>
+        <p style="margin-top: 12px; color: #a8bfcf;">
+          Depende da distância entre o público (ou câmera) e o painel. Para produção virtual e ICVFX, use P1.5–P2.6.
+          Para shows e eventos ao vivo, P2.9–P3.9. Para auditórios com público mais distante, P4–P6.
+          Nossa calculadora seleciona a recomendação automaticamente com base no tipo de projeto.
+        </p>
+      </details>
+
+      <details style="border-bottom: 1px solid #1e2d42; padding: 14px 0; cursor: pointer;">
+        <summary style="color: #fff; font-weight: 600; font-size: 1rem; list-style: none; display: flex; justify-content: space-between;">
+          Quanto custa alugar um LED wall no Brasil?
+        </summary>
+        <p style="margin-top: 12px; color: #a8bfcf;">
+          O investimento varia conforme m², pixel pitch, dias de locação e serviços incluídos.
+          Use a calculadora acima para simular o custo real do seu projeto e clique em
+          "Gerar Proposta" para receber um orçamento detalhado em minutos.
+        </p>
+      </details>
+
+      <details style="border-bottom: 1px solid #1e2d42; padding: 14px 0; cursor: pointer;">
+        <summary style="color: #fff; font-weight: 600; font-size: 1rem; list-style: none; display: flex; justify-content: space-between;">
+          O que é produção virtual com LED wall?
+        </summary>
+        <p style="margin-top: 12px; color: #a8bfcf;">
+          Produção virtual usa paredes de LED de alta resolução como fundo ativo em gravações.
+          Cenários digitais são renderizados em tempo real no Unreal Engine e exibidos no painel,
+          criando ICVFX — reflexos e iluminação reais capturados pela câmera sem pós-produção pesada.
+          É a tecnologia usada em The Mandalorian, disponível agora no Brasil pela ONAV.
+        </p>
+      </details>
+
+      <details style="padding: 14px 0; cursor: pointer;">
+        <summary style="color: #fff; font-weight: 600; font-size: 1rem; list-style: none; display: flex; justify-content: space-between;">
+          Vocês entregam fora de São Paulo?
+        </summary>
+        <p style="margin-top: 12px; color: #a8bfcf;">
+          Sim. Atendemos projetos em todo o Brasil com logística própria. Rio de Janeiro, Belo Horizonte,
+          Brasília, Florianópolis e outras capitais. Informe a cidade na proposta para que possamos
+          incluir o custo de transporte e logística no orçamento.
+        </p>
+      </details>
+
+      <div style="margin-top: 48px; padding: 32px; background: #0f1729; border-radius: 12px; border: 1px solid #1e3050; text-align: center;">
+        <p style="font-size: 1.1rem; color: #ffffff; margin: 0 0 8px;">
+          Pronto para simular seu projeto?
+        </p>
+        <p style="color: #8fa8c0; margin: 0 0 20px;">
+          Role para o topo e use a calculadora — é gratuito e sem compromisso.
+        </p>
+        <a href="#app-wrapper" style="
+          display: inline-block;
+          background: linear-gradient(135deg, #2a5298, #1e3a78);
+          color: #fff;
+          padding: 14px 32px;
+          border-radius: 8px;
+          text-decoration: none;
+          font-weight: 600;
+          font-size: 1rem;
+          transition: opacity 0.2s;
+        ">Usar a Calculadora →</a>
+      </div>
+
+    </div>
+  </section>
+  <!-- ═══════════════════════════════════════════════════════════ -->
 
 </body>
 

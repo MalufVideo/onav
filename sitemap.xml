@@ -1,335 +1,705 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
-        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-
-  <!-- Homepage with Case Study Videos -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://onav.com.br/</loc>
-    <lastmod>2026-01-13</lastmod>
-    <changefreq>weekly</changefreq>
+    <loc>https://www.onav.com.br/</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>1.0</priority>
-    <image:image>
-      <image:loc>https://onav.com.br/img/og-image.webp</image:loc>
-      <image:title>On + Av - Produção Virtual e Painéis LED</image:title>
-    </image:image>
-
-    <!-- Case Study Videos -->
-    <video:video>
-      <video:thumbnail_loc>https://img.youtube.com/vi/OzOQQSURvu4/maxresdefault.jpg</video:thumbnail_loc>
-      <video:title>Olimpíadas Paris 2024 - Produção Virtual Globo</video:title>
-      <video:description>Case de produção virtual para a cobertura das Olimpíadas Paris 2024 pela Globo. LED Wall e tecnologia Disguise.</video:description>
-      <video:player_loc>https://www.youtube.com/embed/OzOQQSURvu4</video:player_loc>
-      <video:duration>180</video:duration>
-      <video:family_friendly>yes</video:family_friendly>
-    </video:video>
-
-    <video:video>
-      <video:thumbnail_loc>https://img.youtube.com/vi/O9XJVbup43M/maxresdefault.jpg</video:thumbnail_loc>
-      <video:title>Hyundai CRETA - Comercial com LED Wall</video:title>
-      <video:description>Produção publicitária para Hyundai CRETA utilizando LED Wall e produção virtual.</video:description>
-      <video:player_loc>https://www.youtube.com/embed/O9XJVbup43M</video:player_loc>
-      <video:duration>60</video:duration>
-      <video:family_friendly>yes</video:family_friendly>
-    </video:video>
-
-    <video:video>
-      <video:thumbnail_loc>https://img.youtube.com/vi/mJVcf-VkZSs/maxresdefault.jpg</video:thumbnail_loc>
-      <video:title>Globo Promo Day - Produção Virtual</video:title>
-      <video:description>Case de produção virtual para o Globo Promo Day com painéis LED.</video:description>
-      <video:player_loc>https://www.youtube.com/embed/mJVcf-VkZSs</video:player_loc>
-      <video:duration>120</video:duration>
-      <video:family_friendly>yes</video:family_friendly>
-    </video:video>
-
-    <video:video>
-      <video:thumbnail_loc>https://img.youtube.com/vi/5InWksj7aNk/maxresdefault.jpg</video:thumbnail_loc>
-      <video:title>Volkswagen T-Cross - Uma Aventura SUVW</video:title>
-      <video:description>Comercial Volkswagen T-Cross produzido com tecnologia de LED Wall e produção virtual.</video:description>
-      <video:player_loc>https://www.youtube.com/embed/5InWksj7aNk</video:player_loc>
-      <video:duration>60</video:duration>
-      <video:family_friendly>yes</video:family_friendly>
-    </video:video>
-
-    <video:video>
-      <video:thumbnail_loc>https://img.youtube.com/vi/eEbOU0eygQk/maxresdefault.jpg</video:thumbnail_loc>
-      <video:title>Primo Rico Ultra Black Friday Infinita</video:title>
-      <video:description>Live do Primo Rico com produção virtual e painéis LED para a Black Friday.</video:description>
-      <video:player_loc>https://www.youtube.com/embed/eEbOU0eygQk</video:player_loc>
-      <video:duration>3600</video:duration>
-      <video:family_friendly>yes</video:family_friendly>
-      <video:live>yes</video:live>
-    </video:video>
-
-    <video:video>
-      <video:thumbnail_loc>https://img.youtube.com/vi/zX1ZCcnWPwc/maxresdefault.jpg</video:thumbnail_loc>
-      <video:title>A Década Milionária - Produção Virtual</video:title>
-      <video:description>Programa A Década Milionária com produção virtual e LED Wall.</video:description>
-      <video:player_loc>https://www.youtube.com/embed/zX1ZCcnWPwc</video:player_loc>
-      <video:duration>3600</video:duration>
-      <video:family_friendly>yes</video:family_friendly>
-    </video:video>
-
-    <video:video>
-      <video:thumbnail_loc>https://img.youtube.com/vi/NMcVgcy_m7c/maxresdefault.jpg</video:thumbnail_loc>
-      <video:title>Campanha Claro Flamingo - Anitta</video:title>
-      <video:description>Comercial Claro com Anitta produzido com tecnologia de LED Wall.</video:description>
-      <video:player_loc>https://www.youtube.com/embed/NMcVgcy_m7c</video:player_loc>
-      <video:duration>60</video:duration>
-      <video:family_friendly>yes</video:family_friendly>
-    </video:video>
-
-    <video:video>
-      <video:thumbnail_loc>https://img.youtube.com/vi/jVAMWTCITVA/maxresdefault.jpg</video:thumbnail_loc>
-      <video:title>Manowar Europe Tour 2022</video:title>
-      <video:description>Turnê Manowar Europa 2022 com painéis LED e sistema Disguise.</video:description>
-      <video:player_loc>https://www.youtube.com/embed/jVAMWTCITVA</video:player_loc>
-      <video:duration>300</video:duration>
-      <video:family_friendly>yes</video:family_friendly>
-    </video:video>
-
-    <video:video>
-      <video:thumbnail_loc>https://img.youtube.com/vi/U9NumXGdxv0/maxresdefault.jpg</video:thumbnail_loc>
-      <video:title>Ponto Final - Documentário Temporada 1</video:title>
-      <video:description>Documentário Ponto Final produzido com tecnologia de produção virtual.</video:description>
-      <video:player_loc>https://www.youtube.com/embed/U9NumXGdxv0</video:player_loc>
-      <video:duration>2700</video:duration>
-      <video:family_friendly>yes</video:family_friendly>
-    </video:video>
-
-    <video:video>
-      <video:thumbnail_loc>https://img.youtube.com/vi/LZIRmhu6Yc8/maxresdefault.jpg</video:thumbnail_loc>
-      <video:title>Lacta - Comercial com LED Wall</video:title>
-      <video:description>Produção publicitária Lacta com tecnologia de LED Wall e produção virtual.</video:description>
-      <video:player_loc>https://www.youtube.com/embed/LZIRmhu6Yc8</video:player_loc>
-      <video:duration>60</video:duration>
-      <video:family_friendly>yes</video:family_friendly>
-    </video:video>
-
-    <video:video>
-      <video:thumbnail_loc>https://img.youtube.com/vi/YA3WOyQboWA/maxresdefault.jpg</video:thumbnail_loc>
-      <video:title>C&amp;A Encontro - Produção Virtual</video:title>
-      <video:description>Evento C&amp;A produzido com painéis LED e tecnologia de produção virtual.</video:description>
-      <video:player_loc>https://www.youtube.com/embed/YA3WOyQboWA</video:player_loc>
-      <video:duration>180</video:duration>
-      <video:family_friendly>yes</video:family_friendly>
-    </video:video>
-
-    <video:video>
-      <video:thumbnail_loc>https://img.youtube.com/vi/1A9PslUFGWE/maxresdefault.jpg</video:thumbnail_loc>
-      <video:title>Bradesco Seguros - Comercial LED Wall</video:title>
-      <video:description>Produção publicitária Bradesco Seguros com LED Wall.</video:description>
-      <video:player_loc>https://www.youtube.com/embed/1A9PslUFGWE</video:player_loc>
-      <video:duration>60</video:duration>
-      <video:family_friendly>yes</video:family_friendly>
-    </video:video>
-
-    <video:video>
-      <video:thumbnail_loc>https://img.youtube.com/vi/2JM1C4Paovg/maxresdefault.jpg</video:thumbnail_loc>
-      <video:title>Avon - Campanha com Produção Virtual</video:title>
-      <video:description>Comercial Avon produzido com tecnologia de LED Wall.</video:description>
-      <video:player_loc>https://www.youtube.com/embed/2JM1C4Paovg</video:player_loc>
-      <video:duration>60</video:duration>
-      <video:family_friendly>yes</video:family_friendly>
-    </video:video>
-
-    <video:video>
-      <video:thumbnail_loc>https://img.youtube.com/vi/G6T20ZAvOgA/maxresdefault.jpg</video:thumbnail_loc>
-      <video:title>Lupo - Comercial com LED Wall</video:title>
-      <video:description>Produção publicitária Lupo com painéis LED e produção virtual.</video:description>
-      <video:player_loc>https://www.youtube.com/embed/G6T20ZAvOgA</video:player_loc>
-      <video:duration>60</video:duration>
-      <video:family_friendly>yes</video:family_friendly>
-    </video:video>
-
-    <video:video>
-      <video:thumbnail_loc>https://img.youtube.com/vi/NS7ivNPzvXg/maxresdefault.jpg</video:thumbnail_loc>
-      <video:title>Gloob - Produção Virtual Infantil</video:title>
-      <video:description>Produção para canal Gloob com tecnologia de LED Wall.</video:description>
-      <video:player_loc>https://www.youtube.com/embed/NS7ivNPzvXg</video:player_loc>
-      <video:duration>120</video:duration>
-      <video:family_friendly>yes</video:family_friendly>
-    </video:video>
-
   </url>
-
-  <!-- Main Service Pages -->
   <url>
-    <loc>https://onav.com.br/producao-virtual-xr</loc>
-    <lastmod>2026-01-12</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://onav.com.br/estudio</loc>
-    <lastmod>2026-01-12</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://onav.com.br/produtos</loc>
-    <lastmod>2026-01-12</lastmod>
+    <loc>https://www.onav.com.br/blog/</loc>
+    <lastmod>2026-02-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-
   <url>
-    <loc>https://onav.com.br/shows</loc>
-    <lastmod>2026-01-12</lastmod>
+    <loc>https://www.onav.com.br/blog/como-escolher-pixel-pitch-led.html</loc>
+    <lastmod>2026-02-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-
   <url>
-    <loc>https://onav.com.br/projecao-mapeada</loc>
-    <lastmod>2026-01-12</lastmod>
+    <loc>https://www.onav.com.br/blog/como-funciona-producao-virtual.html</loc>
+    <lastmod>2026-02-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-
   <url>
-    <loc>https://onav.com.br/criacao-conteudo</loc>
-    <lastmod>2026-01-12</lastmod>
+    <loc>https://www.onav.com.br/blog/disguise-vs-outros-media-servers.html</loc>
+    <lastmod>2026-02-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-
   <url>
-    <loc>https://onav.com.br/consultoria-suporte</loc>
-    <lastmod>2026-01-12</lastmod>
+    <loc>https://www.onav.com.br/blog/erros-comuns-aluguel-led.html</loc>
+    <lastmod>2026-02-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-
-  <!-- Blog Section -->
   <url>
-    <loc>https://onav.com.br/blog</loc>
-    <lastmod>2026-01-13</lastmod>
+    <loc>https://www.onav.com.br/blog/estudio-virtual-sao-paulo.html</loc>
+    <lastmod>2026-02-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-
   <url>
-    <loc>https://onav.com.br/blog/o-que-e-producao-virtual</loc>
-    <lastmod>2026-01-13</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://onav.com.br/img/producao-virtual-hero.webp</image:loc>
-      <image:title>O Que é Produção Virtual - Guia Completo 2026</image:title>
-    </image:image>
+    <loc>https://www.onav.com.br/blog/guia-icvfx-brasil-produtoras.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
-
   <url>
-    <loc>https://onav.com.br/blog/quanto-custa-alugar-painel-led</loc>
-    <lastmod>2026-01-13</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://onav.com.br/img/led-panels-hero.webp</image:loc>
-      <image:title>Quanto Custa Alugar Painel LED para Eventos</image:title>
-    </image:image>
+    <loc>https://www.onav.com.br/blog/in-camera-vfx-vs-pos-producao.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
-
   <url>
-    <loc>https://onav.com.br/blog/led-wall-vs-chroma-key</loc>
-    <lastmod>2026-01-13</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://onav.com.br/img/led-vs-chroma-hero.webp</image:loc>
-      <image:title>LED Wall vs Chroma Key - Comparativo Completo</image:title>
-    </image:image>
+    <loc>https://www.onav.com.br/blog/led-wall-shows-eventos-ao-vivo.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
-
   <url>
-    <loc>https://onav.com.br/blog/como-funciona-producao-virtual</loc>
-    <lastmod>2026-01-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://onav.com.br/img/blog/como-funciona-hero.webp</image:loc>
-      <image:title>Como Funciona a Produção Virtual - Guia Técnico 2026</image:title>
-    </image:image>
+    <loc>https://www.onav.com.br/blog/led-wall-vs-chroma-key.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
-
   <url>
-    <loc>https://onav.com.br/blog/disguise-vs-outros-media-servers</loc>
-    <lastmod>2026-01-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://onav.com.br/img/blog/disguise-comparison-hero.webp</image:loc>
-      <image:title>Disguise vs Outros Media Servers - Comparação Completa 2026</image:title>
-    </image:image>
+    <loc>https://www.onav.com.br/blog/o-que-e-producao-virtual.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
-
   <url>
-    <loc>https://onav.com.br/blog/como-escolher-pixel-pitch-led</loc>
-    <lastmod>2026-01-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://onav.com.br/img/blog/pixel-pitch-hero.webp</image:loc>
-      <image:title>Como Escolher o Pixel Pitch do Painel LED - Guia Definitivo 2026</image:title>
-    </image:image>
+    <loc>https://www.onav.com.br/blog/projecao-mapeada-eventos-corporativos.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
-
   <url>
-    <loc>https://onav.com.br/blog/estudio-virtual-sao-paulo</loc>
-    <lastmod>2026-01-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://onav.com.br/img/blog/estudio-sp-hero.webp</image:loc>
-      <image:title>Estúdio de Produção Virtual em São Paulo - Guia Completo 2026</image:title>
-    </image:image>
+    <loc>https://www.onav.com.br/blog/quanto-custa-alugar-painel-led.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
-
   <url>
-    <loc>https://onav.com.br/blog/erros-comuns-aluguel-led</loc>
-    <lastmod>2026-02-03</lastmod>
+    <loc>https://www.onav.com.br/consultoria-suporte.html</loc>
+    <lastmod>2026-02-18</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://onav.com.br/img/blog/erros-led-hero.webp</image:loc>
-      <image:title>7 Erros Comuns ao Alugar Painel LED (E Como Evitar)</image:title>
-    </image:image>
+    <priority>0.6</priority>
   </url>
-
   <url>
-    <loc>https://onav.com.br/blog/in-camera-vfx-vs-pos-producao</loc>
-    <lastmod>2026-02-06</lastmod>
+    <loc>https://www.onav.com.br/criacao-conteudo.html</loc>
+    <lastmod>2026-02-18</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-    <image:image>
-      <image:loc>https://onav.com.br/img/blog/icvfx-vs-pos-hero.webp</image:loc>
-      <image:title>In-Camera VFX vs Pós-Produção - Quando Usar Cada Um?</image:title>
-    </image:image>
+    <priority>0.6</priority>
   </url>
-
-  <!-- LED Calculator Tool -->
   <url>
-    <loc>https://onav.com.br/led/</loc>
-    <lastmod>2026-01-12</lastmod>
+    <loc>https://www.onav.com.br/en/</loc>
+    <lastmod>2026-02-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-
   <url>
-    <loc>https://onav.com.br/led/mobile</loc>
-    <lastmod>2026-01-12</lastmod>
+    <loc>https://www.onav.com.br/en/blog/</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/consulting-support.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/content-creation.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/antartica.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/avon.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/belo.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/bradesco.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/cea.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/claroflamingo.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/creta.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/decadamilionaria.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/efifa.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/filipe.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/globo.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/globoagro.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/globoagrofeijao.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/gloob.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/lacta.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/ludmilla.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/lupo.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/manowar.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/natura.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/new1.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/new2.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/new3.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/nivea.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/oboticario.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/olympics.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/pontofinal.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/primorico.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/tate.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/tcross.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/modals/vivopre.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/products.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/projection-mapping.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/shows.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/studio.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/en/virtual-production-xr.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/equipamentos-on/</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/escolher-data.html</loc>
+    <lastmod>2026-02-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
-
   <url>
-    <loc>https://onav.com.br/led/multicamera</loc>
-    <lastmod>2026-01-12</lastmod>
+    <loc>https://www.onav.com.br/estudio.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/led/</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/led/mobile.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/led/multicamera.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/led/my-quotes.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/led/screenshot/index-optimized.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/led/unused_files_backup/</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/antartica.html</loc>
+    <lastmod>2026-02-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
-
+  <url>
+    <loc>https://www.onav.com.br/modals/avon.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/belo.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/bradesco.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/cea.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/claroflamingo.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/creta.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/decadamilionaria.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/efifa.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/filipe.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/globo.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/globoagro.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/globoagrofeijao.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/gloob.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/lacta.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/ludmilla.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/lupo.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/manowar.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/natura.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/new1.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/new2.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/new3.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/nivea.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/oboticario.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/olympics.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/pontofinal.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/primorico.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/tate.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/tcross.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/modals/vivopre.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/obrigado.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/pipeline/</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/pipeline/dist/</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/producao-virtual-xr.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/produtos.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/produtos_old.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/projecao-mapeada.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/public/pipeline/</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/quote.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/shows.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/test-calendar.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/tours/adele_munich.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/tours/adele_weekends.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/tours/beyonce_formation.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/tours/coldplay_musicofthespheres.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/tours/ed_sheeran_mathematics.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/tours/envie_seu_projeto.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/tours/justin_timberlake_manofthewoods.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/tours/kiss_endoftheroad.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/tours/phish_sphere.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/tours/proximo_caso.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/tours/u2_joshuatree.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.onav.com.br/tours/u2_sphere.html</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>

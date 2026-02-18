@@ -27,6 +27,10 @@ quotes/
 
 # Auto Claude data directory
 .auto-claude/
+.claude/
+
+# Openclaw config
+openclaw.json
 
 # Pipeline-specific
 pipeline/node_modules/

@@ -1,12 +1,13 @@
-require('dotenv').config();
-const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
-const path = require('path');
-const cors = require('cors');
-const compression = require('compression');
-const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
-const PipelineIntegration = require('./pipeline-integration');
+require("dotenv").config();
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+const path = require("path");
+const cors = require("cors");
+const compression = require("compression");
+const fetch = (...args) =>
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));
+const PipelineIntegration = require("./pipeline-integration");
 
 // Import modular services
 const {
@@ -24,8 +25,8 @@ const {
   sendWhatsAppNotification,
   buildPreReserveMessage,
   buildConfirmedMessage,
-  buildDateConflictMessage
-} = require('./services');
+  buildDateConflictMessage,
+} = require("./services");
 
 const app = express();
 const server = http.createServer(app);
@@ -33,7 +34,7 @@ const io = new Server(server);
 
 // Initialize Pipeline Integration
 const pipelineIntegration = new PipelineIntegration(supabaseAdmin);
-console.log('[pipeline] Pipeline integration module initialized');
+console.log("[pipeline] Pipeline integration module initialized");
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -42,204 +43,286 @@ app.use(express.json());
 app.use(cors());
 
 // Enable gzip/brotli compression for all responses (reduces bandwidth by 60-80%)
-app.use(compression({
-  filter: (req, res) => {
-    // Don't compress if client doesn't accept it
-    if (req.headers['x-no-compression']) {
-      return false;
-    }
-    // Use compression for all compressible content types
-    return compression.filter(req, res);
-  },
-  level: 6, // Balanced compression level (1-9)
-  threshold: 1024 // Only compress responses larger than 1KB
-}));
+app.use(
+  compression({
+    filter: (req, res) => {
+      // Don't compress if client doesn't accept it
+      if (req.headers["x-no-compression"]) {
+        return false;
+      }
+      // Use compression for all compressible content types
+      return compression.filter(req, res);
+    },
+    level: 6, // Balanced compression level (1-9)
+    threshold: 1024, // Only compress responses larger than 1KB
+  }),
+);
 
 // Trust proxy for proper IP detection
-app.set('trust proxy', true);
+app.set("trust proxy", true);
 
 // SEO: Cache headers for static assets
 const cacheControl = (res, filePath) => {
   // Set content types
-  if (filePath.endsWith('.css')) {
-    res.setHeader('Content-Type', 'text/css');
+  if (filePath.endsWith(".css")) {
+    res.setHeader("Content-Type", "text/css");
   }
-  if (filePath.endsWith('.js')) {
-    res.setHeader('Content-Type', 'application/javascript');
+  if (filePath.endsWith(".js")) {
+    res.setHeader("Content-Type", "application/javascript");
   }
 
   // Cache images, fonts, and static assets for 1 year
   if (filePath.match(/\.(webp|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
-    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
   }
   // Cache CSS and JS for 1 week
   else if (filePath.match(/\.(css|js)$/)) {
-    res.setHeader('Cache-Control', 'public, max-age=604800');
+    res.setHeader("Cache-Control", "public, max-age=604800");
   }
   // HTML pages: short cache for freshness
-  else if (filePath.endsWith('.html')) {
-    res.setHeader('Cache-Control', 'public, max-age=3600');
+  else if (filePath.endsWith(".html")) {
+    res.setHeader("Cache-Control", "public, max-age=3600");
   }
 };
 
 // Serve static files from root directory
 // Use process.cwd() for Vercel serverless compatibility
-app.use(express.static(path.join(process.cwd()), {
-  setHeaders: cacheControl
-}));
+app.use(
+  express.static(path.join(process.cwd()), {
+    setHeaders: cacheControl,
+  }),
+);
 
 // Serve static files from 'admin' directory under the /admin path
-app.use('/admin', express.static(path.join(process.cwd(), 'admin')));
+app.use("/admin", express.static(path.join(process.cwd(), "admin")));
 
 // Serve static files from 'led' directory under the /led path
-app.use('/led', express.static(path.join(process.cwd(), 'led')));
+app.use("/led", express.static(path.join(process.cwd(), "led")));
 
 // Serve static files from 'img' directory under the /img path
-app.use('/img', express.static(path.join(process.cwd(), 'img')));
+app.use("/img", express.static(path.join(process.cwd(), "img")));
 
 // Serve static files from 'css' directory under the /css path
-app.use('/css', express.static(path.join(process.cwd(), 'css')));
+app.use("/css", express.static(path.join(process.cwd(), "css")));
 
 // Serve static files from 'js' directory under the /js path
-app.use('/js', express.static(path.join(process.cwd(), 'js')));
+app.use("/js", express.static(path.join(process.cwd(), "js")));
 
 // Serve static files from 'tours' directory under the /tours path
-app.use('/tours', express.static(path.join(process.cwd(), 'tours')));
+app.use("/tours", express.static(path.join(process.cwd(), "tours")));
 
 // Serve static files from 'equipamentos-on' directory under the /equipamentos-on path
-app.use('/equipamentos-on', express.static(path.join(process.cwd(), 'equipamentos-on')));
+app.use(
+  "/equipamentos-on",
+  express.static(path.join(process.cwd(), "equipamentos-on")),
+);
 
 // Serve Pipeline React app static files (from public/pipeline after build)
 // Use process.cwd() for Vercel serverless compatibility
-const pipelinePath = path.join(process.cwd(), 'public/pipeline');
-app.use('/pipeline', express.static(pipelinePath));
+const pipelinePath = path.join(process.cwd(), "public/pipeline");
+app.use("/pipeline", express.static(pipelinePath));
 
 // Pipeline SPA fallback - serve index.html for all /pipeline routes
-app.get('/pipeline/*', (req, res) => {
-  res.sendFile(path.join(pipelinePath, 'index.html'));
+app.get("/pipeline/*", (req, res) => {
+  res.sendFile(path.join(pipelinePath, "index.html"));
 });
 
 // Route to serve equipamentos-on index page
-app.get('/equipamentos-on', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'equipamentos-on', 'index.html'));
+app.get("/equipamentos-on", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "equipamentos-on", "index.html"));
 });
 
 // Route to serve the admin HTML page (old product admin)
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'admin', 'admin.html'));
+app.get("/admin", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "admin", "admin.html"));
 });
 
 // Route to serve the dashboard HTML page (new comprehensive dashboard)
-app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'admin', 'dashboard.html'));
+app.get("/dashboard", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "admin", "dashboard.html"));
 });
 
 // Route to serve the dashboard at /admin/dashboard (alias)
-app.get('/admin/dashboard', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'admin', 'dashboard.html'));
+app.get("/admin/dashboard", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "admin", "dashboard.html"));
 });
 
 // Route to serve the admin login page
-app.get('/admin/login', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'admin', 'login.html'));
+app.get("/admin/login", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "admin", "login.html"));
 });
 
 // Route to serve the main index.html page for root path
-app.get('/', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'index.html'));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "index.html"));
 });
 
 // --- Clean URL Routes (SEO-friendly URLs without .html extension) ---
 // These routes serve HTML pages without the .html extension for better SEO
 
 // Main service pages
-app.get('/produtos', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'produtos.html'));
+app.get("/produtos", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "produtos.html"));
 });
 
-app.get('/estudio', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'estudio.html'));
+app.get("/estudio", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "estudio.html"));
 });
 
-app.get('/shows', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'shows.html'));
+app.get("/shows", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "shows.html"));
 });
 
-app.get('/projecao-mapeada', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'projecao-mapeada.html'));
+app.get("/projecao-mapeada", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "projecao-mapeada.html"));
 });
 
-app.get('/producao-virtual-xr', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'producao-virtual-xr.html'));
+app.get("/producao-virtual-xr", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "producao-virtual-xr.html"));
 });
 
-app.get('/criacao-conteudo', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'criacao-conteudo.html'));
+app.get("/criacao-conteudo", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "criacao-conteudo.html"));
 });
 
-app.get('/consultoria-suporte', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'consultoria-suporte.html'));
+app.get("/consultoria-suporte", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "consultoria-suporte.html"));
 });
 
 // Blog clean URLs
-app.get('/blog', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'blog', 'index.html'));
+app.get("/blog", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "blog", "index.html"));
 });
 
-app.get('/blog/o-que-e-producao-virtual', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'blog', 'o-que-e-producao-virtual.html'));
+app.get("/blog/o-que-e-producao-virtual", (req, res) => {
+  res.sendFile(
+    path.join(process.cwd(), "blog", "o-que-e-producao-virtual.html"),
+  );
 });
 
-app.get('/blog/quanto-custa-alugar-painel-led', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'blog', 'quanto-custa-alugar-painel-led.html'));
+app.get("/blog/quanto-custa-alugar-painel-led", (req, res) => {
+  res.sendFile(
+    path.join(process.cwd(), "blog", "quanto-custa-alugar-painel-led.html"),
+  );
 });
 
-app.get('/blog/led-wall-vs-chroma-key', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'blog', 'led-wall-vs-chroma-key.html'));
+app.get("/blog/led-wall-vs-chroma-key", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "blog", "led-wall-vs-chroma-key.html"));
 });
 
-app.get('/blog/como-funciona-producao-virtual', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'blog', 'como-funciona-producao-virtual.html'));
+app.get("/blog/como-funciona-producao-virtual", (req, res) => {
+  res.sendFile(
+    path.join(process.cwd(), "blog", "como-funciona-producao-virtual.html"),
+  );
 });
 
-app.get('/blog/disguise-vs-outros-media-servers', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'blog', 'disguise-vs-outros-media-servers.html'));
+app.get("/blog/disguise-vs-outros-media-servers", (req, res) => {
+  res.sendFile(
+    path.join(process.cwd(), "blog", "disguise-vs-outros-media-servers.html"),
+  );
 });
 
-app.get('/blog/como-escolher-pixel-pitch-led', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'blog', 'como-escolher-pixel-pitch-led.html'));
+app.get("/blog/como-escolher-pixel-pitch-led", (req, res) => {
+  res.sendFile(
+    path.join(process.cwd(), "blog", "como-escolher-pixel-pitch-led.html"),
+  );
 });
 
-app.get('/blog/estudio-virtual-sao-paulo', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'blog', 'estudio-virtual-sao-paulo.html'));
+app.get("/blog/estudio-virtual-sao-paulo", (req, res) => {
+  res.sendFile(
+    path.join(process.cwd(), "blog", "estudio-virtual-sao-paulo.html"),
+  );
 });
 
-app.get('/blog/erros-comuns-aluguel-led', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'blog', 'erros-comuns-aluguel-led.html'));
+app.get("/blog/erros-comuns-aluguel-led", (req, res) => {
+  res.sendFile(
+    path.join(process.cwd(), "blog", "erros-comuns-aluguel-led.html"),
+  );
 });
 
-app.get('/blog/in-camera-vfx-vs-pos-producao', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'blog', 'in-camera-vfx-vs-pos-producao.html'));
+app.get("/blog/in-camera-vfx-vs-pos-producao", (req, res) => {
+  res.sendFile(
+    path.join(process.cwd(), "blog", "in-camera-vfx-vs-pos-producao.html"),
+  );
 });
 
 // LED calculator clean URLs
-app.get('/led/mobile', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'led', 'mobile.html'));
+app.get("/led/mobile", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "led", "mobile.html"));
 });
 
-app.get('/led/multicamera', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'led', 'multicamera.html'));
+app.get("/led/multicamera", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "led", "multicamera.html"));
 });
 
 // 301 Redirects from old .html URLs to clean URLs for SEO
-app.get('/produtos.html', (req, res) => res.redirect(301, '/produtos'));
-app.get('/estudio.html', (req, res) => res.redirect(301, '/estudio'));
-app.get('/shows.html', (req, res) => res.redirect(301, '/shows'));
-app.get('/projecao-mapeada.html', (req, res) => res.redirect(301, '/projecao-mapeada'));
-app.get('/producao-virtual-xr.html', (req, res) => res.redirect(301, '/producao-virtual-xr'));
-app.get('/criacao-conteudo.html', (req, res) => res.redirect(301, '/criacao-conteudo'));
-app.get('/consultoria-suporte.html', (req, res) => res.redirect(301, '/consultoria-suporte'));
-app.get('/index.html', (req, res) => res.redirect(301, '/'));
+app.get("/produtos.html", (req, res) => res.redirect(301, "/produtos"));
+app.get("/estudio.html", (req, res) => res.redirect(301, "/estudio"));
+app.get("/shows.html", (req, res) => res.redirect(301, "/shows"));
+app.get("/projecao-mapeada.html", (req, res) =>
+  res.redirect(301, "/projecao-mapeada"),
+);
+app.get("/producao-virtual-xr.html", (req, res) =>
+  res.redirect(301, "/producao-virtual-xr"),
+);
+app.get("/criacao-conteudo.html", (req, res) =>
+  res.redirect(301, "/criacao-conteudo"),
+);
+app.get("/consultoria-suporte.html", (req, res) =>
+  res.redirect(301, "/consultoria-suporte"),
+);
+app.get("/index.html", (req, res) => res.redirect(301, "/"));
+
+// --- English (EN) Clean URL Routes ---
+app.get("/en", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "en", "index.html"));
+});
+app.get("/en/", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "en", "index.html"));
+});
+
+app.get("/en/virtual-production-xr", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "en", "virtual-production-xr.html"));
+});
+app.get("/en/studio", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "en", "studio.html"));
+});
+app.get("/en/products", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "en", "products.html"));
+});
+app.get("/en/shows", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "en", "shows.html"));
+});
+app.get("/en/projection-mapping", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "en", "projection-mapping.html"));
+});
+app.get("/en/content-creation", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "en", "content-creation.html"));
+});
+app.get("/en/consulting-support", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "en", "consulting-support.html"));
+});
+app.get("/en/blog", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "en", "blog", "index.html"));
+});
+
+// EN .html -> clean URL redirects
+app.get("/en/index.html", (req, res) => res.redirect(301, "/en/"));
+app.get("/en/virtual-production-xr.html", (req, res) =>
+  res.redirect(301, "/en/virtual-production-xr"),
+);
+app.get("/en/studio.html", (req, res) => res.redirect(301, "/en/studio"));
+app.get("/en/products.html", (req, res) => res.redirect(301, "/en/products"));
+app.get("/en/shows.html", (req, res) => res.redirect(301, "/en/shows"));
+app.get("/en/projection-mapping.html", (req, res) =>
+  res.redirect(301, "/en/projection-mapping"),
+);
+app.get("/en/content-creation.html", (req, res) =>
+  res.redirect(301, "/en/content-creation"),
+);
+app.get("/en/consulting-support.html", (req, res) =>
+  res.redirect(301, "/en/consulting-support"),
+);
 
 // Note: HTML files are served by express.static middleware above
 // Only explicit routes needed for SPA fallbacks and directory index files
@@ -247,66 +330,85 @@ app.get('/index.html', (req, res) => res.redirect(301, '/'));
 // --- API Routes for Products ---
 
 // GET all products
-app.get('/api/products', async (req, res) => {
+app.get("/api/products", async (req, res) => {
   try {
     // Use regular supabase client (anon key) since products table has public read access
     const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .order('category', { ascending: true })
-      .order('name', { ascending: true });
+      .from("products")
+      .select("*")
+      .order("category", { ascending: true })
+      .order("name", { ascending: true });
 
     if (error) throw error;
     res.json(data);
   } catch (error) {
-    console.error('Error fetching products:', error.message);
-    res.status(500).json({ error: 'Failed to fetch products', details: error.message });
+    console.error("Error fetching products:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch products", details: error.message });
   }
 });
 
 // POST a new product
-app.post('/api/products', async (req, res) => {
+app.post("/api/products", async (req, res) => {
   try {
     const { name, description, price, category, unit_type } = req.body;
     // Basic validation
     if (!name || price === undefined || !category || !unit_type) {
-      return res.status(400).json({ error: 'Missing required fields: name, price, category, unit_type' });
+      return res
+        .status(400)
+        .json({
+          error: "Missing required fields: name, price, category, unit_type",
+        });
     }
 
     const { data, error } = await supabaseAdmin
-      .from('products')
+      .from("products")
       .insert([{ name, description, price, category, unit_type }])
       .select(); // Return the inserted row
 
     if (error) throw error;
     res.status(201).json(data[0]); // Return the newly created product
   } catch (error) {
-    console.error('Error adding product:', error.message);
-    res.status(500).json({ error: 'Failed to add product', details: error.message });
+    console.error("Error adding product:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to add product", details: error.message });
   }
 });
 
 // PUT (update) a product by ID
-app.put('/api/products/:id', async (req, res) => {
+app.put("/api/products/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description, price, category, unit_type } = req.body;
 
-    console.log('PUT request received for product ID:', id);
-    console.log('Update data:', { name, description, price, category, unit_type });
+    console.log("PUT request received for product ID:", id);
+    console.log("Update data:", {
+      name,
+      description,
+      price,
+      category,
+      unit_type,
+    });
 
     // First, check if the product exists
     const { data: existingProduct, error: fetchError } = await supabaseAdmin
-      .from('products')
-      .select('*')
-      .eq('id', id)
+      .from("products")
+      .select("*")
+      .eq("id", id)
       .single();
 
-    console.log('Existing product check:', existingProduct, 'Error:', fetchError);
+    console.log(
+      "Existing product check:",
+      existingProduct,
+      "Error:",
+      fetchError,
+    );
 
     if (fetchError || !existingProduct) {
-      console.log('Product not found in database');
-      return res.status(404).json({ error: 'Product not found' });
+      console.log("Product not found in database");
+      return res.status(404).json({ error: "Product not found" });
     }
 
     // Construct update object only with provided fields
@@ -319,76 +421,82 @@ app.put('/api/products/:id', async (req, res) => {
     // updated_at is handled by the trigger
 
     if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ error: 'No fields provided for update' });
+      return res.status(400).json({ error: "No fields provided for update" });
     }
 
-    console.log('Performing update with data:', updateData);
+    console.log("Performing update with data:", updateData);
 
     const { data, error } = await supabaseAdmin
-      .from('products')
+      .from("products")
       .update(updateData)
-      .eq('id', id)
+      .eq("id", id)
       .select(); // Return the updated row
 
-    console.log('Update result - data:', data, 'error:', error);
+    console.log("Update result - data:", data, "error:", error);
 
     if (error) throw error;
     if (!data || data.length === 0) {
-      return res.status(404).json({ error: 'Product update failed - no rows affected' });
+      return res
+        .status(404)
+        .json({ error: "Product update failed - no rows affected" });
     }
     res.json(data[0]); // Return the updated product
   } catch (error) {
-    console.error('Error updating product:', error.message);
-    res.status(500).json({ error: 'Failed to update product', details: error.message });
+    console.error("Error updating product:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to update product", details: error.message });
   }
 });
 
 // DELETE a product by ID
-app.delete('/api/products/:id', async (req, res) => {
+app.delete("/api/products/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
     const { error } = await supabaseAdmin
-      .from('products')
+      .from("products")
       .delete()
-      .eq('id', id);
+      .eq("id", id);
 
     if (error) throw error;
     res.status(204).send(); // No content on successful deletion
   } catch (error) {
-    console.error('Error deleting product:', error.message);
-    res.status(500).json({ error: 'Failed to delete product', details: error.message });
+    console.error("Error deleting product:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to delete product", details: error.message });
   }
 });
 
 // --- Quote History API Routes ---
 
 // Test endpoint to verify server is working
-app.get('/api/test', (req, res) => {
+app.get("/api/test", (req, res) => {
   res.json({
-    message: 'Server is working!',
+    message: "Server is working!",
     timestamp: new Date().toISOString(),
     supabase_configured: !!supabaseUrl && !!supabaseAnonKey,
-    admin_client_available: !!supabaseServiceKey
+    admin_client_available: !!supabaseServiceKey,
   });
 });
 
 // Config endpoint to serve Supabase anon key to frontend
-app.get('/api/config/supabase-key', (req, res) => {
+app.get("/api/config/supabase-key", (req, res) => {
   res.json({
-    key: process.env.SUPABASE_ANON_KEY || supabaseAnonKey
+    key: process.env.SUPABASE_ANON_KEY || supabaseAnonKey,
   });
 });
 
 // Debug endpoint to check quote data structure
-app.get('/api/debug/quote/:id', async (req, res) => {
+app.get("/api/debug/quote/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
     const { data, error } = await supabaseAdmin
-      .from('proposals')
-      .select('*')
-      .eq('id', id)
+      .from("proposals")
+      .select("*")
+      .eq("id", id)
       .single();
 
     if (error) throw error;
@@ -400,39 +508,45 @@ app.get('/api/debug/quote/:id', async (req, res) => {
         parsedDiscountDescription = JSON.parse(data.discount_description);
       }
     } catch (e) {
-      parsedDiscountDescription = { error: 'Failed to parse JSON' };
+      parsedDiscountDescription = { error: "Failed to parse JSON" };
     }
 
     res.json({
       success: true,
       raw_data: data,
-      parsed_discount_description: parsedDiscountDescription
+      parsed_discount_description: parsedDiscountDescription,
     });
-
   } catch (error) {
-    console.error('Error fetching quote debug data:', error);
-    res.status(500).json({ error: 'Failed to fetch quote debug data', details: error.message });
+    console.error("Error fetching quote debug data:", error);
+    res
+      .status(500)
+      .json({
+        error: "Failed to fetch quote debug data",
+        details: error.message,
+      });
   }
 });
 
 // Test endpoint to validate proposal data structure
-app.post('/api/test-proposal-data', async (req, res) => {
+app.post("/api/test-proposal-data", async (req, res) => {
   try {
     const rawData = req.body;
 
     // Helper functions (same as in save-proposal)
     function safeNumber(value) {
-      if (value === null || value === undefined || value === '') return null;
-      if (typeof value === 'number') return value;
-      const cleanedValue = String(value).replace(/[^\d.,]/g, '').replace(',', '.');
+      if (value === null || value === undefined || value === "") return null;
+      if (typeof value === "number") return value;
+      const cleanedValue = String(value)
+        .replace(/[^\d.,]/g, "")
+        .replace(",", ".");
       const num = parseFloat(cleanedValue);
       return isNaN(num) ? null : num;
     }
 
     function safeInteger(value) {
-      if (value === null || value === undefined || value === '') return null;
-      if (typeof value === 'number') return Math.round(value);
-      const cleanedValue = String(value).replace(/\D/g, '');
+      if (value === null || value === undefined || value === "") return null;
+      if (typeof value === "number") return Math.round(value);
+      const cleanedValue = String(value).replace(/\D/g, "");
       const num = parseInt(cleanedValue, 10);
       return isNaN(num) ? null : num;
     }
@@ -444,7 +558,7 @@ app.post('/api/test-proposal-data', async (req, res) => {
       led_principal_width: safeNumber(rawData.led_principal_width),
       led_principal_height: safeNumber(rawData.led_principal_height),
       principal_power_max: safeInteger(rawData.principal_power_max),
-      principal_power_avg: safeInteger(rawData.principal_power_avg)
+      principal_power_avg: safeInteger(rawData.principal_power_avg),
     };
 
     res.json({
@@ -453,22 +567,22 @@ app.post('/api/test-proposal-data', async (req, res) => {
         user_id: rawData.user_id,
         project_name: rawData.project_name,
         led_principal_width: rawData.led_principal_width,
-        principal_power_max: rawData.principal_power_max
+        principal_power_max: rawData.principal_power_max,
       },
       processed_data_sample: processedData,
       data_types: {
         led_principal_width: typeof processedData.led_principal_width,
-        principal_power_max: typeof processedData.principal_power_max
-      }
+        principal_power_max: typeof processedData.principal_power_max,
+      },
     });
   } catch (error) {
-    console.error('Error testing proposal data:', error);
-    res.status(500).json({ error: 'Test failed', details: error.message });
+    console.error("Error testing proposal data:", error);
+    res.status(500).json({ error: "Test failed", details: error.message });
   }
 });
 
 // Setup database schema for quote history and missing columns
-app.post('/api/setup-quote-history', async (req, res) => {
+app.post("/api/setup-quote-history", async (req, res) => {
   try {
     // Add columns to proposals table if they don't exist
     const alterQueries = [
@@ -499,13 +613,13 @@ app.post('/api/setup-quote-history', async (req, res) => {
       `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS quote_url_slug TEXT UNIQUE`,
       `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS quote_approved BOOLEAN DEFAULT FALSE`,
       `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS quote_approved_at TIMESTAMP`,
-      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS quote_approval_ip TEXT`
+      `ALTER TABLE proposals ADD COLUMN IF NOT EXISTS quote_approval_ip TEXT`,
     ];
 
     for (const query of alterQueries) {
-      const { error } = await supabase.rpc('execute_sql', { sql_query: query });
-      if (error && !error.message.includes('already exists')) {
-        console.error('Error altering proposals table:', error);
+      const { error } = await supabase.rpc("execute_sql", { sql_query: query });
+      if (error && !error.message.includes("already exists")) {
+        console.error("Error altering proposals table:", error);
       }
     }
 
@@ -534,57 +648,74 @@ app.post('/api/setup-quote-history', async (req, res) => {
       )
     `;
 
-    const { error: createError } = await supabase.rpc('execute_sql', { sql_query: createTableQuery });
+    const { error: createError } = await supabase.rpc("execute_sql", {
+      sql_query: createTableQuery,
+    });
     if (createError) {
-      console.error('Error creating quote_history table:', createError);
+      console.error("Error creating quote_history table:", createError);
     }
 
-    res.json({ success: true, message: 'Quote history schema setup completed' });
+    res.json({
+      success: true,
+      message: "Quote history schema setup completed",
+    });
   } catch (error) {
-    console.error('Error setting up quote history schema:', error);
-    res.status(500).json({ error: 'Failed to setup quote history schema', details: error.message });
+    console.error("Error setting up quote history schema:", error);
+    res
+      .status(500)
+      .json({
+        error: "Failed to setup quote history schema",
+        details: error.message,
+      });
   }
 });
 
 // Get quote history for a specific proposal
-app.get('/api/quote-history/:proposalId', async (req, res) => {
+app.get("/api/quote-history/:proposalId", async (req, res) => {
   try {
     const { proposalId } = req.params;
 
     const { data, error } = await supabaseAdmin
-      .from('quote_history')
-      .select('*')
-      .eq('proposal_id', proposalId)
-      .order('created_at', { ascending: true });
+      .from("quote_history")
+      .select("*")
+      .eq("proposal_id", proposalId)
+      .order("created_at", { ascending: true });
 
     if (error) throw error;
     res.json(data);
   } catch (error) {
-    console.error('Error fetching quote history:', error);
-    res.status(500).json({ error: 'Failed to fetch quote history', details: error.message });
+    console.error("Error fetching quote history:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch quote history", details: error.message });
   }
 });
 
 // Create a new quote history entry
-app.post('/api/quote-history', async (req, res) => {
+app.post("/api/quote-history", async (req, res) => {
   try {
     const historyEntry = req.body;
 
     const { data, error } = await supabaseAdmin
-      .from('quote_history')
+      .from("quote_history")
       .insert([historyEntry])
       .select();
 
     if (error) throw error;
     res.status(201).json(data[0]);
   } catch (error) {
-    console.error('Error creating quote history entry:', error);
-    res.status(500).json({ error: 'Failed to create quote history entry', details: error.message });
+    console.error("Error creating quote history entry:", error);
+    res
+      .status(500)
+      .json({
+        error: "Failed to create quote history entry",
+        details: error.message,
+      });
   }
 });
 
 // Update proposal with discount and create history entry
-app.put('/api/proposals/:id/apply-discount', async (req, res) => {
+app.put("/api/proposals/:id/apply-discount", async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -592,34 +723,36 @@ app.put('/api/proposals/:id/apply-discount', async (req, res) => {
       discountValue,
       discountReason,
       newStatus,
-      changedBy
+      changedBy,
     } = req.body;
 
     // First, get the current proposal
     const { data: currentProposal, error: fetchError } = await supabaseAdmin
-      .from('proposals')
-      .select('*')
-      .eq('id', id)
+      .from("proposals")
+      .select("*")
+      .eq("id", id)
       .single();
 
     if (fetchError) throw fetchError;
     if (!currentProposal) {
-      return res.status(404).json({ error: 'Proposal not found' });
+      return res.status(404).json({ error: "Proposal not found" });
     }
 
     // Set original price if not set
-    const originalPrice = currentProposal.original_total_price || currentProposal.total_price;
+    const originalPrice =
+      currentProposal.original_total_price || currentProposal.total_price;
 
     // Parse current price
-    const currentPriceStr = currentProposal.total_price || 'R$ 0,00';
-    const currentPriceNum = parseFloat(currentPriceStr.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+    const currentPriceStr = currentProposal.total_price || "R$ 0,00";
+    const currentPriceNum =
+      parseFloat(currentPriceStr.replace(/[^\d,]/g, "").replace(",", ".")) || 0;
 
     // Calculate new price and discount amounts
     let newPrice = currentPriceNum;
     let discountAmount = 0;
 
     if (discountValue > 0) {
-      if (discountType === 'percentage') {
+      if (discountType === "percentage") {
         discountAmount = currentPriceNum * (discountValue / 100);
         newPrice = currentPriceNum - discountAmount;
       } else {
@@ -629,12 +762,14 @@ app.put('/api/proposals/:id/apply-discount', async (req, res) => {
     }
 
     // Format new price
-    const formattedNewPrice = `R$ ${newPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+    const formattedNewPrice = `R$ ${newPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
 
     // Calculate total discount from original
-    const originalPriceNum = parseFloat(originalPrice.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+    const originalPriceNum =
+      parseFloat(originalPrice.replace(/[^\d,]/g, "").replace(",", ".")) || 0;
     const totalDiscountAmount = originalPriceNum - newPrice;
-    const totalDiscountPercentage = originalPriceNum > 0 ? (totalDiscountAmount / originalPriceNum) * 100 : 0;
+    const totalDiscountPercentage =
+      originalPriceNum > 0 ? (totalDiscountAmount / originalPriceNum) * 100 : 0;
 
     // Update proposal
     const updateData = {
@@ -645,20 +780,20 @@ app.put('/api/proposals/:id/apply-discount', async (req, res) => {
       total_discount_amount: totalDiscountAmount,
       discount_reason: discountReason,
       last_modified_at: new Date().toISOString(),
-      last_modified_by: changedBy
+      last_modified_by: changedBy,
     };
 
     const { error: updateError } = await supabaseAdmin
-      .from('proposals')
+      .from("proposals")
       .update(updateData)
-      .eq('id', id);
+      .eq("id", id);
 
     if (updateError) throw updateError;
 
     // Create history entry
     const historyEntry = {
       proposal_id: id,
-      change_type: 'discount_applied',
+      change_type: "discount_applied",
       old_total_price: currentProposal.total_price,
       old_status: currentProposal.status,
       old_discount_percentage: currentProposal.total_discount_percentage || 0,
@@ -671,61 +806,68 @@ app.put('/api/proposals/:id/apply-discount', async (req, res) => {
       discount_value: discountValue,
       discount_reason: discountReason,
       changed_by: changedBy,
-      change_description: `Applied ${discountType === 'percentage' ? discountValue + '%' : 'R$ ' + discountValue} discount`,
-      created_at: new Date().toISOString()
+      change_description: `Applied ${discountType === "percentage" ? discountValue + "%" : "R$ " + discountValue} discount`,
+      created_at: new Date().toISOString(),
     };
 
     const { error: historyError } = await supabaseAdmin
-      .from('quote_history')
+      .from("quote_history")
       .insert([historyEntry]);
 
     if (historyError) {
-      console.error('Error creating history entry:', historyError);
+      console.error("Error creating history entry:", historyError);
     }
 
     // Call the discount email Edge Function
-    console.log('About to call discount email function for proposal ID:', id);
-    console.log('SUPABASE_URL:', process.env.SUPABASE_URL);
-    console.log('SERVICE_ROLE_KEY exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+    console.log("About to call discount email function for proposal ID:", id);
+    console.log("SUPABASE_URL:", process.env.SUPABASE_URL);
+    console.log(
+      "SERVICE_ROLE_KEY exists:",
+      !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+    );
 
     try {
       const functionUrl = `${process.env.SUPABASE_URL}/functions/v1/send-discount-email`;
-      console.log('Calling Edge Function at:', functionUrl);
+      console.log("Calling Edge Function at:", functionUrl);
 
       const discountEmailResponse = await fetch(functionUrl, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
         },
-        body: JSON.stringify({ proposalId: id })
+        body: JSON.stringify({ proposalId: id }),
       });
 
-      console.log('Edge Function response status:', discountEmailResponse.status);
+      console.log(
+        "Edge Function response status:",
+        discountEmailResponse.status,
+      );
 
       if (!discountEmailResponse.ok) {
         const errorText = await discountEmailResponse.text();
-        console.error('Failed to send discount email:', errorText);
+        console.error("Failed to send discount email:", errorText);
       } else {
         const emailResult = await discountEmailResponse.json();
-        console.log('Discount email sent successfully:', emailResult);
+        console.log("Discount email sent successfully:", emailResult);
       }
     } catch (emailError) {
-      console.error('Error calling discount email function:', emailError);
+      console.error("Error calling discount email function:", emailError);
       // Don't fail the discount application if email fails
     }
 
     res.json({
       success: true,
-      message: 'Discount applied successfully',
+      message: "Discount applied successfully",
       newPrice: formattedNewPrice,
       totalDiscountPercentage: totalDiscountPercentage.toFixed(2),
-      totalDiscountAmount: totalDiscountAmount.toFixed(2)
+      totalDiscountAmount: totalDiscountAmount.toFixed(2),
     });
-
   } catch (error) {
-    console.error('Error applying discount:', error);
-    res.status(500).json({ error: 'Failed to apply discount', details: error.message });
+    console.error("Error applying discount:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to apply discount", details: error.message });
   }
 });
 
@@ -734,149 +876,176 @@ app.put('/api/proposals/:id/apply-discount', async (req, res) => {
 // --- User Management API Routes ---
 
 // Get current user profile
-app.get('/api/auth/profile', async (req, res) => {
+app.get("/api/auth/profile", async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      return res.status(401).json({ error: 'No authorization header' });
+      return res.status(401).json({ error: "No authorization header" });
     }
 
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error } = await supabase.auth.getUser(token);
+    const token = authHeader.replace("Bearer ", "");
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser(token);
 
     if (error || !user) {
-      return res.status(401).json({ error: 'Invalid token' });
+      return res.status(401).json({ error: "Invalid token" });
     }
 
     const { data: profile, error: profileError } = await supabaseAdmin
-      .from('user_profiles')
-      .select('*')
-      .eq('id', user.id)
+      .from("user_profiles")
+      .select("*")
+      .eq("id", user.id)
       .single();
 
     if (profileError) {
-      return res.status(404).json({ error: 'Profile not found' });
+      return res.status(404).json({ error: "Profile not found" });
     }
 
     res.json(profile);
   } catch (error) {
-    console.error('Error fetching user profile:', error);
-    res.status(500).json({ error: 'Failed to fetch profile' });
+    console.error("Error fetching user profile:", error);
+    res.status(500).json({ error: "Failed to fetch profile" });
   }
 });
 
 // Get all users (admin only)
-app.get('/api/users', async (req, res) => {
+app.get("/api/users", async (req, res) => {
   try {
     const { data, error } = await supabaseAdmin
-      .from('user_profiles')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .from("user_profiles")
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
     res.json(data);
   } catch (error) {
-    console.error('Error fetching users:', error.message);
-    res.status(500).json({ error: 'Failed to fetch users', details: error.message });
+    console.error("Error fetching users:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch users", details: error.message });
   }
 });
 
 // Get auth data for users (admin only) - Uses service role key
-app.get('/api/users/auth-data', async (req, res) => {
+app.get("/api/users/auth-data", async (req, res) => {
   try {
-    console.log('Auth data endpoint called with service role access');
+    console.log("Auth data endpoint called with service role access");
 
     // Verify user has admin role
     const authHeader = req.headers.authorization;
-    console.log('Auth header present:', !!authHeader);
+    console.log("Auth header present:", !!authHeader);
 
     if (!authHeader) {
-      console.log('No authorization header provided');
-      return res.status(401).json({ error: 'No authorization header' });
+      console.log("No authorization header provided");
+      return res.status(401).json({ error: "No authorization header" });
     }
 
-    const token = authHeader.replace('Bearer ', '');
-    console.log('Token length:', token.length);
+    const token = authHeader.replace("Bearer ", "");
+    console.log("Token length:", token.length);
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      console.log('Auth error:', authError?.message || 'No user found');
-      return res.status(401).json({ error: 'Invalid token', details: authError?.message });
+      console.log("Auth error:", authError?.message || "No user found");
+      return res
+        .status(401)
+        .json({ error: "Invalid token", details: authError?.message });
     }
 
-    console.log('Authenticated user:', user.email);
+    console.log("Authenticated user:", user.email);
 
     // Check if user is admin - special handling for master admin
-    if (user.email === 'nelson.maluf@onprojecoes.com.br') {
-      console.log('Master admin access granted for:', user.email);
+    if (user.email === "nelson.maluf@onprojecoes.com.br") {
+      console.log("Master admin access granted for:", user.email);
     } else {
       // Check if user is admin via user_profiles table
       const { data: profile, error: profileError } = await supabaseAdmin
-        .from('user_profiles')
-        .select('role')
-        .eq('id', user.id)
+        .from("user_profiles")
+        .select("role")
+        .eq("id", user.id)
         .single();
 
-      console.log('Profile lookup result:', profile, 'Error:', profileError?.message);
+      console.log(
+        "Profile lookup result:",
+        profile,
+        "Error:",
+        profileError?.message,
+      );
 
-      if (!profile || profile.role !== 'admin') {
-        console.log('Access denied - not admin:', profile?.role, user.email);
-        return res.status(403).json({ error: 'Admin access required' });
+      if (!profile || profile.role !== "admin") {
+        console.log("Access denied - not admin:", profile?.role, user.email);
+        return res.status(403).json({ error: "Admin access required" });
       }
     }
 
-    console.log('Admin access confirmed for:', user.email);
+    console.log("Admin access confirmed for:", user.email);
 
     // Use service role client to get all auth users
-    const { data: authData, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+    const { data: authData, error: listError } =
+      await supabaseAdmin.auth.admin.listUsers();
 
     if (listError) {
-      console.error('Error listing users:', listError);
-      return res.status(500).json({ error: 'Failed to fetch auth users', details: listError.message });
+      console.error("Error listing users:", listError);
+      return res
+        .status(500)
+        .json({
+          error: "Failed to fetch auth users",
+          details: listError.message,
+        });
     }
 
     console.log(`Successfully fetched ${authData.users.length} auth users`);
     res.json(authData.users);
-
   } catch (error) {
-    console.error('Error fetching auth data:', error.message);
-    res.status(500).json({ error: 'Failed to fetch auth data', details: error.message });
+    console.error("Error fetching auth data:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch auth data", details: error.message });
   }
 });
 
 // Create new user (admin only)
-app.post('/api/users', async (req, res) => {
+app.post("/api/users", async (req, res) => {
   try {
     const { email, full_name, password, role, phone } = req.body;
 
     if (!email || !full_name || !password) {
-      return res.status(400).json({ error: 'Email, full name, and password are required' });
+      return res
+        .status(400)
+        .json({ error: "Email, full name, and password are required" });
     }
 
     // Create user in Supabase Auth (admin-created users are automatically confirmed)
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-      user_metadata: {
-        name: full_name,
-        phone: phone || ''
-      }
-    });
+    const { data: authData, error: authError } =
+      await supabaseAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: {
+          name: full_name,
+          phone: phone || "",
+        },
+      });
 
     if (authError) throw authError;
 
     // Create user profile
     const { data: profileData, error: profileError } = await supabaseAdmin
-      .from('user_profiles')
-      .insert([{
-        id: authData.user.id,
-        email,
-        full_name,
-        phone: phone || '',
-        role: role || 'sales_rep'
-      }])
+      .from("user_profiles")
+      .insert([
+        {
+          id: authData.user.id,
+          email,
+          full_name,
+          phone: phone || "",
+          role: role || "sales_rep",
+        },
+      ])
       .select()
       .single();
 
@@ -884,13 +1053,15 @@ app.post('/api/users', async (req, res) => {
 
     res.status(201).json(profileData);
   } catch (error) {
-    console.error('Error creating user:', error.message);
-    res.status(500).json({ error: 'Failed to create user', details: error.message });
+    console.error("Error creating user:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to create user", details: error.message });
   }
 });
 
 // Update user profile (admin only)
-app.put('/api/users/:id', async (req, res) => {
+app.put("/api/users/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { full_name, role, is_active, phone } = req.body;
@@ -904,9 +1075,9 @@ app.put('/api/users/:id', async (req, res) => {
 
     // Update user profile table
     const { data, error } = await supabaseAdmin
-      .from('user_profiles')
+      .from("user_profiles")
       .update(updateData)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -916,91 +1087,107 @@ app.put('/api/users/:id', async (req, res) => {
     if (phone !== undefined && supabaseServiceKey) {
       try {
         // Update Supabase Auth user metadata
-        const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(id, {
-          user_metadata: {
-            phone: phone
-          }
-        });
+        const { error: authError } =
+          await supabaseAdmin.auth.admin.updateUserById(id, {
+            user_metadata: {
+              phone: phone,
+            },
+          });
 
         if (authError) {
-          console.warn('Failed to update auth metadata for user:', id, authError.message);
+          console.warn(
+            "Failed to update auth metadata for user:",
+            id,
+            authError.message,
+          );
         }
 
         // Update existing quotes with new phone number
         const { error: quotesError } = await supabaseAdmin
-          .from('proposals')
+          .from("proposals")
           .update({ client_phone: phone })
-          .eq('user_id', id);
+          .eq("user_id", id);
 
         if (quotesError) {
-          console.warn('Failed to update quotes phone number for user:', id, quotesError.message);
+          console.warn(
+            "Failed to update quotes phone number for user:",
+            id,
+            quotesError.message,
+          );
         }
 
-        console.log(`Successfully synced phone number ${phone} for user ${id} across all systems`);
+        console.log(
+          `Successfully synced phone number ${phone} for user ${id} across all systems`,
+        );
       } catch (syncError) {
-        console.warn('Error syncing phone number:', syncError.message);
+        console.warn("Error syncing phone number:", syncError.message);
         // Don't fail the main update if sync fails
       }
     }
 
     res.json(data);
   } catch (error) {
-    console.error('Error updating user:', error.message);
-    res.status(500).json({ error: 'Failed to update user', details: error.message });
+    console.error("Error updating user:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to update user", details: error.message });
   }
 });
 
 // Delete user (admin only) - deletes from both user_profiles and Supabase auth
-app.delete('/api/users/:id', async (req, res) => {
+app.delete("/api/users/:id", async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      return res.status(401).json({ error: 'No authorization header' });
+      return res.status(401).json({ error: "No authorization header" });
     }
 
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const token = authHeader.replace("Bearer ", "");
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      return res.status(401).json({ error: 'Invalid token' });
+      return res.status(401).json({ error: "Invalid token" });
     }
 
     // Get user profile to determine role
     const { data: userProfile, error: profileError } = await supabaseAdmin
-      .from('user_profiles')
-      .select('role')
-      .eq('id', user.id)
+      .from("user_profiles")
+      .select("role")
+      .eq("id", user.id)
       .single();
 
     // Special handling for master admin
     let userRole = userProfile?.role;
 
-    if (user.email === 'nelson.maluf@onprojecoes.com.br') {
-      userRole = 'admin';
-      console.log('Master admin detected, granting admin role');
+    if (user.email === "nelson.maluf@onprojecoes.com.br") {
+      userRole = "admin";
+      console.log("Master admin detected, granting admin role");
     }
 
     // If no profile found but user exists, and it's a known sales rep email, grant sales_rep role
-    if (!userRole && user.email === 'nelson@avdesign.video') {
-      userRole = 'sales_rep';
-      console.log('Known sales rep email detected, granting sales_rep role');
+    if (!userRole && user.email === "nelson@avdesign.video") {
+      userRole = "sales_rep";
+      console.log("Known sales rep email detected, granting sales_rep role");
     }
 
-    if (!userRole || !['admin', 'sales_rep'].includes(userRole)) {
-      console.error('Authorization failed for user deletion:', {
+    if (!userRole || !["admin", "sales_rep"].includes(userRole)) {
+      console.error("Authorization failed for user deletion:", {
         user_email: user.email,
         user_role: userRole,
         profile_found: !!userProfile,
-        profile_error: profileError
+        profile_error: profileError,
       });
       return res.status(403).json({
-        error: 'Unauthorized: Only admins and sales reps can delete users',
+        error: "Unauthorized: Only admins and sales reps can delete users",
         debug: {
           user_email: user.email,
           user_role: userRole,
           profile_found: !!userProfile,
-          profile_error: profileError?.message
-        }
+          profile_error: profileError?.message,
+        },
       });
     }
 
@@ -1008,75 +1195,89 @@ app.delete('/api/users/:id', async (req, res) => {
 
     // Get user to delete for validation
     const { data: userToDelete, error: fetchError } = await supabaseAdmin
-      .from('user_profiles')
-      .select('email, role')
-      .eq('id', id)
+      .from("user_profiles")
+      .select("email, role")
+      .eq("id", id)
       .single();
 
     if (fetchError || !userToDelete) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
 
     // Prevent deletion of master admin
-    if (userToDelete.email === 'nelson.maluf@onprojecoes.com.br') {
-      return res.status(403).json({ error: 'Cannot delete master admin account' });
+    if (userToDelete.email === "nelson.maluf@onprojecoes.com.br") {
+      return res
+        .status(403)
+        .json({ error: "Cannot delete master admin account" });
     }
 
     // Delete from user_profiles table first
     const { error: profileDeleteError } = await supabaseAdmin
-      .from('user_profiles')
+      .from("user_profiles")
       .delete()
-      .eq('id', id);
+      .eq("id", id);
 
     if (profileDeleteError) {
-      console.error('Error deleting user profile:', profileDeleteError);
+      console.error("Error deleting user profile:", profileDeleteError);
       throw profileDeleteError;
     }
 
     // Delete from Supabase auth if service key is available
     if (supabaseServiceKey) {
       try {
-        const { error: authDeleteError } = await supabaseAdmin.auth.admin.deleteUser(id);
+        const { error: authDeleteError } =
+          await supabaseAdmin.auth.admin.deleteUser(id);
 
         if (authDeleteError) {
-          console.error('Error deleting user from auth:', authDeleteError);
+          console.error("Error deleting user from auth:", authDeleteError);
           // Don't throw here - profile is already deleted, just log the auth error
-          console.warn(`User profile deleted but auth deletion failed for user ${id}:`, authDeleteError.message);
+          console.warn(
+            `User profile deleted but auth deletion failed for user ${id}:`,
+            authDeleteError.message,
+          );
         } else {
-          console.log(`Successfully deleted user ${id} from both profile and auth`);
+          console.log(
+            `Successfully deleted user ${id} from both profile and auth`,
+          );
         }
       } catch (authError) {
-        console.error('Error during auth deletion:', authError);
+        console.error("Error during auth deletion:", authError);
         // Don't throw here - profile is already deleted
       }
     } else {
-      console.warn('Service role key not available - user deleted from profiles only');
+      console.warn(
+        "Service role key not available - user deleted from profiles only",
+      );
     }
 
     res.json({
       success: true,
-      message: 'User deleted successfully',
-      deletedFromAuth: !!supabaseServiceKey
+      message: "User deleted successfully",
+      deletedFromAuth: !!supabaseServiceKey,
     });
   } catch (error) {
-    console.error('Error deleting user:', error.message);
-    res.status(500).json({ error: 'Failed to delete user', details: error.message });
+    console.error("Error deleting user:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to delete user", details: error.message });
   }
 });
 
 // Sync phone numbers between user profiles and auth metadata (admin only)
-app.post('/api/users/sync-phone-numbers', async (req, res) => {
+app.post("/api/users/sync-phone-numbers", async (req, res) => {
   try {
     if (!supabaseServiceKey) {
-      return res.status(500).json({ error: 'Service role key required for this operation' });
+      return res
+        .status(500)
+        .json({ error: "Service role key required for this operation" });
     }
 
     // Get all user profiles with phone numbers
     const { data: profiles, error: profilesError } = await supabaseAdmin
-      .from('user_profiles')
-      .select('id, phone, email')
-      .not('phone', 'is', null)
-      .neq('phone', '');
+      .from("user_profiles")
+      .select("id, phone, email")
+      .not("phone", "is", null)
+      .neq("phone", "");
 
     if (profilesError) throw profilesError;
 
@@ -1086,31 +1287,37 @@ app.post('/api/users/sync-phone-numbers', async (req, res) => {
     for (const profile of profiles) {
       try {
         // Update auth metadata
-        const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(profile.id, {
-          user_metadata: {
-            phone: profile.phone
-          }
-        });
+        const { error: authError } =
+          await supabaseAdmin.auth.admin.updateUserById(profile.id, {
+            user_metadata: {
+              phone: profile.phone,
+            },
+          });
 
         if (authError) {
-          errors.push(`Failed to update auth metadata for ${profile.email}: ${authError.message}`);
+          errors.push(
+            `Failed to update auth metadata for ${profile.email}: ${authError.message}`,
+          );
           continue;
         }
 
         // Update existing quotes
         const { error: quotesError } = await supabaseAdmin
-          .from('proposals')
+          .from("proposals")
           .update({ client_phone: profile.phone })
-          .eq('user_id', profile.id);
+          .eq("user_id", profile.id);
 
         if (quotesError) {
-          errors.push(`Failed to update quotes for ${profile.email}: ${quotesError.message}`);
+          errors.push(
+            `Failed to update quotes for ${profile.email}: ${quotesError.message}`,
+          );
           continue;
         }
 
         syncedCount++;
-        console.log(`Synced phone number for user: ${profile.email} (${profile.phone})`);
-
+        console.log(
+          `Synced phone number for user: ${profile.email} (${profile.phone})`,
+        );
       } catch (error) {
         errors.push(`Error syncing ${profile.email}: ${error.message}`);
       }
@@ -1121,35 +1328,38 @@ app.post('/api/users/sync-phone-numbers', async (req, res) => {
       message: `Synced phone numbers for ${syncedCount} users`,
       totalUsers: profiles.length,
       syncedCount,
-      errors: errors.length > 0 ? errors : undefined
+      errors: errors.length > 0 ? errors : undefined,
     });
-
   } catch (error) {
-    console.error('Error syncing phone numbers:', error.message);
-    res.status(500).json({ error: 'Failed to sync phone numbers', details: error.message });
+    console.error("Error syncing phone numbers:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to sync phone numbers", details: error.message });
   }
 });
 
 // --- Lead Management API Routes ---
 
 // Get all leads (with role-based filtering)
-app.get('/api/leads', async (req, res) => {
+app.get("/api/leads", async (req, res) => {
   try {
     const { data, error } = await supabaseAdmin
-      .from('leads')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .from("leads")
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
     res.json(data);
   } catch (error) {
-    console.error('Error fetching leads:', error.message);
-    res.status(500).json({ error: 'Failed to fetch leads', details: error.message });
+    console.error("Error fetching leads:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch leads", details: error.message });
   }
 });
 
 // Search leads by name
-app.get('/api/leads/search', async (req, res) => {
+app.get("/api/leads/search", async (req, res) => {
   try {
     const { q } = req.query;
     if (!q) {
@@ -1157,30 +1367,32 @@ app.get('/api/leads/search', async (req, res) => {
     }
 
     const { data, error } = await supabaseAdmin
-      .from('leads')
-      .select('*')
-      .ilike('name', `%${q}%`)
+      .from("leads")
+      .select("*")
+      .ilike("name", `%${q}%`)
       .limit(10);
 
     if (error) throw error;
     res.json(data);
   } catch (error) {
-    console.error('Error searching leads:', error.message);
-    res.status(500).json({ error: 'Failed to search leads', details: error.message });
+    console.error("Error searching leads:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to search leads", details: error.message });
   }
 });
 
 // Create new lead
-app.post('/api/leads', async (req, res) => {
+app.post("/api/leads", async (req, res) => {
   try {
     const { name, email, phone, company, created_by } = req.body;
 
     if (!name) {
-      return res.status(400).json({ error: 'Name is required' });
+      return res.status(400).json({ error: "Name is required" });
     }
 
     const { data, error } = await supabaseAdmin
-      .from('leads')
+      .from("leads")
       .insert([{ name, email, phone, company, created_by }])
       .select()
       .single();
@@ -1188,13 +1400,15 @@ app.post('/api/leads', async (req, res) => {
     if (error) throw error;
     res.status(201).json(data);
   } catch (error) {
-    console.error('Error creating lead:', error.message);
-    res.status(500).json({ error: 'Failed to create lead', details: error.message });
+    console.error("Error creating lead:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to create lead", details: error.message });
   }
 });
 
 // Update lead
-app.put('/api/leads/:id', async (req, res) => {
+app.put("/api/leads/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { name, email, phone, company } = req.body;
@@ -1207,184 +1421,221 @@ app.put('/api/leads/:id', async (req, res) => {
     updateData.updated_at = new Date().toISOString();
 
     const { data, error } = await supabaseAdmin
-      .from('leads')
+      .from("leads")
       .update(updateData)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
     if (error) throw error;
     res.json(data);
   } catch (error) {
-    console.error('Error updating lead:', error.message);
-    res.status(500).json({ error: 'Failed to update lead', details: error.message });
+    console.error("Error updating lead:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to update lead", details: error.message });
   }
 });
 
 // Get proposals with role-based filtering
-app.get('/api/proposals', async (req, res) => {
+app.get("/api/proposals", async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      return res.status(401).json({ error: 'No authorization header' });
+      return res.status(401).json({ error: "No authorization header" });
     }
 
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error } = await supabase.auth.getUser(token);
+    const token = authHeader.replace("Bearer ", "");
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser(token);
 
     if (error || !user) {
-      return res.status(401).json({ error: 'Invalid token' });
+      return res.status(401).json({ error: "Invalid token" });
     }
 
     // Get user profile to determine role
     const { data: userProfile, error: profileError } = await supabaseAdmin
-      .from('user_profiles')
-      .select('role')
-      .eq('id', user.id)
+      .from("user_profiles")
+      .select("role")
+      .eq("id", user.id)
       .single();
 
     // Special handling for master admin
     let userRole = userProfile?.role;
 
-    if (user.email === 'nelson.maluf@onprojecoes.com.br') {
-      userRole = 'admin';
-      console.log('Master admin detected, granting admin role for proposals');
+    if (user.email === "nelson.maluf@onprojecoes.com.br") {
+      userRole = "admin";
+      console.log("Master admin detected, granting admin role for proposals");
     }
 
     // If no profile found but user exists, and it's a known sales rep email, grant sales_rep role
-    if (!userRole && user.email === 'nelson@avdesign.video') {
-      userRole = 'sales_rep';
-      console.log('Known sales rep email detected, granting sales_rep role for proposals');
+    if (!userRole && user.email === "nelson@avdesign.video") {
+      userRole = "sales_rep";
+      console.log(
+        "Known sales rep email detected, granting sales_rep role for proposals",
+      );
 
       // Auto-create profile for known sales rep
       try {
         const { error: createError } = await supabaseAdmin
-          .from('user_profiles')
-          .insert([{
-            id: user.id,
-            email: user.email,
-            full_name: 'Nelson (Sales Rep)',
-            role: 'sales_rep',
-            is_active: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }]);
+          .from("user_profiles")
+          .insert([
+            {
+              id: user.id,
+              email: user.email,
+              full_name: "Nelson (Sales Rep)",
+              role: "sales_rep",
+              is_active: true,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            },
+          ]);
 
         if (!createError) {
-          console.log('Created user profile for sales rep:', user.email);
+          console.log("Created user profile for sales rep:", user.email);
         }
       } catch (err) {
-        console.warn('Could not auto-create sales rep profile:', err.message);
+        console.warn("Could not auto-create sales rep profile:", err.message);
       }
     }
 
-    const context = req.query.context || 'my-quotes';
+    const context = req.query.context || "my-quotes";
 
     // For admin users and sales reps in dashboard context, use service role client to bypass RLS
-    const clientToUse = (['admin', 'sales_rep'].includes(userRole) && context === 'dashboard') ? supabaseAdmin : supabase;
-    console.log(`[DEBUG] Using ${clientToUse === supabaseAdmin ? 'ADMIN' : 'ANON'} client for query`);
+    const clientToUse =
+      ["admin", "sales_rep"].includes(userRole) && context === "dashboard"
+        ? supabaseAdmin
+        : supabase;
+    console.log(
+      `[DEBUG] Using ${clientToUse === supabaseAdmin ? "ADMIN" : "ANON"} client for query`,
+    );
 
-    let query = clientToUse
-      .from('proposals')
-      .select('*');
+    let query = clientToUse.from("proposals").select("*");
 
     // Apply filtering based on user role and context
-    console.log(`[DEBUG] Applying filters - Role: ${userRole}, Context: ${context}, User ID: ${user.id}`);
+    console.log(
+      `[DEBUG] Applying filters - Role: ${userRole}, Context: ${context}, User ID: ${user.id}`,
+    );
 
-    if (context === 'my-quotes') {
-      if (userRole === 'sales_rep') {
+    if (context === "my-quotes") {
+      if (userRole === "sales_rep") {
         // Sales reps see quotes they created AND quotes from their clients
-        console.log('[DEBUG] Sales rep - filtering by sales_rep_id OR client relationship');
+        console.log(
+          "[DEBUG] Sales rep - filtering by sales_rep_id OR client relationship",
+        );
 
         // Get client IDs for this sales rep
         const { data: clientRels, error: clientError } = await supabaseAdmin
-          .from('client_sales_rep_relationships')
-          .select('client_id')
-          .eq('sales_rep_id', user.id)
-          .eq('is_active', true);
+          .from("client_sales_rep_relationships")
+          .select("client_id")
+          .eq("sales_rep_id", user.id)
+          .eq("is_active", true);
 
         if (clientError) {
-          console.error('Error fetching client relationships:', clientError);
+          console.error("Error fetching client relationships:", clientError);
         }
 
-        const clientIds = clientRels?.map(rel => rel.client_id) || [];
+        const clientIds = clientRels?.map((rel) => rel.client_id) || [];
 
         if (clientIds.length > 0) {
           // Show quotes created by sales rep OR by their clients (but avoid duplicates)
-          const userIdFilter = clientIds.map(id => `user_id.eq.${id}`).join(',');
+          const userIdFilter = clientIds
+            .map((id) => `user_id.eq.${id}`)
+            .join(",");
           // Use a more specific filter to prevent duplicates
           const combinedFilter = `sales_rep_id.eq.${user.id},${userIdFilter}`;
           query = query.or(combinedFilter);
         } else {
           // Fallback to only sales rep created quotes
-          query = query.eq('sales_rep_id', user.id);
+          query = query.eq("sales_rep_id", user.id);
         }
-      } else if (userRole === 'admin') {
+      } else if (userRole === "admin") {
         // Admins accessing my-quotes should see their own quotes only
-        console.log('[DEBUG] Admin in my-quotes - filtering by user_id OR sales_rep_id');
+        console.log(
+          "[DEBUG] Admin in my-quotes - filtering by user_id OR sales_rep_id",
+        );
         query = query.or(`user_id.eq.${user.id},sales_rep_id.eq.${user.id}`);
       } else {
         // End users see only their own quotes
-        console.log('[DEBUG] End user - filtering by user_id');
-        query = query.eq('user_id', user.id);
+        console.log("[DEBUG] End user - filtering by user_id");
+        query = query.eq("user_id", user.id);
       }
-    } else if (context === 'dashboard') {
+    } else if (context === "dashboard") {
       // Dashboard context - only admins and sales reps should access this
-      if (!['admin', 'sales_rep'].includes(userRole)) {
-        return res.status(403).json({ error: 'Unauthorized: Only admins and sales reps can access dashboard view' });
+      if (!["admin", "sales_rep"].includes(userRole)) {
+        return res
+          .status(403)
+          .json({
+            error:
+              "Unauthorized: Only admins and sales reps can access dashboard view",
+          });
       }
       // Admins see all quotes, sales reps see quotes they created AND client quotes
-      if (userRole === 'sales_rep') {
-        console.log('[DEBUG] Sales rep in dashboard - filtering by sales_rep_id OR client relationship');
+      if (userRole === "sales_rep") {
+        console.log(
+          "[DEBUG] Sales rep in dashboard - filtering by sales_rep_id OR client relationship",
+        );
 
         // Get client IDs for this sales rep
         const { data: clientRels, error: clientError } = await supabaseAdmin
-          .from('client_sales_rep_relationships')
-          .select('client_id')
-          .eq('sales_rep_id', user.id)
-          .eq('is_active', true);
+          .from("client_sales_rep_relationships")
+          .select("client_id")
+          .eq("sales_rep_id", user.id)
+          .eq("is_active", true);
 
         if (clientError) {
-          console.error('Error fetching client relationships:', clientError);
+          console.error("Error fetching client relationships:", clientError);
         }
 
-        const clientIds = clientRels?.map(rel => rel.client_id) || [];
+        const clientIds = clientRels?.map((rel) => rel.client_id) || [];
 
         if (clientIds.length > 0) {
           // Show quotes created by sales rep OR by their clients (but avoid duplicates)
-          const userIdFilter = clientIds.map(id => `user_id.eq.${id}`).join(',');
+          const userIdFilter = clientIds
+            .map((id) => `user_id.eq.${id}`)
+            .join(",");
           // Use a more specific filter to prevent duplicates
           const combinedFilter = `sales_rep_id.eq.${user.id},${userIdFilter}`;
           query = query.or(combinedFilter);
         } else {
           // Fallback to only sales rep created quotes
-          query = query.eq('sales_rep_id', user.id);
+          query = query.eq("sales_rep_id", user.id);
         }
-      } else if (userRole === 'admin') {
-        console.log('[DEBUG] ADMIN in dashboard - NO FILTER applied, should see ALL quotes');
+      } else if (userRole === "admin") {
+        console.log(
+          "[DEBUG] ADMIN in dashboard - NO FILTER applied, should see ALL quotes",
+        );
       }
       // Note: For admin users, we don't add any filter - they see ALL quotes
     } else {
       // Default: user sees only their own quotes
-      console.log('[DEBUG] Default context - filtering by user_id');
-      query = query.eq('user_id', user.id);
+      console.log("[DEBUG] Default context - filtering by user_id");
+      query = query.eq("user_id", user.id);
     }
 
-    const { data, error: queryError } = await query.order('created_at', { ascending: false });
+    const { data, error: queryError } = await query.order("created_at", {
+      ascending: false,
+    });
 
     if (queryError) throw queryError;
 
     // Remove duplicates that might occur when OR conditions overlap
-    const uniqueData = data.filter((item, index, self) =>
-      index === self.findIndex(t => t.id === item.id)
+    const uniqueData = data.filter(
+      (item, index, self) => index === self.findIndex((t) => t.id === item.id),
     );
 
-    console.log(`[/api/proposals] User: ${user.email} (${user.id}), Role: ${userRole}, Context: ${context}, Found ${uniqueData.length} unique quotes (${data.length} total)`);
+    console.log(
+      `[/api/proposals] User: ${user.email} (${user.id}), Role: ${userRole}, Context: ${context}, Found ${uniqueData.length} unique quotes (${data.length} total)`,
+    );
 
     res.json(uniqueData);
   } catch (error) {
-    console.error('Error fetching proposals:', error.message);
-    res.status(500).json({ error: 'Failed to fetch proposals', details: error.message });
+    console.error("Error fetching proposals:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch proposals", details: error.message });
   }
 });
 
@@ -1392,32 +1643,33 @@ app.get('/api/proposals', async (req, res) => {
 const recentSubmissions = new Map();
 
 // POST save proposal endpoint for dashboard quotes
-app.post('/api/save-proposal', async (req, res) => {
+app.post("/api/save-proposal", async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      return res.status(401).json({ error: 'No authorization header' });
+      return res.status(401).json({ error: "No authorization header" });
     }
 
     // Create a unique key for this submission to prevent duplicates
-    const submissionKey = `${req.body.user_id || 'unknown'}_${req.body.project_name || 'unknown'}_${Date.now()}`;
-    const shortKey = `${req.body.user_id || 'unknown'}_${req.body.project_name || 'unknown'}`;
+    const submissionKey = `${req.body.user_id || "unknown"}_${req.body.project_name || "unknown"}_${Date.now()}`;
+    const shortKey = `${req.body.user_id || "unknown"}_${req.body.project_name || "unknown"}`;
 
     // Check if we received a similar submission recently (within 30 seconds)
     const now = Date.now();
-    const recentSubmission = Array.from(recentSubmissions.entries()).find(([key, timestamp]) =>
-      key.startsWith(shortKey) && (now - timestamp) < 30000
+    const recentSubmission = Array.from(recentSubmissions.entries()).find(
+      ([key, timestamp]) => key.startsWith(shortKey) && now - timestamp < 30000,
     );
 
     if (recentSubmission) {
-      console.log('Duplicate proposal submission detected, rejecting:', {
+      console.log("Duplicate proposal submission detected, rejecting:", {
         submissionKey,
         recentKey: recentSubmission[0],
-        timeDiff: now - recentSubmission[1]
+        timeDiff: now - recentSubmission[1],
       });
       return res.status(409).json({
-        error: 'Duplicate submission detected',
-        message: 'A similar proposal was just submitted. Please wait before submitting again.'
+        error: "Duplicate submission detected",
+        message:
+          "A similar proposal was just submitted. Please wait before submitting again.",
       });
     }
 
@@ -1432,38 +1684,48 @@ app.post('/api/save-proposal', async (req, res) => {
       oldEntries.forEach(([key]) => recentSubmissions.delete(key));
     }
 
-    console.log('Processing new proposal submission:', submissionKey);
+    console.log("Processing new proposal submission:", submissionKey);
 
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const token = authHeader.replace("Bearer ", "");
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      return res.status(401).json({ error: 'Invalid token' });
+      return res.status(401).json({ error: "Invalid token" });
     }
 
     const rawProposalData = req.body;
 
-    console.log('Received proposal data:', JSON.stringify(rawProposalData, null, 2));
+    console.log(
+      "Received proposal data:",
+      JSON.stringify(rawProposalData, null, 2),
+    );
 
     // Ensure required fields are present
     if (!rawProposalData.user_id || !rawProposalData.project_name) {
-      return res.status(400).json({ error: 'Missing required fields: user_id and project_name' });
+      return res
+        .status(400)
+        .json({ error: "Missing required fields: user_id and project_name" });
     }
 
     // Helper function to safely convert string to number
     function safeNumber(value) {
-      if (value === null || value === undefined || value === '') return null;
-      if (typeof value === 'number') return value;
-      const cleanedValue = String(value).replace(/[^\d.,]/g, '').replace(',', '.');
+      if (value === null || value === undefined || value === "") return null;
+      if (typeof value === "number") return value;
+      const cleanedValue = String(value)
+        .replace(/[^\d.,]/g, "")
+        .replace(",", ".");
       const num = parseFloat(cleanedValue);
       return isNaN(num) ? null : num;
     }
 
     // Helper function to safely convert string to integer
     function safeInteger(value) {
-      if (value === null || value === undefined || value === '') return null;
-      if (typeof value === 'number') return Math.round(value);
-      const cleanedValue = String(value).replace(/\D/g, '');
+      if (value === null || value === undefined || value === "") return null;
+      if (typeof value === "number") return Math.round(value);
+      const cleanedValue = String(value).replace(/\D/g, "");
       const num = parseInt(cleanedValue, 10);
       return isNaN(num) ? null : num;
     }
@@ -1474,7 +1736,7 @@ app.post('/api/save-proposal', async (req, res) => {
       // Core required fields
       user_id: rawProposalData.user_id,
       project_name: rawProposalData.project_name,
-      status: rawProposalData.status || 'pending',
+      status: rawProposalData.status || "pending",
 
       // Client Information
       client_name: rawProposalData.client_name,
@@ -1491,24 +1753,33 @@ app.post('/api/save-proposal', async (req, res) => {
       total_price: rawProposalData.total_price,
 
       // Service Selection
-      selected_pod_type: rawProposalData.selected_pod_type
+      selected_pod_type: rawProposalData.selected_pod_type,
     };
 
     // Add LED configuration fields if they exist
     if (rawProposalData.led_principal_width !== undefined) {
-      proposalData.led_principal_width = safeNumber(rawProposalData.led_principal_width);
+      proposalData.led_principal_width = safeNumber(
+        rawProposalData.led_principal_width,
+      );
     }
     if (rawProposalData.led_principal_height !== undefined) {
-      proposalData.led_principal_height = safeNumber(rawProposalData.led_principal_height);
+      proposalData.led_principal_height = safeNumber(
+        rawProposalData.led_principal_height,
+      );
     }
     if (rawProposalData.led_principal_curvature !== undefined) {
-      proposalData.led_principal_curvature = safeInteger(rawProposalData.led_principal_curvature);
+      proposalData.led_principal_curvature = safeInteger(
+        rawProposalData.led_principal_curvature,
+      );
     }
     if (rawProposalData.led_principal_modules !== undefined) {
-      proposalData.led_principal_modules = safeInteger(rawProposalData.led_principal_modules);
+      proposalData.led_principal_modules = safeInteger(
+        rawProposalData.led_principal_modules,
+      );
     }
     if (rawProposalData.led_principal_resolution !== undefined) {
-      proposalData.led_principal_resolution = rawProposalData.led_principal_resolution;
+      proposalData.led_principal_resolution =
+        rawProposalData.led_principal_resolution;
     }
 
     // Add LED Teto configuration if exists
@@ -1516,10 +1787,14 @@ app.post('/api/save-proposal', async (req, res) => {
       proposalData.led_teto_width = safeNumber(rawProposalData.led_teto_width);
     }
     if (rawProposalData.led_teto_height !== undefined) {
-      proposalData.led_teto_height = safeNumber(rawProposalData.led_teto_height);
+      proposalData.led_teto_height = safeNumber(
+        rawProposalData.led_teto_height,
+      );
     }
     if (rawProposalData.led_teto_modules !== undefined) {
-      proposalData.led_teto_modules = safeInteger(rawProposalData.led_teto_modules);
+      proposalData.led_teto_modules = safeInteger(
+        rawProposalData.led_teto_modules,
+      );
     }
 
     // Add power/weight data only if columns exist (they might not be in the actual DB)
@@ -1529,10 +1804,14 @@ app.post('/api/save-proposal', async (req, res) => {
 
     // Add progressive discount information if provided
     if (rawProposalData.discount_percentage !== undefined) {
-      proposalData.discount_percentage = safeNumber(rawProposalData.discount_percentage);
+      proposalData.discount_percentage = safeNumber(
+        rawProposalData.discount_percentage,
+      );
     }
     if (rawProposalData.discount_amount !== undefined) {
-      proposalData.discount_amount = safeNumber(rawProposalData.discount_amount);
+      proposalData.discount_amount = safeNumber(
+        rawProposalData.discount_amount,
+      );
     }
     if (rawProposalData.original_total_price !== undefined) {
       proposalData.original_total_price = rawProposalData.original_total_price;
@@ -1542,8 +1821,13 @@ app.post('/api/save-proposal', async (req, res) => {
     }
 
     // Add selected services if provided
-    if (rawProposalData.selected_services && Array.isArray(rawProposalData.selected_services)) {
-      proposalData.selected_services = JSON.stringify(rawProposalData.selected_services);
+    if (
+      rawProposalData.selected_services &&
+      Array.isArray(rawProposalData.selected_services)
+    ) {
+      proposalData.selected_services = JSON.stringify(
+        rawProposalData.selected_services,
+      );
     }
 
     // Add sales rep information directly (using existing discount_description field to store structured data)
@@ -1565,7 +1849,9 @@ app.post('/api/save-proposal', async (req, res) => {
       proposalData.sales_rep_name = rawProposalData.sales_rep_name;
     }
 
-    console.log(`[save-proposal] Setting sales_rep_id: ${proposalData.sales_rep_id} for user: ${user.email} (${user.id})`);
+    console.log(
+      `[save-proposal] Setting sales_rep_id: ${proposalData.sales_rep_id} for user: ${user.email} (${user.id})`,
+    );
 
     // Store dashboard-specific data as JSON in discount_description
     const dashboardData = {
@@ -1580,50 +1866,67 @@ app.post('/api/save-proposal', async (req, res) => {
       teto_weight: safeInteger(rawProposalData.teto_weight),
 
       // Pixel data
-      led_principal_pixels_width: safeInteger(rawProposalData.led_principal_pixels_width),
-      led_principal_pixels_height: safeInteger(rawProposalData.led_principal_pixels_height),
-      led_principal_total_pixels: safeInteger(rawProposalData.led_principal_total_pixels),
+      led_principal_pixels_width: safeInteger(
+        rawProposalData.led_principal_pixels_width,
+      ),
+      led_principal_pixels_height: safeInteger(
+        rawProposalData.led_principal_pixels_height,
+      ),
+      led_principal_total_pixels: safeInteger(
+        rawProposalData.led_principal_total_pixels,
+      ),
       led_teto_pixels_width: safeInteger(rawProposalData.led_teto_pixels_width),
-      led_teto_pixels_height: safeInteger(rawProposalData.led_teto_pixels_height),
+      led_teto_pixels_height: safeInteger(
+        rawProposalData.led_teto_pixels_height,
+      ),
       led_teto_total_pixels: safeInteger(rawProposalData.led_teto_total_pixels),
-      led_teto_resolution: rawProposalData.led_teto_resolution
+      led_teto_resolution: rawProposalData.led_teto_resolution,
     };
 
-    if (rawProposalData.selected_services && Array.isArray(rawProposalData.selected_services)) {
+    if (
+      rawProposalData.selected_services &&
+      Array.isArray(rawProposalData.selected_services)
+    ) {
       dashboardData.services = rawProposalData.selected_services;
     }
 
     proposalData.discount_description = JSON.stringify(dashboardData);
 
     // Remove null/undefined values to avoid database issues
-    Object.keys(proposalData).forEach(key => {
+    Object.keys(proposalData).forEach((key) => {
       if (proposalData[key] === null || proposalData[key] === undefined) {
         delete proposalData[key];
       }
     });
 
-    console.log('Final proposal data to insert:', JSON.stringify(proposalData, null, 2));
-    console.log('Discount description content:', proposalData.discount_description);
+    console.log(
+      "Final proposal data to insert:",
+      JSON.stringify(proposalData, null, 2),
+    );
+    console.log(
+      "Discount description content:",
+      proposalData.discount_description,
+    );
 
     // Log progressive discount fields specifically for debugging
     if (proposalData.discount_percentage > 0) {
-      console.log('Progressive discount applied:', {
+      console.log("Progressive discount applied:", {
         percentage: proposalData.discount_percentage,
         amount: proposalData.discount_amount,
         original: proposalData.original_total_price,
         final: proposalData.total_price,
-        reason: proposalData.discount_reason
+        reason: proposalData.discount_reason,
       });
     }
 
     const { data, error } = await supabaseAdmin
-      .from('proposals')
+      .from("proposals")
       .insert([proposalData])
       .select()
       .single();
 
     if (error) {
-      console.error('Database error details:', error);
+      console.error("Database error details:", error);
       throw error;
     }
 
@@ -1631,7 +1934,10 @@ app.post('/api/save-proposal', async (req, res) => {
     try {
       await sendProposalWebhook(data);
     } catch (webhookError) {
-      console.warn('Webhook failed but proposal was saved:', webhookError.message);
+      console.warn(
+        "Webhook failed but proposal was saved:",
+        webhookError.message,
+      );
       // Don't fail the proposal creation if webhook fails
     }
 
@@ -1639,7 +1945,10 @@ app.post('/api/save-proposal', async (req, res) => {
     try {
       await sendProposalEmailNotification(data, user.id, userRole);
     } catch (emailError) {
-      console.warn('Email notification failed but proposal was saved:', emailError.message);
+      console.warn(
+        "Email notification failed but proposal was saved:",
+        emailError.message,
+      );
       // Don't fail the proposal creation if email fails
     }
 
@@ -1649,19 +1958,29 @@ app.post('/api/save-proposal', async (req, res) => {
       try {
         calendarResult = await createPreReserveEvent(data);
         if (calendarResult.success) {
-          console.log(`[save-proposal] Pre-reserve calendar event created for proposal ${data.id}`);
+          console.log(
+            `[save-proposal] Pre-reserve calendar event created for proposal ${data.id}`,
+          );
           // Send WhatsApp notification for PRÉ-RESERVA
           try {
-            const whatsappMsg = `🔄 *PRÉ-RESERVA CRIADA*\n\n📋 *Projeto:* ${data.project_name || 'N/A'}\n👤 *Cliente:* ${data.client_name || 'N/A'}\n📧 *Email:* ${data.client_email || 'N/A'}\n📞 *Telefone:* ${data.client_phone || 'N/A'}\n📅 *Data:* ${data.shooting_dates_start || 'N/A'}\n💰 *Valor:* ${data.total_price || 'N/A'}\n\n🔗 ID: ${data.id}`;
+            const whatsappMsg = `🔄 *PRÉ-RESERVA CRIADA*\n\n📋 *Projeto:* ${data.project_name || "N/A"}\n👤 *Cliente:* ${data.client_name || "N/A"}\n📧 *Email:* ${data.client_email || "N/A"}\n📞 *Telefone:* ${data.client_phone || "N/A"}\n📅 *Data:* ${data.shooting_dates_start || "N/A"}\n💰 *Valor:* ${data.total_price || "N/A"}\n\n🔗 ID: ${data.id}`;
             await sendWhatsAppNotification(whatsappMsg);
           } catch (whatsappError) {
-            console.warn('WhatsApp notification failed:', whatsappError.message);
+            console.warn(
+              "WhatsApp notification failed:",
+              whatsappError.message,
+            );
           }
         } else {
-          console.warn(`[save-proposal] Failed to create pre-reserve event: ${calendarResult.error}`);
+          console.warn(
+            `[save-proposal] Failed to create pre-reserve event: ${calendarResult.error}`,
+          );
         }
       } catch (calendarError) {
-        console.warn('Calendar event creation failed but proposal was saved:', calendarError.message);
+        console.warn(
+          "Calendar event creation failed but proposal was saved:",
+          calendarError.message,
+        );
         // Don't fail the proposal creation if calendar fails
       }
     }
@@ -1671,126 +1990,150 @@ app.post('/api/save-proposal', async (req, res) => {
     try {
       pipelineResult = await pipelineIntegration.createPipelineClient(data);
       if (pipelineResult) {
-        console.log(`[save-proposal] Pipeline client created: ${pipelineResult.id}`);
+        console.log(
+          `[save-proposal] Pipeline client created: ${pipelineResult.id}`,
+        );
       }
     } catch (pipelineError) {
-      console.warn('Pipeline client creation failed but proposal was saved:', pipelineError.message);
+      console.warn(
+        "Pipeline client creation failed but proposal was saved:",
+        pipelineError.message,
+      );
     }
 
     res.status(201).json({
       success: true,
-      message: 'Proposal saved successfully',
+      message: "Proposal saved successfully",
       data: data,
       calendar: calendarResult,
-      pipeline: pipelineResult ? { clientId: pipelineResult.id } : null
+      pipeline: pipelineResult ? { clientId: pipelineResult.id } : null,
     });
-
   } catch (error) {
-    console.error('Error saving proposal:', error.message);
-    console.error('Full error object:', error);
+    console.error("Error saving proposal:", error.message);
+    console.error("Full error object:", error);
     res.status(500).json({
-      error: 'Failed to save proposal',
+      error: "Failed to save proposal",
       details: error.message,
-      hint: error.hint || 'Check server logs for more details'
+      hint: error.hint || "Check server logs for more details",
     });
   }
 });
 
 // Check if user exists by email (for dashboard client selection)
-app.post('/api/check-user-by-email', async (req, res) => {
+app.post("/api/check-user-by-email", async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      return res.status(401).json({ error: 'No authorization header' });
+      return res.status(401).json({ error: "No authorization header" });
     }
 
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const token = authHeader.replace("Bearer ", "");
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      return res.status(401).json({ error: 'Invalid token' });
+      return res.status(401).json({ error: "Invalid token" });
     }
 
     // Check if current user is admin or sales_rep
     const { data: userProfile, error: profileError } = await supabaseAdmin
-      .from('user_profiles')
-      .select('role, email')
-      .eq('id', user.id)
+      .from("user_profiles")
+      .select("role, email")
+      .eq("id", user.id)
       .single();
 
-    console.log('User profile check:', { user_id: user.id, email: user.email, profile: userProfile, error: profileError });
+    console.log("User profile check:", {
+      user_id: user.id,
+      email: user.email,
+      profile: userProfile,
+      error: profileError,
+    });
 
     // Special handling for master admin
     let userRole = userProfile?.role;
 
-    if (user.email === 'nelson.maluf@onprojecoes.com.br') {
-      userRole = 'admin';
-      console.log('Master admin detected, granting admin role');
+    if (user.email === "nelson.maluf@onprojecoes.com.br") {
+      userRole = "admin";
+      console.log("Master admin detected, granting admin role");
     }
 
     // If no profile found but user exists, and it's a known sales rep email, grant sales_rep role
-    if (!userRole && user.email === 'nelson@avdesign.video') {
-      userRole = 'sales_rep';
-      console.log('Known sales rep email detected, granting sales_rep role');
+    if (!userRole && user.email === "nelson@avdesign.video") {
+      userRole = "sales_rep";
+      console.log("Known sales rep email detected, granting sales_rep role");
 
       // Auto-create profile for known sales rep
       try {
         const { error: createError } = await supabaseAdmin
-          .from('user_profiles')
-          .insert([{
-            id: user.id,
-            email: user.email,
-            full_name: 'Nelson (Sales Rep)',
-            role: 'sales_rep',
-            is_active: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }]);
+          .from("user_profiles")
+          .insert([
+            {
+              id: user.id,
+              email: user.email,
+              full_name: "Nelson (Sales Rep)",
+              role: "sales_rep",
+              is_active: true,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            },
+          ]);
 
         if (!createError) {
-          console.log('Created user profile for sales rep in check-user-by-email:', user.email);
+          console.log(
+            "Created user profile for sales rep in check-user-by-email:",
+            user.email,
+          );
         }
       } catch (err) {
-        console.warn('Could not auto-create sales rep profile in check-user-by-email:', err.message);
+        console.warn(
+          "Could not auto-create sales rep profile in check-user-by-email:",
+          err.message,
+        );
       }
     }
 
-    if (!userRole || !['admin', 'sales_rep'].includes(userRole)) {
-      console.error('Authorization failed:', {
+    if (!userRole || !["admin", "sales_rep"].includes(userRole)) {
+      console.error("Authorization failed:", {
         user_email: user.email,
         user_role: userRole,
         profile_found: !!userProfile,
-        profile_error: profileError
+        profile_error: profileError,
       });
       return res.status(403).json({
-        error: 'Unauthorized: Only admins and sales reps can check users',
+        error: "Unauthorized: Only admins and sales reps can check users",
         debug: {
           user_email: user.email,
           user_role: userRole,
           profile_found: !!userProfile,
-          profile_error: profileError?.message
-        }
+          profile_error: profileError?.message,
+        },
       });
     }
 
     const { email } = req.body;
     if (!email) {
-      return res.status(400).json({ error: 'Email is required' });
+      return res.status(400).json({ error: "Email is required" });
     }
 
     // Check if user exists in auth.users
     let existingUser = null;
     try {
-      const { data: authUsers, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+      const { data: authUsers, error: listError } =
+        await supabaseAdmin.auth.admin.listUsers();
       if (listError) throw listError;
-      existingUser = authUsers.users.find(u => u.email === email);
+      existingUser = authUsers.users.find((u) => u.email === email);
     } catch (error) {
       // If admin functions don't work, check user_profiles table instead
-      console.log('Admin listUsers failed, checking profiles table:', error.message);
+      console.log(
+        "Admin listUsers failed, checking profiles table:",
+        error.message,
+      );
       const { data: profileUser } = await supabaseAdmin
-        .from('user_profiles')
-        .select('id, email')
-        .eq('email', email)
+        .from("user_profiles")
+        .select("id, email")
+        .eq("email", email)
         .single();
 
       if (profileUser) {
@@ -1801,78 +2144,85 @@ app.post('/api/check-user-by-email', async (req, res) => {
     if (existingUser) {
       // Check for profile data
       const { data: profile } = await supabaseAdmin
-        .from('user_profiles')
-        .select('*')
-        .eq('id', existingUser.id)
+        .from("user_profiles")
+        .select("*")
+        .eq("id", existingUser.id)
         .single();
 
       res.json({
         exists: true,
         user_id: existingUser.id,
-        profile: profile || null
+        profile: profile || null,
       });
     } else {
       res.json({
         exists: false,
         user_id: null,
-        profile: null
+        profile: null,
       });
     }
-
   } catch (error) {
-    console.error('Error checking user by email:', error.message);
-    res.status(500).json({ error: 'Failed to check user', details: error.message });
+    console.error("Error checking user by email:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to check user", details: error.message });
   }
 });
 
 // Public guest user registration (no auth required)
-app.post('/api/register-guest', async (req, res) => {
+app.post("/api/register-guest", async (req, res) => {
   try {
     const { email, phone, full_name, sendEmail } = req.body;
 
     if (!email || !phone || !full_name) {
       return res.status(400).json({
         success: false,
-        error: 'Email, phone, and full_name are required'
+        error: "Email, phone, and full_name are required",
       });
     }
 
     // Generate a random password for the user
-    const randomPassword = Math.random().toString(36).slice(-12) + Math.random().toString(36).slice(-12);
+    const randomPassword =
+      Math.random().toString(36).slice(-12) +
+      Math.random().toString(36).slice(-12);
 
     // Create user in Supabase Auth
     let newUser = null;
     try {
-      const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
-        email: email,
-        password: randomPassword,
-        email_confirm: true,
-        user_metadata: {
-          full_name: full_name,
-          phone: phone
-        }
-      });
+      const { data: userData, error: createError } =
+        await supabaseAdmin.auth.admin.createUser({
+          email: email,
+          password: randomPassword,
+          email_confirm: true,
+          user_metadata: {
+            full_name: full_name,
+            phone: phone,
+          },
+        });
 
       if (createError) {
         // Check if user already exists
-        if (createError.message && createError.message.includes('already registered')) {
+        if (
+          createError.message &&
+          createError.message.includes("already registered")
+        ) {
           return res.status(400).json({
             success: false,
-            error: 'User already exists with this email'
+            error: "User already exists with this email",
           });
         }
         throw createError;
       }
       newUser = userData;
-      console.log('[register-guest] User created in auth:', newUser.user.id);
+      console.log("[register-guest] User created in auth:", newUser.user.id);
     } catch (error) {
-      console.error('[register-guest] Error creating user in auth:', error);
+      console.error("[register-guest] Error creating user in auth:", error);
       if (!supabaseServiceKey) {
         return res.status(500).json({
           success: false,
-          error: 'Cannot create users: Service role key not configured',
-          message: 'Please contact administrator to enable user registration',
-          details: error.message
+          error: "Cannot create users: Service role key not configured",
+          message: "Please contact administrator to enable user registration",
+          details: error.message,
         });
       }
       throw error;
@@ -1884,62 +2234,71 @@ app.post('/api/register-guest', async (req, res) => {
       email: email,
       full_name: full_name,
       phone: phone,
-      role: 'end_user',
-      is_active: true
+      role: "end_user",
+      is_active: true,
     };
 
     const { data: profile, error: insertProfileError } = await supabaseAdmin
-      .from('user_profiles')
+      .from("user_profiles")
       .insert(profileData)
       .select()
       .single();
 
     if (insertProfileError) {
-      console.error('[register-guest] Error creating profile:', insertProfileError);
+      console.error(
+        "[register-guest] Error creating profile:",
+        insertProfileError,
+      );
       // Try to clean up the created user if profile creation fails
       try {
         await supabaseAdmin.auth.admin.deleteUser(newUser.user.id);
       } catch (cleanupError) {
-        console.error('[register-guest] Failed to cleanup user:', cleanupError);
+        console.error("[register-guest] Failed to cleanup user:", cleanupError);
       }
       return res.status(500).json({
         success: false,
-        error: 'Failed to create user profile',
-        details: insertProfileError.message
+        error: "Failed to create user profile",
+        details: insertProfileError.message,
       });
     }
 
-    console.log('[register-guest] Profile created:', profile.id);
+    console.log("[register-guest] Profile created:", profile.id);
 
     // Send magic link email if requested
     if (sendEmail) {
       try {
-        const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-          type: 'magiclink',
-          email: email,
-          options: {
-            redirectTo: `${process.env.BASE_URL || 'http://localhost:3000'}/led/my-quotes.html`
-          }
-        });
+        const { data: linkData, error: linkError } =
+          await supabaseAdmin.auth.admin.generateLink({
+            type: "magiclink",
+            email: email,
+            options: {
+              redirectTo: `${process.env.BASE_URL || "http://localhost:3000"}/led/my-quotes.html`,
+            },
+          });
 
         if (linkError) {
-          console.error('[register-guest] Error generating magic link:', linkError);
+          console.error(
+            "[register-guest] Error generating magic link:",
+            linkError,
+          );
         } else {
-          console.log('[register-guest] Magic link generated:', linkData);
+          console.log("[register-guest] Magic link generated:", linkData);
 
           // Send email with magic link using Resend
           try {
-            const resendResponse = await fetch('https://api.resend.com/emails', {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                from: 'ONAV <noreply@onav.com.br>',
-                to: [email],
-                subject: 'Acesse sua proposta - ONAV',
-                html: `
+            const resendResponse = await fetch(
+              "https://api.resend.com/emails",
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  from: "ONAV <noreply@onav.com.br>",
+                  to: [email],
+                  subject: "Acesse sua proposta - ONAV",
+                  html: `
                   <h2>Bem-vindo à ONAV!</h2>
                   <p>Olá ${full_name},</p>
                   <p>Sua conta foi criada com sucesso. Clique no link abaixo para acessar suas propostas:</p>
@@ -1948,119 +2307,135 @@ app.post('/api/register-guest', async (req, res) => {
                   <p>${linkData.properties.action_link}</p>
                   <br>
                   <p>Atenciosamente,<br>Equipe ONAV</p>
-                `
-              })
-            });
+                `,
+                }),
+              },
+            );
 
             if (!resendResponse.ok) {
               const resendError = await resendResponse.text();
-              console.error('[register-guest] Error sending email via Resend:', resendError);
+              console.error(
+                "[register-guest] Error sending email via Resend:",
+                resendError,
+              );
             } else {
               const resendData = await resendResponse.json();
-              console.log('[register-guest] Email sent successfully:', resendData);
+              console.log(
+                "[register-guest] Email sent successfully:",
+                resendData,
+              );
             }
           } catch (emailError) {
-            console.error('[register-guest] Error sending email:', emailError);
+            console.error("[register-guest] Error sending email:", emailError);
           }
         }
       } catch (linkGenerationError) {
-        console.error('[register-guest] Error in link generation process:', linkGenerationError);
+        console.error(
+          "[register-guest] Error in link generation process:",
+          linkGenerationError,
+        );
       }
     }
 
     res.status(201).json({
       success: true,
       userId: newUser.user.id,
-      message: 'User created successfully'
+      message: "User created successfully",
     });
-
   } catch (error) {
-    console.error('[register-guest] Error creating guest user:', error.message);
+    console.error("[register-guest] Error creating guest user:", error.message);
     res.status(500).json({
       success: false,
-      error: 'Failed to create guest user',
-      details: error.message
+      error: "Failed to create guest user",
+      details: error.message,
     });
   }
 });
 
 // Create new user (for dashboard client creation)
-app.post('/api/create-client-user', async (req, res) => {
+app.post("/api/create-client-user", async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      return res.status(401).json({ error: 'No authorization header' });
+      return res.status(401).json({ error: "No authorization header" });
     }
 
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const token = authHeader.replace("Bearer ", "");
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      return res.status(401).json({ error: 'Invalid token' });
+      return res.status(401).json({ error: "Invalid token" });
     }
 
     // Check if current user is admin or sales_rep
     const { data: userProfile, error: userProfileError } = await supabaseAdmin
-      .from('user_profiles')
-      .select('role, email')
-      .eq('id', user.id)
+      .from("user_profiles")
+      .select("role, email")
+      .eq("id", user.id)
       .single();
 
     // Special handling for master admin
     let userRole = userProfile?.role;
 
-    if (user.email === 'nelson.maluf@onprojecoes.com.br') {
-      userRole = 'admin';
-      console.log('Master admin detected, granting admin role');
+    if (user.email === "nelson.maluf@onprojecoes.com.br") {
+      userRole = "admin";
+      console.log("Master admin detected, granting admin role");
     }
 
     // If no profile found but user exists, and it's a known sales rep email, grant sales_rep role
-    if (!userRole && user.email === 'nelson@avdesign.video') {
-      userRole = 'sales_rep';
-      console.log('Known sales rep email detected, granting sales_rep role');
+    if (!userRole && user.email === "nelson@avdesign.video") {
+      userRole = "sales_rep";
+      console.log("Known sales rep email detected, granting sales_rep role");
     }
 
-    if (!userRole || !['admin', 'sales_rep'].includes(userRole)) {
-      console.error('Authorization failed:', {
+    if (!userRole || !["admin", "sales_rep"].includes(userRole)) {
+      console.error("Authorization failed:", {
         user_email: user.email,
         user_role: userRole,
         profile_found: !!userProfile,
-        profile_error: userProfileError
+        profile_error: userProfileError,
       });
       return res.status(403).json({
-        error: 'Unauthorized: Only admins and sales reps can create users',
+        error: "Unauthorized: Only admins and sales reps can create users",
         debug: {
           user_email: user.email,
           user_role: userRole,
           profile_found: !!userProfile,
-          profile_error: userProfileError?.message
-        }
+          profile_error: userProfileError?.message,
+        },
       });
     }
 
     const { email, password, full_name, company, phone } = req.body;
 
     if (!email || !password || !full_name) {
-      return res.status(400).json({ error: 'Email, password, and full_name are required' });
+      return res
+        .status(400)
+        .json({ error: "Email, password, and full_name are required" });
     }
 
     // Create user in auth
     let newUser = null;
     try {
-      const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
-        email: email,
-        password: password,
-        email_confirm: true
-      });
+      const { data: userData, error: createError } =
+        await supabaseAdmin.auth.admin.createUser({
+          email: email,
+          password: password,
+          email_confirm: true,
+        });
       if (createError) throw createError;
       newUser = userData;
     } catch (error) {
       // If admin createUser doesn't work, return an error with instructions
       if (!supabaseServiceKey) {
         return res.status(500).json({
-          error: 'Cannot create users without service role key',
-          message: 'Please add SUPABASE_SERVICE_ROLE_KEY to your .env file to enable user creation from dashboard',
-          details: error.message
+          error: "Cannot create users without service role key",
+          message:
+            "Please add SUPABASE_SERVICE_ROLE_KEY to your .env file to enable user creation from dashboard",
+          details: error.message,
         });
       }
       throw error;
@@ -2071,82 +2446,89 @@ app.post('/api/create-client-user', async (req, res) => {
       id: newUser.user.id,
       email: email,
       full_name: full_name,
-      role: 'end_user',
-      is_active: true
+      role: "end_user",
+      is_active: true,
     };
 
     // Add optional fields if they're provided
     if (phone) profileData.phone = phone;
 
     const { data: profile, error: insertProfileError } = await supabaseAdmin
-      .from('user_profiles')
+      .from("user_profiles")
       .insert(profileData)
       .select()
       .single();
 
     if (insertProfileError) {
-      console.error('Error creating profile:', insertProfileError);
+      console.error("Error creating profile:", insertProfileError);
       // Try to clean up the created user if profile creation fails
       await supabaseAdmin.auth.admin.deleteUser(newUser.user.id);
-      throw new Error('Failed to create user profile');
+      throw new Error("Failed to create user profile");
     }
 
     res.status(201).json({
       success: true,
       user_id: newUser.user.id,
-      profile: profile
+      profile: profile,
     });
-
   } catch (error) {
-    console.error('Error creating client user:', error.message);
-    res.status(500).json({ error: 'Failed to create client user', details: error.message });
+    console.error("Error creating client user:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to create client user", details: error.message });
   }
 });
 
 // Update user profile (for existing users without complete profiles)
-app.put('/api/update-user-profile', async (req, res) => {
+app.put("/api/update-user-profile", async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      return res.status(401).json({ error: 'No authorization header' });
+      return res.status(401).json({ error: "No authorization header" });
     }
 
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const token = authHeader.replace("Bearer ", "");
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      return res.status(401).json({ error: 'Invalid token' });
+      return res.status(401).json({ error: "Invalid token" });
     }
 
     // Check if current user is admin or sales_rep
     const { data: userProfile, error: userProfileError } = await supabaseAdmin
-      .from('user_profiles')
-      .select('role, email')
-      .eq('id', user.id)
+      .from("user_profiles")
+      .select("role, email")
+      .eq("id", user.id)
       .single();
 
     // Special handling for master admin
     let userRole = userProfile?.role;
 
-    if (user.email === 'nelson.maluf@onprojecoes.com.br') {
-      userRole = 'admin';
+    if (user.email === "nelson.maluf@onprojecoes.com.br") {
+      userRole = "admin";
     }
 
-    if (!userRole || !['admin', 'sales_rep'].includes(userRole)) {
+    if (!userRole || !["admin", "sales_rep"].includes(userRole)) {
       return res.status(403).json({
-        error: 'Unauthorized: Only admins and sales reps can update user profiles',
+        error:
+          "Unauthorized: Only admins and sales reps can update user profiles",
         debug: {
           user_email: user.email,
           user_role: userRole,
-          profile_found: !!userProfile
-        }
+          profile_found: !!userProfile,
+        },
       });
     }
 
     const { user_id, email, full_name, company, phone } = req.body;
 
     if (!user_id || !email || !full_name) {
-      return res.status(400).json({ error: 'user_id, email, and full_name are required' });
+      return res
+        .status(400)
+        .json({ error: "user_id, email, and full_name are required" });
     }
 
     // Update or create profile (only using columns we know exist)
@@ -2154,17 +2536,17 @@ app.put('/api/update-user-profile', async (req, res) => {
       id: user_id,
       email: email,
       full_name: full_name,
-      role: 'end_user',
+      role: "end_user",
       is_active: true,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     // Add optional fields if they're provided
     if (phone) profileData.phone = phone;
 
     const { data: profile, error: updateProfileError } = await supabaseAdmin
-      .from('user_profiles')
-      .upsert(profileData, { onConflict: 'id' })
+      .from("user_profiles")
+      .upsert(profileData, { onConflict: "id" })
       .select()
       .single();
 
@@ -2172,89 +2554,102 @@ app.put('/api/update-user-profile', async (req, res) => {
 
     res.json({
       success: true,
-      profile: profile
+      profile: profile,
     });
-
   } catch (error) {
-    console.error('Error updating user profile:', error.message);
-    res.status(500).json({ error: 'Failed to update user profile', details: error.message });
+    console.error("Error updating user profile:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to update user profile", details: error.message });
   }
 });
 
 // Debug endpoint to check current user profile
-app.get('/api/debug/current-user', async (req, res) => {
+app.get("/api/debug/current-user", async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      return res.status(401).json({ error: 'No authorization header' });
+      return res.status(401).json({ error: "No authorization header" });
     }
 
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const token = authHeader.replace("Bearer ", "");
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      return res.status(401).json({ error: 'Invalid token' });
+      return res.status(401).json({ error: "Invalid token" });
     }
 
     // Get user profile
     const { data: userProfile, error: debugProfileError } = await supabaseAdmin
-      .from('user_profiles')
-      .select('*')
-      .eq('id', user.id)
+      .from("user_profiles")
+      .select("*")
+      .eq("id", user.id)
       .single();
 
     res.json({
       auth_user: {
         id: user.id,
         email: user.email,
-        created_at: user.created_at
+        created_at: user.created_at,
       },
       profile: userProfile,
       profile_error: debugProfileError,
-      is_master_admin: user.email === 'nelson.maluf@onprojecoes.com.br'
+      is_master_admin: user.email === "nelson.maluf@onprojecoes.com.br",
     });
-
   } catch (error) {
-    console.error('Error checking current user:', error.message);
-    res.status(500).json({ error: 'Failed to check current user', details: error.message });
+    console.error("Error checking current user:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to check current user", details: error.message });
   }
 });
 
 // Helper endpoint to create/update admin profile
-app.post('/api/setup-admin-profile', async (req, res) => {
+app.post("/api/setup-admin-profile", async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      return res.status(401).json({ error: 'No authorization header' });
+      return res.status(401).json({ error: "No authorization header" });
     }
 
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const token = authHeader.replace("Bearer ", "");
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      return res.status(401).json({ error: 'Invalid token' });
+      return res.status(401).json({ error: "Invalid token" });
     }
 
     // Only allow master admin to set up profiles
 
-    if (user.email !== 'nelson.maluf@onprojecoes.com.br') {
-      return res.status(403).json({ error: 'Only master admin can setup profiles' });
+    if (user.email !== "nelson.maluf@onprojecoes.com.br") {
+      return res
+        .status(403)
+        .json({ error: "Only master admin can setup profiles" });
     }
 
     // Create or update profile for current user
-    const adminName = 'Nelson Maluf (Master Admin)';
+    const adminName = "Nelson Maluf (Master Admin)";
 
     const { data: profile, error: setupProfileError } = await supabaseAdmin
-      .from('user_profiles')
-      .upsert({
-        id: user.id,
-        email: user.email,
-        full_name: adminName,
-        role: 'admin',
-        is_active: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'id' })
+      .from("user_profiles")
+      .upsert(
+        {
+          id: user.id,
+          email: user.email,
+          full_name: adminName,
+          role: "admin",
+          is_active: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "id" },
+      )
       .select()
       .single();
 
@@ -2262,45 +2657,51 @@ app.post('/api/setup-admin-profile', async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Admin profile created/updated successfully',
-      profile: profile
+      message: "Admin profile created/updated successfully",
+      profile: profile,
     });
-
   } catch (error) {
-    console.error('Error setting up admin profile:', error.message);
-    res.status(500).json({ error: 'Failed to setup admin profile', details: error.message });
+    console.error("Error setting up admin profile:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to setup admin profile", details: error.message });
   }
 });
 
 // Simplified endpoint to create admin profile without auth restrictions
-app.post('/api/bootstrap-admin', async (req, res) => {
+app.post("/api/bootstrap-admin", async (req, res) => {
   try {
     const { user_id, email } = req.body;
 
     if (!user_id || !email) {
-      return res.status(400).json({ error: 'user_id and email are required' });
+      return res.status(400).json({ error: "user_id and email are required" });
     }
 
     // Only allow for master admin emails
 
-    if (email !== 'nelson.maluf@onprojecoes.com.br') {
-      return res.status(403).json({ error: 'Only master admin can be bootstrapped' });
+    if (email !== "nelson.maluf@onprojecoes.com.br") {
+      return res
+        .status(403)
+        .json({ error: "Only master admin can be bootstrapped" });
     }
 
     // Create or update profile for the user
-    const adminName = 'Nelson Maluf (Master Admin)';
+    const adminName = "Nelson Maluf (Master Admin)";
 
     const { data: profile, error: bootstrapError } = await supabaseAdmin
-      .from('user_profiles')
-      .upsert({
-        id: user_id,
-        email: email,
-        full_name: adminName,
-        role: 'admin',
-        is_active: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'id' })
+      .from("user_profiles")
+      .upsert(
+        {
+          id: user_id,
+          email: email,
+          full_name: adminName,
+          role: "admin",
+          is_active: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "id" },
+      )
       .select()
       .single();
 
@@ -2308,96 +2709,111 @@ app.post('/api/bootstrap-admin', async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Admin profile bootstrapped successfully',
-      profile: profile
+      message: "Admin profile bootstrapped successfully",
+      profile: profile,
     });
-
   } catch (error) {
-    console.error('Error bootstrapping admin profile:', error.message);
-    res.status(500).json({ error: 'Failed to bootstrap admin profile', details: error.message });
+    console.error("Error bootstrapping admin profile:", error.message);
+    res
+      .status(500)
+      .json({
+        error: "Failed to bootstrap admin profile",
+        details: error.message,
+      });
   }
 });
 
 // Debug endpoint to check table structure
-app.get('/api/debug/table-structure', async (req, res) => {
+app.get("/api/debug/table-structure", async (req, res) => {
   try {
     // Try to get table info by querying with all possible columns
     const { data, error } = await supabaseAdmin
-      .from('user_profiles')
-      .select('*')
+      .from("user_profiles")
+      .select("*")
       .limit(1);
 
     if (error) {
-      console.error('Error querying user_profiles:', error);
+      console.error("Error querying user_profiles:", error);
 
       // Try basic query to see what columns exist
       const { data: basicData, error: basicError } = await supabaseAdmin
-        .from('user_profiles')
+        .from("user_profiles")
         .select()
         .limit(1);
 
       return res.json({
         error: error,
         basic_query: basicData,
-        basic_error: basicError
+        basic_error: basicError,
       });
     }
 
     res.json({
       success: true,
       sample_data: data,
-      message: 'Query successful'
+      message: "Query successful",
     });
-
   } catch (error) {
-    console.error('Error checking table structure:', error.message);
-    res.status(500).json({ error: 'Failed to check table structure', details: error.message });
+    console.error("Error checking table structure:", error.message);
+    res
+      .status(500)
+      .json({
+        error: "Failed to check table structure",
+        details: error.message,
+      });
   }
 });
 
 // Debug endpoint to verify Google Calendar private key processing
-app.get('/api/debug/google-key', async (req, res) => {
+app.get("/api/debug/google-key", async (req, res) => {
   try {
-    const client_email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || (googleCreds && googleCreds.client_email);
-    const private_key = process.env.GOOGLE_PRIVATE_KEY || (googleCreds && googleCreds.private_key);
+    const client_email =
+      process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL ||
+      (googleCreds && googleCreds.client_email);
+    const private_key =
+      process.env.GOOGLE_PRIVATE_KEY ||
+      (googleCreds && googleCreds.private_key);
 
     if (!client_email || !private_key) {
       return res.json({
         success: false,
-        error: 'Missing credentials',
+        error: "Missing credentials",
         hasEmail: !!client_email,
-        hasKey: !!private_key
+        hasKey: !!private_key,
       });
     }
 
     // Check for common issues
     const rawKeyLength = private_key.length;
-    const hasBeginMarker = private_key.includes('-----BEGIN');
-    const hasEndMarker = private_key.includes('-----END');
-    const hasNewlines = private_key.includes('\n') || private_key.includes('\\n');
+    const hasBeginMarker = private_key.includes("-----BEGIN");
+    const hasEndMarker = private_key.includes("-----END");
+    const hasNewlines =
+      private_key.includes("\n") || private_key.includes("\\n");
 
     // Extract base64 content (same logic as getGoogleAuth)
     let base64Content = private_key;
-    const markerMatch = private_key.match(/-----BEGIN[^-]*-----([A-Za-z0-9+/=\s\n\r]+)-----END[^-]*-----/i);
+    const markerMatch = private_key.match(
+      /-----BEGIN[^-]*-----([A-Za-z0-9+/=\s\n\r]+)-----END[^-]*-----/i,
+    );
     if (markerMatch) {
       base64Content = markerMatch[1];
     }
     // Remove all non-base64 chars including padding
-    base64Content = base64Content.replace(/[^A-Za-z0-9+/]/g, '');
+    base64Content = base64Content.replace(/[^A-Za-z0-9+/]/g, "");
     const originalBase64Length = base64Content.length;
 
     // Fix padding - must be divisible by 4
     const remainder = base64Content.length % 4;
-    let paddingFix = 'none';
+    let paddingFix = "none";
     if (remainder === 1) {
       base64Content = base64Content.slice(0, -1);
-      paddingFix = 'removed 1 extra char';
+      paddingFix = "removed 1 extra char";
     } else if (remainder === 2) {
-      base64Content += '==';
-      paddingFix = 'added ==';
+      base64Content += "==";
+      paddingFix = "added ==";
     } else if (remainder === 3) {
-      base64Content += '=';
-      paddingFix = 'added =';
+      base64Content += "=";
+      paddingFix = "added =";
     }
 
     // Try to decode and verify key structure
@@ -2407,7 +2823,7 @@ app.get('/api/debug/google-key', async (req, res) => {
     let asn1Info = null;
 
     try {
-      const keyBuffer = Buffer.from(base64Content, 'base64');
+      const keyBuffer = Buffer.from(base64Content, "base64");
       keyValid = keyBuffer.length > 0 && keyBuffer[0] === 0x30; // Should start with SEQUENCE
 
       // Parse ASN.1 header
@@ -2416,18 +2832,18 @@ app.get('/api/debug/google-key', async (req, res) => {
         asn1Info = {
           expectedLength,
           actualLength: keyBuffer.length,
-          match: expectedLength === keyBuffer.length
+          match: expectedLength === keyBuffer.length,
         };
       }
 
       // Try to parse with crypto module
       const lines = base64Content.match(/.{1,64}/g) || [];
-      const normalizedKey = `-----BEGIN PRIVATE KEY-----\n${lines.join('\n')}\n-----END PRIVATE KEY-----\n`;
+      const normalizedKey = `-----BEGIN PRIVATE KEY-----\n${lines.join("\n")}\n-----END PRIVATE KEY-----\n`;
 
       try {
         crypto.createPrivateKey({
           key: normalizedKey,
-          format: 'pem'
+          format: "pem",
         });
         cryptoVerified = true;
       } catch (cryptoErr) {
@@ -2440,7 +2856,7 @@ app.get('/api/debug/google-key', async (req, res) => {
     res.json({
       success: true,
       diagnostics: {
-        email: client_email.substring(0, 20) + '...',
+        email: client_email.substring(0, 20) + "...",
         rawKeyLength,
         hasBeginMarker,
         hasEndMarker,
@@ -2456,8 +2872,8 @@ app.get('/api/debug/google-key', async (req, res) => {
         cryptoModuleVerified: cryptoVerified,
         cryptoError: keyError,
         nodeVersion: process.version,
-        opensslVersion: process.versions.openssl
-      }
+        opensslVersion: process.versions.openssl,
+      },
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -2465,7 +2881,7 @@ app.get('/api/debug/google-key', async (req, res) => {
 });
 
 // Setup database tables and RLS policies
-app.post('/api/setup-database', async (req, res) => {
+app.post("/api/setup-database", async (req, res) => {
   try {
     // Create user_profiles table if it doesn't exist
     const createTableSQL = `
@@ -2481,22 +2897,22 @@ app.post('/api/setup-database', async (req, res) => {
       );
     `;
 
-    const { error: createError } = await supabaseAdmin.rpc('exec_sql', {
-      sql: createTableSQL
+    const { error: createError } = await supabaseAdmin.rpc("exec_sql", {
+      sql: createTableSQL,
     });
 
     if (createError) {
-      console.log('Table creation error (may already exist):', createError);
+      console.log("Table creation error (may already exist):", createError);
     }
 
     // Enable RLS
     const enableRLSSQL = `ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;`;
-    const { error: rlsError } = await supabaseAdmin.rpc('exec_sql', {
-      sql: enableRLSSQL
+    const { error: rlsError } = await supabaseAdmin.rpc("exec_sql", {
+      sql: enableRLSSQL,
     });
 
     if (rlsError) {
-      console.log('RLS enable error (may already be enabled):', rlsError);
+      console.log("RLS enable error (may already be enabled):", rlsError);
     }
 
     // Create policies
@@ -2511,38 +2927,42 @@ app.post('/api/setup-database', async (req, res) => {
       `CREATE POLICY IF NOT EXISTS "Users can view own profile" ON user_profiles FOR SELECT USING (auth.uid() = id);`,
 
       // Allow users to update their own profile
-      `CREATE POLICY IF NOT EXISTS "Users can update own profile" ON user_profiles FOR UPDATE USING (auth.uid() = id);`
+      `CREATE POLICY IF NOT EXISTS "Users can update own profile" ON user_profiles FOR UPDATE USING (auth.uid() = id);`,
     ];
 
     for (const policy of policies) {
-      const { error } = await supabaseAdmin.rpc('exec_sql', { sql: policy });
+      const { error } = await supabaseAdmin.rpc("exec_sql", { sql: policy });
       if (error) {
-        console.log('Policy creation warning (may already exist):', error.message);
+        console.log(
+          "Policy creation warning (may already exist):",
+          error.message,
+        );
       }
     }
 
-    res.json({ success: true, message: 'Database setup completed' });
-
+    res.json({ success: true, message: "Database setup completed" });
   } catch (error) {
-    console.error('Error setting up database:', error.message);
-    res.status(500).json({ error: 'Failed to setup database', details: error.message });
+    console.error("Error setting up database:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to setup database", details: error.message });
   }
 });
 
 // --- Public Quote Sharing Routes ---
 
 // Serve the quote viewer page
-app.get('/quote/:slug', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'quote.html'));
+app.get("/quote/:slug", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "quote.html"));
 });
 
 // Serve the calendar test page
-app.get('/test-calendar.html', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'test-calendar.html'));
+app.get("/test-calendar.html", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "test-calendar.html"));
 });
 
 // Public API to fetch quote data by ID (or slug)
-app.get('/api/quotes/public/:slug', async (req, res) => {
+app.get("/api/quotes/public/:slug", async (req, res) => {
   try {
     const { slug } = req.params;
 
@@ -2550,36 +2970,35 @@ app.get('/api/quotes/public/:slug', async (req, res) => {
     // In a production specific slug implementation, we would query by a 'slug' column.
 
     const { data, error } = await supabaseAdmin
-      .from('proposals')
-      .select('*')
-      .eq('id', slug)
+      .from("proposals")
+      .select("*")
+      .eq("id", slug)
       .single();
 
     if (error) {
-      console.error('Error fetching public quote:', error);
-      return res.status(404).json({ error: 'Quote not found' });
+      console.error("Error fetching public quote:", error);
+      return res.status(404).json({ error: "Quote not found" });
     }
 
     // Return only necessary public data (sanitize if needed)
     res.json({ quote: data });
-
   } catch (error) {
-    console.error('Error in public quote API:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error in public quote API:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
 // --- End Public Quote Routes ---
 
-
-
 // --- Google Calendar Availability Route ---
 
-app.post('/api/check-availability', async (req, res) => {
+app.post("/api/check-availability", async (req, res) => {
   try {
     if (!googleCreds) {
-      console.error('Google credentials not configured');
-      return res.status(500).json({ available: false, error: 'Calendar configuration missing' });
+      console.error("Google credentials not configured");
+      return res
+        .status(500)
+        .json({ available: false, error: "Calendar configuration missing" });
     }
 
     const { quoteId, startDate, endDate } = req.body;
@@ -2590,15 +3009,24 @@ app.post('/api/check-availability', async (req, res) => {
 
     // If dates are invalid
     if (isNaN(start.getTime())) {
-      return res.status(400).json({ available: false, error: 'Data de início inválida' });
+      return res
+        .status(400)
+        .json({ available: false, error: "Data de início inválida" });
     }
 
     if (endDate && isNaN(new Date(endDate).getTime())) {
-      return res.status(400).json({ available: false, error: 'Data de fim inválida' });
+      return res
+        .status(400)
+        .json({ available: false, error: "Data de fim inválida" });
     }
 
     if (endDate && new Date(endDate) < start) {
-      return res.status(400).json({ available: false, error: 'A data de fim deve ser posterior à data de início' });
+      return res
+        .status(400)
+        .json({
+          available: false,
+          error: "A data de fim deve ser posterior à data de início",
+        });
     }
 
     // Adjust end date to ensure it covers the full day or range
@@ -2607,26 +3035,28 @@ app.post('/api/check-availability', async (req, res) => {
     end.setHours(23, 59, 59, 999);
     start.setHours(0, 0, 0, 0);
 
-    console.log(`Checking availability for ${start.toISOString()} to ${end.toISOString()}`);
+    console.log(
+      `Checking availability for ${start.toISOString()} to ${end.toISOString()}`,
+    );
 
     const tokens = await getGoogleAuth([
-      'https://www.googleapis.com/auth/calendar.readonly',
-      'https://www.googleapis.com/auth/calendar.events'
+      "https://www.googleapis.com/auth/calendar.readonly",
+      "https://www.googleapis.com/auth/calendar.events",
     ]);
 
     // Query FreeBusy via REST API
-    const freeBusyUrl = 'https://www.googleapis.com/calendar/v3/freeBusy';
+    const freeBusyUrl = "https://www.googleapis.com/calendar/v3/freeBusy";
     const freeBusyRes = await fetch(freeBusyUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${tokens.access_token}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${tokens.access_token}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         timeMin: start.toISOString(),
         timeMax: end.toISOString(),
-        items: [{ id: CALENDAR_ID }]
-      })
+        items: [{ id: CALENDAR_ID }],
+      }),
     });
 
     if (!freeBusyRes.ok) {
@@ -2637,7 +3067,9 @@ app.post('/api/check-availability', async (req, res) => {
     const freeBusyData = await freeBusyRes.json();
 
     // Safely access busy slots - handle case where ID might not match exactly in the response keys
-    const calendarData = freeBusyData.calendars[CALENDAR_ID] || freeBusyData.calendars[Object.keys(freeBusyData.calendars)[0]];
+    const calendarData =
+      freeBusyData.calendars[CALENDAR_ID] ||
+      freeBusyData.calendars[Object.keys(freeBusyData.calendars)[0]];
     const busySlots = (calendarData && calendarData.busy) || [];
 
     // Simplistic check: if ANY busy slot overlaps or exists in this range, it's unavailable.
@@ -2651,25 +3083,26 @@ app.post('/api/check-availability', async (req, res) => {
       return res.json({
         available: false,
         busySlots: busySlots,
-        message: 'Data indisponível',
-        alternatives: alternatives
+        message: "Data indisponível",
+        alternatives: alternatives,
       });
     }
 
-    return res.json({ available: true, message: 'Data disponível' });
-
+    return res.json({ available: true, message: "Data disponível" });
   } catch (error) {
-    console.error('Calendar check error:', error);
+    console.error("Calendar check error:", error);
     res.status(500).json({ available: false, error: error.message });
   }
 });
 
 // --- Test Endpoint to Create Event ---
-app.post('/api/test-create-event', async (req, res) => {
+app.post("/api/test-create-event", async (req, res) => {
   try {
     const { title, date } = req.body;
 
-    const tokens = await getGoogleAuth(['https://www.googleapis.com/auth/calendar.events']);
+    const tokens = await getGoogleAuth([
+      "https://www.googleapis.com/auth/calendar.events",
+    ]);
 
     // Create event via REST API
     const createUrl = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events`;
@@ -2680,91 +3113,114 @@ app.post('/api/test-create-event', async (req, res) => {
     end.setHours(11, 0, 0, 0); // 11:00 AM
 
     const response = await fetch(createUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${tokens.access_token}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${tokens.access_token}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         summary: title,
-        description: 'Evento de teste criado via Onav API',
-        start: { dateTime: start.toISOString(), timeZone: 'America/Sao_Paulo' },
-        end: { dateTime: end.toISOString(), timeZone: 'America/Sao_Paulo' }
-      })
+        description: "Evento de teste criado via Onav API",
+        start: { dateTime: start.toISOString(), timeZone: "America/Sao_Paulo" },
+        end: { dateTime: end.toISOString(), timeZone: "America/Sao_Paulo" },
+      }),
     });
 
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error?.message || 'Failed to create event');
+    if (!response.ok)
+      throw new Error(data.error?.message || "Failed to create event");
 
     res.json({ success: true, id: data.id, htmlLink: data.htmlLink });
   } catch (error) {
-    console.error('Create event error:', error);
+    console.error("Create event error:", error);
     res.status(500).json({ error: error.message });
   }
 });
 
 // Create pre-reserve calendar event for a proposal
-app.post('/api/calendar/pre-reserve', async (req, res) => {
+app.post("/api/calendar/pre-reserve", async (req, res) => {
   try {
     const { proposalId } = req.body;
 
     if (!proposalId) {
-      return res.status(400).json({ error: 'proposalId is required' });
+      return res.status(400).json({ error: "proposalId is required" });
     }
 
     // Fetch the proposal from Supabase
     const { data: proposal, error: fetchError } = await supabaseAdmin
-      .from('proposals')
-      .select('*')
-      .eq('id', proposalId)
+      .from("proposals")
+      .select("*")
+      .eq("id", proposalId)
       .single();
 
     if (fetchError || !proposal) {
-      console.error('[calendar/pre-reserve] Error fetching proposal:', fetchError);
-      return res.status(404).json({ error: 'Proposal not found' });
+      console.error(
+        "[calendar/pre-reserve] Error fetching proposal:",
+        fetchError,
+      );
+      return res.status(404).json({ error: "Proposal not found" });
     }
 
     if (!proposal.shooting_dates_start) {
-      return res.status(400).json({ error: 'Proposal has no shooting dates' });
+      return res.status(400).json({ error: "Proposal has no shooting dates" });
     }
 
     // Create the pre-reserve event
     const result = await createPreReserveEvent(proposal);
 
     if (result.success) {
-      console.log(`[calendar/pre-reserve] Pre-reserve created for proposal ${proposalId}`);
+      console.log(
+        `[calendar/pre-reserve] Pre-reserve created for proposal ${proposalId}`,
+      );
       res.json({
         success: true,
         eventId: result.eventId,
         htmlLink: result.htmlLink,
-        message: 'Pré-reserva criada no calendário'
+        message: "Pré-reserva criada no calendário",
       });
     } else {
-      console.error('[calendar/pre-reserve] Failed to create event:', result.error);
+      console.error(
+        "[calendar/pre-reserve] Failed to create event:",
+        result.error,
+      );
       res.status(500).json({ error: result.error });
     }
   } catch (error) {
-    console.error('[calendar/pre-reserve] Error:', error);
+    console.error("[calendar/pre-reserve] Error:", error);
     res.status(500).json({ error: error.message });
   }
 });
 // --- End Google Calendar Routes ---
 
 // Import Resend (optional - email features disabled without API key)
-const { Resend } = require('resend');
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
-if (!resend) console.warn('WARNING: RESEND_API_KEY not set - email sending features will be disabled');
+const { Resend } = require("resend");
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
+if (!resend)
+  console.warn(
+    "WARNING: RESEND_API_KEY not set - email sending features will be disabled",
+  );
 
 // Handle contact form submissions
-app.post('/api/send-email', async (req, res) => {
+app.post("/api/send-email", async (req, res) => {
   try {
-    const { name, email, subject, message, phone, company, project, 'equipment-interest': equipmentInterest } = req.body;
+    const {
+      name,
+      email,
+      subject,
+      message,
+      phone,
+      company,
+      project,
+      "equipment-interest": equipmentInterest,
+    } = req.body;
 
     // Basic validation - check for either message or project field
     if (!name || !email || (!message && !project)) {
       return res.status(400).json({
-        error: 'Campos obrigatórios: nome, email e mensagem',
-        message: 'Por favor, preencha todos os campos obrigatórios.'
+        error: "Campos obrigatórios: nome, email e mensagem",
+        message: "Por favor, preencha todos os campos obrigatórios.",
       });
     }
 
@@ -2772,63 +3228,73 @@ app.post('/api/send-email', async (req, res) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({
-        error: 'Email inválido',
-        message: 'Por favor, insira um endereço de email válido.'
+        error: "Email inválido",
+        message: "Por favor, insira um endereço de email válido.",
       });
     }
 
     // Prepare email content
-    const emailContent = message || project || '';
-    const emailSubject = subject || `On+Av Site: Nova Mensagem de Contato de ${name}`;
+    const emailContent = message || project || "";
+    const emailSubject =
+      subject || `On+Av Site: Nova Mensagem de Contato de ${name}`;
 
     // Check if Resend is configured
     if (!resend) {
-      console.log('Email would be sent (Resend not configured):', { name, email, subject: emailSubject });
-      return res.status(503).json({ error: 'Email service not configured', message: 'Serviço de email não disponível no momento.' });
+      console.log("Email would be sent (Resend not configured):", {
+        name,
+        email,
+        subject: emailSubject,
+      });
+      return res
+        .status(503)
+        .json({
+          error: "Email service not configured",
+          message: "Serviço de email não disponível no momento.",
+        });
     }
 
     // Send email using Resend
     const { data, error } = await resend.emails.send({
-      from: 'On+Av Contato <contato@onav.com.br>',
-      to: ['nelsonhdvideo@gmail.com'],
+      from: "On+Av Contato <contato@onav.com.br>",
+      to: ["nelsonhdvideo@gmail.com"],
       subject: emailSubject,
       html: `
         <p>Você recebeu uma nova mensagem do formulário de contato do site On+Av:</p>
         <hr>
         <p><strong>Nome:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
-        ${phone ? `<p><strong>Telefone:</strong> ${phone}</p>` : ''}
-        ${company ? `<p><strong>Empresa:</strong> ${company}</p>` : ''}
+        ${phone ? `<p><strong>Telefone:</strong> ${phone}</p>` : ""}
+        ${company ? `<p><strong>Empresa:</strong> ${company}</p>` : ""}
         <p><strong>Mensagem:</strong></p>
-        <p>${emailContent.replace(/\n/g, '<br>')}</p>
-        ${equipmentInterest ? `<p><strong>Equipamentos de interesse:</strong> ${equipmentInterest}</p>` : ''}
+        <p>${emailContent.replace(/\n/g, "<br>")}</p>
+        ${equipmentInterest ? `<p><strong>Equipamentos de interesse:</strong> ${equipmentInterest}</p>` : ""}
         <hr>
-        <p><em>Enviado via formulário do site em ${new Date().toLocaleString('pt-BR')}.</em></p>
+        <p><em>Enviado via formulário do site em ${new Date().toLocaleString("pt-BR")}.</em></p>
       `,
     });
 
     if (error) {
-      console.error('Resend API Error:', error);
+      console.error("Resend API Error:", error);
       return res.status(400).json({
-        error: 'Erro ao enviar email',
-        message: 'Erro ao enviar o email. Tente novamente mais tarde.',
-        details: error.message
+        error: "Erro ao enviar email",
+        message: "Erro ao enviar o email. Tente novamente mais tarde.",
+        details: error.message,
       });
     }
 
-    console.log('Email sent successfully:', data);
+    console.log("Email sent successfully:", data);
 
     res.json({
       success: true,
-      message: 'Mensagem enviada com sucesso! Entraremos em contato em breve.'
+      message: "Mensagem enviada com sucesso! Entraremos em contato em breve.",
     });
-
   } catch (error) {
-    console.error('Error handling contact form:', error.message);
+    console.error("Error handling contact form:", error.message);
     res.status(500).json({
-      error: 'Erro interno do servidor',
-      message: 'Ocorreu um erro ao processar sua mensagem. Tente novamente mais tarde.',
-      details: error.message
+      error: "Erro interno do servidor",
+      message:
+        "Ocorreu um erro ao processar sua mensagem. Tente novamente mais tarde.",
+      details: error.message,
     });
   }
 });
@@ -2838,66 +3304,69 @@ app.post('/api/send-email', async (req, res) => {
 // --- Public Quote API Routes ---
 
 // Serve public quote page
-app.get('/quote/:slug', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'quote.html'));
+app.get("/quote/:slug", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "quote.html"));
 });
 
 // Serve thank you page
-app.get('/obrigado', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'obrigado.html'));
+app.get("/obrigado", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "obrigado.html"));
 });
 
 // Serve alternative date selection page
-app.get('/escolher-data', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'escolher-data.html'));
+app.get("/escolher-data", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "escolher-data.html"));
 });
 
 // Serve test webhook page
-app.get('/test-webhook', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'test-webhook-local.html'));
+app.get("/test-webhook", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "test-webhook-local.html"));
 });
 
 // Debug endpoint to test slug parsing
-app.get('/api/debug/slug/:slug', async (req, res) => {
+app.get("/api/debug/slug/:slug", async (req, res) => {
   const { slug } = req.params;
-  const isTemporary = slug.startsWith('quote-');
-  const id = isTemporary ? slug.replace('quote-', '') : null;
+  const isTemporary = slug.startsWith("quote-");
+  const id = isTemporary ? slug.replace("quote-", "") : null;
 
   res.json({
     originalSlug: slug,
     isTemporary,
     extractedId: id,
-    lookupMethod: isTemporary ? 'ID-based' : 'slug-based'
+    lookupMethod: isTemporary ? "ID-based" : "slug-based",
   });
 });
 
 // Get public quote data by slug
-app.get('/api/quotes/public/:slug', async (req, res) => {
+app.get("/api/quotes/public/:slug", async (req, res) => {
   try {
     const { slug } = req.params;
 
     if (!slug) {
-      return res.status(400).json({ error: 'Quote slug is required' });
+      return res.status(400).json({ error: "Quote slug is required" });
     }
 
     // Get quote by slug or ID (for temporary slugs)
     let quote = null;
     let error = null;
 
-    console.log('Looking up quote with slug:', slug);
+    console.log("Looking up quote with slug:", slug);
 
     // Check if this is a UUID
-    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
-    const isTemporary = slug.startsWith('quote-');
+    const isUUID =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        slug,
+      );
+    const isTemporary = slug.startsWith("quote-");
 
     if (isUUID || isTemporary) {
-      const id = isTemporary ? slug.replace('quote-', '') : slug;
-      console.log('Detected ID format, looking up by ID:', id);
+      const id = isTemporary ? slug.replace("quote-", "") : slug;
+      console.log("Detected ID format, looking up by ID:", id);
 
       const { data, error: idError } = await supabaseAdmin
-        .from('proposals')
-        .select('*')
-        .eq('id', id)
+        .from("proposals")
+        .select("*")
+        .eq("id", id)
         .single();
 
       if (!idError && data) {
@@ -2907,11 +3376,11 @@ app.get('/api/quotes/public/:slug', async (req, res) => {
 
     // If not found by ID, try slug-based lookup
     if (!quote) {
-      console.log('Trying regular slug lookup for:', slug);
+      console.log("Trying regular slug lookup for:", slug);
       const { data, error: slugError } = await supabaseAdmin
-        .from('proposals')
-        .select('*')
-        .eq('quote_url_slug', slug)
+        .from("proposals")
+        .select("*")
+        .eq("quote_url_slug", slug)
         .single();
 
       quote = data;
@@ -2919,16 +3388,16 @@ app.get('/api/quotes/public/:slug', async (req, res) => {
     }
 
     if (error) {
-      console.error('Error fetching quote:', error);
-      return res.status(404).json({ error: 'Quote not found' });
+      console.error("Error fetching quote:", error);
+      return res.status(404).json({ error: "Quote not found" });
     }
 
     if (!quote) {
-      console.log('No quote found for slug:', slug);
-      return res.status(404).json({ error: 'Quote not found' });
+      console.log("No quote found for slug:", slug);
+      return res.status(404).json({ error: "Quote not found" });
     }
 
-    console.log('Found quote:', quote.id, quote.project_name);
+    console.log("Found quote:", quote.id, quote.project_name);
 
     // Parse services data - it can be stored in multiple places
     let parsedServices = [];
@@ -2936,13 +3405,13 @@ app.get('/api/quotes/public/:slug', async (req, res) => {
     // First, try to parse selected_services column
     if (quote.selected_services) {
       try {
-        if (typeof quote.selected_services === 'string') {
+        if (typeof quote.selected_services === "string") {
           parsedServices = JSON.parse(quote.selected_services);
         } else if (Array.isArray(quote.selected_services)) {
           parsedServices = quote.selected_services;
         }
       } catch (e) {
-        console.error('Error parsing selected_services:', e);
+        console.error("Error parsing selected_services:", e);
       }
     }
 
@@ -2954,7 +3423,7 @@ app.get('/api/quotes/public/:slug', async (req, res) => {
           parsedServices = dashboardData.services;
         }
       } catch (e) {
-        console.error('Error parsing services from discount_description:', e);
+        console.error("Error parsing services from discount_description:", e);
       }
     }
 
@@ -2985,25 +3454,24 @@ app.get('/api/quotes/public/:slug', async (req, res) => {
       discount_amount: quote.discount_amount,
       discount_reason: quote.discount_reason,
       quote_approved: quote.quote_approved,
-      quote_approved_at: quote.quote_approved_at
+      quote_approved_at: quote.quote_approved_at,
     };
 
     res.json({ quote: publicQuote });
-
   } catch (error) {
-    console.error('Error in public quote endpoint:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error in public quote endpoint:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
 // Approve quote by slug
-app.post('/api/quotes/approve/:slug', async (req, res) => {
+app.post("/api/quotes/approve/:slug", async (req, res) => {
   try {
     const { slug } = req.params;
-    const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+    const clientIP = req.ip || req.connection.remoteAddress || "unknown";
 
     if (!slug) {
-      return res.status(400).json({ error: 'Quote slug is required' });
+      return res.status(400).json({ error: "Quote slug is required" });
     }
 
     // First, get the complete quote data (need shooting dates for conflict check)
@@ -3011,17 +3479,20 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
     let fetchError = null;
 
     // Check if this is a UUID
-    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
-    const isTemporary = slug.startsWith('quote-');
+    const isUUID =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        slug,
+      );
+    const isTemporary = slug.startsWith("quote-");
 
     if (isUUID || isTemporary) {
-      const id = isTemporary ? slug.replace('quote-', '') : slug;
-      console.log('Detected ID format for approval, looking up by ID:', id);
+      const id = isTemporary ? slug.replace("quote-", "") : slug;
+      console.log("Detected ID format for approval, looking up by ID:", id);
 
       const { data, error: idError } = await supabaseAdmin
-        .from('proposals')
-        .select('*')
-        .eq('id', id)
+        .from("proposals")
+        .select("*")
+        .eq("id", id)
         .single();
 
       if (!idError && data) {
@@ -3031,11 +3502,11 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
 
     // If not found by ID, try slug-based lookup
     if (!existingQuote) {
-      console.log('Trying regular slug lookup for approval:', slug);
+      console.log("Trying regular slug lookup for approval:", slug);
       const { data, error: slugError } = await supabaseAdmin
-        .from('proposals')
-        .select('*')
-        .eq('quote_url_slug', slug)
+        .from("proposals")
+        .select("*")
+        .eq("quote_url_slug", slug)
         .single();
 
       existingQuote = data;
@@ -3043,59 +3514,75 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
     }
 
     if (fetchError || !existingQuote) {
-      return res.status(404).json({ error: 'Quote not found' });
+      return res.status(404).json({ error: "Quote not found" });
     }
 
     if (existingQuote.quote_approved) {
-      return res.status(400).json({ error: 'Quote has already been approved' });
+      return res.status(400).json({ error: "Quote has already been approved" });
     }
 
     // Check for confirmed booking conflicts on the shooting dates
     if (existingQuote.shooting_dates_start) {
-      console.log(`[quote-approval] Checking calendar conflicts for dates: ${existingQuote.shooting_dates_start} to ${existingQuote.shooting_dates_end || existingQuote.shooting_dates_start}`);
+      console.log(
+        `[quote-approval] Checking calendar conflicts for dates: ${existingQuote.shooting_dates_start} to ${existingQuote.shooting_dates_end || existingQuote.shooting_dates_start}`,
+      );
 
       const conflictCheck = await checkConfirmedBookingConflict(
         existingQuote.shooting_dates_start,
-        existingQuote.shooting_dates_end || existingQuote.shooting_dates_start
+        existingQuote.shooting_dates_end || existingQuote.shooting_dates_start,
       );
 
       if (conflictCheck.hasConflict) {
-        console.log(`[quote-approval] Date conflict found! Blocking approval for quote ${existingQuote.id}`);
+        console.log(
+          `[quote-approval] Date conflict found! Blocking approval for quote ${existingQuote.id}`,
+        );
         // Send WhatsApp notification for Data Indisponível
         try {
-          const whatsappMsg = `⚠️ *DATA INDISPONÍVEL*\n\n📅 *Data Solicitada:* ${existingQuote.shooting_dates_start || 'N/A'}\n👤 *Cliente:* ${existingQuote.client_name || 'N/A'}\n📧 *Email:* ${existingQuote.client_email || 'N/A'}\n📞 *Telefone:* ${existingQuote.client_phone || 'N/A'}\n📋 *Projeto:* ${existingQuote.project_name || 'N/A'}\n\n❌ Cliente tentou reservar data já ocupada!\n🔗 ID: ${existingQuote.id}`;
+          const whatsappMsg = `⚠️ *DATA INDISPONÍVEL*\n\n📅 *Data Solicitada:* ${existingQuote.shooting_dates_start || "N/A"}\n👤 *Cliente:* ${existingQuote.client_name || "N/A"}\n📧 *Email:* ${existingQuote.client_email || "N/A"}\n📞 *Telefone:* ${existingQuote.client_phone || "N/A"}\n📋 *Projeto:* ${existingQuote.project_name || "N/A"}\n\n❌ Cliente tentou reservar data já ocupada!\n🔗 ID: ${existingQuote.id}`;
           await sendWhatsAppNotification(whatsappMsg);
         } catch (whatsappError) {
-          console.warn('WhatsApp notification failed:', whatsappError.message);
+          console.warn("WhatsApp notification failed:", whatsappError.message);
         }
         return res.status(409).json({
-          error: 'date_conflict',
-          message: 'Esta data já está reservada para outra gravação. Um especialista entrará em contato para encontrar uma nova data disponível.',
+          error: "date_conflict",
+          message:
+            "Esta data já está reservada para outra gravação. Um especialista entrará em contato para encontrar uma nova data disponível.",
           conflictingEvents: conflictCheck.conflictingEvents,
-          portugueseMessage: 'Infelizmente, a data selecionada já foi confirmada para outro projeto. Nossa equipe entrará em contato em breve para ajudá-lo a encontrar uma data alternativa.'
+          portugueseMessage:
+            "Infelizmente, a data selecionada já foi confirmada para outro projeto. Nossa equipe entrará em contato em breve para ajudá-lo a encontrar uma data alternativa.",
         });
       }
     }
 
     // No conflict - proceed with approval
     const approvedAt = new Date().toISOString();
-    console.log(`Attempting to approve quote ID: ${existingQuote.id}, IP: ${clientIP}`);
+    console.log(
+      `Attempting to approve quote ID: ${existingQuote.id}, IP: ${clientIP}`,
+    );
 
     // Use parameterized update to prevent SQL injection
     const { error: updateError } = await supabaseAdmin
-      .from('proposals')
+      .from("proposals")
       .update({
         quote_approved: true,
         quote_approved_at: approvedAt,
         quote_approval_ip: clientIP,
-        status: 'approved'
+        status: "approved",
       })
-      .eq('id', existingQuote.id);
+      .eq("id", existingQuote.id);
 
     if (updateError) {
-      console.error('Error updating quote approval:', updateError);
-      console.error('Update error details:', JSON.stringify(updateError, null, 2));
-      return res.status(500).json({ error: 'Failed to approve quote', details: updateError.message });
+      console.error("Error updating quote approval:", updateError);
+      console.error(
+        "Update error details:",
+        JSON.stringify(updateError, null, 2),
+      );
+      return res
+        .status(500)
+        .json({
+          error: "Failed to approve quote",
+          details: updateError.message,
+        });
     }
 
     // Create confirmed booking calendar event
@@ -3104,19 +3591,29 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
       try {
         calendarResult = await createConfirmedBookingEvent(existingQuote);
         if (calendarResult.success) {
-          console.log(`[quote-approval] Confirmed booking calendar event created for quote ${existingQuote.id}`);
+          console.log(
+            `[quote-approval] Confirmed booking calendar event created for quote ${existingQuote.id}`,
+          );
           // Send WhatsApp notification for CONFIRMADO
           try {
-            const whatsappMsg = `✅ *CONFIRMADO*\n\n📋 *Projeto:* ${existingQuote.project_name || 'N/A'}\n👤 *Cliente:* ${existingQuote.client_name || 'N/A'}\n📧 *Email:* ${existingQuote.client_email || 'N/A'}\n📞 *Telefone:* ${existingQuote.client_phone || 'N/A'}\n📅 *Data:* ${existingQuote.shooting_dates_start || 'N/A'}\n💰 *Valor:* ${existingQuote.total_price || 'N/A'}\n\n🎉 Proposta aprovada pelo cliente!\n🔗 ID: ${existingQuote.id}`;
+            const whatsappMsg = `✅ *CONFIRMADO*\n\n📋 *Projeto:* ${existingQuote.project_name || "N/A"}\n👤 *Cliente:* ${existingQuote.client_name || "N/A"}\n📧 *Email:* ${existingQuote.client_email || "N/A"}\n📞 *Telefone:* ${existingQuote.client_phone || "N/A"}\n📅 *Data:* ${existingQuote.shooting_dates_start || "N/A"}\n💰 *Valor:* ${existingQuote.total_price || "N/A"}\n\n🎉 Proposta aprovada pelo cliente!\n🔗 ID: ${existingQuote.id}`;
             await sendWhatsAppNotification(whatsappMsg);
           } catch (whatsappError) {
-            console.warn('WhatsApp notification failed:', whatsappError.message);
+            console.warn(
+              "WhatsApp notification failed:",
+              whatsappError.message,
+            );
           }
         } else {
-          console.warn(`[quote-approval] Failed to create confirmed booking event: ${calendarResult.error}`);
+          console.warn(
+            `[quote-approval] Failed to create confirmed booking event: ${calendarResult.error}`,
+          );
         }
       } catch (calendarError) {
-        console.warn('Calendar event creation failed but quote was approved:', calendarError.message);
+        console.warn(
+          "Calendar event creation failed but quote was approved:",
+          calendarError.message,
+        );
         // Don't fail the approval if calendar fails
       }
     }
@@ -3124,105 +3621,125 @@ app.post('/api/quotes/approve/:slug', async (req, res) => {
     // Get the updated quote data for the response
     let completeQuote = null;
     if (isUUID || isTemporary) {
-      const id = isTemporary ? slug.replace('quote-', '') : slug;
+      const id = isTemporary ? slug.replace("quote-", "") : slug;
       const { data } = await supabaseAdmin
-        .from('proposals')
-        .select('*')
-        .eq('id', id)
+        .from("proposals")
+        .select("*")
+        .eq("id", id)
         .single();
       completeQuote = data;
     }
 
     if (!completeQuote) {
       const { data } = await supabaseAdmin
-        .from('proposals')
-        .select('*')
-        .eq('quote_url_slug', slug)
+        .from("proposals")
+        .select("*")
+        .eq("quote_url_slug", slug)
         .single();
       completeQuote = data;
     }
 
     // TODO: Send approval notification email to admin/sales team
-    console.log(`Quote approved: ${existingQuote.project_name} by client at ${clientIP}`);
+    console.log(
+      `Quote approved: ${existingQuote.project_name} by client at ${clientIP}`,
+    );
 
     // PIPELINE INTEGRATION: Update client stage and create job
     let pipelineResult = null;
     try {
-      pipelineResult = await pipelineIntegration.updateClientAndCreateJob(completeQuote || existingQuote);
+      pipelineResult = await pipelineIntegration.updateClientAndCreateJob(
+        completeQuote || existingQuote,
+      );
       if (pipelineResult.success) {
-        console.log(`[quote-approval] Pipeline updated - Client: ${pipelineResult.client?.id}, Job: ${pipelineResult.job?.id}`);
+        console.log(
+          `[quote-approval] Pipeline updated - Client: ${pipelineResult.client?.id}, Job: ${pipelineResult.job?.id}`,
+        );
       }
     } catch (pipelineError) {
-      console.warn('Pipeline integration failed but quote was approved:', pipelineError.message);
+      console.warn(
+        "Pipeline integration failed but quote was approved:",
+        pipelineError.message,
+      );
     }
 
     res.json({
       success: true,
-      message: 'Quote approved successfully',
+      message: "Quote approved successfully",
       approvedAt: approvedAt,
       quote: completeQuote,
       calendar: calendarResult,
-      pipeline: pipelineResult
+      pipeline: pipelineResult,
     });
-
   } catch (error) {
-    console.error('Error in quote approval endpoint:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error in quote approval endpoint:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
 // Generate URL slug for a proposal
-app.post('/api/proposals/:id/generate-slug', async (req, res) => {
+app.post("/api/proposals/:id/generate-slug", async (req, res) => {
   try {
     const { id } = req.params;
 
     if (!id) {
-      return res.status(400).json({ error: 'Proposal ID is required' });
+      return res.status(400).json({ error: "Proposal ID is required" });
     }
 
     // Check authorization
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      return res.status(401).json({ error: 'No authorization header' });
+      return res.status(401).json({ error: "No authorization header" });
     }
 
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const token = authHeader.replace("Bearer ", "");
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      return res.status(401).json({ error: 'Invalid token' });
+      return res.status(401).json({ error: "Invalid token" });
     }
 
     // Get user profile to determine role
     const { data: userProfile, error: profileError } = await supabaseAdmin
-      .from('user_profiles')
-      .select('role')
-      .eq('id', user.id)
+      .from("user_profiles")
+      .select("role")
+      .eq("id", user.id)
       .single();
 
     // Special handling for master admin
     let userRole = userProfile?.role;
 
-    if (user.email === 'nelson.maluf@onprojecoes.com.br') {
-      userRole = 'admin';
+    if (user.email === "nelson.maluf@onprojecoes.com.br") {
+      userRole = "admin";
     }
 
     // If no profile found but user exists, and it's a known sales rep email, grant sales_rep role
-    if (!userRole && user.email === 'nelson@avdesign.video') {
-      userRole = 'sales_rep';
+    if (!userRole && user.email === "nelson@avdesign.video") {
+      userRole = "sales_rep";
     }
 
-    if (!userRole || !['admin', 'sales_rep'].includes(userRole)) {
-      return res.status(403).json({ error: 'Unauthorized: Only admins and sales reps can generate quote URLs' });
+    if (!userRole || !["admin", "sales_rep"].includes(userRole)) {
+      return res
+        .status(403)
+        .json({
+          error:
+            "Unauthorized: Only admins and sales reps can generate quote URLs",
+        });
     }
 
     // Check if supabaseAdmin is properly configured
     if (!supabaseAdmin) {
-      console.error('Supabase admin client not configured');
-      return res.status(500).json({ error: 'Server configuration error: Admin client not available' });
+      console.error("Supabase admin client not configured");
+      return res
+        .status(500)
+        .json({
+          error: "Server configuration error: Admin client not available",
+        });
     }
 
-    console.log('Fetching proposal with ID:', id);
+    console.log("Fetching proposal with ID:", id);
 
     // Try to get proposal with quote_url_slug first, fallback to basic fields if column doesn't exist
     let proposal = null;
@@ -3230,21 +3747,23 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
 
     try {
       const { data, error } = await supabaseAdmin
-        .from('proposals')
-        .select('project_name, quote_url_slug')
-        .eq('id', id)
+        .from("proposals")
+        .select("project_name, quote_url_slug")
+        .eq("id", id)
         .single();
 
       proposal = data;
       fetchError = error;
     } catch (error) {
       // If quote_url_slug column doesn't exist, try without it
-      if (error.message && error.message.includes('quote_url_slug')) {
-        console.log('quote_url_slug column does not exist, fetching without it');
+      if (error.message && error.message.includes("quote_url_slug")) {
+        console.log(
+          "quote_url_slug column does not exist, fetching without it",
+        );
         const { data, error: basicError } = await supabaseAdmin
-          .from('proposals')
-          .select('project_name')
-          .eq('id', id)
+          .from("proposals")
+          .select("project_name")
+          .eq("id", id)
           .single();
 
         proposal = data ? { ...data, quote_url_slug: null } : null;
@@ -3255,16 +3774,18 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
     }
 
     if (fetchError) {
-      console.error('Database error fetching proposal:', fetchError);
-      return res.status(500).json({ error: 'Database error', details: fetchError.message });
+      console.error("Database error fetching proposal:", fetchError);
+      return res
+        .status(500)
+        .json({ error: "Database error", details: fetchError.message });
     }
 
     if (!proposal) {
-      console.error('Proposal not found for ID:', id);
-      return res.status(404).json({ error: 'Proposal not found' });
+      console.error("Proposal not found for ID:", id);
+      return res.status(404).json({ error: "Proposal not found" });
     }
 
-    console.log('Found proposal:', proposal);
+    console.log("Found proposal:", proposal);
 
     // If already has a slug, return it
     if (proposal.quote_url_slug) {
@@ -3273,36 +3794,40 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
 
     // Generate a simple slug from project name
     function generateSlug(projectName) {
-      if (!projectName || typeof projectName !== 'string') {
-        return 'quote-' + Date.now(); // Fallback slug
+      if (!projectName || typeof projectName !== "string") {
+        return "quote-" + Date.now(); // Fallback slug
       }
-      return projectName
-        .toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, "") // Remove accents (ç -> c, ã -> a, etc)
-        .replace(/[^\w\s-]/g, '') // Remove remaining special characters
-        .replace(/\s+/g, '-')     // Replace spaces with hyphens
-        .replace(/-+/g, '-')      // Replace multiple hyphens with single
-        .trim('-') || 'quote-' + Date.now(); // Fallback if empty
+      return (
+        projectName
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "") // Remove accents (ç -> c, ã -> a, etc)
+          .replace(/[^\w\s-]/g, "") // Remove remaining special characters
+          .replace(/\s+/g, "-") // Replace spaces with hyphens
+          .replace(/-+/g, "-") // Replace multiple hyphens with single
+          .trim("-") || "quote-" + Date.now()
+      ); // Fallback if empty
     }
 
-    console.log('Generating slug for project:', proposal.project_name);
+    console.log("Generating slug for project:", proposal.project_name);
     let baseSlug = generateSlug(proposal.project_name);
     let finalSlug = baseSlug;
     let counter = 1;
-    console.log('Base slug generated:', baseSlug);
+    console.log("Base slug generated:", baseSlug);
 
     // Check for existing slugs and make unique
     while (true) {
       try {
         const { data: existing, error: checkError } = await supabaseAdmin
-          .from('proposals')
-          .select('id')
-          .eq('quote_url_slug', finalSlug)
-          .neq('id', id)
+          .from("proposals")
+          .select("id")
+          .eq("quote_url_slug", finalSlug)
+          .neq("id", id)
           .single();
 
-        if (checkError && checkError.code !== 'PGRST116') { // PGRST116 is "not found" which is what we want
-          console.error('Error checking existing slug:', checkError);
+        if (checkError && checkError.code !== "PGRST116") {
+          // PGRST116 is "not found" which is what we want
+          console.error("Error checking existing slug:", checkError);
           throw checkError;
         }
 
@@ -3310,59 +3835,67 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
 
         finalSlug = `${baseSlug}-${counter}`;
         counter++;
-        console.log('Slug exists, trying:', finalSlug);
+        console.log("Slug exists, trying:", finalSlug);
 
-        if (counter > 100) { // Prevent infinite loop
+        if (counter > 100) {
+          // Prevent infinite loop
           finalSlug = `${baseSlug}-${Date.now()}`;
           break;
         }
       } catch (error) {
-        console.error('Error in slug uniqueness check:', error);
+        console.error("Error in slug uniqueness check:", error);
         finalSlug = `${baseSlug}-${Date.now()}`;
         break;
       }
     }
 
     // Update proposal with the generated slug
-    console.log('Updating proposal with slug:', finalSlug);
+    console.log("Updating proposal with slug:", finalSlug);
 
     try {
       const { error: updateError } = await supabaseAdmin
-        .from('proposals')
+        .from("proposals")
         .update({ quote_url_slug: finalSlug })
-        .eq('id', id);
+        .eq("id", id);
 
       if (updateError) {
         // If the column doesn't exist, create a simple mapping in memory or return a temporary slug
-        if (updateError.message && updateError.message.includes('quote_url_slug')) {
-          console.log('quote_url_slug column does not exist, returning temporary slug');
+        if (
+          updateError.message &&
+          updateError.message.includes("quote_url_slug")
+        ) {
+          console.log(
+            "quote_url_slug column does not exist, returning temporary slug",
+          );
           // For now, return a slug based on the proposal ID - this is a temporary workaround
           const tempSlug = `quote-${id}`;
-          console.log('Using temporary slug (column not found):', tempSlug);
+          console.log("Using temporary slug (column not found):", tempSlug);
           return res.json({ slug: tempSlug });
         } else {
           throw updateError;
         }
       }
 
-      console.log('Successfully generated and saved slug:', finalSlug);
+      console.log("Successfully generated and saved slug:", finalSlug);
       res.json({ slug: finalSlug });
     } catch (updateError) {
-      console.error('Error updating proposal with slug:', updateError);
+      console.error("Error updating proposal with slug:", updateError);
 
       // Fallback: return a temporary slug based on ID
       const tempSlug = `quote-${id}`;
-      console.log('Fallback: using temporary slug due to update error:', tempSlug);
+      console.log(
+        "Fallback: using temporary slug due to update error:",
+        tempSlug,
+      );
       res.json({ slug: tempSlug });
     }
-
   } catch (error) {
-    console.error('Error in generate slug endpoint:', error);
-    console.error('Error stack:', error.stack);
+    console.error("Error in generate slug endpoint:", error);
+    console.error("Error stack:", error.stack);
     res.status(500).json({
-      error: 'Internal server error',
+      error: "Internal server error",
       details: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
     });
   }
 });
@@ -3372,39 +3905,39 @@ app.post('/api/proposals/:id/generate-slug', async (req, res) => {
 // --- End User and Lead Management Routes ---
 
 // Socket.io connection handling (existing code)
-io.on('connection', (socket) => {
-  console.log('A user connected via Socket.IO'); // Clarified log message
+io.on("connection", (socket) => {
+  console.log("A user connected via Socket.IO"); // Clarified log message
 
-  socket.on('disconnect', () => {
-    console.log('Socket.IO user disconnected');
+  socket.on("disconnect", () => {
+    console.log("Socket.IO user disconnected");
   });
 
   // Handle audio data from client
-  socket.on('audioData', async (audioData) => {
+  socket.on("audioData", async (audioData) => {
     try {
       // Here we would process the audio data with OpenAI
       // For now, we'll just echo it back
-      socket.emit('aiResponse', {
-        type: 'audio',
-        data: 'AI response would go here'
+      socket.emit("aiResponse", {
+        type: "audio",
+        data: "AI response would go here",
       });
     } catch (error) {
-      console.error('Error processing audio:', error);
-      socket.emit('error', { message: 'Error processing audio' });
+      console.error("Error processing audio:", error);
+      socket.emit("error", { message: "Error processing audio" });
     }
   });
 
   // Handle text data from client
-  socket.on('textData', async (textData) => {
+  socket.on("textData", async (textData) => {
     try {
       // Here we would process the text data with OpenAI
-      socket.emit('aiResponse', {
-        type: 'text',
-        data: 'AI response to: ' + textData
+      socket.emit("aiResponse", {
+        type: "text",
+        data: "AI response to: " + textData,
       });
     } catch (error) {
-      console.error('Error processing text:', error);
-      socket.emit('error', { message: 'Error processing text' });
+      console.error("Error processing text:", error);
+      socket.emit("error", { message: "Error processing text" });
     }
   });
 });
@@ -3416,17 +3949,18 @@ const sentWebhooks = new Set();
 async function sendProposalWebhook(proposalData) {
   try {
     // Create a unique key for this proposal
-    const webhookKey = `${proposalData.id || 'unknown'}_${Date.now()}`;
+    const webhookKey = `${proposalData.id || "unknown"}_${Date.now()}`;
 
     // Check if we already sent this webhook recently (within 10 seconds)
-    const recentKey = `${proposalData.id || 'unknown'}`;
+    const recentKey = `${proposalData.id || "unknown"}`;
     const now = Date.now();
-    const isRecent = Array.from(sentWebhooks).some(key =>
-      key.startsWith(recentKey) && (now - parseInt(key.split('_')[1])) < 10000
+    const isRecent = Array.from(sentWebhooks).some(
+      (key) =>
+        key.startsWith(recentKey) && now - parseInt(key.split("_")[1]) < 10000,
     );
 
     if (isRecent) {
-      console.log('Skipping duplicate webhook for proposal:', proposalData.id);
+      console.log("Skipping duplicate webhook for proposal:", proposalData.id);
       return;
     }
 
@@ -3436,10 +3970,10 @@ async function sendProposalWebhook(proposalData) {
     // Clean up old entries (keep only last 100)
     if (sentWebhooks.size > 100) {
       const oldestKeys = Array.from(sentWebhooks).slice(0, 50);
-      oldestKeys.forEach(key => sentWebhooks.delete(key));
+      oldestKeys.forEach((key) => sentWebhooks.delete(key));
     }
 
-    console.log('Sending webhook from SERVER for proposal:', proposalData.id);
+    console.log("Sending webhook from SERVER for proposal:", proposalData.id);
 
     const webhookPayload = {
       // Client Information
@@ -3466,7 +4000,7 @@ async function sendProposalWebhook(proposalData) {
       selected_pod_type: proposalData.selected_pod_type,
       selected_services: proposalData.selected_services,
 
-      // LED Configuration Details  
+      // LED Configuration Details
       led_principal_width: proposalData.led_principal_width,
       led_principal_height: proposalData.led_principal_height,
       led_principal_modules: proposalData.led_principal_modules,
@@ -3499,16 +4033,19 @@ async function sendProposalWebhook(proposalData) {
       status: proposalData.status,
 
       // Additional context
-      source: 'onav_led_calculator_server',
+      source: "onav_led_calculator_server",
       timestamp: new Date().toISOString(),
-      webhook_call_id: `server_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      webhook_call_id: `server_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     };
 
-    console.log('Sending proposal webhook to N8N from server:', proposalData.id);
+    console.log(
+      "Sending proposal webhook to N8N from server:",
+      proposalData.id,
+    );
 
     // Send to N8N webhook using GET with query parameters
     const queryParams = new URLSearchParams();
-    Object.keys(webhookPayload).forEach(key => {
+    Object.keys(webhookPayload).forEach((key) => {
       if (webhookPayload[key] !== null && webhookPayload[key] !== undefined) {
         // Convert arrays to string format for URL params
         const value = Array.isArray(webhookPayload[key])
@@ -3520,79 +4057,91 @@ async function sendProposalWebhook(proposalData) {
 
     const webhookUrl = `https://n8n.avauto.fun/webhook/061d8866-fa53-435a-9a5f-ceafb3e2e639?${queryParams.toString()}`;
 
-    console.log('Server webhook URL being called:', webhookUrl);
-    console.log('Server query parameters count:', queryParams.toString().split('&').length);
+    console.log("Server webhook URL being called:", webhookUrl);
+    console.log(
+      "Server query parameters count:",
+      queryParams.toString().split("&").length,
+    );
 
     const response = await fetch(webhookUrl, {
-      method: 'GET'
+      method: "GET",
     });
 
     if (!response.ok) {
-      throw new Error(`Webhook failed: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Webhook failed: ${response.status} ${response.statusText}`,
+      );
     }
 
-    console.log('Webhook sent successfully to N8N from server');
-
+    console.log("Webhook sent successfully to N8N from server");
   } catch (error) {
-    console.error('Error sending webhook to N8N from server:', error);
+    console.error("Error sending webhook to N8N from server:", error);
     throw error;
   }
 }
 
 // Email notification function to send proposal emails using Supabase Edge Function
-async function sendProposalEmailNotification(proposalData, createdByUserId, currentUserRole) {
+async function sendProposalEmailNotification(
+  proposalData,
+  createdByUserId,
+  currentUserRole,
+) {
   try {
-    console.log('Sending proposal email notification from server via Supabase Edge Function');
+    console.log(
+      "Sending proposal email notification from server via Supabase Edge Function",
+    );
 
     // Use supabaseAdmin client for calling Edge Functions (already has service key)
-    const { data, error } = await supabaseAdmin.functions.invoke('send-quote-notification', {
-      body: {
-        proposalId: proposalData.id,
-        createdByUserId: createdByUserId,
-        currentUserRole: currentUserRole
-      }
-    });
+    const { data, error } = await supabaseAdmin.functions.invoke(
+      "send-quote-notification",
+      {
+        body: {
+          proposalId: proposalData.id,
+          createdByUserId: createdByUserId,
+          currentUserRole: currentUserRole,
+        },
+      },
+    );
 
     if (error) {
       throw new Error(`Email notification failed: ${error.message}`);
     }
 
-    console.log('Email notification sent successfully from server:', data);
-
+    console.log("Email notification sent successfully from server:", data);
   } catch (error) {
-    console.error('Error sending email notification from server:', error);
+    console.error("Error sending email notification from server:", error);
     throw error;
   }
 }
 
 // --- Webhook Proxy Endpoint ---
 // Proxy endpoint to handle webhook calls and bypass CORS
-app.post('/api/webhook-proxy', async (req, res) => {
+app.post("/api/webhook-proxy", async (req, res) => {
   try {
     const { targetUrl, payload } = req.body;
 
     if (!targetUrl || !payload) {
-      return res.status(400).json({ error: 'Missing targetUrl or payload' });
+      return res.status(400).json({ error: "Missing targetUrl or payload" });
     }
 
-    console.log('Proxying webhook to:', targetUrl);
-    console.log('Payload:', JSON.stringify(payload, null, 2));
+    console.log("Proxying webhook to:", targetUrl);
+    console.log("Payload:", JSON.stringify(payload, null, 2));
 
     // Import fetch dynamically for Node.js compatibility
-    const fetch = (await import('node-fetch')).default;
+    const fetch = (await import("node-fetch")).default;
 
     const response = await fetch(targetUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'ONAV-Webhook-Proxy/1.0'
+        "Content-Type": "application/json",
+        "User-Agent": "ONAV-Webhook-Proxy/1.0",
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
 
     const responseText = await response.text();
-    console.log('Webhook response status:', response.status);
-    console.log('Webhook response:', responseText);
+    console.log("Webhook response status:", response.status);
+    console.log("Webhook response:", responseText);
 
     // Try to parse as JSON, fallback to text
     let responseData;
@@ -3605,14 +4154,13 @@ app.post('/api/webhook-proxy', async (req, res) => {
     res.status(response.status).json({
       success: response.ok,
       status: response.status,
-      data: responseData
+      data: responseData,
     });
-
   } catch (error) {
-    console.error('Webhook proxy error:', error);
+    console.error("Webhook proxy error:", error);
     res.status(500).json({
-      error: 'Webhook proxy failed',
-      details: error.message
+      error: "Webhook proxy failed",
+      details: error.message,
     });
   }
 });
@@ -3620,10 +4168,12 @@ app.post('/api/webhook-proxy', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 // For local development
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    console.log(`API endpoints for products available at http://localhost:${PORT}/api/products`);
+    console.log(
+      `API endpoints for products available at http://localhost:${PORT}/api/products`,
+    );
   });
 }
 

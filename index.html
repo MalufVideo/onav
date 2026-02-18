@@ -30,6 +30,7 @@
 
   <!-- Hreflang for international targeting -->
   <link rel="alternate" hreflang="pt-br" href="https://onav.com.br/">
+  <link rel="alternate" hreflang="en" href="https://onav.com.br/en/">
   <link rel="alternate" hreflang="x-default" href="https://onav.com.br/">
 
   <!-- Open Graph / Facebook -->
@@ -780,6 +781,7 @@
               class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Estúdio</a>
             <a href="/blog"
               class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200">Blog</a>
+            <a href="/en/" class="text-light-text hover:text-primary px-2 py-2 text-sm font-medium transition-colors duration-200" title="English">🇺🇸 EN</a>
             <a href="#contact"
               class="btn-primary text-sm font-bold px-5 py-2 rounded-md hover:bg-opacity-90 transition-all duration-200">Contato</a>
           </div>
@@ -2512,6 +2514,13 @@
             if (response.ok) {
               messageDiv.classList.add('bg-green-900', 'bg-opacity-30', 'border', 'border-green-500', 'text-green-400');
               messageDiv.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Mensagem enviada com sucesso! Entraremos em contato em breve.';
+              // GA4 Lead Tracking - Contact Form
+              try {
+                if (typeof gtag === 'function') {
+                  gtag('event', 'qualify_lead', { 'event_category': 'contact_form', 'event_label': 'form_submitted' });
+                  gtag('event', 'generate_lead', { 'event_category': 'contact_form', 'event_label': 'homepage_contact' });
+                }
+              } catch(e) {}
               contactForm.reset(); // Clear the form
 
               // Scroll to message
@@ -3090,6 +3099,41 @@
   </div>
 
   <script src="js/modal-loader.js" defer></script>
+
+  <!-- GA4 Newsletter Tracking -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Track newsletter form submissions
+      var nlForms = document.querySelectorAll('[id*="newsletter"]');
+      nlForms.forEach(function(form) {
+        form.addEventListener('submit', function() {
+          try {
+            if (typeof gtag === 'function') {
+              gtag('event', 'newsletter_signup', {
+                'event_category': 'engagement',
+                'event_label': window.location.pathname
+              });
+            }
+          } catch(e) {}
+        });
+      });
+      // Track all WhatsApp link clicks
+      var waLinks = document.querySelectorAll('a[href*="wa.me"]');
+      waLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          try {
+            if (typeof gtag === 'function') {
+              gtag('event', 'whatsapp_click', {
+                'event_category': 'engagement',
+                'event_label': window.location.pathname
+              });
+            }
+          } catch(e) {}
+        });
+      });
+    });
+  </script>
+
 </body>
 
 </html>

@@ -402,5 +402,40 @@
         });
     });
   </script>
+
+  <!-- GA4 Newsletter Tracking -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Track newsletter form submissions
+      var nlForms = document.querySelectorAll('[id*="newsletter"]');
+      nlForms.forEach(function(form) {
+        form.addEventListener('submit', function() {
+          try {
+            if (typeof gtag === 'function') {
+              gtag('event', 'newsletter_signup', {
+                'event_category': 'engagement',
+                'event_label': window.location.pathname
+              });
+            }
+          } catch(e) {}
+        });
+      });
+      // Track all WhatsApp link clicks
+      var waLinks = document.querySelectorAll('a[href*="wa.me"]');
+      waLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          try {
+            if (typeof gtag === 'function') {
+              gtag('event', 'whatsapp_click', {
+                'event_category': 'engagement',
+                'event_label': window.location.pathname
+              });
+            }
+          } catch(e) {}
+        });
+      });
+    });
+  </script>
+
 </body>
 </html>

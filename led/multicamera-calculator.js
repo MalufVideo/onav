@@ -1418,6 +1418,22 @@ class MulticameraCalculator {
       alert(`Proposta salva (ID: ${proposalId}), mas ocorreu um erro crítico ao tentar enviar o email: ${invokeError.message}. Por favor, contate o suporte.`);
     }
 
+    // --- GA4 Lead Tracking ---
+    try {
+      if (typeof gtag === 'function') {
+        gtag('event', 'qualify_lead', {
+          'event_category': 'multicamera_calculator',
+          'event_label': 'quote_submitted',
+          'user_type': isGuestUser ? 'guest' : 'authenticated'
+        });
+        gtag('event', 'generate_lead', {
+          'event_category': 'multicamera_calculator',
+          'event_label': isGuestUser ? 'guest_quote' : 'auth_quote',
+          'currency': 'BRL'
+        });
+      }
+    } catch (gaError) { console.warn('[MulticameraCalc] GA event error:', gaError); }
+
     // --- Success Handling ---
     console.log('[MulticameraCalculator] Resetting cart and showing confirmation...');
 

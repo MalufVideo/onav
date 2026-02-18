@@ -300,6 +300,7 @@
                         <a href="/estudio" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium">Estúdio</a>
                         <a href="/produtos" class="text-light-text hover:text-primary px-3 py-2 text-sm font-medium">Equipamentos</a>
                         <a href="/blog" class="text-primary px-3 py-2 text-sm font-medium">Blog</a>
+                        <a href="/en/" class="text-light-text hover:text-primary px-2 py-2 text-sm font-medium transition-colors duration-200" title="English">🇺🇸 EN</a>
                         <a href="/#contact" class="btn-primary text-sm font-bold px-5 py-2 rounded-md">Contato</a>
                     </div>
                 </div>
@@ -572,6 +573,43 @@
             </div>
 
         </div>
+    
+                <!-- ── Calculator CTA ── -->
+                <div style="
+                    background: linear-gradient(135deg, #0d1b2e 0%, #1a3a5c 100%);
+                    border: 1px solid #2a4a70;
+                    border-radius: 16px;
+                    padding: 40px 32px;
+                    text-align: center;
+                    margin: 48px 0 24px;
+                ">
+                    <p style="font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; color: #5b9bd5; margin: 0 0 8px; font-weight: 600;">
+                        Ferramenta Exclusiva ONAV
+                    </p>
+                    <h3 style="font-size: 1.6rem; color: #ffffff; margin: 0 0 12px; font-weight: 700; line-height: 1.3;">
+                        Simule seu Painel de LED em 3D — Gratuitamente
+                    </h3>
+                    <p style="color: #8fa8c0; font-size: 1rem; margin: 0 0 28px; max-width: 520px; margin-left: auto; margin-right: auto;">
+                        Configure largura, altura e curvatura do seu LED wall e veja o investimento
+                        estimado em tempo real. A única calculadora 3D de LED do Brasil.
+                    </p>
+                    <a href="/led/" style="
+                        display: inline-block;
+                        background: linear-gradient(135deg, #2a5298, #1e3a78);
+                        color: #fff;
+                        padding: 16px 40px;
+                        border-radius: 8px;
+                        text-decoration: none;
+                        font-weight: 700;
+                        font-size: 1.05rem;
+                        letter-spacing: 0.3px;
+                        transition: opacity 0.2s;
+                    ">
+                        Usar a Calculadora de LED →
+                    </a>
+                </div>
+                <!-- ── /Calculator CTA ── -->
+
     </article>
 
     <!-- Footer -->
@@ -588,5 +626,40 @@
             </p>
         </div>
     </footer>
+
+  <!-- GA4 Newsletter Tracking -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Track newsletter form submissions
+      var nlForms = document.querySelectorAll('[id*="newsletter"]');
+      nlForms.forEach(function(form) {
+        form.addEventListener('submit', function() {
+          try {
+            if (typeof gtag === 'function') {
+              gtag('event', 'newsletter_signup', {
+                'event_category': 'engagement',
+                'event_label': window.location.pathname
+              });
+            }
+          } catch(e) {}
+        });
+      });
+      // Track all WhatsApp link clicks
+      var waLinks = document.querySelectorAll('a[href*="wa.me"]');
+      waLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          try {
+            if (typeof gtag === 'function') {
+              gtag('event', 'whatsapp_click', {
+                'event_category': 'engagement',
+                'event_label': window.location.pathname
+              });
+            }
+          } catch(e) {}
+        });
+      });
+    });
+  </script>
+
 </body>
 </html>

@@ -16,6 +16,7 @@
           "tours/**/*",
           "equipamentos-on/**/*",
           "blog/**/*",
+          "en/**/*",
           "*.html",
           "*.xml"
         ]
