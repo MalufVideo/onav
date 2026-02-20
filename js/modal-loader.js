@@ -150,7 +150,8 @@
       { overlay: 'oboticarioPlayOverlay', video: 'oboticarioVideo' },
       { overlay: 'antartidaClipPlayOverlay', video: 'antartidaClipVideo' },
       { overlay: 'antartidaBrunoPlayOverlay', video: 'antartidaBrunoVideo' },
-      { overlay: 'niveaBtsPlayOverlay', video: 'niveaBtsVideo' }
+      { overlay: 'niveaBtsPlayOverlay', video: 'niveaBtsVideo' },
+      { overlay: 'globelezaPlayOverlay', video: 'globelezaVideo' }
     ];
 
     videoConfigs.forEach(function (cfg) {

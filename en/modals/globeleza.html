@@ -1,0 +1,94 @@
+<h3 class="text-xl font-bold mb-2 text-light-text"
+        style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.5rem; color: #f0f0f0;">
+        Carnaval Globeleza 2026 — TV Globo</h3>
+
+      <!-- Video Player -->
+      <div
+        style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+        <div id="globelezaPlayOverlay"
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('/img/carnaval_04.webp'); background-size: cover; background-position: center; cursor: pointer; border-radius: 8px; overflow: hidden; z-index: 2; display: flex; align-items: center; justify-content: center;">
+          <div
+            style="background-color: rgba(0, 0, 0, 0.7); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+            <i class="fas fa-play" style="color: #00ffaa; font-size: 24px; margin-left: 4px;"></i>
+          </div>
+        </div>
+        <video id="globelezaVideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 8px; display: none;" controls>
+          <source data-src="/img/carnaval_globeleza_video.mp4" type="video/mp4">
+        </video>
+      </div>
+
+      <!-- Case Study Content -->
+      <div id="globelezaCaseStudyContent">
+        <p class="text-medium-text text-sm mb-4"
+          style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-bottom: 1rem;">Technical implementation of Augmented Reality (AR) and Stype tracking calibration for the live broadcast of Carnaval Globeleza 2026 on TV Globo, using Disguise VX4 and RXII media servers to drive the LED wall and insert AR into the PGM output.</p>
+
+        <div class="flex flex-wrap gap-2" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono"
+            style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">AR / xR</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono"
+            style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Disguise VX4</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono"
+            style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Disguise RXII</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono"
+            style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Stype Tracking</span>
+          <span class="bg-darker text-primary text-[10px] px-2 py-1 rounded-full font-mono"
+            style="background-color: #121212; color: #00ffaa; font-size: 0.625rem; padding: 0.25rem 0.5rem; border-radius: 9999px; font-family: monospace;">Broadcast</span>
+        </div>
+
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">The Project</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">Carnaval Globeleza 2026 marked yet another edition of TV Globo's iconic carnival broadcast, and On+Av was invited to lead the technical implementation of Augmented Reality and xR in the studio. The invitation came through <strong>Alex Arrabal</strong>, who signed the artwork for this xR implementation. Alex has a long history with Globo and a deep understanding of how the network likes to approach visual aesthetics — the studio looked absolutely amazing.</p>
+
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-top: 15px;">We had the honor of making the entire technical side work: calibrating the Stype tracking system, configuring the Disguise VX4 and RXII servers, and integrating the live feed into the LED wall with AR insertion directly into the PGM (Program Output) of the broadcast.</p>
+
+        <!-- Two Column Image Row -->
+        <div style="display: flex; gap: 10px; margin: 20px 0;">
+          <div style="flex: 1; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/carnaval_03.webp" alt="Globo studio with robotic camera, LED walls with calibration grid and janela mágica, blue stage — preparation for Carnaval Globeleza 2026" width="1280" height="960"
+              style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+          <div style="flex: 1; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <img src="/img/carnaval_04.webp" alt="Globo studio with presenters on blue stage, jib camera and LED wall displaying colorful Carnaval Globeleza 2026 content" width="1280" height="960"
+              style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+          </div>
+        </div>
+
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Calibration & Tracking</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">One of the most critical aspects of the project was the Stype tracking system calibration. For Augmented Reality to work flawlessly during a live broadcast, the camera system needs to know exactly where it is in 3D space on every single frame. Our team calibrated the tracking with millimeter precision, ensuring that virtual elements integrated seamlessly with the real set throughout the entire broadcast.</p>
+
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-top: 15px;">The <strong>Disguise VX4</strong> servers were responsible for processing content in real-time and feeding the LED wall with the artwork created by Alex Arrabal, while the <strong>Disguise RXII</strong> processed the AR layer that was inserted directly into the program signal (PGM), creating the illusion of 3D elements integrated into the real set for viewers at home.</p>
+
+        <!-- Full Width Image - Disguise Workstation -->
+        <div
+          style="width: 100%; margin: 20px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+          <img src="/img/carnaval_01.webp"
+            alt="Disguise workstation with Stype tracking laptop and monitor showing live AR output of Carnaval Globeleza 2026 with virtual scenery" width="1280" height="960"
+            style="width: 100%; display: block;" loading="lazy">
+        </div>
+
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Technical Implementation</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">The technical solution involved a complete real-time processing chain:</p>
+
+        <ul style="list-style-type: disc; padding-left: 20px; color: #cccccc; font-size: 0.9em; margin: 15px 0;">
+          <li style="margin-bottom: 8px;"><strong>Disguise VX4</strong> — primary server feeding the LED wall with real-time content, synchronized with camera tracking</li>
+          <li style="margin-bottom: 8px;"><strong>Disguise RXII</strong> — processing the Augmented Reality layer inserted directly into the PGM</li>
+          <li style="margin-bottom: 8px;"><strong>Stype Tracking</strong> — camera tracking system calibrated with precision for real-time 3D positioning</li>
+          <li style="margin-bottom: 8px;"><strong>Broadcast integration</strong> — live LED wall feed + AR composited into the program signal for national broadcast</li>
+          <li style="margin-bottom: 8px;"><strong>Art direction by Alex Arrabal</strong> — virtual sets created specifically for Globo's xR format</li>
+        </ul>
+
+        <!-- Full Width Image - Live Broadcast Output -->
+        <div
+          style="width: 100%; margin: 20px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+          <img src="/img/carnaval_02.webp"
+            alt="Monitor showing live Carnaval Globeleza 2026 broadcast — presenters on blue stage with AR carnival scenery and escola de samba flag" width="1280" height="960"
+            style="width: 100%; display: block;" loading="lazy">
+        </div>
+
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Live Operation</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">With everything very well calibrated, the operation during the live broadcast was extremely smooth. The entire system worked flawlessly — the tracking responded with precision, the Disguise servers maintained total stability, and the integration between the LED wall content and the AR layer in the PGM was perfect. The on-screen result was a stunning visual experience for millions of viewers.</p>
+
+        <h4 style="color: #f0f0f0; font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Results</h4>
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc;">The partnership between Alex Arrabal's art direction and On+Av's technical implementation resulted in a visually stunning carnival broadcast. The combination of real-time AR with the LED set created an immersive experience that raised the bar for Carnaval Globeleza to a new technological standard.</p>
+
+        <p style="font-size: 0.9em; line-height: 1.6; color: #cccccc; margin-top: 15px;">This project reinforces On+Av's position as a technical reference in xR and AR implementations for live broadcast in Brazil. From tracking calibration to Disguise server operation, every step was executed with the excellence that a national live broadcast demands — and the result was a smooth, flawless operation that delighted audiences across the country.</p>
+      </div>
