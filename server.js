@@ -2961,27 +2961,52 @@ app.get("/test-calendar.html", (req, res) => {
   res.sendFile(path.join(process.cwd(), "test-calendar.html"));
 });
 
-// Public API to fetch quote data by ID (or slug)
+// Public API to fetch quote data by slug or ID
 app.get("/api/quotes/public/:slug", async (req, res) => {
   try {
     const { slug } = req.params;
+    let quote = null;
 
-    // For now, we assume the 'slug' is just the UUID of the proposal.
-    // In a production specific slug implementation, we would query by a 'slug' column.
+    // Check if this is a UUID or temporary slug (quote-<uuid>)
+    const isUUID =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        slug,
+      );
+    const isTemporary = slug.startsWith("quote-");
 
-    const { data, error } = await supabaseAdmin
-      .from("proposals")
-      .select("*")
-      .eq("id", slug)
-      .single();
+    if (isUUID || isTemporary) {
+      const id = isTemporary ? slug.replace("quote-", "") : slug;
+      console.log("Public quote lookup by ID:", id);
+      const { data, error } = await supabaseAdmin
+        .from("proposals")
+        .select("*")
+        .eq("id", id)
+        .single();
 
-    if (error) {
-      console.error("Error fetching public quote:", error);
+      if (!error && data) {
+        quote = data;
+      }
+    }
+
+    // If not found by ID, try slug-based lookup
+    if (!quote) {
+      console.log("Public quote lookup by slug:", slug);
+      const { data, error } = await supabaseAdmin
+        .from("proposals")
+        .select("*")
+        .eq("quote_url_slug", slug)
+        .single();
+
+      if (!error && data) {
+        quote = data;
+      }
+    }
+
+    if (!quote) {
       return res.status(404).json({ error: "Quote not found" });
     }
 
-    // Return only necessary public data (sanitize if needed)
-    res.json({ quote: data });
+    res.json({ quote });
   } catch (error) {
     console.error("Error in public quote API:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -3302,11 +3327,6 @@ app.post("/api/send-email", async (req, res) => {
 // --- End Email API Route ---
 
 // --- Public Quote API Routes ---
-
-// Serve public quote page
-app.get("/quote/:slug", (req, res) => {
-  res.sendFile(path.join(process.cwd(), "quote.html"));
-});
 
 // Serve thank you page
 app.get("/obrigado", (req, res) => {
