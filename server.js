@@ -3740,13 +3740,22 @@ app.post("/api/proposals/:id/generate-slug", async (req, res) => {
       userRole = "sales_rep";
     }
 
-    if (!userRole || !["admin", "sales_rep"].includes(userRole)) {
-      return res
-        .status(403)
-        .json({
-          error:
-            "Unauthorized: Only admins and sales reps can generate quote URLs",
-        });
+    const isPrivileged = userRole && ["admin", "sales_rep"].includes(userRole);
+
+    // If not admin/sales_rep, verify the user owns this proposal
+    if (!isPrivileged) {
+      const { data: ownerCheck } = await supabaseAdmin
+        .from("proposals")
+        .select("id")
+        .eq("id", id)
+        .eq("user_id", user.id)
+        .single();
+
+      if (!ownerCheck) {
+        return res
+          .status(403)
+          .json({ error: "Unauthorized: You can only share your own quotes" });
+      }
     }
 
     // Check if supabaseAdmin is properly configured

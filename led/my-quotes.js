@@ -660,17 +660,40 @@ async function showQuoteDetails(quote) {
   const shareButton = modalContent.querySelector('#share-quote-btn');
   if (shareButton) {
     shareButton.addEventListener('click', async () => {
-      const shareUrl = `${window.location.origin}/quote/${proposalId}`;
+      const originalContent = shareButton.innerHTML;
+      shareButton.innerHTML = 'Gerando link...';
       try {
+        // Get readable slug from API
+        const supabase = window.auth.getSupabaseClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+
+        let shareUrl = `${window.location.origin}/quote/${proposalId}`;
+
+        if (token) {
+          const resp = await fetch(`/api/proposals/${proposalId}/generate-slug`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (resp.ok) {
+            const slugData = await resp.json();
+            shareUrl = `${window.location.origin}/quote/${slugData.slug}`;
+          }
+        }
+
         await navigator.clipboard.writeText(shareUrl);
-        const originalContent = shareButton.innerHTML;
         shareButton.innerHTML = 'Copiado! ✅';
         setTimeout(() => {
           shareButton.innerHTML = originalContent;
         }, 2000);
       } catch (err) {
         console.error('Failed to copy: ', err);
-        alert(`Link da proposta: ${shareUrl}`);
+        shareButton.innerHTML = originalContent;
+        const fallbackUrl = `${window.location.origin}/quote/${proposalId}`;
+        alert(`Link da proposta: ${fallbackUrl}`);
       }
     });
   }
