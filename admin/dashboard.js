@@ -338,7 +338,7 @@ async function loadQuotesPage() {
                 </div>
             </div>
             <table>
-                <thead><tr><th>ID</th><th>Projeto</th><th>Cliente</th><th>Comercial</th><th>Período</th><th>Valor Total</th><th>Status</th><th>Ações</th></tr></thead>
+                <thead><tr><th>ID</th><th>Projeto</th><th>Cliente</th><th>Comercial</th><th>Período</th><th>Valor Total</th><th>Status</th><th>Criado em</th><th>Ações</th></tr></thead>
                 <tbody id="quotesTableBody">${generateQuotesTable(quotes)}</tbody>
             </table>
         </div>`;
@@ -738,7 +738,7 @@ function getExtendedQuoteData(quote) {
 }
 
 function generateQuotesTable(quotes) {
-    if (!quotes || quotes.length === 0) return '<tr><td colspan="8" class="text-center">Nenhum orçamento</td></tr>';
+    if (!quotes || quotes.length === 0) return '<tr><td colspan="9" class="text-center">Nenhum orçamento</td></tr>';
     return quotes.map(quote => `
         <tr data-status="${quote.status}">
             <td>#${quote.id.substring(0, 8)}</td>
@@ -748,6 +748,7 @@ function generateQuotesTable(quotes) {
             <td>${formatDateRange(quote.shooting_dates_start, quote.shooting_dates_end)}</td>
             <td>${quote.total_price || 'N/A'}</td>
             <td><span class="status-badge ${quote.status}">${getStatusLabel(quote.status)}</span></td>
+            <td>${formatDateTime(quote.created_at)}</td>
             <td><div class="action-buttons">
                 <button class="btn btn-sm btn-primary view-quote-btn" data-quote-id="${quote.id}" title="Ver Detalhes"><i class="fas fa-eye"></i></button>
                 <button class="btn btn-sm btn-secondary edit-quote-btn" data-quote-id="${quote.id}" title="Editar"><i class="fas fa-edit"></i></button>
@@ -2104,6 +2105,12 @@ function filterTableByStatus(tableBodyId, status) {
 function formatDate(dateString) {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('pt-BR');
+}
+
+function formatDateTime(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
 function formatDateRange(start, end) {
