@@ -295,12 +295,23 @@ DOM.loginModal.addEventListener('click', (e) => {
 
 // ===== Init =====
 (async function init() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session?.user && isAuthorized(session.user.email)) {
-    updateAuthUI(session.user);
-    loadProfitData();
-  } else {
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) {
+      console.warn('Session check error:', error.message);
+    }
+    if (session?.user && isAuthorized(session.user.email)) {
+      updateAuthUI(session.user);
+      loadProfitData();
+    } else {
+      DOM.loadingIndicator.classList.add('hidden');
+      updateAuthUI(null);
+    }
+  } catch (err) {
+    console.error('Init error:', err);
     DOM.loadingIndicator.classList.add('hidden');
-    updateAuthUI(null);
+    DOM.loginBtn.classList.remove('hidden');
+    DOM.unauthorizedMessage.classList.remove('hidden');
   }
 })();
+
