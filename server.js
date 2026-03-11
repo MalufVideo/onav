@@ -5,6 +5,8 @@ const { Server } = require("socket.io");
 const path = require("path");
 const cors = require("cors");
 const compression = require("compression");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 const PipelineIntegration = require("./pipeline-integration");
@@ -39,8 +41,81 @@ console.log("[pipeline] Pipeline integration module initialized");
 // Middleware to parse JSON bodies
 app.use(express.json());
 
-// Enable CORS for all origins (adjust for production later if needed)
-app.use(cors());
+// Security: Helmet for HTTP security headers
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://cdn.jsdelivr.net",
+          "https://cdnjs.cloudflare.com",
+        ],
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://cdnjs.cloudflare.com",
+          "https://fonts.googleapis.com",
+        ],
+        fontSrc: [
+          "'self'",
+          "https://cdnjs.cloudflare.com",
+          "https://fonts.gstatic.com",
+        ],
+        imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: [
+          "'self'",
+          "https://qhhjvpsxkfjcxitpnhxi.supabase.co",
+          "wss://qhhjvpsxkfjcxitpnhxi.supabase.co",
+        ],
+        frameSrc: ["'self'"],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+  }),
+);
+
+// Security: CORS restricted to actual domains
+const allowedOrigins = [
+  "https://www.onav.com.br",
+  "https://onav.com.br",
+  "https://onav.vercel.app",
+];
+if (process.env.NODE_ENV !== "production") {
+  allowedOrigins.push("http://localhost:3000", "http://127.0.0.1:3000");
+}
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  }),
+);
+
+// Security: Rate limiting
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests, please try again later." },
+});
+app.use("/api/", apiLimiter);
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: "Too many login attempts, please try again later." },
+});
+app.use("/admin/login", authLimiter);
 
 // Enable gzip/brotli compression for all responses (reduces bandwidth by 60-80%)
 app.use(
@@ -85,36 +160,20 @@ const cacheControl = (res, filePath) => {
   }
 };
 
-// Serve static files from root directory
-// Use process.cwd() for Vercel serverless compatibility
-app.use(
-  express.static(path.join(process.cwd()), {
-    setHeaders: cacheControl,
-  }),
-);
-
-// Serve static files from 'admin' directory under the /admin path
-app.use("/admin", express.static(path.join(process.cwd(), "admin")));
-
-// Serve static files from 'led' directory under the /led path
-app.use("/led", express.static(path.join(process.cwd(), "led")));
-
-// Serve static files from 'img' directory under the /img path
-app.use("/img", express.static(path.join(process.cwd(), "img")));
-
-// Serve static files from 'css' directory under the /css path
-app.use("/css", express.static(path.join(process.cwd(), "css")));
-
-// Serve static files from 'js' directory under the /js path
-app.use("/js", express.static(path.join(process.cwd(), "js")));
-
-// Serve static files from 'tours' directory under the /tours path
-app.use("/tours", express.static(path.join(process.cwd(), "tours")));
-
-// Serve static files from 'equipamentos-on' directory under the /equipamentos-on path
+// Serve static files from specific public directories ONLY (not the root)
+// This prevents exposing server.js, package.json, .env files, backups, etc.
+const staticOptions = { setHeaders: cacheControl };
+app.use("/admin", express.static(path.join(process.cwd(), "admin"), staticOptions));
+app.use("/led", express.static(path.join(process.cwd(), "led"), staticOptions));
+app.use("/img", express.static(path.join(process.cwd(), "img"), staticOptions));
+app.use("/css", express.static(path.join(process.cwd(), "css"), staticOptions));
+app.use("/js", express.static(path.join(process.cwd(), "js"), staticOptions));
+app.use("/tours", express.static(path.join(process.cwd(), "tours"), staticOptions));
+app.use("/modals", express.static(path.join(process.cwd(), "modals"), staticOptions));
+app.use("/en", express.static(path.join(process.cwd(), "en"), staticOptions));
 app.use(
   "/equipamentos-on",
-  express.static(path.join(process.cwd(), "equipamentos-on")),
+  express.static(path.join(process.cwd(), "equipamentos-on"), staticOptions),
 );
 
 // Serve Pipeline React app static files (from public/pipeline after build)
@@ -137,12 +196,14 @@ app.get("/admin", (req, res) => {
   res.sendFile(path.join(process.cwd(), "admin", "admin.html"));
 });
 
-// Route to serve the dashboard HTML page (new comprehensive dashboard)
+// Dashboard page routes
+// Security: The dashboard page itself contains NO secrets (service role key removed).
+// Auth is enforced client-side (Supabase session check → redirect to login).
+// All data flows through authenticated API endpoints (requireAdminApi middleware).
 app.get("/dashboard", (req, res) => {
   res.sendFile(path.join(process.cwd(), "admin", "dashboard.html"));
 });
 
-// Route to serve the dashboard at /admin/dashboard (alias)
 app.get("/admin/dashboard", (req, res) => {
   res.sendFile(path.join(process.cwd(), "admin", "dashboard.html"));
 });
@@ -910,6 +971,208 @@ app.get("/api/auth/profile", async (req, res) => {
   }
 });
 
+// ============================================================
+// Admin API middleware - verifies admin/sales_rep via auth token
+// ============================================================
+async function requireAdminApi(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: "No authorization header" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser(token);
+    if (error || !user) {
+      return res.status(401).json({ error: "Invalid token" });
+    }
+
+    const { data: profile } = await supabaseAdmin
+      .from("user_profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    const isMasterAdmin =
+      user.email === "nelson.maluf@onprojecoes.com.br" ||
+      user.email === "nelsonhdvideo@gmail.com";
+    const role = profile?.role || (isMasterAdmin ? "admin" : null);
+
+    if (!role || !["admin", "sales_rep"].includes(role)) {
+      return res.status(403).json({ error: "Insufficient permissions" });
+    }
+
+    req.user = user;
+    req.userRole = role;
+    next();
+  } catch (err) {
+    console.error("[Admin API Auth] Error:", err);
+    return res.status(500).json({ error: "Authentication failed" });
+  }
+}
+
+// ============================================================
+// Master Admin middleware - only nelsonhdvideo@gmail.com allowed
+// ============================================================
+async function requireMasterAdmin(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: "No authorization header" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser(token);
+    if (error || !user) {
+      return res.status(401).json({ error: "Invalid token" });
+    }
+    if (user.email !== "nelsonhdvideo@gmail.com") {
+      return res.status(403).json({ error: "Dashboard restricted to master admin only" });
+    }
+    req.user = user;
+    req.userRole = "master_admin";
+    next();
+  } catch (err) {
+    console.error("[Master Admin Auth] Error:", err);
+    return res.status(500).json({ error: "Authentication failed" });
+  }
+}
+
+// ============================================================
+// Admin Dashboard API endpoints (server-side, no client service key needed)
+// ============================================================
+
+// Dashboard stats (overview cards)
+app.get("/api/admin/stats", requireMasterAdmin, async (req, res) => {
+  try {
+    const today = new Date();
+    const firstDayOfMonth = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      1,
+    ).toISOString();
+
+    const [leadsRes, pendingRes, totalRes, approvedRes, revenueRes] =
+      await Promise.all([
+        supabaseAdmin
+          .from("proposals")
+          .select("id")
+          .gte("created_at", firstDayOfMonth),
+        supabaseAdmin
+          .from("proposals")
+          .select("id")
+          .eq("status", "pending"),
+        supabaseAdmin.from("proposals").select("id"),
+        supabaseAdmin
+          .from("proposals")
+          .select("id")
+          .eq("status", "approved"),
+        supabaseAdmin
+          .from("proposals")
+          .select("total_price")
+          .eq("status", "approved")
+          .gte("created_at", firstDayOfMonth),
+      ]);
+
+    const revenue =
+      revenueRes.data?.reduce((sum, q) => {
+        const val = parseFloat(
+          String(q.total_price || "0")
+            .replace(/[^\d,]/g, "")
+            .replace(",", "."),
+        );
+        return sum + (isNaN(val) ? 0 : val);
+      }, 0) || 0;
+
+    res.json({
+      newLeads: leadsRes.data?.length || 0,
+      pendingQuotes: pendingRes.data?.length || 0,
+      conversionRate:
+        totalRes.data?.length > 0
+          ? Math.round(
+              ((approvedRes.data?.length || 0) / totalRes.data.length) * 100,
+            )
+          : 0,
+      monthlyRevenue: revenue,
+    });
+  } catch (error) {
+    console.error("Error fetching dashboard stats:", error);
+    res.status(500).json({ error: "Failed to fetch stats" });
+  }
+});
+
+// All leads/proposals for the leads page
+app.get("/api/admin/leads", requireMasterAdmin, async (req, res) => {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("proposals")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    res.json(data || []);
+  } catch (error) {
+    console.error("Error fetching leads:", error);
+    res.status(500).json({ error: "Failed to fetch leads" });
+  }
+});
+
+// Recent activities for the overview page
+app.get("/api/admin/recent-activities", requireMasterAdmin, async (req, res) => {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("proposals")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(5);
+    if (error) throw error;
+    res.json(data || []);
+  } catch (error) {
+    console.error("Error fetching recent activities:", error);
+    res.status(500).json({ error: "Failed to fetch recent activities" });
+  }
+});
+
+// Sync missing user profiles (admin only)
+app.post("/api/admin/sync-profiles", requireMasterAdmin, async (req, res) => {
+  try {
+    if (req.userRole !== "admin") {
+      return res.status(403).json({ error: "Admin only" });
+    }
+
+    const { data: authData, error: authError } =
+      await supabaseAdmin.auth.admin.listUsers();
+    if (authError) throw authError;
+
+    const { data: profiles, error: profileError } = await supabaseAdmin
+      .from("user_profiles")
+      .select("id");
+    if (profileError) throw profileError;
+
+    const profileIds = new Set((profiles || []).map((p) => p.id));
+    const missingUsers = authData.users.filter((u) => !profileIds.has(u.id));
+
+    let synced = 0;
+    for (const user of missingUsers) {
+      const { error } = await supabaseAdmin.from("user_profiles").insert({
+        id: user.id,
+        email: user.email,
+        full_name: user.email.split("@")[0],
+        role: "end_user",
+      });
+      if (!error) synced++;
+    }
+
+    res.json({ synced, total: missingUsers.length });
+  } catch (error) {
+    console.error("Error syncing profiles:", error);
+    res.status(500).json({ error: "Failed to sync profiles" });
+  }
+});
+
 // Get all users (admin only)
 app.get("/api/users", async (req, res) => {
   try {
@@ -1063,6 +1326,30 @@ app.post("/api/users", async (req, res) => {
 // Update user profile (admin only)
 app.put("/api/users/:id", async (req, res) => {
   try {
+    // Verify the requester is authenticated and is an admin
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ error: "No authorization header" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
+    if (authErr || !user) {
+      return res.status(401).json({ error: "Invalid token" });
+    }
+
+    // Check if requester is admin
+    const isMasterAdmin = user.email === "nelson.maluf@onprojecoes.com.br" || user.email === "nelsonhdvideo@gmail.com";
+    if (!isMasterAdmin) {
+      const { data: requesterProfile } = await supabaseAdmin
+        .from("user_profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+      if (!requesterProfile || requesterProfile.role !== "admin") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+    }
+
     const { id } = req.params;
     const { full_name, role, is_active, phone } = req.body;
 

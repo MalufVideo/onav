@@ -7,7 +7,8 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 // Authorized users
 const AUTHORIZED_USERS = [
     'carlos.murta@onprojecoes.com.br',
-    'nelsonhdvideo@gmail.com'
+    'nelsonhdvideo@gmail.com',
+    'hugo@onprojecoes.com.br'
 ];
 
 const MASTER_ADMIN = 'nelsonhdvideo@gmail.com';

@@ -1,32 +1,67 @@
 // Dashboard JavaScript - Complete Admin Control System
-// Initialize Supabase with service role key for admin operations
+// NOTE: All admin operations go through server-side API endpoints.
+// The service role key is NEVER exposed to the browser.
 const SUPABASE_URL = 'https://qhhjvpsxkfjcxitpnhxi.supabase.co';
-// Fallback keys (will try to fetch anon key from server)
-let SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1ODk4NzksImV4cCI6MjA1NTE2NTg3OX0.kAcBsHJnlr56fJ6qvXSLOWRiLTnQR7ilXUi_2Qzj4RE';
-const SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczOTU4OTg3OSwiZXhwIjoyMDU1MTY1ODc5fQ.z2VbGSyj6HCxtFyji69JX9uoBw1fRPWM74YSZisdDCU';
 
 let supabaseClient = null;
-let supabaseAdmin = null;
+
+// Helper: get auth token for API calls
+async function getAuthToken() {
+    if (!supabaseClient) return null;
+    const { data } = await supabaseClient.auth.getSession();
+    return data?.session?.access_token || null;
+}
+
+// Helper: make authenticated API call to server
+async function adminApiFetch(endpoint, options = {}) {
+    const token = await getAuthToken();
+    if (!token) throw new Error('Not authenticated');
+    const headers = { ...options.headers, 'Authorization': `Bearer ${token}` };
+    if (options.body && !headers['Content-Type']) {
+        headers['Content-Type'] = 'application/json';
+    }
+    const response = await fetch(endpoint, { ...options, headers });
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({ error: 'Request failed' }));
+        throw new Error(err.error || `HTTP ${response.status}`);
+    }
+    return response.json();
+}
 
 async function initSupabase() {
+    let anonKey = null;
     try {
         console.log('[Dashboard] Fetching Supabase key from server...');
         const response = await fetch('/api/config/supabase-key');
         if (response.ok) {
             const data = await response.json();
             if (data.key) {
-                SUPABASE_ANON_KEY = data.key;
+                anonKey = data.key;
                 console.log('[Dashboard] Supabase anon key loaded from server');
             }
         }
     } catch (e) {
-        console.warn('[Dashboard] Failed to fetch key, using fallback:', e);
+        console.warn('[Dashboard] Failed to fetch key from server:', e);
     }
 
-    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-        auth: { autoRefreshToken: false, persistSession: false }
-    });
+    if (!anonKey) {
+        console.error('[Dashboard] Could not load Supabase key. Dashboard will not work.');
+        return;
+    }
+
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, anonKey);
+}
+
+// XSS sanitization helper - sanitize any user data before inserting into DOM
+function sanitize(str) {
+    if (str === null || str === undefined) return '';
+    if (typeof DOMPurify !== 'undefined') {
+        return DOMPurify.sanitize(String(str), { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+    }
+    // Fallback: escape HTML entities
+    const div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
 }
 
 // Global state
@@ -73,7 +108,16 @@ async function checkAuth() {
         return;
     }
 
-    console.log('[Dashboard] Logged in as:', user.email);
+    // === MASTER ADMIN GATE ===
+    // Dashboard is restricted to master admin only
+    if (user.email !== 'nelsonhdvideo@gmail.com') {
+        console.warn('[Dashboard] Access denied for:', user.email);
+        await supabaseClient.auth.signOut();
+        window.location.href = '/admin/login?error=access_denied';
+        return;
+    }
+
+    console.log('[Dashboard] Master admin access granted:', user.email);
     currentUser = user;
 
     // Get user profile
@@ -85,23 +129,15 @@ async function checkAuth() {
             .single();
 
         if (error) {
-            console.warn('User profile not found, checking if master admin');
-            // Special handling for master admin
-            if (user.email === 'nelson.maluf@onprojecoes.com.br' || user.email === 'nelsonhdvideo@gmail.com') {
-                userProfile = { role: 'admin', full_name: 'Nelson Maluf (Master Admin)' };
-            } else {
-                userProfile = { role: 'end_user', full_name: user.email };
-            }
+            console.warn('User profile not found, using defaults');
+            userProfile = { role: 'admin', full_name: 'Nelson Maluf (Master Admin)' };
         } else {
             userProfile = profile;
-            // Ensure master admin always has admin role
-            if (user.email === 'nelson.maluf@onprojecoes.com.br' || user.email === 'nelsonhdvideo@gmail.com') {
-                userProfile.role = 'admin';
-            }
+            userProfile.role = 'admin'; // Master admin always has admin role
         }
     } catch (error) {
         console.warn('Error fetching user profile:', error);
-        userProfile = { role: 'end_user', full_name: user.email };
+        userProfile = { role: 'admin', full_name: 'Nelson Maluf (Master Admin)' };
     }
 
     // Update UI based on role
@@ -125,45 +161,18 @@ async function checkAuth() {
         console.warn('Error updating admin last login:', updateError);
     }
 
-    // Add admin functions for user management
-    if (userProfile?.role === 'admin' && (user.email === 'nelson.maluf@onprojecoes.com.br' || user.email === 'nelsonhdvideo@gmail.com')) {
-        window.syncMissingProfiles = async () => {
-            try {
-                // Find users in auth.users that don't have profiles
-                const { data: authUsers, error: authError } = await supabaseAdmin.auth.admin.listUsers();
-                if (authError) throw authError;
-
-                const { data: profiles, error: profileError } = await supabaseAdmin
-                    .from('user_profiles')
-                    .select('id');
-                if (profileError) throw profileError;
-
-                const profileIds = new Set(profiles.map(p => p.id));
-                const missingUsers = authUsers.users.filter(u => !profileIds.has(u.id));
-
-                for (const user of missingUsers) {
-                    const { error } = await supabaseClient
-                        .from('user_profiles')
-                        .insert({
-                            id: user.id,
-                            email: user.email,
-                            full_name: user.email.split('@')[0],
-                            role: 'end_user'
-                        });
-
-                    if (error) console.error('Error creating profile for', user.email, error);
-                }
-
-                showToast(`Synced ${missingUsers.length} missing user profiles!`, 'success');
-                if (currentPage === 'users') loadPage('users'); // Refresh if on users page
-            } catch (error) {
-                console.error('Error syncing profiles:', error);
-                showToast('Error syncing profiles: ' + error.message, 'error');
-            }
-        };
-
-        console.log('Admin functions loaded. Run syncMissingProfiles() to sync any missing user profiles');
-    }
+    // Admin sync function (master admin only)
+    window.syncMissingProfiles = async () => {
+        try {
+            const result = await adminApiFetch('/api/admin/sync-profiles', { method: 'POST' });
+            showToast(`Synced ${result.synced} of ${result.total} missing user profiles!`, 'success');
+            if (currentPage === 'users') loadPage('users');
+        } catch (error) {
+            console.error('Error syncing profiles:', error);
+            showToast('Error syncing profiles: ' + error.message, 'error');
+        }
+    };
+    console.log('Master admin functions loaded. Run syncMissingProfiles() if needed.');
 }
 
 // Setup UI based on user role
@@ -286,8 +295,8 @@ async function loadOverviewPage() {
 
 async function loadLeadsPage() {
     pageTitle.textContent = 'Gerenciamento de Leads';
-    // USE ADMIN CLIENT TO SEE ALL LEADS
-    const { data: leads } = await supabaseAdmin.from('proposals').select('*').order('created_at', { ascending: false });
+    // Fetch all leads via server-side admin API
+    const leads = await adminApiFetch('/api/admin/leads');
     pageContent.innerHTML = `
         <div class="data-table">
             <div class="table-header">
@@ -648,35 +657,21 @@ async function loadSettingsPage() {
 
 // Data Fetching & Generation
 async function fetchDashboardStats() {
-    const today = new Date();
-    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1).toISOString();
-
-    // USE ADMIN CLIENT FOR DASHBOARD STATS TO ENSURE VISIBILITY
-    const { data: leads } = await supabaseAdmin.from('proposals').select('id').gte('created_at', firstDayOfMonth);
-    const { data: pending } = await supabaseAdmin.from('proposals').select('id').eq('status', 'pending');
-    const { data: total } = await supabaseAdmin.from('proposals').select('id');
-    const { data: approved } = await supabaseAdmin.from('proposals').select('id').eq('status', 'approved');
-    const { data: revenueData } = await supabaseAdmin.from('proposals').select('total_price').eq('status', 'approved').gte('created_at', firstDayOfMonth);
-    const revenue = revenueData?.reduce((sum, q) => sum + (parseFloat(q.total_price?.replace(/[^\d,]/g, '').replace(',', '.')) || 0), 0) || 0;
-    return {
-        newLeads: leads?.length || 0,
-        pendingQuotes: pending?.length || 0,
-        conversionRate: total?.length > 0 ? Math.round((approved?.length / total?.length) * 100) : 0,
-        monthlyRevenue: revenue
-    };
+    // Fetch stats via server-side admin API
+    return await adminApiFetch('/api/admin/stats');
 }
 
 function generateLeadsTable(leads) {
     if (!leads || leads.length === 0) return '<tr><td colspan="7" class="text-center">Nenhum lead encontrado</td></tr>';
     return leads.map(lead => `
-        <tr data-status="${lead.status || 'new'}">
-            <td>${lead.client_name || 'N/A'}</td><td>${lead.client_company || 'N/A'}</td><td>${lead.project_name || 'N/A'}</td>
-            <td>${formatDate(lead.created_at)}</td><td>${lead.total_price || 'N/A'}</td>
-            <td><span class="status-badge ${lead.status || 'new'}">${getStatusLabel(lead.status || 'new')}</span></td>
+        <tr data-status="${sanitize(lead.status || 'new')}">
+            <td>${sanitize(lead.client_name || 'N/A')}</td><td>${sanitize(lead.client_company || 'N/A')}</td><td>${sanitize(lead.project_name || 'N/A')}</td>
+            <td>${formatDate(lead.created_at)}</td><td>${sanitize(lead.total_price || 'N/A')}</td>
+            <td><span class="status-badge ${sanitize(lead.status || 'new')}">${getStatusLabel(lead.status || 'new')}</span></td>
             <td><div class="action-buttons">
-                <button class="btn btn-sm btn-primary" onclick="viewLeadDetails('${lead.id}')"><i class="fas fa-eye"></i></button>
-                <button class="btn btn-sm btn-secondary" onclick="editQuote('${lead.id}')"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-sm btn-success" onclick="sendWhatsApp('${lead.client_phone}')"><i class="fab fa-whatsapp"></i></button>
+                <button class="btn btn-sm btn-primary" onclick="viewLeadDetails('${sanitize(lead.id)}')"><i class="fas fa-eye"></i></button>
+                <button class="btn btn-sm btn-secondary" onclick="editQuote('${sanitize(lead.id)}')"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm btn-success" onclick="sendWhatsApp('${sanitize(lead.client_phone)}')"><i class="fab fa-whatsapp"></i></button>
             </div></td>
         </tr>`).join('');
 }
@@ -762,24 +757,24 @@ function generateProductsTable(products) {
     if (!products || products.length === 0) return '<tr><td colspan="6" class="text-center">Nenhum produto</td></tr>';
     return products.map(p => `
         <tr>
-            <td>${p.name}</td><td>${p.description || 'N/A'}</td><td>${p.category || 'N/A'}</td>
+            <td>${sanitize(p.name)}</td><td>${sanitize(p.description || 'N/A')}</td><td>${sanitize(p.category || 'N/A')}</td>
             <td>R$ ${p.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td><td>${getUnitTypeLabel(p.unit_type)}</td>
             <td><div class="action-buttons">
-                <button class="btn btn-sm btn-secondary edit-btn" data-id="${p.id}"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-sm btn-danger delete-btn" data-id="${p.id}"><i class="fas fa-trash"></i></button>
+                <button class="btn btn-sm btn-secondary edit-btn" data-id="${sanitize(p.id)}"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm btn-danger delete-btn" data-id="${sanitize(p.id)}"><i class="fas fa-trash"></i></button>
             </div></td>
         </tr>`).join('');
 }
 
 async function generateRecentActivities() {
-    // USE ADMIN CLIENT FOR ACTIVITIES
-    const { data } = await supabaseAdmin.from('proposals').select('*').order('created_at', { ascending: false }).limit(5);
+    // Fetch recent activities via server-side admin API
+    const data = await adminApiFetch('/api/admin/recent-activities');
     if (!data || data.length === 0) return '<tr><td colspan="5" class="text-center">Nenhuma atividade recente</td></tr>';
     return data.map(act => `
         <tr>
-            <td><i class="fas fa-file-invoice"></i> Orçamento</td><td>${act.project_name || 'N/A'}</td>
-            <td>${act.client_name || 'N/A'}</td><td>${formatDate(act.created_at)}</td>
-            <td><span class="status-badge ${act.status}">${getStatusLabel(act.status)}</span></td>
+            <td><i class="fas fa-file-invoice"></i> Orçamento</td><td>${sanitize(act.project_name || 'N/A')}</td>
+            <td>${sanitize(act.client_name || 'N/A')}</td><td>${formatDate(act.created_at)}</td>
+            <td><span class="status-badge ${sanitize(act.status)}">${getStatusLabel(act.status)}</span></td>
         </tr>`).join('');
 }
 
@@ -790,17 +785,17 @@ async function viewLeadDetails(leadId) {
     const content = document.getElementById('leadDetailsContent');
     content.innerHTML = `
         <h3>Detalhes do Lead</h3>
-        <p><strong>Cliente:</strong> ${lead.client_name}</p>
-        <p><strong>Empresa:</strong> ${lead.client_company}</p>
-        <p><strong>Email:</strong> ${lead.client_email}</p>
-        <p><strong>Telefone:</strong> ${lead.client_phone}</p>
-        <p><strong>Projeto:</strong> ${lead.project_name}</p>
+        <p><strong>Cliente:</strong> ${sanitize(lead.client_name)}</p>
+        <p><strong>Empresa:</strong> ${sanitize(lead.client_company)}</p>
+        <p><strong>Email:</strong> ${sanitize(lead.client_email)}</p>
+        <p><strong>Telefone:</strong> ${sanitize(lead.client_phone)}</p>
+        <p><strong>Projeto:</strong> ${sanitize(lead.project_name)}</p>
         <p><strong>Data:</strong> ${formatDate(lead.created_at)}</p>
-        <p><strong>Status:</strong> <span class="status-badge ${lead.status}">${getStatusLabel(lead.status)}</span></p>
+        <p><strong>Status:</strong> <span class="status-badge ${sanitize(lead.status)}">${getStatusLabel(lead.status)}</span></p>
         <hr>
         <h4>Orçamento Inicial</h4>
-        <p><strong>Valor:</strong> ${lead.total_price}</p>
-        <p><strong>Detalhes:</strong> ${lead.led_principal_width}x${lead.led_principal_height}m (Principal), ${lead.led_teto_width}x${lead.led_teto_height}m (Teto)</p>`;
+        <p><strong>Valor:</strong> ${sanitize(lead.total_price)}</p>
+        <p><strong>Detalhes:</strong> ${sanitize(lead.led_principal_width)}x${sanitize(lead.led_principal_height)}m (Principal), ${sanitize(lead.led_teto_width)}x${sanitize(lead.led_teto_height)}m (Teto)</p>`;
     openModal('leadDetailsModal');
 }
 
@@ -2645,15 +2640,15 @@ function generateUsersTable(users) {
         return `
             <tr data-status="${user.is_active ? "active" : "inactive"}" ${!user.has_profile ? 'style="background-color: rgba(234, 179, 8, 0.15);"' : ''}>
                 <td>
-                    ${user.full_name || user.raw_user_meta_data?.name || user.raw_user_meta_data?.full_name || "N/A"}
+                    ${sanitize(user.full_name || user.raw_user_meta_data?.name || user.raw_user_meta_data?.full_name || "N/A")}
                     ${!user.has_profile ? '<br><small style="color: #facc15;"><i class="fas fa-exclamation-triangle"></i> Sem perfil</small>' : ''}
                 </td>
                 <td>
-                    ${user.email || "N/A"}
+                    ${sanitize(user.email || "N/A")}
                     <br><small>${emailConfirmed} ${profileStatus}</small>
                 </td>
-                <td>${phoneNumber}</td>
-                <td>${roleLabel}</td>
+                <td>${sanitize(phoneNumber)}</td>
+                <td>${sanitize(roleLabel)}</td>
                 <td>
                     <span class="status-badge ${user.is_active ? 'active' : 'inactive'}">
                         ${user.is_active ? 'Ativo' : 'Inativo'}
@@ -2867,19 +2862,28 @@ async function saveUser(event, userId) {
 
     try {
         if (userId) {
-            // Update existing user
-            const { error } = await supabaseClient
-                .from("user_profiles")
-                .update({
+            // Update existing user via server-side API (uses service role key to bypass RLS)
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) throw new Error("Not authenticated");
+
+            const response = await fetch(`/api/users/${userId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({
                     full_name: userData.full_name,
                     phone: userData.phone,
                     role: userData.role,
-                    is_active: userData.is_active,
-                    updated_at: new Date().toISOString()
+                    is_active: userData.is_active
                 })
-                .eq("id", userId);
+            });
 
-            if (error) throw error;
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `HTTP ${response.status}`);
+            }
             showToast("Usuário atualizado com sucesso!", "success");
         } else {
             // Create new user via API
@@ -2951,6 +2955,14 @@ async function deleteUser(userId) {
 async function toggleUserStatus(userId) {
     try {
         // Get current user status
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) throw new Error("Not authenticated");
+
+        // First get current status via the same API
+        const getResponse = await fetch('/api/users/auth-data', {
+            headers: { 'Authorization': `Bearer ${session.access_token}` }
+        });
+        // Fall back to supabase client just for reading (reading is OK, writing isn't)
         const { data: user, error: fetchError } = await supabaseClient
             .from("user_profiles")
             .select("is_active")
@@ -2959,17 +2971,21 @@ async function toggleUserStatus(userId) {
 
         if (fetchError) throw fetchError;
 
-        // Toggle status
+        // Toggle status via server-side API (bypasses RLS)
         const newStatus = !user.is_active;
-        const { error } = await supabaseClient
-            .from("user_profiles")
-            .update({
-                is_active: newStatus,
-                updated_at: new Date().toISOString()
-            })
-            .eq("id", userId);
+        const response = await fetch(`/api/users/${userId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${session.access_token}`
+            },
+            body: JSON.stringify({ is_active: newStatus })
+        });
 
-        if (error) throw error;
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP ${response.status}`);
+        }
 
         showToast(`Usuário ${newStatus ? "ativado" : "desativado"} com sucesso!`, "success");
         loadPage("users");
