@@ -1,7 +1,7 @@
 // ===== Supabase Client =====
 const SUPABASE_URL = 'https://qhhjvpsxkfjcxitpnhxi.supabase.co';
 const SUPABASE_ANON_KEY = window.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1ODk4NzksImV4cCI6MjA1NTE2NTg3OX0.kAcBsHJnlr56fJ6qvXSLOWRiLTnQR7ilXUi_2Qzj4RE';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabase;
 
 // ===== Authorized Users =====
 const AUTHORIZED_EMAILS = [
@@ -21,7 +21,6 @@ const AUTHORIZED_EMAILS = [
 const TAX_RATE = 0.166;
 
 // ===== Default Product Mapping: sell product → cost product =====
-// Maps the product name in "products" table to the closest match in "preco_atacado_produtos_on"
 const DEFAULT_PRODUCT_MAPPING = {
   'LED Module':              '2.6mm indoor Absen NT',
   'MX-40 Pro Processor':     'MX-40',
@@ -33,35 +32,7 @@ const DEFAULT_PRODUCT_MAPPING = {
 };
 
 // ===== DOM Elements =====
-const DOM = {
-  loginBtn: document.getElementById('login-btn'),
-  userInfo: document.getElementById('user-info'),
-  userEmail: document.getElementById('user-email'),
-  userRole: document.getElementById('user-role'),
-  logoutBtn: document.getElementById('logout-btn'),
-  loginModal: document.getElementById('login-modal'),
-  loginForm: document.getElementById('login-form'),
-  loginError: document.getElementById('login-error'),
-  cancelLoginBtn: document.getElementById('cancel-login-btn'),
-  unauthorizedMessage: document.getElementById('unauthorized-message'),
-  loadingIndicator: document.getElementById('loading-indicator'),
-  errorMessage: document.getElementById('error-message'),
-  errorText: document.getElementById('error-text'),
-  calculatorContent: document.getElementById('calculator-content'),
-  profitTableBody: document.getElementById('profit-table-body'),
-  // Summary
-  totalRevenue: document.getElementById('total-revenue'),
-  totalCost: document.getElementById('total-cost'),
-  totalTaxes: document.getElementById('total-taxes'),
-  totalProfit: document.getElementById('total-profit'),
-  totalProfitPct: document.getElementById('total-profit-pct'),
-  // Footer
-  footerRevenue: document.getElementById('footer-revenue'),
-  footerCost: document.getElementById('footer-cost'),
-  footerTaxes: document.getElementById('footer-taxes'),
-  footerProfit: document.getElementById('footer-profit'),
-  footerMargin: document.getElementById('footer-margin'),
-};
+const DOM = {};
 
 // ===== Currency Formatting =====
 function formatBRL(value) {
@@ -295,18 +266,20 @@ function renderSummary(rows) {
 }
 
 // ===== Event Listeners =====
-DOM.loginBtn.addEventListener('click', showLoginModal);
-DOM.cancelLoginBtn.addEventListener('click', hideLoginModal);
-DOM.loginForm.addEventListener('submit', handleLogin);
-DOM.logoutBtn.addEventListener('click', handleLogout);
+function setupEventListeners() {
+  DOM.loginBtn.addEventListener('click', showLoginModal);
+  DOM.cancelLoginBtn.addEventListener('click', hideLoginModal);
+  DOM.loginForm.addEventListener('submit', handleLogin);
+  DOM.logoutBtn.addEventListener('click', handleLogout);
 
-// Close modal on background click
-DOM.loginModal.addEventListener('click', (e) => {
-  if (e.target === DOM.loginModal) hideLoginModal();
-});
+  // Close modal on background click
+  DOM.loginModal.addEventListener('click', (e) => {
+    if (e.target === DOM.loginModal) hideLoginModal();
+  });
+}
 
 // ===== Init =====
-(async function init() {
+async function init() {
   try {
     const { data: { session }, error } = await supabase.auth.getSession();
     if (error) {
@@ -325,5 +298,56 @@ DOM.loginModal.addEventListener('click', (e) => {
     DOM.loginBtn.classList.remove('hidden');
     DOM.unauthorizedMessage.classList.remove('hidden');
   }
-})();
+}
 
+// Ensure DOM and external scripts are fully loaded before initializing
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize DOM mapping
+  Object.assign(DOM, {
+    loginBtn: document.getElementById('login-btn'),
+    userInfo: document.getElementById('user-info'),
+    userEmail: document.getElementById('user-email'),
+    userRole: document.getElementById('user-role'),
+    logoutBtn: document.getElementById('logout-btn'),
+    loginModal: document.getElementById('login-modal'),
+    loginForm: document.getElementById('login-form'),
+    loginError: document.getElementById('login-error'),
+    cancelLoginBtn: document.getElementById('cancel-login-btn'),
+    unauthorizedMessage: document.getElementById('unauthorized-message'),
+    loadingIndicator: document.getElementById('loading-indicator'),
+    errorMessage: document.getElementById('error-message'),
+    errorText: document.getElementById('error-text'),
+    calculatorContent: document.getElementById('calculator-content'),
+    profitTableBody: document.getElementById('profit-table-body'),
+    totalRevenue: document.getElementById('total-revenue'),
+    totalCost: document.getElementById('total-cost'),
+    totalTaxes: document.getElementById('total-taxes'),
+    totalProfit: document.getElementById('total-profit'),
+    totalProfitPct: document.getElementById('total-profit-pct'),
+    footerRevenue: document.getElementById('footer-revenue'),
+    footerCost: document.getElementById('footer-cost'),
+    footerTaxes: document.getElementById('footer-taxes'),
+    footerProfit: document.getElementById('footer-profit'),
+    footerMargin: document.getElementById('footer-margin'),
+  });
+
+  // Check if Supabase loaded properly
+  let checks = 0;
+  function waitForSupabase() {
+    if (window.supabase) {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      setupEventListeners();
+      init();
+    } else if (checks < 50) { // Wait up to 5 seconds (50 * 100ms)
+      checks++;
+      setTimeout(waitForSupabase, 100);
+    } else {
+      console.error('Supabase failed to load within 5 seconds.');
+      DOM.loadingIndicator.classList.add('hidden');
+      DOM.errorText.textContent = 'Erro ao carregar banco de dados (Supabase não disponível). Tente recarregar a página.';
+      DOM.errorMessage.classList.remove('hidden');
+    }
+  }
+
+  waitForSupabase();
+});
