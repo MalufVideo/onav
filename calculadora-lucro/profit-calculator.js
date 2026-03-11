@@ -169,7 +169,16 @@ async function loadProfitData() {
     // Build profit rows
     const rows = [];
     sellProducts.forEach(sellProduct => {
-      const sellPrice = parseFloat(sellProduct.price) || 0;
+      let sellPrice = parseFloat(sellProduct.price) || 0;
+      let displayName = sellProduct.name;
+
+      // Special handling for LED Module:
+      // Selling price is per 50x50cm (0.25 sqm) -> mult by 4 to get 1 sqm
+      // Cost price is already per 1 sqm.
+      if (sellProduct.name === 'LED Module') {
+        sellPrice = sellPrice * 4;
+        displayName = 'LED Module (m²)';
+      }
 
       // Find cost product name via mapping
       const costProductName = DEFAULT_PRODUCT_MAPPING[sellProduct.name];
@@ -186,7 +195,7 @@ async function loadProfitData() {
       const margin = sellPrice > 0 ? (profit / sellPrice) * 100 : 0;
 
       rows.push({
-        name: sellProduct.name,
+        name: displayName,
         category: sellProduct.category,
         sellPrice,
         costPrice,
