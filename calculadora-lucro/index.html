@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <!-- Google Analytics 4 + Google Tag Manager -->
+  <script>
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        var ga = document.createElement('script');
+        ga.async = true;
+        ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-HPLPNWR5LS';
+        document.head.appendChild(ga);
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-HPLPNWR5LS');
+      }, 1000);
+    });
+  </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Lucro - ON AV</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .profit-positive { color: #4ade80; }
+    .profit-negative { color: #f87171; }
+    .profit-zero { color: #9ca3af; }
+    .card-glass {
+      background: rgba(31, 41, 55, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(75, 85, 99, 0.4);
+    }
+    .summary-card {
+      background: linear-gradient(135deg, rgba(31, 41, 55, 0.9), rgba(17, 24, 39, 0.95));
+      border: 1px solid rgba(75, 85, 99, 0.5);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .summary-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+    .table-row:hover { background: rgba(55, 65, 81, 0.5); }
+    .tax-badge {
+      background: rgba(251, 191, 36, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(251, 191, 36, 0.3);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+    .fade-in-delay-1 { animation-delay: 0.1s; opacity: 0; }
+    .fade-in-delay-2 { animation-delay: 0.2s; opacity: 0; }
+    .fade-in-delay-3 { animation-delay: 0.3s; opacity: 0; }
+    .fade-in-delay-4 { animation-delay: 0.4s; opacity: 0; }
+  </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-gray-800 p-4 shadow-lg border-b border-gray-700">
+    <div class="container mx-auto flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold flex items-center gap-2">
+          <span class="text-green-400">💰</span> Calculadora de Lucro
+        </h1>
+        <p class="text-gray-400 text-sm mt-1">Análise de margem por produto • Imposto: 16,6%</p>
+      </div>
+      <div id="auth-container" class="flex items-center gap-3">
+        <a href="/equipamentos-on/" class="text-gray-400 hover:text-white text-sm transition-colors mr-3">← Preços Atacado</a>
+        <button id="login-btn" class="hidden bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition-colors">
+          Login
+        </button>
+        <div id="user-info" class="hidden flex items-center gap-3">
+          <div class="text-right">
+            <p id="user-email" class="text-sm font-medium"></p>
+            <p id="user-role" class="text-xs text-gray-400"></p>
+          </div>
+          <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm transition-colors">
+            Sair
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto p-6">
+
+    <!-- Unauthorized message -->
+    <div id="unauthorized-message" class="hidden mb-6 bg-yellow-900 border border-yellow-700 text-yellow-200 px-4 py-3 rounded">
+      <p class="font-bold">Acesso Restrito</p>
+      <p class="text-sm">Faça login com uma conta autorizada para acessar a calculadora de lucro.</p>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" class="text-center py-12">
+      <svg class="animate-spin h-8 w-8 text-blue-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="text-gray-400 mt-2">Carregando dados de preços...</p>
+    </div>
+
+    <!-- Error Message -->
+    <div id="error-message" class="hidden bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded mb-6">
+      <p class="font-bold">Erro ao carregar dados</p>
+      <p class="text-sm" id="error-text"></p>
+    </div>
+
+    <!-- Calculator Content (hidden until authenticated) -->
+    <div id="calculator-content" class="hidden">
+
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="summary-card rounded-xl p-5 fade-in fade-in-delay-1">
+          <p class="text-gray-400 text-xs uppercase tracking-wider mb-1">Receita Total / Dia</p>
+          <p id="total-revenue" class="text-2xl font-bold text-white">R$ 0</p>
+        </div>
+        <div class="summary-card rounded-xl p-5 fade-in fade-in-delay-2">
+          <p class="text-gray-400 text-xs uppercase tracking-wider mb-1">Custo Total / Dia</p>
+          <p id="total-cost" class="text-2xl font-bold text-orange-400">R$ 0</p>
+        </div>
+        <div class="summary-card rounded-xl p-5 fade-in fade-in-delay-3">
+          <p class="text-gray-400 text-xs uppercase tracking-wider mb-1">Impostos 16,6%</p>
+          <p id="total-taxes" class="text-2xl font-bold text-yellow-400">R$ 0</p>
+        </div>
+        <div class="summary-card rounded-xl p-5 fade-in fade-in-delay-4">
+          <p class="text-gray-400 text-xs uppercase tracking-wider mb-1">Lucro Líquido / Dia</p>
+          <p id="total-profit" class="text-2xl font-bold profit-positive">R$ 0</p>
+          <p id="total-profit-pct" class="text-sm text-gray-400 mt-1"></p>
+        </div>
+      </div>
+
+      <!-- Tax Rate Info -->
+      <div class="flex items-center gap-2 mb-4">
+        <span class="tax-badge text-xs font-medium px-3 py-1 rounded-full">Impostos: 16,6%</span>
+        <span class="text-gray-500 text-xs">Aplicado sobre o preço de venda</span>
+      </div>
+
+      <!-- Profit Table -->
+      <div class="card-glass rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-700 bg-gray-800/50">
+                <th class="text-left px-4 py-3 font-semibold text-gray-300">Produto</th>
+                <th class="text-right px-4 py-3 font-semibold text-gray-300">Preço Venda</th>
+                <th class="text-right px-4 py-3 font-semibold text-gray-300">Custo</th>
+                <th class="text-right px-4 py-3 font-semibold text-yellow-400">Impostos 16,6%</th>
+                <th class="text-right px-4 py-3 font-semibold text-green-400">Lucro (R$)</th>
+                <th class="text-right px-4 py-3 font-semibold text-green-400">Margem (%)</th>
+              </tr>
+            </thead>
+            <tbody id="profit-table-body">
+              <!-- Rows generated by JS -->
+            </tbody>
+            <tfoot>
+              <tr class="border-t-2 border-gray-600 bg-gray-800/70 font-bold">
+                <td class="px-4 py-3">TOTAL</td>
+                <td class="text-right px-4 py-3" id="footer-revenue">R$ 0</td>
+                <td class="text-right px-4 py-3" id="footer-cost">R$ 0</td>
+                <td class="text-right px-4 py-3 text-yellow-400" id="footer-taxes">R$ 0</td>
+                <td class="text-right px-4 py-3" id="footer-profit">R$ 0</td>
+                <td class="text-right px-4 py-3" id="footer-margin">0%</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- Data Sources Note -->
+      <div class="mt-6 text-gray-500 text-xs flex items-center gap-2">
+        <span>📊</span>
+        <span>Preços de venda: tabela <strong>products</strong> (calculadora LED) • Custos: tabela <strong>preco_atacado_produtos_on</strong> (preços atacado)</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- Login Modal -->
+  <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+      <h2 class="text-xl font-bold mb-4">Login - Área Restrita</h2>
+      <p class="text-gray-400 text-sm mb-4">Apenas usuários autorizados podem acessar a calculadora de lucro.</p>
+
+      <form id="login-form">
+        <div class="mb-4">
+          <label for="login-email" class="block text-sm font-medium mb-2">Email</label>
+          <input type="email" id="login-email"
+            class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+            placeholder="seu@email.com" required>
+        </div>
+
+        <div class="mb-6">
+          <label for="login-password" class="block text-sm font-medium mb-2">Senha</label>
+          <input type="password" id="login-password"
+            class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+            placeholder="••••••••" required>
+        </div>
+
+        <div class="flex gap-2">
+          <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition-colors">
+            Entrar
+          </button>
+          <button type="button" id="cancel-login-btn"
+            class="flex-1 bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded transition-colors">
+            Cancelar
+          </button>
+        </div>
+      </form>
+
+      <div id="login-error" class="hidden mt-4 bg-red-900 border border-red-700 text-red-200 px-3 py-2 rounded text-sm"></div>
+    </div>
+  </div>
+
+  <script src="profit-calculator.js"></script>
+</body>
+</html>

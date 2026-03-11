@@ -173,29 +173,34 @@
     </div>
 
     <script>
-        // Supabase configuration
+        // Supabase configuration - key loaded from server only, never hardcoded
         const SUPABASE_URL = 'https://qhhjvpsxkfjcxitpnhxi.supabase.co';
-        // Fallback key, but will try to fetch from server first
-        let SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1ODk4NzksImV4cCI6MjA1NTE2NTg3OX0.kAcBsHJnlr56fJ6qvXSLOWRiLTnQR7ilXUi_2Qzj4RE';
 
         let supabaseClient = null;
 
         async function initSupabase() {
+            let anonKey = null;
             try {
                 console.log('Fetching Supabase key from server...');
                 const response = await fetch('/api/config/supabase-key');
                 if (response.ok) {
                     const data = await response.json();
                     if (data.key) {
-                        SUPABASE_ANON_KEY = data.key;
+                        anonKey = data.key;
                         console.log('Supabase key loaded from server');
                     }
                 }
             } catch (e) {
-                console.warn('Failed to fetch Supabase key, using fallback:', e);
+                console.error('Failed to fetch Supabase key:', e);
             }
 
-            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            if (!anonKey) {
+                document.getElementById('errorText').textContent = 'Erro ao carregar configuração. Recarregue a página.';
+                document.getElementById('errorArea').style.display = 'block';
+                return;
+            }
+
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, anonKey);
 
             // Check if already logged in
             const { data: { session } } = await supabaseClient.auth.getSession();

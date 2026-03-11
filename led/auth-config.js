@@ -4,8 +4,7 @@
 // The anon key is safe to use in the browser with Row Level Security (RLS) enabled in Supabase
 // Load from environment variable or fetch from server endpoint
 
-// Fallback anon key (safe to expose - public key protected by RLS)
-const FALLBACK_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1ODk4NzksImV4cCI6MjA1NTE2NTg3OX0.kAcBsHJnlr56fJ6qvXSLOWRiLTnQR7ilXUi_2Qzj4RE';
+// No hardcoded fallback key - must be loaded from server
 
 // Immediate check and async loading
 (async function loadSupabaseKey() {
@@ -36,13 +35,9 @@ const FALLBACK_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3M
   } catch (error) {
     console.error('[auth-config.js] Failed to load Supabase key from server:', error);
 
-    // Use fallback key immediately instead of retrying
-    console.log('[auth-config.js] Using fallback Supabase anon key');
-    window.SUPABASE_KEY = FALLBACK_SUPABASE_ANON_KEY;
-
-    // Dispatch event to notify that config is ready with fallback
+    console.error('[auth-config.js] Could not load Supabase key. Auth will not work.');
+    // Still dispatch event so dependent code can handle the error gracefully
     window.dispatchEvent(new CustomEvent('supabaseConfigReady'));
-    console.log('[auth-config.js] Supabase key loaded successfully (fallback)');
   }
 })();
 

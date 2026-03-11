@@ -186,6 +186,11 @@
         "blogPost": [
           {
             "@type": "BlogPosting",
+            "headline": "Case TV Globo: 4 Prêmios GEMA com Produção Virtual nas Olimpíadas",
+            "url": "https://onav.com.br/blog/case-globo-olimpiadas-gema-awards"
+          },
+          {
+            "@type": "BlogPosting",
             "headline": "O Que é Produção Virtual: Guia Completo 2026",
             "url": "https://onav.com.br/blog/o-que-e-producao-virtual"
           },
@@ -306,6 +311,42 @@
     <section class="py-12 px-4">
       <div class="max-w-7xl mx-auto">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Featured: Case Globo -->
+          <article class="article-card rounded-xl overflow-hidden" style="border-color: rgba(255, 215, 0, 0.3);">
+            <a href="/blog/case-globo-olimpiadas-gema-awards">
+              <img
+                src="/img/blog/case-globo-gema-hero.webp"
+                alt="Case TV Globo - 4 Prêmios GEMA com Produção Virtual nas Olimpíadas"
+                class="w-full h-48 object-cover"
+                loading="lazy"
+                onerror="this.src='/img/hero_background.webp'"
+              />
+            </a>
+            <div class="p-6">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-xs font-semibold uppercase px-2 py-0.5 rounded-full" style="background: rgba(255, 215, 0, 0.15); color: #ffd700;">Case de Sucesso</span>
+                <span class="text-xs text-medium-text">• 12 min de leitura</span>
+              </div>
+              <h2 class="text-xl font-bold mb-3 text-light-text">
+                <a
+                  href="/blog/case-globo-olimpiadas-gema-awards"
+                  class="hover:text-primary transition-colors"
+                >
+                  Case TV Globo: 4 Prêmios Internacionais com Produção Virtual nas Olimpíadas
+                </a>
+              </h2>
+              <p class="text-medium-text text-sm mb-4">
+                Como o projeto "Olympics — I'm The Podium" conquistou Ouro, Prata e Bronze no GEMA Awards 2025 utilizando LED walls e Disguise fornecidos pela On + Av.
+              </p>
+              <a
+                href="/blog/case-globo-olimpiadas-gema-awards"
+                class="text-primary text-sm font-semibold hover:underline"
+              >
+                Ler case completo →
+              </a>
+            </div>
+          </article>
+
           <!-- Article 1 -->
           <article class="article-card rounded-xl overflow-hidden">
             <a href="/blog/o-que-e-producao-virtual">
@@ -771,6 +812,23 @@
       </div>
     </section>
 
+    <!-- Newsletter Section -->
+    <section class="py-16 px-4">
+      <div class="max-w-2xl mx-auto text-center p-10 rounded-2xl" style="background: rgba(15, 15, 15, 0.65); border: 1px solid rgba(255, 255, 255, 0.1);">
+        <h2 class="text-2xl md:text-3xl font-bold mb-3 text-light-text">
+          Receba nossos artigos por email
+        </h2>
+        <p class="text-medium-text mb-8">
+          Conteúdo exclusivo sobre produção virtual, LED e tecnologia AV direto na sua caixa de entrada. Sem spam.
+        </p>
+        <form id="newsletter-blog" class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto" onsubmit="return handleNewsletterSubmit(event)">
+          <input type="email" name="email" required placeholder="seu@email.com" class="flex-1 px-4 py-3 rounded-md border border-gray-700 text-light-text placeholder-gray-500 focus:border-primary focus:outline-none text-sm" style="background: #0a0a0a;">
+          <button type="submit" class="btn-primary font-bold px-6 py-3 rounded-md text-sm whitespace-nowrap">Inscrever-se</button>
+        </form>
+        <p id="newsletter-success" class="text-primary text-sm mt-3 hidden">Obrigado! Você receberá nossos próximos artigos.</p>
+      </div>
+    </section>
+
     <!-- CTA Section -->
     <section class="py-20 px-4">
       <div class="max-w-4xl mx-auto text-center">
@@ -806,10 +864,30 @@
       </div>
     </footer>
 
-    <!-- GA4 Newsletter Tracking -->
+    <!-- Newsletter Handler -->
+    <script>
+      function handleNewsletterSubmit(e) {
+        e.preventDefault();
+        var form = e.target;
+        var email = form.querySelector('input[name="email"]').value;
+        var subscribers = JSON.parse(localStorage.getItem('onav_newsletter') || '[]');
+        subscribers.push({ email: email, date: new Date().toISOString(), source: window.location.pathname });
+        localStorage.setItem('onav_newsletter', JSON.stringify(subscribers));
+        form.style.display = 'none';
+        document.getElementById('newsletter-success').classList.remove('hidden');
+        try {
+          if (typeof gtag === "function") {
+            gtag("event", "newsletter_signup", { event_category: "engagement", event_label: window.location.pathname });
+          }
+        } catch(e) {}
+        return false;
+      }
+    </script>
+
+    <!-- GA4 Tracking -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        // Track newsletter form submissions
+        // Track newsletter form submissions (legacy)
         var nlForms = document.querySelectorAll('[id*="newsletter"]');
         nlForms.forEach(function (form) {
           form.addEventListener("submit", function () {
