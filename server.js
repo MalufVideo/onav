@@ -198,6 +198,10 @@ app.use(
   "/equipamentos-on",
   express.static(path.join(process.cwd(), "equipamentos-on"), staticOptions),
 );
+app.use(
+  "/calculadora-lucro",
+  express.static(path.join(process.cwd(), "calculadora-lucro"), staticOptions),
+);
 
 // Serve Pipeline React app static files (from public/pipeline after build)
 // Use process.cwd() for Vercel serverless compatibility
@@ -212,6 +216,11 @@ app.get("/pipeline/*", (req, res) => {
 // Route to serve equipamentos-on index page
 app.get("/equipamentos-on", (req, res) => {
   res.sendFile(path.join(process.cwd(), "equipamentos-on", "index.html"));
+});
+
+// Route to serve calculadora-lucro index page
+app.get("/calculadora-lucro", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "calculadora-lucro", "index.html"));
 });
 
 // Route to serve the admin HTML page (old product admin)
