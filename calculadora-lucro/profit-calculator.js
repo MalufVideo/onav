@@ -1,6 +1,6 @@
 // ===== Supabase Client =====
 const SUPABASE_URL = 'https://qhhjvpsxkfjcxitpnhxi.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE4NTQ0NjIsImV4cCI6MjA0NzQzMDQ2Mn0.VAbvscPOPRMJLQk5E_4x7IuuWKdvRj1F12_6xXP03Tk';
+const SUPABASE_ANON_KEY = window.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoaGp2cHN4a2ZqY3hpdHBuaHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1ODk4NzksImV4cCI6MjA1NTE2NTg3OX0.kAcBsHJnlr56fJ6qvXSLOWRiLTnQR7ilXUi_2Qzj4RE';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ===== Authorized Users =====
@@ -11,7 +11,10 @@ const AUTHORIZED_EMAILS = [
   'hugowschramm@outlook.com',
   'bernardo@onav.com.br',
   'projetos@onav.com.br',
-  'financeiro@onav.com.br'
+  'financeiro@onav.com.br',
+  'carlos.murta@onprojecoes.com.br',
+  'nelsonhdvideo@gmail.com',
+  'hugo@onprojecoes.com.br'
 ];
 
 // ===== Tax Rate =====
