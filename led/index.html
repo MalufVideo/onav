@@ -576,62 +576,6 @@
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Reset time to start of day
 
-        // Initialize date pickers
-        flatpickr("#shooting-dates-start", {
-          dateFormat: "d/m/Y",
-          locale: "pt",
-          allowInput: false,
-          disableMobile: true,
-          minDate: today, // Prevent selecting past dates
-          onChange: function (selectedDates, dateStr, instance) {
-            // Enable the end date picker after selecting a start date
-            const endDatePicker = flatpickr("#shooting-dates-end");
-            endDatePicker.set("minDate", selectedDates[0]);
-
-            // Update the proposal summary to reflect the price changes
-            if (document.getElementById('shooting-dates-end').value) {
-              window.setTimeout(() => {
-                if (typeof updateProposalSummary === 'function') {
-                  updateProposalSummary();
-                }
-              }, 100);
-            }
-          }
-        });
-
-        flatpickr("#shooting-dates-end", {
-          dateFormat: "d/m/Y",
-          locale: "pt",
-          allowInput: false,
-          disableMobile: true,
-          minDate: today, // Prevent selecting past dates
-          onReady: function (selectedDates, dateStr, instance) {
-            // Force format to d/m/Y for any pre-existing value
-            const input = instance.input;
-            if (input.value && input.value.includes('-')) {
-              const date = new Date(input.value);
-              if (!isNaN(date)) {
-                const day = date.getDate().toString().padStart(2, '0');
-                const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                const year = date.getFullYear();
-                input.value = `${day}/${month}/${year}`;
-                instance.selectedDates[0] = date;
-                instance.latestSelectedDateObj = date;
-              }
-            }
-          },
-          onChange: function (selectedDates, dateStr, instance) {
-            // Update the proposal summary to reflect the price changes
-            if (document.getElementById('shooting-dates-start').value) {
-              window.setTimeout(() => {
-                if (typeof updateProposalSummary === 'function') {
-                  updateProposalSummary();
-                }
-              }, 100);
-            }
-          }
-        });
-
         // --- Initialize Flatpickr for the Quote Cart Modal ---
         const cartStartDatePicker = flatpickr("#cart-shooting-dates-start", {
           dateFormat: "d/m/Y",
