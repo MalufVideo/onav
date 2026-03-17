@@ -409,7 +409,7 @@ class QuoteCartModal {
     show() {
         ledLog('[QuoteCartModal] show() method called.');
         if (this.modalElement) {
-            this.modalElement.style.display = 'block';
+            this.modalElement.style.display = 'flex';
             // Show/hide guest info form based on auth status
             const guestForm = document.getElementById('guest-info-form');
             if (guestForm) {

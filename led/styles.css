@@ -1195,9 +1195,9 @@ input[type="range"]::-moz-range-thumb {
   border-left: 3px solid #0066cc;
 }
 
-/* Flatpickr z-index fix: calendar must render above modal overlay (z-index 1000) */
+/* Flatpickr z-index fix: calendar must render well above modal overlay (z-index 1000) */
 .flatpickr-calendar {
-  z-index: 1001 !important;
+  z-index: 10001 !important;
 }
 
 /* Adjust modal vertical position: center but slightly lower */

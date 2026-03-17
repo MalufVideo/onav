@@ -53,6 +53,7 @@ app.use(
           "'unsafe-eval'",
           "https://cdn.tailwindcss.com",
           "https://cdn.jsdelivr.net",
+
           "https://cdnjs.cloudflare.com",
           "https://www.googletagmanager.com",
           "https://www.google.com",
@@ -64,6 +65,7 @@ app.use(
           "'self'",
           "'unsafe-inline'",
           "https://cdn.tailwindcss.com",
+          "https://cdn.jsdelivr.net",
           "https://cdnjs.cloudflare.com",
           "https://fonts.googleapis.com",
         ],

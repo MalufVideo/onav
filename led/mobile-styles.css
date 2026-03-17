@@ -580,7 +580,7 @@ body {
 /* Flatpickr Mobile Adjustments */
 .flatpickr-calendar {
   font-size: 14px;
-  z-index: 1001 !important;
+  z-index: 10001 !important;
 }
 
 .flatpickr-day {

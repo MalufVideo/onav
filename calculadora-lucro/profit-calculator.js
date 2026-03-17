@@ -31,6 +31,11 @@ const DEFAULT_PRODUCT_MAPPING = {
   'Estúdio':                 'Estúdio',
 };
 
+// ===== Global Data Cache =====
+let allCostProducts = [];
+let allSellProducts = [];
+let costLookupObj = {};
+
 // ===== DOM Elements =====
 const DOM = {};
 
@@ -128,18 +133,32 @@ async function loadProfitData() {
     if (sellResult.error) throw sellResult.error;
     if (costResult.error) throw costResult.error;
 
-    const sellProducts = sellResult.data;
-    const costProducts = costResult.data;
+    allSellProducts = sellResult.data;
+    allCostProducts = costResult.data;
 
     // Build cost lookup
-    const costLookup = {};
-    costProducts.forEach(p => {
-      costLookup[p.product_name] = parseFloat(p.daily_rental_price) || 0;
+    costLookupObj = {};
+    allCostProducts.forEach(p => {
+      costLookupObj[p.product_name] = parseFloat(p.daily_rental_price) || 0;
     });
 
-    // Build profit rows
+    renderDefaultProducts();
+
+    DOM.loadingIndicator.classList.add('hidden');
+    DOM.calculatorContent.classList.remove('hidden');
+
+  } catch (err) {
+    console.error('Error loading profit data:', err);
+    DOM.loadingIndicator.classList.add('hidden');
+    DOM.errorText.textContent = err.message || 'Erro desconhecido.';
+    DOM.errorMessage.classList.remove('hidden');
+  }
+}
+
+// ===== Logic & Rendering =====
+function renderDefaultProducts() {
     const rows = [];
-    sellProducts.forEach(sellProduct => {
+    allSellProducts.forEach(sellProduct => {
       let sellPrice = parseFloat(sellProduct.price) || 0;
       let displayName = sellProduct.name;
 
@@ -156,8 +175,8 @@ async function loadProfitData() {
       let costPrice = 0;
       let costSource = '';
 
-      if (costProductName && costLookup.hasOwnProperty(costProductName)) {
-        costPrice = costLookup[costProductName];
+      if (costProductName && costLookupObj.hasOwnProperty(costProductName)) {
+        costPrice = costLookupObj[costProductName];
         costSource = costProductName;
       }
 
@@ -180,16 +199,104 @@ async function loadProfitData() {
 
     renderTable(rows);
     renderSummary(rows);
+}
 
-    DOM.loadingIndicator.classList.add('hidden');
-    DOM.calculatorContent.classList.remove('hidden');
+function parseWhatsAppText(text) {
+  const lines = text.split('\n');
+  const items = [];
+  
+  lines.forEach(line => {
+    if (!line.includes('R$') || line.toLowerCase().includes('investimento total')) return;
+    
+    let parts = line.split(':');
+    let name = parts[0].trim();
+    let rest = parts.length > 1 ? parts.slice(1).join(':') : name;
+    
+    if (parts.length === 1) {
+       name = line.split('R$')[0].trim();
+       rest = line;
+    }
 
-  } catch (err) {
-    console.error('Error loading profit data:', err);
-    DOM.loadingIndicator.classList.add('hidden');
-    DOM.errorText.textContent = err.message || 'Erro desconhecido.';
-    DOM.errorMessage.classList.remove('hidden');
-  }
+    let quantity = 1;
+    const qtyMatch = rest.match(/(\d+)\s*=/);
+    if (qtyMatch) quantity = parseInt(qtyMatch[1], 10);
+    if (line.toLowerCase().includes('+backup')) quantity += 1;
+
+    const match = rest.match(/R\$\s*([\d\.,]+)/);
+    if (match) {
+      const valueStr = match[1].replace(/\./g, '').replace(',', '.');
+      const sellPrice = parseFloat(valueStr);
+      items.push({ originalName: name, quantity, sellPrice });
+    }
+  });
+  return items;
+}
+
+function handleWhatsAppParse() {
+   const text = DOM.whatsappInput.value;
+   if (!text.trim()) {
+      renderDefaultProducts();
+      return;
+   }
+   
+   const parsedItems = parseWhatsAppText(text);
+   const rows = [];
+   
+   parsedItems.forEach(item => {
+      let costPrice = 0;
+      let costSource = '';
+      let hasCostMapping = false;
+      
+      let mappedName = '';
+      const originalLower = item.originalName.toLowerCase();
+      if (originalLower.includes('painel de led')) mappedName = '2.6mm indoor Absen NT';
+      else if (originalLower.includes('processadora')) mappedName = 'MX-40';
+      else if (originalLower.includes('disguise vx')) mappedName = 'disguise VX4';
+      else if (originalLower.includes('disguise rx')) mappedName = 'disguise RXII';
+      else if (originalLower.includes('camera tracking')) mappedName = 'Stype RedSpy';
+      else if (originalLower.includes('estúdio')) mappedName = 'Estúdio';
+      
+      if (mappedName && costLookupObj.hasOwnProperty(mappedName)) {
+         const unitCost = costLookupObj[mappedName];
+         if (mappedName === '2.6mm indoor Absen NT') {
+             const stdSellProduct = allSellProducts.find(p => p.name === 'LED Module');
+             const stdSellPricePerM2 = stdSellProduct ? (parseFloat(stdSellProduct.price) || 0) * 4 : 4000;
+             const estimatedM2 = item.sellPrice / (stdSellPricePerM2 || 4000);
+             costPrice = unitCost * estimatedM2;
+             costSource = `2.6mm indoor Absen NT (est. ${estimatedM2.toFixed(1)}m²)`;
+             hasCostMapping = true;
+         } else {
+             costPrice = unitCost * item.quantity;
+             costSource = mappedName + (item.quantity > 1 ? ` (x${item.quantity})` : '');
+             hasCostMapping = true;
+         }
+      }
+      
+      const taxes = item.sellPrice * TAX_RATE;
+      const profit = item.sellPrice - costPrice - taxes;
+      const margin = item.sellPrice > 0 ? (profit / item.sellPrice) * 100 : 0;
+      const category = (originalLower.includes('equipe') || originalLower.includes('frete')) ? 'Serviços Orçamento VP' : 'Equipamentos Orçamento VP';
+
+      rows.push({
+        name: item.originalName + (item.quantity > 1 ? ` (x${item.quantity})` : ''),
+        category: category,
+        sellPrice: item.sellPrice,
+        costPrice,
+        costSource,
+        taxes,
+        profit,
+        margin,
+        hasCostMapping
+      });
+   });
+   
+   renderTable(rows);
+   renderSummary(rows);
+}
+
+function clearWhatsAppParse() {
+   DOM.whatsappInput.value = '';
+   renderDefaultProducts();
 }
 
 // ===== Rendering =====
@@ -271,6 +378,8 @@ function setupEventListeners() {
   DOM.cancelLoginBtn.addEventListener('click', hideLoginModal);
   DOM.loginForm.addEventListener('submit', handleLogin);
   DOM.logoutBtn.addEventListener('click', handleLogout);
+  if (DOM.parseWhatsAppBtn) DOM.parseWhatsAppBtn.addEventListener('click', handleWhatsAppParse);
+  if (DOM.clearWhatsAppBtn) DOM.clearWhatsAppBtn.addEventListener('click', clearWhatsAppParse);
 
   // Close modal on background click
   DOM.loginModal.addEventListener('click', (e) => {
@@ -316,6 +425,9 @@ document.addEventListener('DOMContentLoaded', () => {
     unauthorizedMessage: document.getElementById('unauthorized-message'),
     loadingIndicator: document.getElementById('loading-indicator'),
     errorMessage: document.getElementById('error-message'),
+    whatsappInput: document.getElementById('whatsapp-input'),
+    parseWhatsAppBtn: document.getElementById('parse-whatsapp-btn'),
+    clearWhatsAppBtn: document.getElementById('clear-whatsapp-btn'),
     errorText: document.getElementById('error-text'),
     calculatorContent: document.getElementById('calculator-content'),
     profitTableBody: document.getElementById('profit-table-body'),
