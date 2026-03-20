@@ -381,8 +381,12 @@ function renderProducts(products) {
         categoryMap[product.category].push(product);
     });
 
-    // Create sections for each category
-    Object.keys(categoryMap).sort().forEach(categoryName => {
+    // Define row layout: Row 1 = LED + Processamento, Row 2 = Projetores + Lentes + Estúdio
+    const row1Categories = ['LED', 'Processamento'];
+    const row2Categories = ['Projetores', 'Lentes', 'Estúdio'];
+
+    // Helper to create a category section
+    function createCategorySection(categoryName, categoryProducts) {
         const section = document.createElement('section');
         section.className = 'flex flex-col';
         section.id = `${categoryName.toLowerCase().replace(/\s+/g, '-')}-section`;
@@ -395,15 +399,50 @@ function renderProducts(products) {
         productsDiv.className = 'flex flex-col gap-1.5';
         productsDiv.id = `${categoryName.toLowerCase().replace(/\s+/g, '-')}-products`;
 
-        // Add products to this category
-        categoryMap[categoryName].forEach(product => {
+        categoryProducts.forEach(product => {
             productsDiv.appendChild(createProductCard(product));
         });
 
         section.appendChild(header);
         section.appendChild(productsDiv);
-        productsContainer.appendChild(section);
+        return section;
+    }
+
+    // Row 1: LED + Processamento (2 columns)
+    const row1 = document.createElement('div');
+    row1.className = 'grid grid-cols-1 md:grid-cols-2 gap-6';
+    row1Categories.forEach(categoryName => {
+        if (categoryMap[categoryName]) {
+            row1.appendChild(createCategorySection(categoryName, categoryMap[categoryName]));
+        }
     });
+    if (row1.children.length > 0) {
+        productsContainer.appendChild(row1);
+    }
+
+    // Row 2: Projetores + Lentes + Estúdio (3 columns)
+    const row2 = document.createElement('div');
+    row2.className = 'grid grid-cols-1 md:grid-cols-3 gap-6';
+    row2Categories.forEach(categoryName => {
+        if (categoryMap[categoryName]) {
+            row2.appendChild(createCategorySection(categoryName, categoryMap[categoryName]));
+        }
+    });
+    if (row2.children.length > 0) {
+        productsContainer.appendChild(row2);
+    }
+
+    // Any remaining categories not in the predefined rows
+    const allDefinedCategories = [...row1Categories, ...row2Categories];
+    const remainingCategories = Object.keys(categoryMap).filter(c => !allDefinedCategories.includes(c)).sort();
+    if (remainingCategories.length > 0) {
+        const row3 = document.createElement('div');
+        row3.className = 'grid grid-cols-1 md:grid-cols-3 gap-6';
+        remainingCategories.forEach(categoryName => {
+            row3.appendChild(createCategorySection(categoryName, categoryMap[categoryName]));
+        });
+        productsContainer.appendChild(row3);
+    }
 
     // Update auth UI to enable/disable editing
     updateAuthUI();
